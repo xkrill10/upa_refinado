@@ -1,0 +1,10 @@
+{
+  "name": "UPA Control v1.2",
+  "description": "Sistema de Gestão Operacional de UPA com Painel de Chamadas e Controle de Setores",
+  "requestFramePermissions": [
+    "camera",
+    "microphone",
+    "geolocation"
+  ],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
