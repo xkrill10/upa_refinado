@@ -621,9 +621,9 @@ export default function PatientEvolution() {
       <div className="glass-card-premium border border-white/40 dark:border-white/10 p-1.5 rounded-2xl flex flex-wrap gap-1.5 items-center bg-white/20 dark:bg-slate-900/20 backdrop-blur-md shadow-sm">
         {[
           { id: "all", label: "Histórico Geral", icon: <History className="h-3.5 w-3.5" /> },
+          { id: "vitals", label: "Sinais Vitais", icon: <Activity className="h-3.5 w-3.5" /> },
           { id: "evolutions", label: "Evoluções", icon: <MessageSquare className="h-3.5 w-3.5" /> },
           { id: "prescriptions", label: "Prescrições", icon: <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z"/><path d="m8.5 8.5 7 7"/></svg> },
-          { id: "vitals", label: "Sinais Vitais", icon: <Activity className="h-3.5 w-3.5" /> },
           { id: "exams", label: "Exames & Procedimentos", icon: <Search className="h-3.5 w-3.5" /> },
           { id: "discharge", label: "Alta & Desfecho", icon: <CheckCircle2 className="h-3.5 w-3.5" /> },
         ].map((tab) => {
