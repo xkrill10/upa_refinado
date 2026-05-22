@@ -172,7 +172,7 @@ export default function Pharmacy() {
       <div className="grid gap-4 grid-cols-2 md:grid-cols-3 lg:grid-cols-6 mb-6">
         <Card 
           className={cn(
-            "glass-card cursor-pointer transition-all hover:scale-[1.02] active:scale-95 border-2",
+            "glass-card-premium shadow-[0_8px_30px_rgba(0,0,0,0.12)] cursor-pointer transition-all hover:scale-[1.02] active:scale-95 border-2",
             specialFilter === "all" ? "bg-primary/5 border-primary/20 shadow-lg shadow-primary/5" : "hover:bg-primary/5 border-transparent opacity-80 hover:opacity-100"
           )}
           onClick={() => {
@@ -192,7 +192,7 @@ export default function Pharmacy() {
 
         <Card 
           className={cn(
-            "glass-card cursor-pointer transition-all hover:scale-[1.02] active:scale-95 border-2", 
+            "glass-card-premium shadow-[0_8px_30px_rgba(0,0,0,0.12)] cursor-pointer transition-all hover:scale-[1.02] active:scale-95 border-2", 
             specialFilter === "lowStock" 
               ? "bg-destructive/10 border-destructive shadow-lg shadow-destructive/5" 
               : lowStock.length > 0 
@@ -216,7 +216,7 @@ export default function Pharmacy() {
 
         <Card 
           className={cn(
-            "glass-card cursor-pointer transition-all hover:scale-[1.02] active:scale-95 border-2", 
+            "glass-card-premium shadow-[0_8px_30px_rgba(0,0,0,0.12)] cursor-pointer transition-all hover:scale-[1.02] active:scale-95 border-2", 
             specialFilter === "thermolabile"
               ? "bg-blue-600/10 border-blue-600 shadow-lg shadow-blue-600/5"
               : "hover:bg-blue-600/5 border-transparent opacity-80 hover:opacity-100"
@@ -238,7 +238,7 @@ export default function Pharmacy() {
 
         <Card 
           className={cn(
-            "glass-card cursor-pointer transition-all hover:scale-[1.02] active:scale-95 border-2", 
+            "glass-card-premium shadow-[0_8px_30px_rgba(0,0,0,0.12)] cursor-pointer transition-all hover:scale-[1.02] active:scale-95 border-2", 
             specialFilter === "highAlert"
               ? "bg-pink-600/10 border-pink-600 shadow-lg shadow-pink-600/5"
               : "hover:bg-pink-600/5 border-transparent opacity-80 hover:opacity-100"
@@ -260,7 +260,7 @@ export default function Pharmacy() {
 
         <Card 
           className={cn(
-            "glass-card cursor-pointer transition-all hover:scale-[1.02] active:scale-95 border-2",
+            "glass-card-premium shadow-[0_8px_30px_rgba(0,0,0,0.12)] cursor-pointer transition-all hover:scale-[1.02] active:scale-95 border-2",
             specialFilter === "controlled" ? "bg-slate-900/10 border-slate-900 shadow-lg shadow-slate-900/5" : "hover:bg-slate-900/5 border-transparent opacity-80 hover:opacity-100"
           )}
           onClick={() => {
@@ -278,7 +278,7 @@ export default function Pharmacy() {
 
         <Card 
           className={cn(
-            "glass-card cursor-pointer transition-all hover:scale-[1.02] active:scale-95 border-2 border-slate-950/20",
+            "glass-card-premium shadow-[0_8px_30px_rgba(0,0,0,0.12)] cursor-pointer transition-all hover:scale-[1.02] active:scale-95 border-2 border-slate-950/20",
             specialFilter === "narcotics" ? "bg-slate-950/20 border-slate-950" : "hover:bg-slate-950/5 opacity-80 hover:opacity-100"
           )}
           onClick={() => {
@@ -298,7 +298,7 @@ export default function Pharmacy() {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-        <TabsList className="bg-muted/50 p-1">
+        <TabsList className="glass-card-premium p-1 h-14 rounded-2xl border border-white/40 dark:border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.12)] overflow-x-auto flex-nowrap shrink-0">
           <TabsTrigger value="stock" className="gap-2"><Package className="h-4 w-4" />Estoque</TabsTrigger>
           <TabsTrigger value="controlled" className="gap-2"><ShieldAlert className="h-4 w-4" />Psicotrópicos / Narcóticos</TabsTrigger>
           <TabsTrigger value="dispensing" className="gap-2"><Pill className="h-4 w-4" />Dispensação</TabsTrigger>
@@ -369,7 +369,7 @@ export default function Pharmacy() {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input placeholder="Filtrar por paciente, medicamento ou profissional..." value={movSearch} onChange={e => setMovSearch(e.target.value)} className="pl-9" />
           </div>
-          <Card className="glass-card overflow-hidden">
+          <Card className="glass-card-premium border-white/40 dark:border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.12)] overflow-hidden">
             <CardContent className="p-0">
               <Table>
                 <TableHeader className="bg-muted/30">
@@ -426,7 +426,7 @@ export default function Pharmacy() {
 
       {/* MEDICATION DETAILS DIALOG */}
       <Dialog open={!!selectedMedDetails} onOpenChange={(open) => !open && setSelectedMedDetails(null)}>
-        <DialogContent className="max-w-2xl p-0 overflow-hidden rounded-[2rem]">
+        <DialogContent className="max-w-2xl p-0 overflow-hidden rounded-[2rem] glass-card-premium shadow-[0_30px_60px_-15px_rgba(0,0,0,0.3)]">
           <DialogHeader className={cn(
             "p-8 text-white transition-colors duration-500",
             ['psychotropic', 'narcotic'].includes(selectedMedDetails?.category || '') ? "bg-slate-950" : 
@@ -528,7 +528,7 @@ export default function Pharmacy() {
 
       {/* QUICK STOCK ENTRY DIALOG */}
       <Dialog open={!!medForStockEntry} onOpenChange={(open) => !open && setMedForStockEntry(null)}>
-        <DialogContent className="max-w-md p-0 overflow-hidden rounded-[2rem]">
+        <DialogContent className="max-w-md p-0 overflow-hidden rounded-[2rem] glass-card-premium shadow-[0_30px_60px_-15px_rgba(0,0,0,0.3)]">
           <DialogHeader className="p-8 bg-green-600 text-white">
             <DialogTitle className="text-2xl font-black uppercase tracking-tight flex items-center gap-2">
               <Plus className="h-6 w-6" />
@@ -582,7 +582,7 @@ export default function Pharmacy() {
 
       {/* QUICK DISPENSE DIALOG */}
       <Dialog open={!!medForQuickDispense} onOpenChange={(open) => !open && setMedForQuickDispense(null)}>
-        <DialogContent className="max-w-md p-0 overflow-hidden rounded-[2rem]">
+        <DialogContent className="max-w-md p-0 overflow-hidden rounded-[2rem] glass-card-premium shadow-[0_30px_60px_-15px_rgba(0,0,0,0.3)]">
           <DialogHeader className="p-8 bg-primary text-white">
             <DialogTitle className="text-2xl font-black uppercase tracking-tight flex items-center gap-2">
               <Pill className="h-6 w-6" />
@@ -678,7 +678,7 @@ export default function Pharmacy() {
 
       {/* QUICK CONTROLLED DISPATCH DIALOG */}
       <Dialog open={!!medForControlledDispatch} onOpenChange={(open) => !open && setMedForControlledDispatch(null)}>
-        <DialogContent className="max-w-md p-0 overflow-hidden rounded-[2rem] border-4 border-slate-950">
+        <DialogContent className="max-w-md p-0 overflow-hidden rounded-[2rem] glass-card-premium shadow-[0_30px_60px_-15px_rgba(0,0,0,0.3)] border-4 border-slate-950">
           <DialogHeader className="p-8 bg-slate-950 text-white relative">
             <div className="absolute top-4 right-4 bg-white/10 p-2 rounded-full backdrop-blur-sm">
               <ShieldAlert className="h-6 w-6 text-white" />
@@ -1235,7 +1235,7 @@ function RegisterMedicationForm({ onSave }: { onSave: (m: Omit<Medication, 'id'>
   };
 
   return (
-    <Card className="glass-card">
+    <Card className="glass-card-premium border-white/40 dark:border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.12)]">
       <CardHeader className="bg-muted/30 border-b mb-6">
         <CardTitle className="text-xl font-black uppercase flex items-center justify-between gap-2">
           <div className="flex items-center gap-2">

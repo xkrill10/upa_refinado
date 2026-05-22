@@ -178,10 +178,10 @@ export default function Patients() {
               setCurrentPage(1);
             }}
             className={cn(
-              "rounded-xl border p-4 flex items-center gap-4 transition-all duration-300 cursor-pointer select-none backdrop-blur-md",
+              "rounded-2xl border p-4 flex items-center gap-4 transition-all duration-300 cursor-pointer select-none",
               activeFilter === stat.id 
-                ? cn("bg-white/90 dark:bg-slate-900/60 font-black", stat.activeBorder) 
-                : "border-slate-200/40 dark:border-slate-800/40 bg-white/70 dark:bg-slate-900/45 hover:bg-white/90 dark:hover:bg-slate-900/60 shadow-xl"
+                ? cn("glass-card-premium font-black ring-2 ring-offset-2 ring-slate-400 dark:ring-slate-600 shadow-2xl scale-[1.02] relative z-10", stat.activeBorder) 
+                : "border-white/40 dark:border-white/10 glass-card-premium opacity-80 hover:opacity-100 hover:scale-[1.02] shadow-[0_8px_30px_rgba(0,0,0,0.12)] hover:shadow-xl"
             )}
           >
             <div className={cn("p-2.5 rounded-lg transition-transform duration-300 flex items-center justify-center shrink-0", stat.bgStyle, stat.textStyle, activeFilter === stat.id && "scale-110")}>
@@ -200,7 +200,7 @@ export default function Patients() {
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground transition-colors group-focus-within:text-[#006699] dark:group-focus-within:text-sky-400" />
           <Input 
             placeholder="Buscar por nome ou CPF..." 
-            className="pl-10 h-11 bg-white/70 dark:bg-slate-900/40 border border-slate-200/50 dark:border-slate-800/55 focus-visible:ring-[#006699]/20 dark:focus-visible:ring-sky-500/20 text-foreground transition-all rounded-xl shadow-inner placeholder:text-muted-foreground/60" 
+            className="pl-10 h-11 glass-card-premium border-white/40 dark:border-white/10 focus-visible:ring-[#006699]/40 dark:focus-visible:ring-sky-500/40 text-foreground transition-all rounded-xl shadow-[0_8px_30px_rgba(0,0,0,0.12)] placeholder:text-muted-foreground/60" 
             value={searchTerm}
             onChange={(e) => {
               setSearchTerm(e.target.value);
@@ -211,18 +211,18 @@ export default function Patients() {
         <Button 
           variant="outline" 
           onClick={exportToCSV}
-          className="w-full md:w-auto h-11 rounded-xl font-bold gap-2 text-foreground border-slate-200/60 dark:border-slate-850 hover:bg-slate-50 dark:hover:bg-slate-900 hover:text-[#006699] dark:hover:text-sky-400 bg-white/50 dark:bg-slate-900/40 backdrop-blur-md transition-all shadow-sm"
+          className="w-full md:w-auto h-11 rounded-xl font-bold gap-2 text-foreground border-white/40 dark:border-white/10 glass-card-premium hover:text-[#006699] dark:hover:text-sky-400 transition-all shadow-[0_8px_30px_rgba(0,0,0,0.12)] hover:scale-[1.02]"
         >
           <Download className="h-4 w-4" /> Exportar CSV
         </Button>
       </div>
 
-      <Card className="border border-slate-200/40 dark:border-slate-800/45 shadow-xl overflow-hidden bg-white/70 dark:bg-slate-900/45 rounded-xl transition-colors duration-500">
+      <Card className="glass-card-premium border-white/40 dark:border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.12)] overflow-hidden rounded-2xl transition-colors duration-500">
         <CardContent className="p-0">
           <TooltipProvider>
             <div className="overflow-x-auto">
               <Table>
-                <TableHeader className="bg-slate-55/35 dark:bg-slate-950/20 border-b border-slate-200/40 dark:border-slate-800/40">
+                <TableHeader className="bg-gradient-to-r from-white/40 to-white/10 dark:from-slate-900/40 dark:to-slate-900/10 backdrop-blur-md border-b border-white/40 dark:border-white/10">
                   <TableRow className="hover:bg-transparent border-none">
                     <TableHead className="text-[#006699] dark:text-sky-400 h-12 text-[10px] font-black uppercase tracking-widest pl-6">Paciente</TableHead>
                     <TableHead className="text-[#006699] dark:text-sky-400 h-12 text-[10px] font-black uppercase tracking-widest text-center">Idade</TableHead>
@@ -367,7 +367,7 @@ export default function Patients() {
             
             {/* Pagination Controls */}
             {totalPages > 1 && (
-              <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-6 py-4 border-t border-slate-200/30 dark:border-slate-800/30 bg-slate-50/15 dark:bg-slate-950/15 text-foreground">
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-6 py-4 border-t border-white/40 dark:border-white/10 bg-white/20 dark:bg-slate-900/30 backdrop-blur-md text-foreground">
                 <p className="text-xs font-bold text-muted-foreground">
                   Mostrando {(currentPage - 1) * itemsPerPage + 1} a {Math.min(currentPage * itemsPerPage, filteredPatients.length)} de {filteredPatients.length} pacientes
                 </p>
@@ -375,7 +375,7 @@ export default function Patients() {
                   <Button
                     variant="outline"
                     size="sm"
-                    className="h-8 rounded-lg font-black uppercase text-[10px] tracking-wider border border-slate-200 dark:border-slate-800 text-foreground bg-white/50 dark:bg-slate-900/30 hover:bg-slate-50 dark:hover:bg-slate-900"
+                    className="h-8 rounded-lg font-black uppercase text-[10px] tracking-wider border border-white/40 dark:border-white/10 text-foreground glass-card-premium hover:text-[#006699] dark:hover:text-sky-400"
                     onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
                     disabled={currentPage === 1}
                   >
@@ -387,7 +387,7 @@ export default function Patients() {
                   <Button
                     variant="outline"
                     size="sm"
-                    className="h-8 rounded-lg font-black uppercase text-[10px] tracking-wider border border-slate-200 dark:border-slate-800 text-foreground bg-white/50 dark:bg-slate-900/30 hover:bg-slate-50 dark:hover:bg-slate-900"
+                    className="h-8 rounded-lg font-black uppercase text-[10px] tracking-wider border border-white/40 dark:border-white/10 text-foreground glass-card-premium hover:text-[#006699] dark:hover:text-sky-400"
                     onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
                     disabled={currentPage === totalPages}
                   >
@@ -403,7 +403,7 @@ export default function Patients() {
 
       {/* Call Control Dialog */}
       <Dialog open={showCallControl} onOpenChange={setShowCallControl}>
-        <DialogContent className="max-w-md p-0 overflow-hidden rounded-xl border border-slate-200/40 dark:border-slate-800/40 bg-white dark:bg-slate-950 shadow-2xl [&>button]:hidden">
+        <DialogContent className="max-w-md p-0 overflow-hidden rounded-2xl glass-card-premium border-white/40 dark:border-white/10 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.3)] [&>button]:hidden">
           <DialogHeader className={cn(
             "p-6 text-white transition-colors duration-500 border-b border-slate-200/20 dark:border-slate-800/20",
             selectedPatient?.risk === 'emergency' ? 'bg-red-650 bg-red-600' :

@@ -66,15 +66,16 @@ export function AppSidebar() {
   return (
     <Sidebar variant="floating" collapsible="icon" className="border-none shadow-[0_20px_60px_-15px_rgba(0,0,0,0.5)] z-30 [&>div[data-sidebar=sidebar]]:bg-gradient-to-b [&>div[data-sidebar=sidebar]]:from-[#004466]/95 [&>div[data-sidebar=sidebar]]:to-[#001a33]/95 [&>div[data-sidebar=sidebar]]:backdrop-blur-xl [&>div[data-sidebar=sidebar]]:border [&>div[data-sidebar=sidebar]]:border-blue-700/30">
       <SidebarHeader className="p-3 pb-2 bg-transparent border-b border-blue-700/30">
-        <div className="flex items-center gap-3">
-          <div className="h-9 w-9 rounded-lg bg-primary/10 flex items-center justify-center shrink-0 border border-primary/20 shadow-sm">
-            <Activity className="h-5 w-5 text-primary animate-pulse" />
+        <div className="flex items-center gap-3 p-3 rounded-xl bg-gradient-to-br from-white/10 to-white/5 border border-white/20 shadow-[0_8px_30px_rgba(0,0,0,0.2)] backdrop-blur-md relative overflow-hidden group transition-all duration-300 hover:border-white/30 hover:shadow-[0_8px_30px_rgba(14,165,233,0.2)]">
+          <div className="absolute inset-0 bg-gradient-to-r from-sky-500/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+          <div className="h-10 w-10 rounded-lg bg-sky-500/20 flex items-center justify-center shrink-0 border border-sky-400/30 shadow-inner backdrop-blur-md z-10 transition-transform group-hover:scale-105 duration-300">
+            <Activity className="h-5 w-5 text-sky-300 drop-shadow-[0_0_8px_rgba(14,165,233,0.8)] animate-pulse-slow" />
           </div>
           {!collapsed && (
-              <div className="flex flex-col">
-                <h1 className="text-lg mission-control-title text-sidebar-foreground uppercase font-black">UPA Control</h1>
-                <div className="flex items-center gap-1.5 leading-none">
-                  <span className="text-[9px] text-sidebar-foreground/60 font-bold uppercase tracking-widest">Sistema de Gestão</span>
+              <div className="flex flex-col z-10">
+                <h1 className="text-lg mission-control-title text-white uppercase font-black tracking-tight drop-shadow-md">UPA Control</h1>
+                <div className="flex items-center gap-1.5 leading-none mt-0.5">
+                  <span className="text-[9px] text-sky-200/80 font-black uppercase tracking-[0.2em]">Sistema de Gestão</span>
                 </div>
               </div>
           )}
@@ -117,13 +118,13 @@ export function AppSidebar() {
                                  className={cn(
                                     "flex items-center justify-center shrink-0 transition-all duration-300",
                                    active 
-                                     ? "text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.6)]" 
+                                     ? "text-sky-300 drop-shadow-[0_0_8px_rgba(14,165,233,0.8)]" 
                                      : "text-blue-100/70 group-hover/item:text-blue-50"
                                  )}
                                >
                                  <item.icon className={cn(
                                     "h-[22px] w-[22px] transition-all duration-300",
-                                   active ? "stroke-[2.5px]" : "stroke-[2px]"
+                                   active ? "stroke-[2.5px] animate-pulse-slow" : "stroke-[2px]"
                                  )} />
                                </motion.div>
  

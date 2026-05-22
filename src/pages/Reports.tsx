@@ -3,7 +3,9 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import { FileText, Calendar, Download, FileSpreadsheet, FileArchive, Info, Users, Clock, Globe, HeartPulse, Activity, ClipboardList, Stethoscope } from "lucide-react";
 import { motion } from "motion/react";
 import { Button } from "@/components/ui/button";
-
+import { toast } from "sonner";
+import { useState } from "react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 const attendanceWeeklyData = [
   { name: 'Seg', total: 110 },
   { name: 'Ter', total: 135 },
@@ -41,6 +43,8 @@ const consolidatedMetrics = [
 ];
 
 export default function Reports() {
+  const [selectedKpi, setSelectedKpi] = useState<any>(null);
+
   const currentDate = new Date().toLocaleDateString('pt-BR', {
     day: '2-digit',
     month: 'long',
@@ -64,13 +68,13 @@ export default function Reports() {
         </div>
         
         <div className="flex gap-2">
-          <Button variant="outline" size="sm" className="bg-red-50 text-red-600 border-red-100 hover:bg-red-100 dark:bg-red-950/20 dark:border-red-900/30">
+          <Button variant="outline" size="sm" className="glass-card-premium border-red-500/30 text-red-600 hover:text-red-700 hover:bg-red-500/10 dark:text-red-400 dark:hover:text-red-300">
             <FileText className="mr-2 h-4 w-4" /> PDF
           </Button>
-          <Button variant="outline" size="sm" className="bg-emerald-50 text-emerald-600 border-emerald-100 hover:bg-emerald-100 dark:bg-emerald-950/20 dark:border-emerald-900/30">
+          <Button variant="outline" size="sm" className="glass-card-premium border-emerald-500/30 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-500/10 dark:text-emerald-400 dark:hover:text-emerald-300">
             <FileSpreadsheet className="mr-2 h-4 w-4" /> EXCEL
           </Button>
-          <Button variant="outline" size="sm" className="bg-blue-50 text-blue-600 border-blue-100 hover:bg-blue-100 dark:bg-blue-950/20 dark:border-blue-900/30">
+          <Button variant="outline" size="sm" className="glass-card-premium border-blue-500/30 text-blue-600 hover:text-blue-700 hover:bg-blue-500/10 dark:text-blue-400 dark:hover:text-blue-300">
             <FileArchive className="mr-2 h-4 w-4" /> WORD
           </Button>
         </div>
@@ -84,24 +88,31 @@ export default function Reports() {
           { label: "Casos de Urgência (Vermelho)", value: "8", sub: "Encaminhados para estabilização/UTI", subColor: "text-red-500", highlight: true },
           { label: "Tempo Médio de Espera", value: "45 min", sub: "Classificação Verde/Azul", subColor: "text-muted-foreground" },
         ].map((kpi, i) => (
-          <Card key={i} className="glass-card card-highlight">
-            <CardContent className="pt-6">
-              <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-1">{kpi.label}</p>
-              <div className="flex flex-col">
-                <span className={`text-4xl font-black tabular-nums ${kpi.highlight ? 'text-red-500' : ''}`}>{kpi.value}</span>
-                <p className={`text-[10px] font-bold mt-1 ${kpi.subColor}`}>
-                  {kpi.sub}
-                </p>
-              </div>
-            </CardContent>
-          </Card>
+          <motion.div 
+            key={i} 
+            whileTap={{ scale: 0.95 }} 
+            onClick={() => setSelectedKpi(kpi)}
+            className="cursor-pointer"
+          >
+            <Card className="glass-card-premium border-white/40 dark:border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.12)] hover:scale-[1.02] transition-transform h-full">
+              <CardContent className="pt-6">
+                <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-1">{kpi.label}</p>
+                <div className="flex flex-col">
+                  <span className={`text-4xl font-black tabular-nums ${kpi.highlight ? 'text-red-500' : ''}`}>{kpi.value}</span>
+                  <p className={`text-[10px] font-bold mt-1 ${kpi.subColor}`}>
+                    {kpi.sub}
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
         ))}
       </div>
 
       {/* Main Charts Area */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Weekly Attendance Bar Chart */}
-        <Card className="lg:col-span-8 glass-card">
+        <Card className="lg:col-span-8 glass-card-premium border-white/40 dark:border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.12)]">
           <CardHeader>
             <CardTitle className="text-xl font-black mission-control-title">Atendimentos por Dia (Última Semana)</CardTitle>
             <CardDescription className="text-xs uppercase font-bold tracking-widest">Volume diário de pacientes acolhidos na unidade</CardDescription>
@@ -146,7 +157,7 @@ export default function Reports() {
         </Card>
 
         {/* Risk Classification Donut Chart */}
-        <Card className="lg:col-span-4 glass-card">
+        <Card className="lg:col-span-4 glass-card-premium border-white/40 dark:border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.12)]">
           <CardHeader>
             <CardTitle className="text-xl font-black mission-control-title">Classificação de Risco</CardTitle>
             <CardDescription className="text-xs uppercase font-bold tracking-widest">Distribuição de pacientes por prioridade</CardDescription>
@@ -193,7 +204,7 @@ export default function Reports() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        <Card className="lg:col-span-7 glass-card">
+        <Card className="lg:col-span-7 glass-card-premium border-white/40 dark:border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.12)]">
           <CardContent className="pt-6">
             <div className="divide-y divide-border/50">
               {consolidatedMetrics.map((metric, i) => (
@@ -211,7 +222,7 @@ export default function Reports() {
           </CardContent>
         </Card>
 
-        <Card className="lg:col-span-5 glass-card">
+        <Card className="lg:col-span-5 glass-card-premium border-white/40 dark:border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.12)]">
           <CardHeader>
             <CardTitle className="text-[10px] font-black uppercase tracking-[0.1em] text-muted-foreground text-center">Comparativo de Ações e Desfechos (Últimas 24h)</CardTitle>
           </CardHeader>
@@ -250,6 +261,57 @@ export default function Reports() {
           </CardContent>
         </Card>
       </div>
+
+      <Dialog open={!!selectedKpi} onOpenChange={(open) => !open && setSelectedKpi(null)}>
+        <DialogContent className="sm:max-w-[700px] p-0 overflow-hidden glass-card-premium border-white/40 dark:border-white/10 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.3)] rounded-2xl">
+          <DialogHeader className="p-8 pb-4 bg-gradient-to-r from-white/40 to-white/10 dark:from-slate-900/40 dark:to-slate-900/10 border-b border-white/20 dark:border-white/5">
+            <DialogTitle className="text-2xl font-black uppercase tracking-tight mission-control-title flex items-center gap-3">
+              <div className="p-2 rounded-xl bg-primary/10 text-primary">
+                <Info className="h-6 w-6" />
+              </div>
+              {selectedKpi?.label}
+            </DialogTitle>
+            <DialogDescription className="text-xs font-bold uppercase tracking-widest text-muted-foreground mt-2">
+              Detalhamento de Métrica • {selectedKpi?.sub}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="p-8 space-y-6">
+            <div className="flex items-center justify-between p-6 bg-white/40 dark:bg-slate-900/40 rounded-xl border border-white/30 dark:border-white/10">
+              <div>
+                <p className="text-[10px] font-black uppercase text-muted-foreground tracking-widest">Valor Consolidado</p>
+                <p className={`text-5xl font-black mt-1 ${selectedKpi?.highlight ? 'text-red-500' : 'text-foreground'}`}>{selectedKpi?.value}</p>
+              </div>
+              <div className="h-16 w-16 rounded-full border-4 border-primary/20 flex items-center justify-center relative">
+                <Activity className="h-6 w-6 text-primary absolute animate-pulse" />
+              </div>
+            </div>
+            
+            <div className="space-y-4">
+              <h4 className="text-[11px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2">
+                <ClipboardList className="h-4 w-4" /> Quebra de Dados Recentes
+              </h4>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="p-4 rounded-xl border border-white/20 dark:border-white/10 bg-white/20 dark:bg-slate-950/20">
+                  <p className="text-[10px] font-black uppercase text-muted-foreground">Variação 24h</p>
+                  <p className="text-lg font-bold text-emerald-500 mt-1">+12.4%</p>
+                </div>
+                <div className="p-4 rounded-xl border border-white/20 dark:border-white/10 bg-white/20 dark:bg-slate-950/20">
+                  <p className="text-[10px] font-black uppercase text-muted-foreground">Meta do Período</p>
+                  <p className="text-lg font-bold text-blue-500 mt-1">Atingida</p>
+                </div>
+                <div className="col-span-2 p-4 rounded-xl border border-white/20 dark:border-white/10 bg-white/20 dark:bg-slate-950/20 flex justify-between items-center">
+                  <p className="text-xs font-bold uppercase text-muted-foreground">Última Atualização do Banco</p>
+                  <p className="text-xs font-mono font-bold">Hoje, 10:45</p>
+                </div>
+              </div>
+            </div>
+            
+            <Button className="w-full h-12 rounded-xl text-[11px] font-black uppercase tracking-widest" onClick={() => toast.success("Exportação iniciada. O download começará em breve.")}>
+              Exportar Detalhamento em CSV
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </motion.div>
   );
 }

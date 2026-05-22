@@ -62,7 +62,7 @@ export function NewStaffModal({ open, onOpenChange, onSuccess }: NewStaffModalPr
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[700px] p-0 overflow-hidden border-none shadow-2xl rounded-[2rem]">
+      <DialogContent className="sm:max-w-[700px] p-0 overflow-hidden glass-card-premium border-white/40 dark:border-white/10 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.3)] rounded-[2rem]">
         <div className="bg-gradient-to-br from-blue-600 to-blue-800 p-8 text-white relative">
           <div className="absolute top-0 right-0 -mr-10 -mt-10 w-40 h-40 bg-white/10 rounded-full blur-2xl pointer-events-none" />
           <UserPlus className="absolute right-8 top-1/2 -translate-y-1/2 h-24 w-24 text-white/10 pointer-events-none" />
@@ -81,7 +81,7 @@ export function NewStaffModal({ open, onOpenChange, onSuccess }: NewStaffModalPr
           </DialogDescription>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-8 space-y-8 bg-slate-50 dark:bg-slate-950">
+        <form onSubmit={handleSubmit} className="p-8 space-y-8 bg-transparent">
           
           {/* Section 1: Personal Data */}
           <div className="space-y-4">
@@ -97,7 +97,7 @@ export function NewStaffModal({ open, onOpenChange, onSuccess }: NewStaffModalPr
                   <Input 
                     required
                     placeholder="Ex: João da Silva Santos" 
-                    className="pl-10 h-12 rounded-xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm"
+                    className="pl-10 h-12 rounded-xl border-slate-200/50 dark:border-slate-800/50 bg-white/40 dark:bg-slate-900/40 backdrop-blur-sm shadow-sm"
                     value={formData.name}
                     onChange={(e) => handleChange('name', e.target.value)}
                   />
@@ -110,7 +110,7 @@ export function NewStaffModal({ open, onOpenChange, onSuccess }: NewStaffModalPr
                   <Input 
                     required
                     placeholder="000.000.000-00" 
-                    className="pl-10 h-12 rounded-xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm"
+                    className="pl-10 h-12 rounded-xl border-slate-200/50 dark:border-slate-800/50 bg-white/40 dark:bg-slate-900/40 backdrop-blur-sm shadow-sm"
                     value={formData.cpf}
                     onChange={(e) => handleChange('cpf', e.target.value)}
                   />
@@ -123,7 +123,7 @@ export function NewStaffModal({ open, onOpenChange, onSuccess }: NewStaffModalPr
                   <Input 
                     type="date"
                     required
-                    className="pl-10 h-12 rounded-xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm"
+                    className="pl-10 h-12 rounded-xl border-slate-200/50 dark:border-slate-800/50 bg-white/40 dark:bg-slate-900/40 backdrop-blur-sm shadow-sm"
                     value={formData.birth}
                     onChange={(e) => handleChange('birth', e.target.value)}
                   />
@@ -136,7 +136,7 @@ export function NewStaffModal({ open, onOpenChange, onSuccess }: NewStaffModalPr
                   <Input 
                     required
                     placeholder="(00) 00000-0000" 
-                    className="pl-10 h-12 rounded-xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm"
+                    className="pl-10 h-12 rounded-xl border-slate-200/50 dark:border-slate-800/50 bg-white/40 dark:bg-slate-900/40 backdrop-blur-sm shadow-sm"
                     value={formData.phone}
                     onChange={(e) => handleChange('phone', e.target.value)}
                   />
@@ -155,7 +155,7 @@ export function NewStaffModal({ open, onOpenChange, onSuccess }: NewStaffModalPr
               <div className="space-y-2">
                 <Label className="text-[10px] font-black uppercase tracking-widest text-slate-500">Cargo</Label>
                 <Select required value={formData.role} onValueChange={(v) => handleChange('role', v)}>
-                  <SelectTrigger className="h-12 rounded-xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm">
+                  <SelectTrigger className="h-12 rounded-xl border-slate-200/50 dark:border-slate-800/50 bg-white/40 dark:bg-slate-900/40 backdrop-blur-sm shadow-sm">
                     <SelectValue placeholder="Selecione o cargo" />
                   </SelectTrigger>
                   <SelectContent className="rounded-xl border-slate-200 dark:border-slate-800 dark:bg-slate-950">
@@ -171,7 +171,7 @@ export function NewStaffModal({ open, onOpenChange, onSuccess }: NewStaffModalPr
               <div className="space-y-2">
                 <Label className="text-[10px] font-black uppercase tracking-widest text-slate-500">Especialidade / Setor</Label>
                 <Select required value={formData.specialty} onValueChange={(v) => handleChange('specialty', v)}>
-                  <SelectTrigger className="h-12 rounded-xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm">
+                  <SelectTrigger className="h-12 rounded-xl border-slate-200/50 dark:border-slate-800/50 bg-white/40 dark:bg-slate-900/40 backdrop-blur-sm shadow-sm">
                     <SelectValue placeholder="Selecione a área" />
                   </SelectTrigger>
                   <SelectContent className="rounded-xl border-slate-200 dark:border-slate-800 dark:bg-slate-950">
@@ -190,7 +190,7 @@ export function NewStaffModal({ open, onOpenChange, onSuccess }: NewStaffModalPr
                   <CreditCard className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                   <Input 
                     placeholder="000000-XX" 
-                    className="pl-10 h-12 rounded-xl border-slate-200 bg-white shadow-sm"
+                    className="pl-10 h-12 rounded-xl border-slate-200/50 dark:border-slate-800/50 bg-white/40 dark:bg-slate-900/40 backdrop-blur-sm shadow-sm"
                     value={formData.registry}
                     onChange={(e) => handleChange('registry', e.target.value)}
                   />
@@ -200,7 +200,7 @@ export function NewStaffModal({ open, onOpenChange, onSuccess }: NewStaffModalPr
               <div className="space-y-2">
                 <Label className="text-[10px] font-black uppercase tracking-widest text-slate-500">Regime de Escala</Label>
                 <Select required value={formData.shift} onValueChange={(v) => handleChange('shift', v)}>
-                  <SelectTrigger className="h-12 rounded-xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm">
+                  <SelectTrigger className="h-12 rounded-xl border-slate-200/50 dark:border-slate-800/50 bg-white/40 dark:bg-slate-900/40 backdrop-blur-sm shadow-sm">
                     <SelectValue placeholder="Selecione o turno" />
                   </SelectTrigger>
                   <SelectContent className="rounded-xl border-slate-200 dark:border-slate-800 dark:bg-slate-950">

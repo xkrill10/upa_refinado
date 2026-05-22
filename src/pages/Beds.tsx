@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { BedDouble, AlertCircle, CheckCircle2, Settings2, Info, UserRound, HeartPulse, Thermometer, Droplets, Activity, Sparkles, Clock3, Timer, Pill, ArrowRightLeft, Stethoscope, ArrowRight, Globe } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
@@ -53,11 +53,85 @@ export default function Beds() {
   const [targetBedId, setTargetBedId] = useState<string>("");
   const [localRisk, setLocalRisk] = useState<string | null>(null);
   const [vitalsForm, setVitalsForm] = useState({
-    heartRate: "88",
-    bloodPressure: "12/8",
-    saturation: "98",
-    temperature: "36.5"
+    heartRate: "",
+    bloodPressure: "",
+    saturation: "",
+    temperature: ""
   });
+
+  useEffect(() => {
+    if (!editingVitalsPatient) return;
+    
+    // Only calculate if the user has entered at least one parameter
+    if (!vitalsForm.heartRate && !vitalsForm.bloodPressure && !vitalsForm.saturation && !vitalsForm.temperature) {
+      setLocalRisk(null);
+      return;
+    }
+    
+    const hr = parseInt(vitalsForm.heartRate) || 80;
+    const temp = parseFloat(vitalsForm.temperature) || 36.5;
+    const sat = parseFloat(vitalsForm.saturation) || 98;
+    
+    let sys = 120;
+    let dia = 80;
+    const bp = vitalsForm.bloodPressure;
+    if (bp && bp.includes('/')) {
+      let parts = bp.split('/');
+      let parsedSys = parseInt(parts[0]);
+      let parsedDia = parseInt(parts[1]);
+      if (parsedSys < 30) parsedSys = parsedSys * 10;
+      if (parsedDia < 15 && parsedDia > 0) parsedDia = parsedDia * 10;
+      sys = parsedSys || 120;
+      dia = parsedDia || 80;
+    } else if (bp) {
+      let parsedSys = parseInt(bp);
+      if (parsedSys < 30) parsedSys = parsedSys * 10;
+      sys = parsedSys || 120;
+    }
+
+    let calculatedRisk = 'less-urgent'; 
+
+    // EMERGÊNCIA (Vermelho)
+    if (
+      hr > 130 || hr < 40 || 
+      temp > 40 || temp < 35 || 
+      sat < 90 || 
+      sys >= 180 || dia >= 120 || sys < 80
+    ) {
+      calculatedRisk = 'emergency';
+    } 
+    // MUITO URGENTE (Laranja)
+    else if (
+      (hr >= 120 && hr <= 130) || (hr >= 40 && hr <= 50) || 
+      (temp >= 39 && temp <= 40) || 
+      (sat >= 90 && sat <= 94) || 
+      (sys >= 160 && sys < 180) || (dia >= 100 && dia < 120) || (sys >= 80 && sys < 90)
+    ) {
+      calculatedRisk = 'very-urgent';
+    } 
+    // URGENTE (Amarelo)
+    else if (
+      (hr >= 100 && hr < 120) || 
+      (temp >= 37.5 && temp < 39) || 
+      (sat >= 95 && sat <= 97) || 
+      (sys >= 140 && sys < 160) || (dia >= 90 && dia < 100)
+    ) {
+      calculatedRisk = 'urgent';
+    } 
+    // NÃO URGENTE (Azul) - Sinais perfeitamente normais e excelentes
+    else if (
+      (hr >= 60 && hr <= 80) && 
+      (temp >= 36 && temp <= 37) && 
+      (sat >= 98) && 
+      (sys >= 110 && sys <= 120) && (dia >= 70 && dia <= 80)
+    ) {
+      calculatedRisk = 'not-urgent';
+    }
+    // Caso contrário cai no POUCO URGENTE (Verde) como padrão para leve alteração ou valores normais abrangentes
+
+    setLocalRisk(calculatedRisk);
+  }, [vitalsForm, editingVitalsPatient]);
+
   const { beds, updateBedStatus, transferPatient, getStats } = useBeds();
   const { patients, updatePatient } = usePatients();
   const stats = getStats();
@@ -165,11 +239,11 @@ export default function Beds() {
         const patient = getBedPatient(bed);
         const getPremiumStyles = (risk: string | undefined) => {
           switch (risk) {
-            case 'emergency': return 'border-red-500/40 dark:border-red-500/50 shadow-[0_0_25px_rgba(239,68,68,0.15)] ring-1 ring-red-500/10 dark:ring-red-500/20 bg-white/70 dark:bg-slate-900/45 rounded-xl';
-            case 'very-urgent': return 'border-orange-500/40 dark:border-orange-500/50 shadow-[0_0_25px_rgba(249,115,22,0.15)] ring-1 ring-orange-500/10 dark:ring-orange-500/20 bg-white/70 dark:bg-slate-900/45 rounded-xl';
-            case 'urgent': return 'border-amber-400/40 dark:border-amber-400/55 shadow-[0_0_25px_rgba(251,191,36,0.15)] ring-1 ring-amber-400/10 dark:ring-amber-400/20 bg-white/70 dark:bg-slate-900/45 rounded-xl';
-            case 'less-urgent': return 'border-emerald-500/40 dark:border-emerald-500/55 shadow-[0_0_25px_rgba(34,197,94,0.15)] ring-1 ring-emerald-500/10 dark:ring-emerald-500/20 bg-white/70 dark:bg-slate-900/45 rounded-xl';
-            default: return 'border-slate-200/40 dark:border-slate-800/40 shadow-xl bg-white/70 dark:bg-slate-900/45 rounded-xl';
+            case 'emergency': return 'border-red-500/40 dark:border-red-500/50 shadow-[0_0_25px_rgba(239,68,68,0.15)] ring-1 ring-red-500/10 dark:ring-red-500/20 glass-card rounded-xl';
+            case 'very-urgent': return 'border-orange-500/40 dark:border-orange-500/50 shadow-[0_0_25px_rgba(249,115,22,0.15)] ring-1 ring-orange-500/10 dark:ring-orange-500/20 glass-card rounded-xl';
+            case 'urgent': return 'border-amber-400/40 dark:border-amber-400/55 shadow-[0_0_25px_rgba(251,191,36,0.15)] ring-1 ring-amber-400/10 dark:ring-amber-400/20 glass-card rounded-xl';
+            case 'less-urgent': return 'border-emerald-500/40 dark:border-emerald-500/55 shadow-[0_0_25px_rgba(34,197,94,0.15)] ring-1 ring-emerald-500/10 dark:ring-emerald-500/20 glass-card rounded-xl';
+            default: return 'border-slate-200/40 dark:border-slate-800/40 shadow-xl glass-card rounded-xl';
           }
         };
 
@@ -196,7 +270,7 @@ export default function Beds() {
           >
             <Card className={cn(
               "group transition-all duration-500 overflow-hidden h-full flex flex-col relative rounded-xl border-none shadow-none",
-              bed.status === 'occupied' ? premiumStyles : "border border-slate-200/40 dark:border-slate-800/40 bg-white/70 dark:bg-slate-900/45 hover:bg-white/90 dark:hover:bg-slate-900/60 shadow-xl"
+              bed.status === 'occupied' ? premiumStyles : "glass-card hover:brightness-110 dark:hover:brightness-125 shadow-xl"
             )}>
               {/* Premium Top Accent */}
               {bed.status === 'occupied' && (
@@ -227,80 +301,94 @@ export default function Beds() {
                 </div>
               </CardHeader>
 
-              <CardContent className="p-4 pt-0 space-y-4 flex-1">
+              <CardContent className="p-4 pt-0 space-y-4 flex-1 relative z-10">
                 {bed.status === 'occupied' ? (
                   <div className="space-y-4">
-                    <div className="p-3 rounded-xl bg-slate-50/50 dark:bg-slate-950/45 border border-slate-200/40 dark:border-slate-800/40 backdrop-blur-sm">
+                    <div className="p-3.5 rounded-2xl bg-gradient-to-br from-white/50 to-white/20 dark:from-slate-900/50 dark:to-slate-800/20 border border-white/50 dark:border-white/5 shadow-[inset_0_1px_2px_rgba(255,255,255,0.6)] backdrop-blur-md">
                        <div 
-                         className="flex items-center gap-2 mb-2 cursor-pointer hover:bg-[#006699]/5 dark:hover:bg-sky-450/5 p-1 rounded-lg transition-colors group/pname"
+                         className="flex items-center gap-2 mb-3 cursor-pointer hover:bg-white/40 dark:hover:bg-slate-800/50 p-1.5 rounded-xl transition-all group/pname shadow-sm border border-transparent hover:border-white/50 dark:hover:border-white/10"
                          onClick={(e) => {
                            e.stopPropagation();
                            setSummaryPatient(patient);
                          }}
                        >
-                         <UserRound className="h-3 w-3 text-[#006699] dark:text-sky-400 group-hover/pname:scale-110 transition-transform" />
-                         <span className="text-[11px] font-bold truncate group-hover/pname:text-[#006699] dark:group-hover/pname:text-sky-300 text-foreground">{formatWords(patient?.name || "")}</span>
+                         <UserRound className="h-3.5 w-3.5 text-[#006699] dark:text-sky-400 group-hover/pname:scale-110 transition-transform drop-shadow-sm" />
+                         <span className="text-[12px] font-black truncate group-hover/pname:text-[#006699] dark:group-hover/pname:text-sky-300 text-foreground">{formatWords(patient?.name || "")}</span>
                        </div>
                        <div className="grid grid-cols-2 gap-2">
                           <div 
-                            className="flex items-center gap-1.5 text-[9px] font-bold text-muted-foreground uppercase cursor-help hover:text-[#006699] dark:hover:text-sky-300 transition-colors"
+                            className="flex items-center justify-center gap-1.5 bg-white/40 dark:bg-slate-950/40 py-2 rounded-xl text-[9px] font-black text-slate-600 dark:text-slate-400 uppercase cursor-help hover:text-[#006699] dark:hover:text-sky-300 transition-colors border border-white/40 dark:border-white/5 shadow-[inset_0_1px_1px_rgba(255,255,255,0.4)]"
                             onClick={(e) => {
                               e.stopPropagation();
                               setTimelinePatient(patient);
                             }}
                           >
-                            <Timer className="h-2.5 w-2.5 text-blue-500" /> Permanência: 4h
+                            <Timer className="h-3 w-3 text-blue-500 drop-shadow-[0_0_5px_rgba(59,130,246,0.5)]" /> Perm: 4h
                           </div>
                           <div 
-                            className="flex items-center gap-1.5 text-[9px] font-bold text-muted-foreground uppercase cursor-pointer hover:text-[#006699] dark:hover:text-sky-300 transition-colors"
+                            className="flex items-center justify-center gap-1.5 bg-white/40 dark:bg-slate-950/40 py-2 rounded-xl text-[9px] font-black text-slate-600 dark:text-slate-400 uppercase cursor-pointer hover:text-[#006699] dark:hover:text-sky-300 transition-colors border border-white/40 dark:border-white/5 shadow-[inset_0_1px_1px_rgba(255,255,255,0.4)]"
                             onClick={(e) => {
                               e.stopPropagation();
-                              setEditingVitalsPatient(patient); // Reusing the modal for now, but we can add risk change there
+                              setEditingVitalsPatient(patient); 
+                              setLocalRisk(null);
+                              setVitalsForm({
+                                heartRate: "",
+                                bloodPressure: "",
+                                saturation: "",
+                                temperature: ""
+                              });
                             }}
                           >
                             <AlertCircle className={cn(
-                              "h-2.5 w-2.5",
-                              patient.risk === 'emergency' ? "text-red-500 animate-pulse" : "text-emerald-500"
+                              "h-3 w-3 drop-shadow-[0_0_5px_currentColor]",
+                              patient.risk === 'emergency' ? "text-red-500 animate-pulse-slow" : "text-emerald-500"
                             )} /> Risco: {patient.risk === 'emergency' ? 'Crítico' : 'Estável'}
                           </div>
                        </div>
                     </div>
 
                     <div 
-                      className="grid grid-cols-4 gap-2 cursor-pointer hover:opacity-85 transition-opacity"
+                      className="grid grid-cols-4 gap-2 cursor-pointer group/vitals"
                       onClick={(e) => {
                         e.stopPropagation();
                         setEditingVitalsPatient(patient);
-                        setLocalRisk(patient.risk); // Initialize local risk
+                        setLocalRisk(null); 
                         if (patient.vitals) {
                           setVitalsForm({
-                            heartRate: patient.vitals.heartRate || "88",
-                            bloodPressure: patient.vitals.bloodPressure || "12/8",
-                            saturation: patient.vitals.saturation || "98",
-                            temperature: patient.vitals.temperature || "36.5"
+                            heartRate: patient.vitals.heartRate || "",
+                            bloodPressure: patient.vitals.bloodPressure || "",
+                            saturation: patient.vitals.saturation || "",
+                            temperature: patient.vitals.temperature || ""
+                          });
+                        } else {
+                          setVitalsForm({
+                            heartRate: "",
+                            bloodPressure: "",
+                            saturation: "",
+                            temperature: ""
                           });
                         }
                       }}
                     >
-                       <div className="flex flex-col items-center p-1.5 rounded-lg bg-slate-50/50 dark:bg-slate-900/40 border border-slate-200/20 dark:border-slate-800/20">
-                         <HeartPulse className="h-3 w-3 text-red-500 mb-1" />
-                         <span className="text-[9px] font-black text-foreground">{patient.vitals?.heartRate || "88"}</span>
-                         <span className="text-[7px] font-bold uppercase text-muted-foreground">FC</span>
+                       <div className="flex flex-col items-center justify-center p-2 rounded-xl bg-white/40 dark:bg-slate-900/40 border border-white/50 dark:border-white/5 shadow-sm group-hover/vitals:bg-white/60 dark:group-hover/vitals:bg-slate-800/50 transition-colors">
+                         <HeartPulse className="h-3.5 w-3.5 text-red-500 mb-1 drop-shadow-[0_0_5px_rgba(239,68,68,0.5)]" />
+                         <span className="text-[11px] font-black text-foreground leading-none">{patient.vitals?.heartRate || "88"}</span>
+                         <span className="text-[7px] font-black uppercase text-slate-500 dark:text-slate-400 mt-0.5">FC</span>
                        </div>
-                       <div className="flex flex-col items-center p-1.5 rounded-lg bg-slate-50/50 dark:bg-slate-900/40 border border-slate-200/20 dark:border-slate-800/20">
-                         <Activity className="h-3 w-3 text-blue-500 mb-1" />
-                         <span className="text-[9px] font-black text-foreground">{patient.vitals?.bloodPressure || "12/8"}</span>
-                         <span className="text-[7px] font-bold uppercase text-muted-foreground">PA</span>
+                       <div className="flex flex-col items-center justify-center p-2 rounded-xl bg-white/40 dark:bg-slate-900/40 border border-white/50 dark:border-white/5 shadow-sm group-hover/vitals:bg-white/60 dark:group-hover/vitals:bg-slate-800/50 transition-colors">
+                         <Activity className="h-3.5 w-3.5 text-blue-500 mb-1 drop-shadow-[0_0_5px_rgba(59,130,246,0.5)]" />
+                         <span className="text-[11px] font-black text-foreground leading-none">{patient.vitals?.bloodPressure || "12/8"}</span>
+                         <span className="text-[7px] font-black uppercase text-slate-500 dark:text-slate-400 mt-0.5">PA</span>
                        </div>
-                       <div className="flex flex-col items-center p-1.5 rounded-lg bg-slate-50/50 dark:bg-slate-900/40 border border-slate-200/20 dark:border-slate-800/20">
-                         <Droplets className="h-3 w-3 text-emerald-500 mb-1" />
-                         <span className="text-[9px] font-black text-foreground">{patient.vitals?.saturation ? patient.vitals.saturation + "%" : "98%"}</span>
-                         <span className="text-[7px] font-bold uppercase text-muted-foreground">SAT</span>
+                       <div className="flex flex-col items-center justify-center p-2 rounded-xl bg-white/40 dark:bg-slate-900/40 border border-white/50 dark:border-white/5 shadow-sm group-hover/vitals:bg-white/60 dark:group-hover/vitals:bg-slate-800/50 transition-colors">
+                         <Droplets className="h-3.5 w-3.5 text-emerald-500 mb-1 drop-shadow-[0_0_5px_rgba(16,185,129,0.5)]" />
+                         <span className="text-[11px] font-black text-foreground leading-none">{patient.vitals?.saturation ? patient.vitals.saturation + "%" : "98%"}</span>
+                         <span className="text-[7px] font-black uppercase text-slate-500 dark:text-slate-400 mt-0.5">SAT</span>
                        </div>
-                       <div className="flex flex-col items-center p-1.5 rounded-lg bg-slate-50/50 dark:bg-slate-900/40 border border-slate-200/20 dark:border-slate-800/20">
-                         <Thermometer className="h-3 w-3 text-orange-500 mb-1" />
-                         <span className="text-[9px] font-black text-foreground">{patient.vitals?.temperature || "36.5"}</span>
-                         <span className="text-[7px] font-bold uppercase text-muted-foreground">TEMP</span>
+                       <div className="flex flex-col items-center justify-center p-2 rounded-xl bg-white/40 dark:bg-slate-900/40 border border-white/50 dark:border-white/5 shadow-sm group-hover/vitals:bg-white/60 dark:group-hover/vitals:bg-slate-800/50 transition-colors">
+                         <Thermometer className="h-3.5 w-3.5 text-orange-500 mb-1 drop-shadow-[0_0_5px_rgba(249,115,22,0.5)]" />
+                         <span className="text-[11px] font-black text-foreground leading-none">{patient.vitals?.temperature || "36.5"}</span>
+                         <span className="text-[7px] font-black uppercase text-slate-500 dark:text-slate-400 mt-0.5">TEMP</span>
                        </div>
                     </div>
                   </div>
@@ -319,7 +407,7 @@ export default function Beds() {
                 <div className="flex gap-2 pt-2 mt-auto">
                   <Button
                     variant="outline"
-                    className="flex-1 text-[9px] font-black uppercase h-9 rounded-xl border-slate-200/60 dark:border-slate-800"
+                    className="flex-1 text-[10px] font-black uppercase tracking-[0.15em] h-10 rounded-xl bg-gradient-to-b from-white/60 to-white/30 dark:from-slate-800/60 dark:to-slate-900/60 border border-white/60 dark:border-white/10 hover:from-[#006699] hover:to-[#004d73] hover:text-white dark:hover:from-sky-500 dark:hover:to-sky-600 dark:hover:text-slate-950 transition-all shadow-sm text-foreground hover:shadow-lg"
                     onClick={() => setSelectedBedId(bed.id)}
                   >
                     Gerenciar
@@ -327,10 +415,10 @@ export default function Beds() {
                   {bed.status === 'available' && (
                     <Button
                       variant="secondary"
-                      className="flex-1 text-[9px] font-black uppercase h-9 rounded-xl"
+                      className="flex-1 text-[10px] font-black uppercase tracking-[0.15em] h-10 rounded-xl bg-white/40 dark:bg-slate-800/40 hover:bg-emerald-500 hover:text-white dark:hover:bg-emerald-500 transition-all border border-white/50 dark:border-white/10 backdrop-blur-md shadow-sm"
                       onClick={() => updateBedStatus(bed.id, 'maintenance')}
                     >
-                      <Sparkles className="h-3 w-3 mr-1" /> Limpar
+                      <Sparkles className="h-3.5 w-3.5 mr-1.5" /> Limpar
                     </Button>
                   )}
                 </div>
@@ -453,8 +541,8 @@ export default function Beds() {
                   className={cn(
                     "glass-card border border-slate-200/40 dark:border-slate-800/40 rounded-xl shadow-lg cursor-pointer transition-all duration-[400ms] hover:scale-[1.01] active:scale-95 overflow-hidden group backdrop-blur-md",
                     selectedRisk === stat.risk 
-                      ? cn("bg-white/90 dark:bg-slate-800/80 ring-2 ring-offset-2 ring-offset-background", stat.activeColor) 
-                      : "bg-white/60 dark:bg-slate-900/40 grayscale-[0.2] hover:grayscale-0",
+                      ? cn("ring-2 ring-offset-2 ring-offset-background brightness-110", stat.activeColor) 
+                      : "grayscale-[0.2] hover:grayscale-0",
                   )}
                   onClick={() => setSelectedRisk(selectedRisk === stat.risk ? null : stat.risk)}
                 >
@@ -481,8 +569,8 @@ export default function Beds() {
               ))}
             </div>
 
-            <Card className="glass-card border border-slate-200/40 dark:border-slate-800/40 shadow-xl overflow-hidden bg-white/70 dark:bg-slate-900/45 transition-colors duration-500 rounded-xl">
-              <CardHeader className="p-6 bg-white/40 dark:bg-slate-950/15 border-b border-slate-200/40 dark:border-slate-800/40">
+            <Card className="glass-card-premium border-none shadow-2xl overflow-hidden transition-all duration-500 rounded-xl">
+              <CardHeader className="p-6 border-b border-white/20 dark:border-white/5">
                 <div className="flex items-center justify-between">
                   <div>
                     <div className="flex items-center gap-3">
@@ -528,48 +616,50 @@ export default function Beds() {
                       return new Date(a.patient.arrivalTime).getTime() - new Date(b.patient.arrivalTime).getTime();
                     })
                     .map(({ bed, patient }) => (
-                      <div key={bed.id} className="glass-card bg-white/70 dark:bg-slate-900/45 border border-slate-200/40 dark:border-slate-800/40 rounded-xl p-4 flex flex-col gap-4 hover:shadow-2xl hover:bg-white/90 dark:hover:bg-slate-900/60 hover:-translate-y-1 transition-all duration-300 group shadow-none">
-                        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                          <div className="flex items-center gap-3">
-                            <div className="h-10 w-10 rounded-xl bg-slate-100/85 dark:bg-slate-950/80 border border-slate-200/20 dark:border-slate-800/20 shadow-inner flex items-center justify-center font-black text-[10px] text-muted-foreground group-hover:bg-[#006699]/10 group-hover:text-[#006699] dark:group-hover:text-sky-400 transition-all">
+                      <div key={bed.id} className="glass-card-premium rounded-2xl p-5 flex flex-col gap-5 hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.1)] hover:-translate-y-1.5 transition-all duration-500 group relative overflow-hidden">
+                        <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-transparent dark:from-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+                        
+                        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 relative z-10">
+                          <div className="flex items-center gap-4">
+                            <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-white/80 to-white/30 dark:from-slate-800/80 dark:to-slate-900/40 border border-white/60 dark:border-white/10 shadow-[inset_0_1px_1px_rgba(255,255,255,0.8),0_4px_10px_rgba(0,0,0,0.05)] flex items-center justify-center font-black text-[11px] text-slate-700 dark:text-slate-300 group-hover:scale-105 group-hover:shadow-[inset_0_1px_1px_rgba(255,255,255,0.8),0_8px_20px_rgba(14,165,233,0.15)] group-hover:text-[#006699] dark:group-hover:text-sky-400 transition-all duration-300 backdrop-blur-md">
                               {patient.ticket}
                             </div>
-                            <div>
-                              <p className="text-sm font-bold text-foreground">{formatWords(patient.name)}</p>
-                              <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mt-0.5">{patient.age} Anos • CPF: {patient.cpf || '***'}</p>
+                            <div className="space-y-0.5">
+                              <p className="text-[15px] font-black text-foreground tracking-tight group-hover:text-[#006699] dark:group-hover:text-sky-300 transition-colors">{formatWords(patient.name)}</p>
+                              <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted-foreground opacity-80">{patient.age} Anos • CPF: {patient.cpf || '***'}</p>
                             </div>
                           </div>
-                          <div className="flex flex-col items-end gap-1.5 shrink-0">
-                            <Badge className={cn("text-[9px] font-bold px-2 py-0.5 shadow-sm", patient.risk === 'emergency' ? "bg-red-500 hover:bg-red-600" : patient.risk === 'very-urgent' ? "bg-orange-500 hover:bg-orange-600" : patient.risk === 'urgent' ? "bg-[#FFDE21] text-black hover:bg-[#FFDE21]/90" : patient.risk === 'less-urgent' ? "bg-green-500 hover:bg-green-600" : "bg-blue-600 hover:bg-blue-700")}>
+                          <div className="flex flex-col items-end gap-2 shrink-0">
+                            <Badge className={cn("text-[10px] font-black px-2.5 py-0.5 shadow-md border border-white/20", patient.risk === 'emergency' ? "bg-red-500 hover:bg-red-600" : patient.risk === 'very-urgent' ? "bg-orange-500 hover:bg-orange-600" : patient.risk === 'urgent' ? "bg-[#FFDE21] text-black hover:bg-[#FFDE21]/90" : patient.risk === 'less-urgent' ? "bg-emerald-500 hover:bg-emerald-600" : "bg-blue-600 hover:bg-blue-700")}>
                               {patient.risk === 'emergency' ? 'Emergência' : patient.risk === 'very-urgent' ? 'Muito Urgente' : patient.risk === 'urgent' ? 'Urgente' : patient.risk === 'less-urgent' ? 'Pouco Urgente' : 'Não Urgente'}
                             </Badge>
-                            <span className="text-[10px] font-bold text-muted-foreground flex items-center gap-1">
-                              <div className={cn("h-1.5 w-1.5 rounded-full", patient.risk === 'emergency' ? "bg-red-500 animate-pulse" : patient.risk === 'very-urgent' ? "bg-orange-500 animate-pulse" : patient.risk === 'urgent' ? "bg-[#FFDE21] animate-pulse" : patient.risk === 'less-urgent' ? "bg-green-500" : "bg-blue-600")} />
+                            <span className="text-[10px] font-bold text-slate-600 dark:text-slate-400 flex items-center gap-1.5 bg-white/40 dark:bg-slate-900/40 px-2 py-0.5 rounded-full border border-white/40 dark:border-slate-700/50 backdrop-blur-sm">
+                              <div className={cn("h-1.5 w-1.5 rounded-full shadow-[0_0_5px_currentColor]", patient.risk === 'emergency' ? "bg-red-500 text-red-500 animate-pulse-slow" : patient.risk === 'very-urgent' ? "bg-orange-500 text-orange-500 animate-pulse-slow" : patient.risk === 'urgent' ? "bg-[#FFDE21] text-[#FFDE21] animate-pulse-slow" : patient.risk === 'less-urgent' ? "bg-emerald-500 text-emerald-500" : "bg-blue-600 text-blue-600")} />
                               {bed.name} ({bed.ward})
                             </span>
                           </div>
                         </div>
                         
-                        <div className="grid grid-cols-3 gap-2 bg-slate-50/50 dark:bg-slate-950/50 p-2 rounded-xl border border-slate-200/40 dark:border-slate-800/40 shadow-inner">
-                          <div className="flex items-center justify-center gap-2">
-                            <HeartPulse className="h-3.5 w-3.5 text-red-500" />
+                        <div className="grid grid-cols-3 gap-3 bg-gradient-to-r from-white/40 via-white/20 to-white/40 dark:from-slate-900/40 dark:via-slate-800/20 dark:to-slate-900/40 p-2.5 rounded-2xl border border-white/50 dark:border-white/10 shadow-[inset_0_1px_2px_rgba(255,255,255,0.4),0_2px_10px_rgba(0,0,0,0.02)] backdrop-blur-md relative z-10">
+                          <div className="flex items-center justify-center gap-2.5 bg-white/30 dark:bg-slate-900/50 py-1.5 rounded-xl border border-white/40 dark:border-white/5 shadow-sm group/vital hover:bg-white/60 dark:hover:bg-slate-800/50 transition-colors">
+                            <HeartPulse className="h-4 w-4 text-red-500 drop-shadow-[0_0_8px_rgba(239,68,68,0.5)] group-hover/vital:scale-110 transition-transform" />
                             <div className="flex flex-col">
-                              <span className="text-[11px] font-black leading-none text-foreground">{patient.vitals?.heartRate || "--"}</span>
-                              <span className="text-[8px] font-bold text-muted-foreground leading-none mt-0.5">BPM</span>
+                              <span className="text-[13px] font-black leading-none text-foreground">{patient.vitals?.heartRate || "--"}</span>
+                              <span className="text-[8px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest mt-0.5">BPM</span>
                             </div>
                           </div>
-                          <div className="flex items-center justify-center gap-2 border-l border-r border-slate-200/40 dark:border-slate-800/40">
-                            <Activity className="h-3.5 w-3.5 text-blue-500" />
+                          <div className="flex items-center justify-center gap-2.5 bg-white/30 dark:bg-slate-900/50 py-1.5 rounded-xl border border-white/40 dark:border-white/5 shadow-sm group/vital hover:bg-white/60 dark:hover:bg-slate-800/50 transition-colors">
+                            <Activity className="h-4 w-4 text-sky-500 drop-shadow-[0_0_8px_rgba(14,165,233,0.5)] group-hover/vital:scale-110 transition-transform" />
                             <div className="flex flex-col">
-                              <span className="text-[11px] font-black leading-none text-foreground">{patient.vitals?.bloodPressure || "--"}</span>
-                              <span className="text-[8px] font-bold text-muted-foreground leading-none mt-0.5">PA</span>
+                              <span className="text-[13px] font-black leading-none text-foreground">{patient.vitals?.bloodPressure || "--"}</span>
+                              <span className="text-[8px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest mt-0.5">PA</span>
                             </div>
                           </div>
-                          <div className="flex items-center justify-center gap-2">
-                            <Droplets className="h-3.5 w-3.5 text-green-500" />
+                          <div className="flex items-center justify-center gap-2.5 bg-white/30 dark:bg-slate-900/50 py-1.5 rounded-xl border border-white/40 dark:border-white/5 shadow-sm group/vital hover:bg-white/60 dark:hover:bg-slate-800/50 transition-colors">
+                            <Droplets className="h-4 w-4 text-emerald-500 drop-shadow-[0_0_8px_rgba(16,185,129,0.5)] group-hover/vital:scale-110 transition-transform" />
                             <div className="flex flex-col">
-                              <span className="text-[11px] font-black leading-none text-foreground">{patient.vitals?.saturation ? patient.vitals.saturation + "%" : "--"}</span>
-                              <span className="text-[8px] font-bold text-muted-foreground leading-none mt-0.5">O2</span>
+                              <span className="text-[13px] font-black leading-none text-foreground">{patient.vitals?.saturation ? patient.vitals.saturation + "%" : "--"}</span>
+                              <span className="text-[8px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest mt-0.5">O2</span>
                             </div>
                           </div>
                         </div>
@@ -577,10 +667,11 @@ export default function Beds() {
                         <Button 
                           variant="outline" 
                           size="sm" 
-                          className="w-full text-[10px] font-black uppercase tracking-widest rounded-xl h-10 bg-white/50 dark:bg-slate-900/40 border-slate-200/60 dark:border-slate-800 hover:bg-[#006699] hover:text-white dark:hover:bg-sky-500 dark:hover:text-slate-950 hover:border-transparent transition-all shadow-sm text-foreground" 
+                          className="relative z-10 w-full text-[11px] font-black uppercase tracking-[0.2em] rounded-xl h-11 bg-gradient-to-b from-white/60 to-white/30 dark:from-slate-800/60 dark:to-slate-900/60 border border-white/60 dark:border-white/10 hover:from-[#006699] hover:to-[#004d73] hover:text-white dark:hover:from-sky-500 dark:hover:to-sky-600 dark:hover:text-slate-950 hover:border-transparent hover:shadow-[0_8px_20px_rgba(0,102,153,0.25)] transition-all duration-300 text-foreground group/btn overflow-hidden" 
                           onClick={() => navigate(`/paciente/${patient.id}`, { state: { from: '/leitos', label: 'Leitos' } })}
                         >
-                          Visualizar Prontuário <ArrowRight className="h-3.5 w-3.5 ml-2" />
+                          <div className="absolute inset-0 bg-white/20 translate-y-[-100%] group-hover/btn:translate-y-[100%] transition-transform duration-700 pointer-events-none" />
+                          Visualizar Prontuário <ArrowRight className="h-4 w-4 ml-2 group-hover/btn:translate-x-1 transition-transform" />
                         </Button>
                       </div>
                     ))}
@@ -602,44 +693,48 @@ export default function Beds() {
 
       <Dialog open={!!selectedBedId} onOpenChange={(open) => !open && setSelectedBedId(null)}>
         {selectedBed && (
-          <DialogContent className="sm:max-w-[480px] rounded-xl p-0 overflow-hidden border border-slate-200/40 dark:border-slate-800/40 bg-white dark:bg-slate-950 shadow-2xl">
-            <DialogHeader className="p-8 pb-4 border-b border-slate-200/40 dark:border-slate-800/40 flex-row items-center gap-4 space-y-0 text-left bg-slate-50/30 dark:bg-slate-950/30">
-              <div className="h-12 w-12 rounded-xl bg-[#006699]/10 dark:bg-sky-400/10 flex items-center justify-center text-[#006699] dark:text-sky-400 shrink-0">
-                <BedDouble className="h-6 w-6" />
-              </div>
-              <div>
-                <DialogTitle className="text-xl font-black uppercase tracking-tight leading-none text-foreground">{selectedBed.name}</DialogTitle>
-                <DialogDescription className="text-[10px] font-bold uppercase tracking-widest opacity-60 mt-1.5">
-                  {selectedBed.ward} · {selectedBed.room}
-                </DialogDescription>
-              </div>
-            </DialogHeader>
+          <DialogContent className="sm:max-w-[500px] rounded-2xl p-0 overflow-hidden glass-card-premium border-white/40 dark:border-white/10 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.3)]">
+            <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-white/10 dark:from-slate-900/80 dark:to-slate-950/90 pointer-events-none" />
             
-            <div className="grid gap-6 p-8 py-5">
-              <Tabs defaultValue="status" className="w-full">
-                <TabsList className="grid w-full grid-cols-3 mb-4 bg-slate-100/50 dark:bg-slate-900/50 p-1 rounded-lg h-12 border border-slate-200/40 dark:border-slate-800/40">
-                  <TabsTrigger value="status" className="rounded-md text-[10px] font-black uppercase tracking-widest data-[state=active]:bg-[#006699] dark:data-[state=active]:bg-sky-500 data-[state=active]:text-white dark:data-[state=active]:text-slate-950 transition-all">Status</TabsTrigger>
-                  <TabsTrigger value="care" className="rounded-md text-[10px] font-black uppercase tracking-widest data-[state=active]:bg-[#006699] dark:data-[state=active]:bg-sky-500 data-[state=active]:text-white dark:data-[state=active]:text-slate-950 transition-all">Cuidados</TabsTrigger>
-                  <TabsTrigger value="meds" className="rounded-md text-[10px] font-black uppercase tracking-widest data-[state=active]:bg-[#006699] dark:data-[state=active]:bg-sky-500 data-[state=active]:text-white dark:data-[state=active]:text-slate-950 transition-all">Prescrição</TabsTrigger>
-                </TabsList>
+            <div className="relative z-10">
+              <DialogHeader className="p-8 pb-5 border-b border-white/20 dark:border-white/5 flex-row items-center gap-5 space-y-0 text-left">
+                <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-[#006699]/20 to-[#006699]/5 dark:from-sky-400/20 dark:to-sky-400/5 flex items-center justify-center text-[#006699] dark:text-sky-400 shrink-0 border border-[#006699]/20 dark:border-sky-400/20 shadow-[inset_0_1px_1px_rgba(255,255,255,0.4)] backdrop-blur-md">
+                  <BedDouble className="h-7 w-7 drop-shadow-[0_0_8px_rgba(0,102,153,0.5)] dark:drop-shadow-[0_0_8px_rgba(56,189,248,0.5)]" />
+                </div>
+                <div>
+                  <DialogTitle className="text-2xl font-black uppercase tracking-tight leading-none text-foreground drop-shadow-sm">{selectedBed.name}</DialogTitle>
+                  <DialogDescription className="text-[11px] font-black uppercase tracking-[0.2em] opacity-80 mt-2 text-slate-600 dark:text-slate-400 flex items-center gap-2">
+                    <span className="px-2 py-0.5 rounded-full bg-white/40 dark:bg-slate-800/50 border border-white/50 dark:border-white/5">{selectedBed.ward}</span> 
+                    <span className="px-2 py-0.5 rounded-full bg-white/40 dark:bg-slate-800/50 border border-white/50 dark:border-white/5">{selectedBed.room}</span>
+                  </DialogDescription>
+                </div>
+              </DialogHeader>
+              
+              <div className="grid gap-6 p-8 py-6">
+                <Tabs defaultValue="status" className="w-full">
+                  <TabsList className="grid w-full grid-cols-3 mb-6 bg-white/30 dark:bg-slate-900/40 p-1.5 rounded-xl h-14 border border-white/50 dark:border-white/5 shadow-[inset_0_1px_2px_rgba(0,0,0,0.05)] backdrop-blur-md">
+                    <TabsTrigger value="status" className="rounded-lg text-[10px] font-black uppercase tracking-[0.15em] data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#006699] data-[state=active]:to-[#004d73] dark:data-[state=active]:from-sky-500 dark:data-[state=active]:to-sky-600 data-[state=active]:text-white data-[state=active]:shadow-lg transition-all">Status</TabsTrigger>
+                    <TabsTrigger value="care" className="rounded-lg text-[10px] font-black uppercase tracking-[0.15em] data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#006699] data-[state=active]:to-[#004d73] dark:data-[state=active]:from-sky-500 dark:data-[state=active]:to-sky-600 data-[state=active]:text-white data-[state=active]:shadow-lg transition-all">Cuidados</TabsTrigger>
+                    <TabsTrigger value="meds" className="rounded-lg text-[10px] font-black uppercase tracking-[0.15em] data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#006699] data-[state=active]:to-[#004d73] dark:data-[state=active]:from-sky-500 dark:data-[state=active]:to-sky-600 data-[state=active]:text-white data-[state=active]:shadow-lg transition-all">Prescrição</TabsTrigger>
+                  </TabsList>
 
                 <TabsContent value="status" className="space-y-4 outline-none">
-                  <div className="p-4 rounded-xl bg-slate-50/50 dark:bg-slate-900/45 border border-slate-200/40 dark:border-slate-800/30">
-                    <h4 className="text-xs font-black uppercase tracking-widest text-[#006699] dark:text-sky-400 mb-3 flex items-center gap-2">
-                      <Info className="h-3 w-3" />
+                  <div className="p-5 rounded-2xl bg-white/40 dark:bg-slate-900/40 border border-white/50 dark:border-white/5 shadow-[inset_0_1px_2px_rgba(255,255,255,0.4)] backdrop-blur-sm">
+                    <h4 className="text-xs font-black uppercase tracking-[0.15em] text-[#006699] dark:text-sky-400 mb-4 flex items-center gap-2">
+                      <Info className="h-4 w-4" />
                       Ocupação do Leito
                     </h4>
                     <Select value={selectedBed.status} onValueChange={(value) => handleStatusChange(value as BedStatus)}>
-                      <SelectTrigger className="w-full h-12 rounded-xl bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-850 shadow-sm font-bold text-foreground">
+                      <SelectTrigger className="w-full h-12 rounded-xl bg-white/60 dark:bg-slate-800/60 border border-white/60 dark:border-white/10 shadow-sm font-bold text-foreground backdrop-blur-md hover:bg-white/80 dark:hover:bg-slate-800/80 transition-colors">
                         <SelectValue placeholder="Selecione o status" />
                       </SelectTrigger>
-                      <SelectContent className="rounded-xl border border-slate-200/60 dark:border-slate-800/60 shadow-xl bg-white dark:bg-slate-950">
-                        <SelectItem value="available" className="font-bold text-emerald-600">Disponível</SelectItem>
-                        <SelectItem value="occupied" className="font-bold text-red-600">Ocupado</SelectItem>
-                        <SelectItem value="maintenance" className="font-bold text-yellow-600">Manutenção</SelectItem>
+                      <SelectContent className="rounded-xl border border-white/40 dark:border-white/10 shadow-2xl bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl">
+                        <SelectItem value="available" className="font-bold text-emerald-600 dark:text-emerald-400">Disponível</SelectItem>
+                        <SelectItem value="occupied" className="font-bold text-red-600 dark:text-red-400">Ocupado</SelectItem>
+                        <SelectItem value="maintenance" className="font-bold text-yellow-600 dark:text-yellow-400">Manutenção</SelectItem>
                       </SelectContent>
                     </Select>
-                    <p className="mt-3 text-[11px] text-muted-foreground leading-relaxed italic opacity-70">
+                    <p className="mt-4 text-[12px] font-medium text-slate-600 dark:text-slate-400 leading-relaxed italic">
                       {statusConfig[selectedBed.status].description}
                     </p>
                   </div>
@@ -694,21 +789,21 @@ export default function Beds() {
                 </TabsContent>
               </Tabs>
 
-              <div className="space-y-3 pt-4 border-t border-slate-200/40 dark:border-slate-800/40">
-                <h4 className="text-xs font-black uppercase tracking-widest text-[#006699] dark:text-sky-400 px-1">Atividades Recentes</h4>
+              <div className="space-y-3 pt-5 border-t border-white/20 dark:border-white/5">
+                <h4 className="text-xs font-black uppercase tracking-[0.15em] text-[#006699] dark:text-sky-400 px-1">Atividades Recentes</h4>
                 <div className="space-y-2">
-                  <div className="p-3 rounded-xl bg-slate-50/50 dark:bg-slate-900/40 border border-slate-200/20 dark:border-slate-800/20 text-[11px] flex justify-between items-center text-foreground">
-                    <span className="font-medium text-muted-foreground">Status alterado para {statusConfig[selectedBed.status].label}</span>
-                    <span className="text-[10px] opacity-50 font-mono">Agora</span>
+                  <div className="p-4 rounded-xl bg-white/40 dark:bg-slate-900/40 border border-white/50 dark:border-white/5 text-[12px] flex justify-between items-center text-foreground backdrop-blur-sm shadow-[inset_0_1px_1px_rgba(255,255,255,0.4)]">
+                    <span className="font-bold text-slate-700 dark:text-slate-300">Status alterado para <span className="font-black text-[#006699] dark:text-sky-400">{statusConfig[selectedBed.status].label}</span></span>
+                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 bg-white/50 dark:bg-slate-800/50 px-2 py-0.5 rounded-md">Agora</span>
                   </div>
                 </div>
               </div>
             </div>
 
-            <DialogFooter className="flex flex-wrap gap-2 p-8 pt-4 border-t border-slate-200/40 dark:border-slate-800/40 bg-slate-50/20 dark:bg-slate-950/30">
+            <DialogFooter className="flex flex-wrap gap-3 p-8 pt-5 border-t border-white/20 dark:border-white/5 bg-white/20 dark:bg-slate-900/20 backdrop-blur-md relative z-10">
                 <Button 
                   type="button" 
-                  className="flex-1 h-12 rounded-xl font-black uppercase tracking-[0.2em] text-[10px] bg-slate-900 dark:bg-slate-100 hover:bg-slate-850 text-white dark:text-slate-950"
+                  className="flex-1 h-12 rounded-xl font-black uppercase tracking-[0.15em] text-[10px] bg-gradient-to-r from-slate-800 to-slate-900 dark:from-slate-200 dark:to-white hover:from-slate-700 hover:to-slate-800 dark:hover:from-white dark:hover:to-slate-200 text-white dark:text-slate-950 shadow-lg border border-slate-700 dark:border-white/20 transition-all"
                   onClick={() => setSelectedBedId(null)}
                 >
                   Concluir
@@ -716,19 +811,19 @@ export default function Beds() {
                 {selectedBed && selectedBed.status === 'occupied' && (
                   <Button
                     variant="outline"
-                    className="flex-1 h-12 rounded-xl font-bold uppercase tracking-widest text-[10px] border-amber-200 text-amber-600 hover:bg-amber-50 dark:border-amber-500/25 dark:text-amber-400 dark:hover:bg-amber-500/10 bg-transparent"
+                    className="flex-1 h-12 rounded-xl font-black uppercase tracking-[0.15em] text-[10px] border border-amber-400/50 text-amber-600 dark:text-amber-400 hover:bg-amber-500/10 bg-white/40 dark:bg-slate-900/40 backdrop-blur-sm transition-all"
                     onClick={() => {
                       setTransferringBedId(selectedBed.id);
                       setSelectedBedId(null);
                     }}
                   >
-                    <ArrowRightLeft className="h-3 w-3 mr-2" /> Trocar Leito
+                    <ArrowRightLeft className="h-4 w-4 mr-2" /> Trocar Leito
                   </Button>
                 )}
                 {selectedBed && (
                   <Button
                     variant="secondary"
-                    className="flex-1 h-12 rounded-xl font-bold uppercase tracking-widest text-[10px]"
+                    className="flex-1 h-12 rounded-xl font-black uppercase tracking-[0.15em] text-[10px] bg-gradient-to-r from-[#006699] to-[#004d73] dark:from-sky-500 dark:to-sky-600 hover:brightness-110 text-white shadow-lg border border-white/20 transition-all"
                     onClick={() => {
                       const patient = getBedPatient(selectedBed);
                       if (patient) {
@@ -739,10 +834,11 @@ export default function Beds() {
                       }
                     }}
                   >
-                    Prontuário
+                    Prontuário <ArrowRight className="h-4 w-4 ml-2" />
                   </Button>
                 )}
               </DialogFooter>
+            </div>
           </DialogContent>
         )}
       </Dialog>
@@ -770,7 +866,8 @@ export default function Beds() {
                       <HeartPulse className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-red-500/50" />
                       <input 
                         type="text" 
-                        className="w-full h-12 bg-slate-50/50 dark:bg-slate-900/40 border border-slate-200/60 dark:border-slate-800/60 rounded-xl pl-10 pr-4 text-sm font-black text-foreground focus:ring-2 focus:ring-[#006699]/20 dark:focus:ring-sky-55/20 transition-all outline-none"
+                        placeholder="Ex: 88"
+                        className="w-full h-12 bg-slate-50/50 dark:bg-slate-900/40 border border-slate-200/60 dark:border-slate-800/60 rounded-xl pl-10 pr-4 text-sm font-black text-foreground placeholder:text-muted-foreground/50 focus:ring-2 focus:ring-[#006699]/20 dark:focus:ring-sky-55/20 transition-all outline-none"
                         value={vitalsForm.heartRate}
                         onChange={(e) => setVitalsForm({...vitalsForm, heartRate: e.target.value})}
                       />
@@ -782,9 +879,37 @@ export default function Beds() {
                       <Activity className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-blue-500/50" />
                       <input 
                         type="text" 
-                        className="w-full h-12 bg-slate-50/50 dark:bg-slate-900/40 border border-slate-200/60 dark:border-slate-800/60 rounded-xl pl-10 pr-4 text-sm font-black text-foreground focus:ring-2 focus:ring-[#006699]/20 dark:focus:ring-sky-55/20 transition-all outline-none"
+                        placeholder="Ex: 120/80"
+                        className="w-full h-12 bg-slate-50/50 dark:bg-slate-900/40 border border-slate-200/60 dark:border-slate-800/60 rounded-xl pl-10 pr-4 text-sm font-black text-foreground placeholder:text-muted-foreground/50 focus:ring-2 focus:ring-[#006699]/20 dark:focus:ring-sky-55/20 transition-all outline-none"
                         value={vitalsForm.bloodPressure}
-                        onChange={(e) => setVitalsForm({...vitalsForm, bloodPressure: e.target.value})}
+                        onChange={(e) => {
+                          let val = e.target.value;
+                          
+                          // Permite apagar livremente
+                          if (val.length < vitalsForm.bloodPressure.length) {
+                            setVitalsForm({...vitalsForm, bloodPressure: val});
+                            return;
+                          }
+                          
+                          // Remove tudo que não for número
+                          let v = val.replace(/\D/g, '');
+                          
+                          // Aplica a máscara dinâmica
+                          if (v.length === 3) {
+                            v = v.replace(/(\d{2})(\d{1})/, '$1/$2'); // 128 -> 12/8
+                          } else if (v.length === 4) {
+                            v = v.replace(/(\d{3})(\d{1})/, '$1/$2'); // 1208 -> 120/8
+                          } else if (v.length >= 5) {
+                            v = v.slice(0, 6).replace(/(\d{3})(\d{2,3})/, '$1/$2'); // 12080 -> 120/80
+                          }
+                          
+                          // Se o usuário digitou a barra manualmente no final, a gente respeita
+                          if (val.endsWith('/') && !v.includes('/')) {
+                             v = v + '/';
+                          }
+
+                          setVitalsForm({...vitalsForm, bloodPressure: v});
+                        }}
                       />
                     </div>
                   </div>
@@ -794,7 +919,8 @@ export default function Beds() {
                       <Droplets className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-emerald-500/50" />
                       <input 
                         type="text" 
-                        className="w-full h-12 bg-slate-50/50 dark:bg-slate-900/40 border border-slate-200/60 dark:border-slate-800/60 rounded-xl pl-10 pr-4 text-sm font-black text-foreground focus:ring-2 focus:ring-[#006699]/20 dark:focus:ring-sky-55/20 transition-all outline-none"
+                        placeholder="Ex: 98"
+                        className="w-full h-12 bg-slate-50/50 dark:bg-slate-900/40 border border-slate-200/60 dark:border-slate-800/60 rounded-xl pl-10 pr-4 text-sm font-black text-foreground placeholder:text-muted-foreground/50 focus:ring-2 focus:ring-[#006699]/20 dark:focus:ring-sky-55/20 transition-all outline-none"
                         value={vitalsForm.saturation}
                         onChange={(e) => setVitalsForm({...vitalsForm, saturation: e.target.value})}
                       />
@@ -806,7 +932,8 @@ export default function Beds() {
                       <Thermometer className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-orange-500/50" />
                       <input 
                         type="text" 
-                        className="w-full h-12 bg-slate-50/50 dark:bg-slate-900/40 border border-slate-200/60 dark:border-slate-800/60 rounded-xl pl-10 pr-4 text-sm font-black text-foreground focus:ring-2 focus:ring-[#006699]/20 dark:focus:ring-sky-55/20 transition-all outline-none"
+                        placeholder="Ex: 36.5"
+                        className="w-full h-12 bg-slate-50/50 dark:bg-slate-900/40 border border-slate-200/60 dark:border-slate-800/60 rounded-xl pl-10 pr-4 text-sm font-black text-foreground placeholder:text-muted-foreground/50 focus:ring-2 focus:ring-[#006699]/20 dark:focus:ring-sky-55/20 transition-all outline-none"
                         value={vitalsForm.temperature}
                         onChange={(e) => setVitalsForm({...vitalsForm, temperature: e.target.value})}
                       />
@@ -829,13 +956,14 @@ export default function Beds() {
                 )}
 
                 <div className="space-y-2 pt-4 border-t border-slate-200/40 dark:border-slate-800/40">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Classificação de Risco (Manchester)</label>
+                  <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Classificação de Risco</label>
                   <div className="flex gap-2">
                     {[
-                      { id: 'emergency', color: 'bg-red-500', label: 'Emergência' },
-                      { id: 'very-urgent', color: 'bg-orange-500', label: 'Muito Urgente' },
-                      { id: 'urgent', color: 'bg-[#FFDE21]', label: 'Urgente' },
-                      { id: 'less-urgent', color: 'bg-green-500', label: 'Pouco Urgente' }
+                      { id: 'emergency', color: 'bg-red-500 text-white', label: 'Emergência' },
+                      { id: 'very-urgent', color: 'bg-orange-500 text-white', label: 'Muito Urgente' },
+                      { id: 'urgent', color: 'bg-[#FFDE21] text-black', label: 'Urgente' },
+                      { id: 'less-urgent', color: 'bg-green-500 text-white', label: 'Pouco Urgente' },
+                      { id: 'not-urgent', color: 'bg-blue-600 text-white', label: 'Não Urgente' }
                     ].map((r) => (
                       <button
                         key={r.id}
@@ -844,12 +972,12 @@ export default function Beds() {
                           setLocalRisk(r.id);
                         }}
                         className={cn(
-                          "flex-1 h-8 rounded-lg text-[8px] font-black uppercase text-white transition-all hover:scale-105",
+                          "flex-1 h-8 rounded-lg text-[8px] font-black uppercase transition-all hover:scale-105 flex items-center justify-center px-0.5 leading-none text-center",
                           r.color,
-                          localRisk === r.id ? "ring-2 ring-offset-2 ring-slate-400 scale-110 shadow-lg" : "opacity-45"
+                          localRisk === r.id ? "ring-2 ring-offset-2 ring-slate-400 scale-105 shadow-lg" : "opacity-45"
                         )}
                       >
-                        {r.id.split('-')[0]}
+                        {r.label}
                       </button>
                     ))}
                   </div>

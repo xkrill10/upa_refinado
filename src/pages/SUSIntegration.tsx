@@ -452,9 +452,9 @@ export default function SUSIntegration() {
                 Censo Global
               </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[800px] rounded-[3rem] p-0 overflow-hidden border-none shadow-2xl">
+            <DialogContent className="sm:max-w-[800px] rounded-[3rem] p-0 overflow-hidden glass-card-premium border-white/40 dark:border-white/10 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.3)]">
               <div className="font-sans">
-                <div className="p-10 bg-muted/30 border-b relative">
+                <div className="p-10 bg-gradient-to-r from-white/40 to-white/10 dark:from-slate-900/40 dark:to-slate-900/10 border-b border-white/20 dark:border-white/5 relative">
                   <div className="absolute top-0 right-0 p-10 opacity-10 pointer-events-none">
                     <Building2 className="h-32 w-32" />
                   </div>
@@ -465,7 +465,12 @@ export default function SUSIntegration() {
 
                 <div className="p-10 space-y-10">
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div className="p-6 rounded-[2rem] bg-emerald-500/5 border border-emerald-500/20">
+                    <motion.div 
+                      whileHover={{ scale: 1.05 }} 
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => toast.info("Gerando relatório detalhado: Ocupação Enfermaria")}
+                      className="p-6 rounded-[2rem] bg-emerald-500/5 border border-emerald-500/20 cursor-pointer hover:shadow-lg hover:shadow-emerald-500/10 transition-shadow"
+                    >
                       <p className="text-[10px] font-black uppercase tracking-widest text-emerald-600 mb-2">Ocupação Enfermaria</p>
                       <div className="flex items-baseline gap-2">
                         <span className="text-4xl font-black text-emerald-600">72%</span>
@@ -474,9 +479,14 @@ export default function SUSIntegration() {
                       <div className="h-1.5 w-full bg-emerald-200 rounded-full mt-4 overflow-hidden">
                         <div className="h-full bg-emerald-500" style={{ width: '72%' }} />
                       </div>
-                    </div>
+                    </motion.div>
 
-                    <div className="p-6 rounded-[2rem] bg-amber-500/5 border border-amber-500/20">
+                    <motion.div 
+                      whileHover={{ scale: 1.05 }} 
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => toast.info("Gerando relatório detalhado: Ocupação UTI/Críticos")}
+                      className="p-6 rounded-[2rem] bg-amber-500/5 border border-amber-500/20 cursor-pointer hover:shadow-lg hover:shadow-amber-500/10 transition-shadow"
+                    >
                       <p className="text-[10px] font-black uppercase tracking-widest text-amber-600 mb-2">Ocupação UTI/Críticos</p>
                       <div className="flex items-baseline gap-2">
                         <span className="text-4xl font-black text-amber-600">89%</span>
@@ -485,9 +495,14 @@ export default function SUSIntegration() {
                       <div className="h-1.5 w-full bg-amber-200 rounded-full mt-4 overflow-hidden">
                         <div className="h-full bg-amber-500" style={{ width: '89%' }} />
                       </div>
-                    </div>
+                    </motion.div>
 
-                    <div className="p-6 rounded-[2rem] bg-red-500/5 border border-red-500/20">
+                    <motion.div 
+                      whileHover={{ scale: 1.05 }} 
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => toast.info("Gerando relatório detalhado: Leitos Isolamento")}
+                      className="p-6 rounded-[2rem] bg-red-500/5 border border-red-500/20 cursor-pointer hover:shadow-lg hover:shadow-red-500/10 transition-shadow"
+                    >
                       <p className="text-[10px] font-black uppercase tracking-widest text-red-600 mb-2">Leitos Isolamento</p>
                       <div className="flex items-baseline gap-2">
                         <span className="text-4xl font-black text-red-600">94%</span>
@@ -496,7 +511,7 @@ export default function SUSIntegration() {
                       <div className="h-1.5 w-full bg-red-200 rounded-full mt-4 overflow-hidden">
                         <div className="h-full bg-red-500" style={{ width: '94%' }} />
                       </div>
-                    </div>
+                    </motion.div>
                   </div>
 
                   <div className="space-y-4">
@@ -549,7 +564,7 @@ export default function SUSIntegration() {
                 Novo Pedido de Vaga
               </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[600px] rounded-[2rem] p-0 overflow-hidden border-none shadow-2xl">
+            <DialogContent className="sm:max-w-[600px] rounded-[2rem] p-0 overflow-hidden glass-card-premium border-white/40 dark:border-white/10 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.3)]">
               <form onSubmit={(e) => { e.preventDefault(); toast.success("Soliitação enviada com sucesso!"); setIsNewRequestOpen(false); }}>
                 <DialogHeader className="p-8 bg-primary text-white">
                   <div className="flex items-center gap-3 mb-2">
@@ -618,7 +633,7 @@ export default function SUSIntegration() {
                   <div className="space-y-2">
                     <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Justificativa Clínica e Observações</Label>
                     <textarea 
-                      className="w-full min-h-[100px] rounded-2xl border border-border/50 bg-background p-4 text-sm focus:ring-2 focus:ring-primary/20 outline-none transition-all"
+                      className="w-full min-h-[100px] rounded-2xl border border-border/50 bg-white/5 dark:bg-slate-900/5 backdrop-blur-sm p-4 text-sm focus:ring-2 focus:ring-primary/20 outline-none transition-all"
                       placeholder="Detalhes sobre o quadro clínico, exames realizados e necessidade da transferência..."
                     />
                   </div>
@@ -636,7 +651,7 @@ export default function SUSIntegration() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card 
-          className="glass-card cursor-pointer hover:shadow-lg hover:border-green-500/40 transition-all group scale-100 hover:scale-[1.02] active:scale-95 duration-200"
+          className="glass-card-premium border-white/40 dark:border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.12)] cursor-pointer hover:shadow-2xl hover:border-green-500/40 transition-all group scale-100 hover:scale-[1.02] active:scale-95 duration-200"
           onClick={() => {
             setActiveTab("mapa");
             setFilterType("todas");
@@ -657,7 +672,7 @@ export default function SUSIntegration() {
         </Card>
         
         <Card 
-          className="glass-card cursor-pointer hover:shadow-lg hover:border-yellow-500/40 transition-all group scale-100 hover:scale-[1.02] active:scale-95 duration-200"
+          className="glass-card-premium border-white/40 dark:border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.12)] cursor-pointer hover:shadow-2xl hover:border-yellow-500/40 transition-all group scale-100 hover:scale-[1.02] active:scale-95 duration-200"
           onClick={() => {
             setActiveTab("mapa");
             setFilterType("todas");
@@ -678,7 +693,7 @@ export default function SUSIntegration() {
         </Card>
 
         <Card 
-          className="glass-card cursor-pointer hover:shadow-lg hover:border-red-500/40 transition-all group scale-100 hover:scale-[1.02] active:scale-95 duration-200"
+          className="glass-card-premium border-white/40 dark:border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.12)] cursor-pointer hover:shadow-2xl hover:border-red-500/40 transition-all group scale-100 hover:scale-[1.02] active:scale-95 duration-200"
           onClick={() => {
             setActiveTab("solicitacoes");
             toast.warning("Fila de espera para regulação aberta");
@@ -696,7 +711,7 @@ export default function SUSIntegration() {
         </Card>
 
         <Card 
-          className="glass-card cursor-pointer hover:shadow-lg hover:border-primary/40 transition-all group scale-100 hover:scale-[1.02] active:scale-95 duration-200"
+          className="glass-card-premium border-white/40 dark:border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.12)] cursor-pointer hover:shadow-2xl hover:border-primary/40 transition-all group scale-100 hover:scale-[1.02] active:scale-95 duration-200"
           onClick={() => {
             setActiveTab("rede");
             toast.info("Painel de rede regional acessado");
@@ -715,14 +730,14 @@ export default function SUSIntegration() {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="bg-muted/50 p-1 w-fit mb-4">
+        <TabsList className="glass-card-premium p-1 h-14 rounded-2xl border border-white/40 dark:border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.12)] w-fit mb-4 overflow-x-auto flex-nowrap shrink-0">
           <TabsTrigger value="mapa" className="px-6 py-2 text-xs font-bold uppercase tracking-wider">Mapa de Vagas</TabsTrigger>
           <TabsTrigger value="solicitacoes" className="px-6 py-2 text-xs font-bold uppercase tracking-wider">Solicitações</TabsTrigger>
           <TabsTrigger value="rede" className="px-6 py-2 text-xs font-bold uppercase tracking-wider">Rede Assistencial</TabsTrigger>
         </TabsList>
 
         <TabsContent value="mapa" className="space-y-6">
-          <Card className="glass-card border-0 shadow-sm overflow-hidden">
+          <Card className="glass-card-premium border border-white/40 dark:border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.12)] overflow-hidden">
             <CardContent className="p-0">
               <div className="p-4 border-b bg-muted/20 flex flex-wrap gap-4 items-center">
                 <div className="relative flex-1 min-w-[240px]">
@@ -869,10 +884,10 @@ export default function SUSIntegration() {
 
           {/* Unit Details Dialog */}
           <Dialog open={!!selectedUnit} onOpenChange={(open) => !open && setSelectedUnit(null)}>
-            <DialogContent className="sm:max-w-[500px] rounded-[2rem] p-0 overflow-hidden border-none shadow-2xl">
+            <DialogContent className="sm:max-w-[500px] rounded-[2rem] p-0 overflow-hidden glass-card-premium border-white/40 dark:border-white/10 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.3)]">
               {selectedUnit && (
                 <div className="font-sans">
-                  <div className="p-8 bg-muted/30 border-b">
+                  <div className="p-8 bg-gradient-to-r from-white/40 to-white/10 dark:from-slate-900/40 dark:to-slate-900/10 border-b border-white/20 dark:border-white/5">
                     <div className="flex items-center gap-4 mb-4">
                       <div className="h-14 w-14 rounded-2xl bg-primary/10 flex items-center justify-center">
                         <Hospital className="h-8 w-8 text-primary" />
@@ -960,7 +975,7 @@ export default function SUSIntegration() {
         <TabsContent value="solicitacoes" className="space-y-6">
           <div className="grid grid-cols-1 gap-4">
             {mockRequests.map((req) => (
-              <Card key={req.id} className="glass-card overflow-hidden group hover:shadow-lg transition-all border-none">
+              <Card key={req.id} className="glass-card-premium border border-white/40 dark:border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.12)] overflow-hidden group hover:scale-[1.02] transition-all">
                 <CardContent className="p-0">
                   <div className={cn(
                     "w-full h-1.5",
@@ -1058,7 +1073,7 @@ export default function SUSIntegration() {
         
         <TabsContent value="rede">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <Card className="glass-card border-none shadow-sm overflow-hidden bg-white hover:shadow-md transition-all">
+            <Card className="glass-card-premium border border-white/40 dark:border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.12)] overflow-hidden hover:scale-[1.02] transition-all">
               <CardHeader className="p-6">
                 <div className="flex items-center gap-3 mb-2">
                   <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center">
@@ -1089,7 +1104,7 @@ export default function SUSIntegration() {
               </CardContent>
             </Card>
 
-            <Card className="glass-card border-none shadow-sm overflow-hidden bg-white hover:shadow-md transition-all">
+            <Card className="glass-card-premium border border-white/40 dark:border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.12)] overflow-hidden hover:scale-[1.02] transition-all">
               <CardHeader className="p-6">
                 <div className="flex items-center gap-3 mb-2">
                   <div className="h-10 w-10 rounded-xl bg-amber-500/10 flex items-center justify-center">
@@ -1120,7 +1135,7 @@ export default function SUSIntegration() {
               </CardContent>
             </Card>
 
-            <Card className="glass-card border-none shadow-sm overflow-hidden bg-background border border-border/40 hover:shadow-md transition-all md:col-span-1 lg:col-span-1 group">
+            <Card className="glass-card-premium border border-white/40 dark:border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.12)] overflow-hidden hover:scale-[1.02] transition-all md:col-span-1 lg:col-span-1 group">
               <CardHeader className="p-6">
                 <div className="flex items-center gap-3 mb-2">
                   <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary group-hover:scale-110 transition-transform shrink-0">

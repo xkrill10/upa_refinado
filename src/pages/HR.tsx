@@ -164,7 +164,7 @@ export default function HR() {
                 Gerenciar Escala
               </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[700px] rounded-xl p-0 overflow-hidden border-none shadow-2xl">
+            <DialogContent className="sm:max-w-[700px] rounded-[2rem] p-0 overflow-hidden glass-card-premium border-white/40 dark:border-white/10 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.3)]">
               <form onSubmit={handleUpdateSchedule}>
                 <DialogHeader className="p-8 bg-primary text-white">
                   <div className="flex items-center gap-3 mb-2">
@@ -184,14 +184,14 @@ export default function HR() {
                       <Stethoscope className="h-3 w-3" />
                       Novo Plantonista
                     </div>
-                    <div className="space-y-4 rounded-3xl border border-border/50 bg-muted/20 p-6">
+                    <div className="space-y-4 rounded-3xl border border-border/50 bg-white/5 dark:bg-slate-900/5 backdrop-blur-sm p-6">
                       <div className="space-y-2">
                         <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Profissional</Label>
                         <Select onValueChange={(val) => setNewStaff(p => ({ ...p, name: val }))}>
-                          <SelectTrigger className="h-12 rounded-xl border-border/40">
+                          <SelectTrigger className="h-12 rounded-xl border-slate-200/50 dark:border-slate-800/50 bg-white/40 dark:bg-slate-900/40 backdrop-blur-sm shadow-sm">
                             <SelectValue placeholder="Selecione o membro" />
                           </SelectTrigger>
-                          <SelectContent className="rounded-xl border-border/50">
+                          <SelectContent className="rounded-xl border-slate-200/50 dark:border-slate-800/50 bg-white/40 dark:bg-slate-900/40 backdrop-blur-sm shadow-sm">
                             <SelectItem value="1">Dr. Carlos Souza (Clínica)</SelectItem>
                             <SelectItem value="2">Enf. Ana Paula (Urgência)</SelectItem>
                             <SelectItem value="3">Dra. Beatriz Lima (Pediatria)</SelectItem>
@@ -201,10 +201,10 @@ export default function HR() {
                       <div className="space-y-2">
                         <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Turno de Trabalho</Label>
                         <Select defaultValue="day" onValueChange={(val) => setNewStaff(p => ({ ...p, shift: val }))}>
-                          <SelectTrigger className="h-12 rounded-xl border-border/40">
+                          <SelectTrigger className="h-12 rounded-xl border-slate-200/50 dark:border-slate-800/50 bg-white/40 dark:bg-slate-900/40 backdrop-blur-sm shadow-sm">
                             <SelectValue placeholder="Selecione o turno" />
                           </SelectTrigger>
-                          <SelectContent className="rounded-xl border-border/50">
+                          <SelectContent className="rounded-xl border-slate-200/50 dark:border-slate-800/50 bg-white/40 dark:bg-slate-900/40 backdrop-blur-sm shadow-sm">
                             <SelectItem value="day">Diurno (07:00 - 19:00)</SelectItem>
                             <SelectItem value="night">Noturno (19:00 - 07:00)</SelectItem>
                             <SelectItem value="special">Especial / 24h</SelectItem>
@@ -237,7 +237,7 @@ export default function HR() {
                         { name: "Ricardo Silva", time: "13:00 - 01:00", active: true },
                         { name: "Dra. Maria Clara", time: "19:00 - 07:00", active: false },
                       ].map((item, i) => (
-                        <div key={i} className="flex items-center justify-between p-3 rounded-2xl bg-white border border-border/50 shadow-sm">
+                        <div key={i} className="flex items-center justify-between p-3 rounded-2xl bg-white/40 dark:bg-slate-900/40 backdrop-blur-sm border border-border/50 shadow-sm">
                           <div className="flex items-center gap-3">
                             <div className={cn("h-2 w-2 rounded-full", item.active ? "bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]" : "bg-slate-300")} />
                             <span className="text-xs font-bold uppercase tracking-tight">{item.name}</span>
@@ -249,7 +249,7 @@ export default function HR() {
                   </div>
                 </div>
 
-                <div className="rounded-3xl border border-red-100 bg-red-50/50 p-6 space-y-3">
+                <div className="rounded-3xl border border-red-500/20 bg-red-500/10 backdrop-blur-sm p-6 space-y-3">
                   <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-red-600">
                     <ShieldAlert className="h-4 w-4" />
                     Zonas de Atenção / Déficits

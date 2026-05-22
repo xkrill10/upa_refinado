@@ -238,7 +238,7 @@ export default function Sectors() {
               "h-9 px-4 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all shadow-sm border-none",
               isAudioEnabled 
                 ? "bg-emerald-500 hover:bg-emerald-600 dark:bg-emerald-600 dark:hover:bg-emerald-500 text-white shadow-sm" 
-                : "border border-slate-200/60 dark:border-slate-850 text-foreground bg-white/50 dark:bg-slate-900/40 backdrop-blur-md hover:bg-slate-50 dark:hover:bg-slate-900 hover:text-[#006699] dark:hover:text-sky-400"
+                : "border border-white/40 dark:border-white/10 text-foreground glass-card-premium hover:text-[#006699] dark:hover:text-sky-400"
             )}
           >
             {isAudioEnabled ? "Áudio do Painel: ATIVO" : "Áudio do Painel: INATIVO"}
@@ -251,7 +251,7 @@ export default function Sectors() {
       </div>
 
       <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-6">
-        <TabsList className="bg-slate-50/45 dark:bg-slate-950/25 p-1 h-14 rounded-xl border border-slate-200/40 dark:border-slate-800/40 backdrop-blur-md w-full md:w-auto overflow-x-auto flex-nowrap shadow-inner">
+        <TabsList className="glass-card-premium p-1 h-14 rounded-xl border border-white/40 dark:border-white/10 w-full md:w-auto overflow-x-auto flex-nowrap shadow-[0_8px_30px_rgba(0,0,0,0.12)]">
           <TabsTrigger 
             value="census"
             onClick={() => {
@@ -300,10 +300,10 @@ export default function Sectors() {
               <Card 
                 key={stat.risk} 
                 className={cn(
-                  "rounded-xl border cursor-pointer transition-all duration-300 hover:scale-[1.01] active:scale-[0.99] overflow-hidden group backdrop-blur-md",
+                  "rounded-2xl border cursor-pointer transition-all duration-300 overflow-hidden group select-none",
                   selectedRisk === stat.risk 
-                    ? cn("bg-white/95 dark:bg-slate-900/60", stat.activeBorder) 
-                    : "border-slate-200/40 dark:border-slate-800/40 bg-white/70 dark:bg-slate-900/45 hover:bg-white/90 dark:hover:bg-slate-900/60 shadow-md"
+                    ? cn("glass-card-premium font-black ring-2 ring-offset-2 ring-slate-400 dark:ring-slate-600 shadow-2xl scale-[1.02] relative z-10", stat.activeBorder) 
+                    : "border-white/40 dark:border-white/10 glass-card-premium opacity-80 hover:opacity-100 hover:scale-[1.02] shadow-[0_8px_30px_rgba(0,0,0,0.12)] hover:shadow-xl"
                 )}
                 onClick={() => setSelectedRisk(selectedRisk === stat.risk ? null : stat.risk)}
               >
@@ -330,8 +330,8 @@ export default function Sectors() {
             ))}
           </div>
 
-          <Card className="rounded-xl border border-slate-200/40 dark:border-slate-800/45 shadow-xl overflow-hidden bg-white/70 dark:bg-slate-900/45 backdrop-blur-md ">
-            <CardHeader className="p-6 bg-slate-50/35 dark:bg-slate-950/20 border-b border-slate-200/40 dark:border-slate-805">
+          <Card className="glass-card-premium border-white/40 dark:border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.12)] overflow-hidden rounded-2xl transition-colors duration-500">
+            <CardHeader className="p-6 bg-gradient-to-r from-white/40 to-white/10 dark:from-slate-900/40 dark:to-slate-900/10 backdrop-blur-md border-b border-white/40 dark:border-white/10">
               <div className="flex items-center justify-between">
                 <div>
                   <div className="flex items-center gap-3">
@@ -379,7 +379,7 @@ export default function Sectors() {
                   }).map(patient => {
                     const pDiff = (now.getTime() - new Date(patient.arrivalTime).getTime()) / 60000;
                     return (
-                      <div key={patient.id} className="rounded-xl border border-slate-200/30 dark:border-slate-800/30 bg-white/60 dark:bg-slate-900/30 p-4 flex flex-col gap-4 hover:bg-white/90 dark:hover:bg-slate-900/50 hover:shadow-lg transition-all duration-300 group">
+                      <div key={patient.id} className="rounded-2xl border border-white/40 dark:border-white/10 glass-card-premium p-4 flex flex-col gap-4 hover:scale-[1.02] hover:shadow-[0_8px_30px_rgba(0,0,0,0.12)] transition-all duration-300 group relative z-10">
                         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                           <div className="flex items-center gap-3">
                             <div className="h-10 w-10 rounded-lg bg-slate-100/50 dark:bg-slate-900/40 flex items-center justify-center font-black text-[10px] text-slate-550 dark:text-slate-400 border border-slate-200/30 dark:border-slate-850 transition-colors group-hover:bg-[#006699]/10 group-hover:text-[#006699] dark:group-hover:text-sky-400 group-hover:border-[#006699]/10 dark:group-hover:border-sky-500/10 shrink-0">
@@ -405,7 +405,7 @@ export default function Sectors() {
                           </div>
                         </div>
                         
-                        <div className="flex items-center justify-between bg-slate-50/40 dark:bg-slate-950/20 px-3 py-2 rounded-lg border border-slate-200/30 dark:border-slate-800/30 text-[10px] font-bold text-muted-foreground uppercase">
+                        <div className="flex items-center justify-between bg-white/30 dark:bg-slate-950/40 px-3 py-2 rounded-xl border border-white/40 dark:border-white/10 text-[10px] font-bold text-muted-foreground uppercase shadow-inner">
                           <span className="flex items-center gap-1.5">
                             <Clock className="h-3.5 w-3.5 text-[#006699] dark:text-sky-400" />
                             Entrada: {format(new Date(patient.arrivalTime), "HH:mm", { locale: ptBR })}
@@ -418,7 +418,7 @@ export default function Sectors() {
                         <Button 
                           variant="outline" 
                           size="sm" 
-                          className="w-full text-[10px] font-black uppercase tracking-widest rounded-lg h-10 border border-slate-200/60 dark:border-slate-850 hover:bg-slate-50 dark:hover:bg-slate-900 hover:text-[#006699] dark:hover:text-sky-400 bg-white/50 dark:bg-slate-900/40 backdrop-blur-md transition-all shadow-sm"
+                          className="w-full text-[10px] font-black uppercase tracking-widest rounded-xl h-10 border border-white/40 dark:border-white/10 glass-card-premium hover:text-[#006699] dark:hover:text-sky-400 transition-all shadow-sm hover:scale-[1.02]"
                           onClick={() => navigate(`/paciente/${patient.id}`, { state: { from: '/setores', label: 'Setores' } })}
                         >
                           Visualizar Prontuário <ChevronRight className="h-3.5 w-3.5 ml-1" />
@@ -470,9 +470,9 @@ export default function Sectors() {
                   >
                     <Card 
                       className={cn(
-                        "group hover:shadow-xl transition-all duration-300 border border-slate-200/40 dark:border-slate-800/40 overflow-hidden rounded-xl border-l-[4px] h-full flex flex-col backdrop-blur-md",
+                        "group hover:shadow-xl transition-all duration-300 border overflow-hidden rounded-2xl border-l-[4px] h-full flex flex-col glass-card-premium",
                         group.borderColor,
-                        occupancy >= 100 ? "bg-red-500/5 dark:bg-red-500/5" : "bg-white/70 dark:bg-slate-900/40 hover:bg-white/95 dark:hover:bg-slate-900/55",
+                        occupancy >= 100 ? "bg-red-500/10 dark:bg-red-500/10 border-white/40" : "border-white/40 dark:border-white/10 opacity-90 hover:opacity-100 hover:scale-[1.02]",
                         isRedAlert ? "animate-blink-red border-red-500 dark:border-red-500/50 shadow-md shadow-red-500/10" : 
                         isAmberAlert ? "animate-blink-amber border-amber-400 dark:border-amber-500/50 shadow-md shadow-amber-400/10" : ""
                       )}
@@ -604,7 +604,7 @@ export default function Sectors() {
         ))}
       </Tabs>
       <Dialog open={showSectorDialog} onOpenChange={setShowSectorDialog}>
-        <DialogContent className="sm:max-w-[550px] p-0 overflow-hidden border border-slate-200/40 dark:border-slate-800/40 bg-white/95 dark:bg-slate-950/90 backdrop-blur-md shadow-2xl rounded-xl">
+        <DialogContent className="sm:max-w-[550px] p-0 overflow-hidden glass-card-premium border-white/40 dark:border-white/10 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.3)] rounded-2xl">
           {selectedSector && (
             <>
               <div className={cn("h-1.5 w-full", selectedSector.group.progressBarColor)} />
