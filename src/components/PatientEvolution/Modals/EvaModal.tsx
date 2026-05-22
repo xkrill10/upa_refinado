@@ -46,7 +46,7 @@ export function EvaModal({ isOpen, onClose, onApply }: EvaModalProps) {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[500px] rounded-2xl glass-card-premium shadow-2xl">
+      <DialogContent className="sm:max-w-[500px] rounded-xl glass-card-premium shadow-2xl">
         <DialogHeader>
           <DialogTitle className="text-2xl mission-control-title flex items-center gap-2">
             <Heart className="h-6 w-6 text-red-500 animate-pulse" />
@@ -90,7 +90,7 @@ export function EvaModal({ isOpen, onClose, onApply }: EvaModalProps) {
 
           {/* Wong-Baker Faces e Caracterização */}
           {evaScore !== null ? (
-            <div className="p-4 rounded-2xl bg-muted/20 border border-border flex items-center gap-4 transition-all">
+            <div className="p-4 rounded-xl bg-muted/20 border border-border flex items-center gap-4 transition-all">
               <span className="text-4xl">
                 {evaScore === 0 ? "😃" : evaScore <= 3 ? "🙂" : evaScore <= 7 ? "😐" : evaScore <= 8 ? "🙁" : evaScore === 9 ? "😩" : "😭"}
               </span>
@@ -102,7 +102,7 @@ export function EvaModal({ isOpen, onClose, onApply }: EvaModalProps) {
               </div>
             </div>
           ) : (
-            <div className="p-4 rounded-2xl bg-muted/10 border border-dashed border-border flex items-center gap-4 transition-all opacity-50">
+            <div className="p-4 rounded-xl bg-muted/10 border border-dashed border-border flex items-center gap-4 transition-all opacity-50">
               <span className="text-4xl grayscale">😶</span>
               <div>
                 <p className="text-xs font-black uppercase text-muted-foreground">Classificação da Dor</p>

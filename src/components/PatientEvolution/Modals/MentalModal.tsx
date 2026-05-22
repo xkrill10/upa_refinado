@@ -78,7 +78,7 @@ export function MentalModal({ isOpen, onClose, onApply }: MentalModalProps) {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[800px] rounded-2xl glass-card-premium shadow-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-[800px] rounded-xl glass-card-premium shadow-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-2xl mission-control-title flex items-center gap-2">
             <Brain className="h-6 w-6 text-violet-500 animate-pulse" />
@@ -333,7 +333,7 @@ export function MentalModal({ isOpen, onClose, onApply }: MentalModalProps) {
                   }
 
                   return (
-                    <div className="mt-4 p-4 rounded-2xl bg-slate-50/70 dark:bg-slate-900/40 backdrop-blur-md border border-slate-200/60 dark:border-slate-800/50 space-y-3">
+                    <div className="mt-4 p-4 rounded-xl bg-slate-50/70 dark:bg-slate-900/40 backdrop-blur-md border border-slate-200/60 dark:border-slate-800/50 space-y-3">
                       <div className="flex items-center justify-between">
                         <div>
                           <p className="text-[10px] font-black uppercase text-muted-foreground tracking-wider">Escore RASS</p>
@@ -542,7 +542,7 @@ export function MentalModal({ isOpen, onClose, onApply }: MentalModalProps) {
                   }
 
                   return (
-                    <div className="mt-4 p-4 rounded-2xl bg-slate-50/70 dark:bg-slate-900/40 backdrop-blur-md border border-slate-200/60 dark:border-slate-800/50 space-y-3">
+                    <div className="mt-4 p-4 rounded-xl bg-slate-50/70 dark:bg-slate-900/40 backdrop-blur-md border border-slate-200/60 dark:border-slate-800/50 space-y-3">
                       <div className="flex items-center justify-between">
                         <div>
                           <p className="text-[10px] font-black uppercase text-muted-foreground tracking-wider">Pontuação SAD PERSONS</p>
@@ -782,7 +782,7 @@ export function MentalModal({ isOpen, onClose, onApply }: MentalModalProps) {
                   }
 
                   return (
-                    <div className="mt-4 p-4 rounded-2xl bg-slate-50/70 dark:bg-slate-900/40 backdrop-blur-md border border-slate-200/60 dark:border-slate-800/50 space-y-3">
+                    <div className="mt-4 p-4 rounded-xl bg-slate-50/70 dark:bg-slate-900/40 backdrop-blur-md border border-slate-200/60 dark:border-slate-800/50 space-y-3">
                       <div className="flex items-center justify-between">
                         <div>
                           <p className="text-[10px] font-black uppercase text-muted-foreground tracking-wider">Pontuação CIWA-Ar</p>
@@ -899,7 +899,7 @@ export function MentalModal({ isOpen, onClose, onApply }: MentalModalProps) {
                   }
 
                   return (
-                    <div className="mt-4 p-4 rounded-2xl bg-slate-50/70 dark:bg-slate-900/40 backdrop-blur-md border border-slate-200/60 dark:border-slate-800/50 space-y-3">
+                    <div className="mt-4 p-4 rounded-xl bg-slate-50/70 dark:bg-slate-900/40 backdrop-blur-md border border-slate-200/60 dark:border-slate-800/50 space-y-3">
                       <div className="flex items-center justify-between">
                         <div>
                           <p className="text-[10px] font-black uppercase text-muted-foreground tracking-wider">Pontuação CAGE</p>
@@ -983,7 +983,7 @@ export function MentalModal({ isOpen, onClose, onApply }: MentalModalProps) {
                       </div>
                     ))}
                   </div>
-                  <div className="p-3 rounded-2xl bg-slate-50/70 dark:bg-slate-900/40 backdrop-blur-md border border-slate-200/60 dark:border-slate-800/50 space-y-2">
+                  <div className="p-3 rounded-xl bg-slate-50/70 dark:bg-slate-900/40 backdrop-blur-md border border-slate-200/60 dark:border-slate-800/50 space-y-2">
                     <div className="flex items-center justify-between">
                       <div><p className="text-[10px] font-black uppercase text-muted-foreground tracking-wider">Escore PHQ-9</p><p className="text-3xl font-black">{score} <span className="text-sm font-bold text-muted-foreground">/ 27 pts</span></p></div>
                       <Badge className={cn("h-7 rounded-lg text-[9px] font-black uppercase tracking-wider px-2", sevColor)}>{severity}</Badge>
@@ -1036,7 +1036,7 @@ export function MentalModal({ isOpen, onClose, onApply }: MentalModalProps) {
                       </div>
                     ))}
                   </div>
-                  <div className="p-3 rounded-2xl bg-slate-50/70 dark:bg-slate-900/40 backdrop-blur-md border border-slate-200/60 dark:border-slate-800/50 space-y-2">
+                  <div className="p-3 rounded-xl bg-slate-50/70 dark:bg-slate-900/40 backdrop-blur-md border border-slate-200/60 dark:border-slate-800/50 space-y-2">
                     <div className="flex items-center justify-between">
                       <div><p className="text-[10px] font-black uppercase text-muted-foreground tracking-wider">Escore GAD-7</p><p className="text-3xl font-black">{score} <span className="text-sm font-bold text-muted-foreground">/ 21 pts</span></p></div>
                       <Badge className={cn("h-7 rounded-lg text-[9px] font-black uppercase tracking-wider px-2", sevColor)}>{severity}</Badge>
@@ -1111,7 +1111,7 @@ export function MentalModal({ isOpen, onClose, onApply }: MentalModalProps) {
                     ? "Critérios obrigatórios (1 e 2) não preenchidos. Delirium improvável. Continuar monitoramento de rotina."
                     : "Critérios 1 e 2 presentes, mas nenhum dos complementares (3 ou 4). Delirium improvável — monitorar.";
                   return (
-                    <div className="p-3 rounded-2xl bg-slate-50/70 dark:bg-slate-900/40 backdrop-blur-md border border-slate-200/60 dark:border-slate-800/50 space-y-2">
+                    <div className="p-3 rounded-xl bg-slate-50/70 dark:bg-slate-900/40 backdrop-blur-md border border-slate-200/60 dark:border-slate-800/50 space-y-2">
                       <div className="flex items-center justify-between">
                         <div><p className="text-[10px] font-black uppercase text-muted-foreground tracking-wider">Resultado CAM</p></div>
                         <Badge className={cn("h-7 rounded-lg text-[9px] font-black uppercase tracking-wider px-2", positiveCAM ? "bg-red-600 text-white animate-pulse" : "bg-emerald-500 text-white")}>

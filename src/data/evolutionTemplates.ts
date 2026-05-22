@@ -957,3 +957,166 @@ export const FARMA_PED_PROCEDURES: CareItem[] = [
   { id: "farma_ped_preparo", label: "🥄 Orientação Preparo Soluções", text: "CONDUTA FARMACÊUTICA (PEDIÁTRICA):\n- Orientação aos pais sobre o preparo correto de suspensões orais (ex: antibióticos em pó) e uso do dosador (seringa/copinho em ml, não colher).\n", toastMsg: "Orientação Suspensão" },
   { id: "farma_ped_aprazamento", label: "⏱️ Aprazamento Pediátrico", text: "CONDUTA FARMACÊUTICA (PEDIÁTRICA):\n- Otimização do aprazamento (horários) para respeitar o ciclo de sono da criança sem prejudicar o nível sérico do medicamento.\n", toastMsg: "Ajuste Aprazamento" }
 ];
+
+export const PRESCRIPTION_MEDICATION_ITEMS: CareItem[] = [
+  {
+    id: "presc_dipirona",
+    label: "💊 Analgesia Comum (Dipirona)",
+    text: "1. Dipirona 1g EV diluído em Soro Fisiológico 0.9% 100ml - correr em 20 minutos (se febre > 37.8°C ou dor moderada/grave).\n",
+    toastMsg: "Combo de Analgesia"
+  },
+  {
+    id: "presc_tramal",
+    label: "🔥 Analgesia Forte (Tramal+Buscopan)",
+    text: "1. Tramadol 50mg EV + Escopolamina (Buscopan) 20mg EV diluídos em Soro Fisiológico 0.9% 100ml - correr lento em 30 minutos (se dor intensa ou cólica).\n",
+    toastMsg: "Combo de Analgesia Forte"
+  },
+  {
+    id: "presc_vomito",
+    label: "🤢 Combo Anti-vômito",
+    text: "1. Ondansetrona 8mg EV diluído em Soro Fisiológico 0.9% 100ml - correr em 20 minutos (se náuseas ou vômitos).\n2. Metoclopramida (Plasil) 10mg EV lento (se refratário).\n",
+    toastMsg: "Combo Gastrointestinal"
+  },
+  {
+    id: "presc_alergico",
+    label: "🤧 Antialérgico (Fenergan+Dexa)",
+    text: "1. Prometazina (Fenergan) 50mg IM profundo.\n2. Dexametasona 10mg EV diluída em SF 0.9% 100ml.\n",
+    toastMsg: "Combo Antialérgico"
+  },
+  {
+    id: "presc_hipertensiva",
+    label: "❤️ Crise Hipertensiva (Captopril)",
+    text: "1. Captopril 25mg Via Oral (se PAS > 180 ou PAD > 110 sem sinais de alarme).\n2. Reavaliar PA em 40 minutos.\n",
+    toastMsg: "Combo Crise Hipertensiva"
+  },
+  {
+    id: "presc_hipoglicemia",
+    label: "🩸 Hipoglicemia (Glicose 50%)",
+    text: "1. Glicose 50% 4 ampolas (40ml) EV em bolus lento.\n2. Reavaliar HGT em 15 minutos.\n",
+    toastMsg: "Combo Hipoglicemia"
+  },
+  {
+    id: "presc_nebulizacao",
+    label: "🫁 Nebulização (Berotec/Atrovent)",
+    text: "1. Inalação com Soro Fisiológico 0.9% 5ml + Fenoterol (Berotec) 5 gotas + Ipratrópio (Atrovent) 10 gotas. Realizar a cada 20 minutos, até 3 vezes se broncoespasmo grave.\n",
+    toastMsg: "Combo de Nebulização"
+  }
+];
+
+export const PRESCRIPTION_DIET_ITEMS: CareItem[] = [
+  {
+    id: "presc_hidratacao",
+    label: "💧 Hidratação Venosa 500ml",
+    text: "1. Soro Fisiológico 0.9% 500ml EV - correr em 2 horas em bomba de infusão ou gotejamento rápido para hidratação endovenosa.\n",
+    toastMsg: "Combo de Hidratação"
+  },
+  {
+    id: "presc_dieta_geral",
+    label: "🍽️ Dieta Geral / Livre",
+    text: "1. Dieta livre por via oral (sem restrições alimentares).\n",
+    toastMsg: "Dieta Geral"
+  },
+  {
+    id: "presc_dieta_leve",
+    label: "🥣 Dieta Leve / Branda",
+    text: "1. Dieta leve e branda por via oral, de fácil digestão (pobre em resíduos).\n",
+    toastMsg: "Dieta Leve"
+  },
+  {
+    id: "presc_dieta_zero",
+    label: "🚫 Dieta Zero (Jejum)",
+    text: "1. Dieta zero por via oral (jejum absoluto) devido a procedimento / exames / quadro agudo.\n",
+    toastMsg: "Dieta Zero"
+  },
+  {
+    id: "presc_dieta_liquida",
+    label: "🥤 Dieta Líquida / Pastosa",
+    text: "1. Dieta líquida e pastosa por via oral para melhor deglutição.\n",
+    toastMsg: "Dieta Líquida/Pastosa"
+  },
+  {
+    id: "presc_dieta_hiposodica",
+    label: "🥬 Dieta Hipossódica / Diabética",
+    text: "1. Dieta hipossódica e para diabéticos (pobre em sódio e sem açúcares simples).\n",
+    toastMsg: "Dieta Restritiva"
+  },
+  {
+    id: "presc_monitoramento",
+    label: "📊 Monitoramento SSVV",
+    text: "1. Monitorização contínua de Sinais Vitais (PA, FC, SpO2, Temp, FR) a cada [ ] horas.\n",
+    toastMsg: "Monitoramento de Sinais Vitais"
+  },
+  {
+    id: "presc_repouso",
+    label: "🛌 Repouso Absoluto",
+    text: "1. Repouso absoluto no leito com cabeceira elevada a 30-45 graus.\n",
+    toastMsg: "Repouso Absoluto"
+  }
+];
+
+export const DISCHARGE_TYPE_ITEMS: CareItem[] = [
+  {
+    id: "alta_medica",
+    label: "✅ Alta Médica (Melhorado)",
+    text: "DESFECHO: ALTA MÉDICA (MELHORADO)\n\nPaciente evoluiu com melhora clínica após medicações realizadas na unidade. No momento: hemodinamicamente estável, eupneico, acianótico, afebril, consciente e orientado. Sem queixas álgicas agudas.\n\nConduta: Alta com orientações de sinais de alarme e receituário médico em mãos. Orientado a retornar se piora do quadro.",
+    toastMsg: "Resumo de Alta Médica"
+  },
+  {
+    id: "alta_pedido",
+    label: "📜 Alta a Pedido (Contra Orientação)",
+    text: "DESFECHO: ALTA A PEDIDO\n\nPaciente solicita alta a pedido, declarando-se ciente dos riscos de interromper a avaliação/tratamento clínico proposto. Orientado(a) quanto aos sinais de alarme e gravidade. \n\nConduta: Assina o Termo de Responsabilidade (Evasão/Alta a Pedido) que deverá ser anexado ao prontuário impresso.",
+    toastMsg: "Resumo de Alta a Pedido"
+  },
+  {
+    id: "alta_transferencia",
+    label: "🚑 Transferência Hospitalar",
+    text: "DESFECHO: TRANSFERÊNCIA HOSPITALAR\n\nPaciente necessita de avaliação de especialidade / internação não disponível nesta unidade. Vaga solicitada via CROSS/Central de Regulação.\n\nConduta: Transferido via ambulância acompanhado de equipe, monitorizado e com suporte adequado. Prontuário e exames entregues à equipe de transporte.",
+    toastMsg: "Resumo de Transferência"
+  },
+  {
+    id: "alta_evasao",
+    label: "🏃 Evasão",
+    text: "DESFECHO: EVASÃO\n\nPaciente evadiu-se da unidade antes do término do atendimento ou avaliação médica/reavaliação. Retirado acesso venoso (caso aplicável). \n\nComunicado à equipe de enfermagem e recepção. Prontuário encerrado administrativamente por evasão.",
+    toastMsg: "Resumo de Evasão"
+  },
+  {
+    id: "alta_obito",
+    label: "✝️ Óbito (PCR)",
+    text: "DESFECHO: ÓBITO\n\nPaciente apresentou Parada Cardiorrespiratória (PCR). Iniciadas manobras de RCP avançada conforme protocolo ACLS. Sem retorno da circulação espontânea após [COMPLETAR] minutos de reanimação. Constatado óbito às [HORÁRIO].\n\nConduta: Encaminhado corpo para o morgue. Comunicado aos familiares presentes na unidade. Emitida Declaração de Óbito.",
+    toastMsg: "Resumo de Óbito"
+  }
+];
+
+export const DISCHARGE_CONDUCT_ITEMS: CareItem[] = [
+  {
+    id: "alta_conduta_alarme",
+    label: "⚠️ Sinais de Alarme (Geral)",
+    text: "ORIENTAÇÃO DE SINAIS DE ALARME:\nOrientado retornar imediatamente à UPA caso apresente febre persistente (>38°C), dor intensa refratária, falta de ar, vômitos incoercíveis, sonolência excessiva, desmaio ou alteração do nível de consciência.\n",
+    toastMsg: "Sinais de Alarme"
+  },
+  {
+    id: "alta_conduta_curativo",
+    label: "🩹 Cuidados de Enfermagem / Curativos",
+    text: "CUIDADOS COM CURATIVOS E FERIDAS:\nOrientado a manter o curativo limpo e seco. Realizar higienização diária com água corrente e sabão neutro, aplicar antisséptico prescrito e refazer cobertura seca. Retirar pontos em [ ] dias na Unidade Básica de Saúde.\n",
+    toastMsg: "Cuidados com Curativos"
+  },
+  {
+    id: "alta_conduta_receituario",
+    label: "💊 Adesão ao Receituário Médico",
+    text: "ORIENTAÇÃO FARMACÊUTICA E ADESÃO:\nOrientado detalhadamente sobre o uso correto das medicações prescritas para uso domiciliar (dosagem, horários e duração do tratamento). Ressaltada a importância de não interromper o tratamento antibiótico antes do prazo.\n",
+    toastMsg: "Adesão ao Receituário"
+  },
+  {
+    id: "alta_conduta_isolamento",
+    label: "🦠 Isolamento Respiratório Domiciliar",
+    text: "RECOMENDAÇÃO DE ISOLAMENTO RESPIRATÓRIO:\nPaciente orientado a manter isolamento respiratório domiciliar por [ ] dias devido a suspeita/confirmação de patologia infectocontagiosa aérea. Uso de máscara descartável, higienização frequente das mãos e não compartilhar utensílios.\n",
+    toastMsg: "Isolamento Respiratório"
+  },
+  {
+    id: "alta_conduta_retorno",
+    label: "📅 Retorno e Seguimento na UBS",
+    text: "SEGUIMENTO E RETORNO:\nPaciente orientado a agendar consulta de seguimento e reavaliação clínica na sua Unidade Básica de Saúde (UBS) de referência em até [ ] dias, portando o resumo de alta desta UPA.\n",
+    toastMsg: "Retorno na UBS"
+  }
+];
+

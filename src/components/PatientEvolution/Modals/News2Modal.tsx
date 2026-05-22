@@ -28,24 +28,24 @@ export function News2Modal({ isOpen, onClose, onApply }: News2ModalProps) {
   const hasRedScore = [news2Fr, news2Spo2, news2O2, news2Temp, news2Pas, news2Fc, news2Acvpu].some(val => parseInt(val || "0") === 3);
 
   let newsClass = "Risco Baixo";
-  let colorClass = "bg-emerald-500/10 text-emerald-600 border-emerald-500/20";
+  let colorClass = "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20";
   let actionText = "Monitorar a cada 12 horas. Resposta baseada na enfermaria.";
 
   if (score >= 7) {
     newsClass = "Risco Alto (Emergência)";
-    colorClass = "bg-red-500/10 text-red-600 border-red-500/20";
+    colorClass = "bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/20";
     actionText = "Resposta de Emergência (Sala Vermelha). Acionar médico imediatamente. Monitorização contínua.";
   } else if (score >= 5) {
     newsClass = "Risco Médio (Urgente)";
-    colorClass = "bg-orange-500/10 text-orange-600 border-orange-500/20";
+    colorClass = "bg-orange-500/10 text-orange-600 dark:text-orange-400 border-orange-500/20";
     actionText = "Resposta Urgente. Avaliação médica rápida. Monitorização no mínimo a cada 1 hora.";
   } else if (hasRedScore) {
     newsClass = "Risco Baixo-Médio (Avaliar)";
-    colorClass = "bg-amber-500/10 text-amber-600 border-amber-500/20";
+    colorClass = "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20";
     actionText = "Requer revisão urgente pelo médico ou enfermeiro sênior para decidir se escalona o cuidado.";
   } else if (score >= 1) {
     newsClass = "Risco Baixo";
-    colorClass = "bg-emerald-500/10 text-emerald-600 border-emerald-500/20";
+    colorClass = "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20";
     actionText = "Monitorar a cada 4-6 horas.";
   }
 
@@ -70,7 +70,7 @@ export function News2Modal({ isOpen, onClose, onApply }: News2ModalProps) {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[750px] rounded-2xl glass-card-premium shadow-2xl max-h-[95vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-[750px] rounded-xl glass-card-premium shadow-2xl max-h-[95vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-2xl mission-control-title flex items-center gap-2">
             <Activity className="h-6 w-6 text-emerald-500" />
@@ -89,7 +89,7 @@ export function News2Modal({ isOpen, onClose, onApply }: News2ModalProps) {
               setNews2Scale(val);
               setNews2Spo2("0");
             }}>
-              <SelectTrigger className="h-10 rounded-xl bg-muted/30 border-dashed">
+              <SelectTrigger className="h-10 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium border-dashed">
                 <SelectValue placeholder="Selecione..." />
               </SelectTrigger>
               <SelectContent className="rounded-xl">

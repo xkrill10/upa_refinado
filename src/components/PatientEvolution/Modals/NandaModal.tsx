@@ -39,7 +39,7 @@ export function NandaModal({ isOpen, onClose, onApply }: NandaModalProps) {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[800px] rounded-2xl glass-card-premium shadow-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-[800px] rounded-xl glass-card-premium shadow-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-2xl mission-control-title flex items-center gap-2">
             <Activity className="h-6 w-6 text-primary" />
@@ -92,7 +92,7 @@ export function NandaModal({ isOpen, onClose, onApply }: NandaModalProps) {
                   <Label className="text-xs font-black uppercase text-foreground/80 flex items-center gap-1">
                     <span>2. Resultados Esperados (NOC)</span>
                   </Label>
-                  <div className="p-3.5 rounded-2xl bg-muted/20 border border-border/60 space-y-2.5">
+                  <div className="p-3.5 rounded-xl bg-muted/20 border border-border/60 space-y-2.5">
                     {selectedNandaNocList.map((noc, idx) => (
                       <div key={idx} className="flex items-start gap-2.5">
                         <CheckCircle2 className="h-4 w-4 text-emerald-500 mt-0.5 shrink-0" />
@@ -107,7 +107,7 @@ export function NandaModal({ isOpen, onClose, onApply }: NandaModalProps) {
                   <Label className="text-xs font-black uppercase text-foreground/80 flex items-center gap-1">
                     <span>3. Intervenções de Enfermagem (NIC)</span>
                   </Label>
-                  <div className="p-3.5 rounded-2xl bg-muted/20 border border-border/60 space-y-2.5">
+                  <div className="p-3.5 rounded-xl bg-muted/20 border border-border/60 space-y-2.5">
                     {selectedNandaNicList.map((nic, idx) => (
                       <div key={idx} className="flex items-start gap-2.5">
                         <CheckCircle2 className="h-4 w-4 text-primary mt-0.5 shrink-0" />
@@ -118,7 +118,7 @@ export function NandaModal({ isOpen, onClose, onApply }: NandaModalProps) {
                 </div>
               </div>
             ) : (
-              <div className="flex-1 flex flex-col items-center justify-center border-2 border-dashed border-border rounded-2xl p-6 text-center text-muted-foreground bg-muted/5">
+              <div className="flex-1 flex flex-col items-center justify-center border-2 border-dashed border-border rounded-xl p-6 text-center text-muted-foreground bg-muted/5">
                 <Activity className="h-10 w-10 text-muted-foreground/30 mb-2 animate-pulse" />
                 <p className="text-xs font-black uppercase tracking-wider text-muted-foreground/60">Aguardando Seleção</p>
                 <p className="text-[10px] text-muted-foreground/40 mt-1 max-w-[240px]">Selecione um diagnóstico de enfermagem na coluna esquerda para planejar os cuidados NOC/NIC.</p>

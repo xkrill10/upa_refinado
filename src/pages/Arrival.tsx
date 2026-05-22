@@ -229,7 +229,7 @@ export default function Arrival() {
                               placeholder="000.000.000-00"
                               value={cpf}
                               onChange={(e) => setCpf(maskCPF(e.target.value))}
-                              className="h-14 font-mono text-lg focus-visible:ring-offset-0 focus-visible:ring-2 focus-visible:ring-primary/20 transition-all bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 backdrop-blur-md shadow-[inset_0_2px_8px_rgba(0,0,0,0.05)] dark:shadow-[inset_0_2px_8px_rgba(0,0,0,0.2)] focus:bg-white/40 dark:focus:bg-slate-900/40 rounded-2xl placeholder:text-muted-foreground/50"
+                              className="h-14 font-mono text-lg focus-visible:ring-offset-0 focus-visible:ring-2 focus-visible:ring-primary/20 transition-all border border-black/10 dark:border-white/10 backdrop-blur-md shadow-[inset_0_2px_8px_rgba(0,0,0,0.05)] dark:shadow-[inset_0_2px_8px_rgba(0,0,0,0.2)] rounded-2xl placeholder:text-muted-foreground/50"
                             />
                           </div>
                           <div className="space-y-2">
@@ -238,7 +238,7 @@ export default function Arrival() {
                               type="date"
                               value={birthDate}
                               onChange={(e) => setBirthDate(e.target.value)}
-                              className="h-14 focus-visible:ring-offset-0 focus-visible:ring-2 focus-visible:ring-primary/20 transition-all bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 backdrop-blur-md shadow-[inset_0_2px_8px_rgba(0,0,0,0.05)] dark:shadow-[inset_0_2px_8px_rgba(0,0,0,0.2)] focus:bg-white/40 dark:focus:bg-slate-900/40 rounded-2xl placeholder:text-muted-foreground/50"
+                              className="h-14 focus-visible:ring-offset-0 focus-visible:ring-2 focus-visible:ring-primary/20 transition-all border border-black/10 dark:border-white/10 backdrop-blur-md shadow-[inset_0_2px_8px_rgba(0,0,0,0.05)] dark:shadow-[inset_0_2px_8px_rgba(0,0,0,0.2)] rounded-2xl placeholder:text-muted-foreground/50"
                             />
                           </div>
                           <div className="space-y-2 md:col-span-2">
@@ -247,7 +247,7 @@ export default function Arrival() {
                                placeholder="000 0000 0000 0000"
                                value={susCard}
                                onChange={(e) => setSusCard(maskSUS(e.target.value))}
-                               className="h-14 font-mono focus-visible:ring-offset-0 focus-visible:ring-2 focus-visible:ring-primary/20 transition-all bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 backdrop-blur-md shadow-[inset_0_2px_8px_rgba(0,0,0,0.05)] dark:shadow-[inset_0_2px_8px_rgba(0,0,0,0.2)] focus:bg-white/40 dark:focus:bg-slate-900/40 rounded-2xl placeholder:text-muted-foreground/50"
+                               className="h-14 font-mono focus-visible:ring-offset-0 focus-visible:ring-2 focus-visible:ring-primary/20 transition-all border border-black/10 dark:border-white/10 backdrop-blur-md shadow-[inset_0_2px_8px_rgba(0,0,0,0.05)] dark:shadow-[inset_0_2px_8px_rgba(0,0,0,0.2)] rounded-2xl placeholder:text-muted-foreground/50"
                              />
                              <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider">Necessário para atendimento gratuito (SUS)</p>
                           </div>
@@ -257,7 +257,7 @@ export default function Arrival() {
                               placeholder="Nome completo da mãe"
                               value={motherName}
                               onChange={(e) => setMotherName(formatWords(e.target.value))}
-                              className="h-14 focus-visible:ring-offset-0 focus-visible:ring-2 focus-visible:ring-primary/20 transition-all bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 backdrop-blur-md shadow-[inset_0_2px_8px_rgba(0,0,0,0.05)] dark:shadow-[inset_0_2px_8px_rgba(0,0,0,0.2)] focus:bg-white/40 dark:focus:bg-slate-900/40 rounded-2xl placeholder:text-muted-foreground/50"
+                              className="h-14 focus-visible:ring-offset-0 focus-visible:ring-2 focus-visible:ring-primary/20 transition-all border border-black/10 dark:border-white/10 backdrop-blur-md shadow-[inset_0_2px_8px_rgba(0,0,0,0.05)] dark:shadow-[inset_0_2px_8px_rgba(0,0,0,0.2)] rounded-2xl placeholder:text-muted-foreground/50"
                             />
                           </div>
                         </div>
@@ -285,10 +285,10 @@ export default function Arrival() {
                               !active && key === 'pediatric' && "hover:border-orange-400 hover:shadow-[0_8px_20px_rgba(249,115,22,0.15)]",
                               !active && key === 'emergency' && "hover:border-red-400 hover:shadow-[0_8px_20px_rgba(239,68,68,0.15)]",
                               active && "scale-[1.02] text-foreground font-medium",
-                              active && key === 'normal' && "border-blue-500 shadow-[0_10px_30px_rgba(59,130,246,0.3)] bg-blue-50/80 dark:bg-blue-900/30",
-                              active && key === 'preferential' && "border-amber-500 shadow-[0_10px_30px_rgba(245,158,11,0.3)] bg-amber-50/80 dark:bg-amber-900/30",
-                              active && key === 'pediatric' && "border-orange-500 shadow-[0_10px_30px_rgba(249,115,22,0.3)] bg-orange-50/80 dark:bg-orange-900/30",
-                              active && key === 'emergency' && "border-red-500 shadow-[0_10px_30px_rgba(239,68,68,0.3)] bg-red-50/80 dark:bg-red-900/30"
+                              active && key === 'normal' && "border-blue-500 shadow-[0_10px_30px_rgba(59,130,246,0.3)] bg-blue-500/15 dark:bg-blue-900/40",
+                              active && key === 'preferential' && "border-amber-500 shadow-[0_10px_30px_rgba(245,158,11,0.3)] bg-amber-500/15 dark:bg-amber-900/40",
+                              active && key === 'pediatric' && "border-orange-500 shadow-[0_10px_30px_rgba(249,115,22,0.3)] bg-orange-500/15 dark:bg-orange-900/40",
+                              active && key === 'emergency' && "border-red-500 shadow-[0_10px_30px_rgba(239,68,68,0.3)] bg-red-500/15 dark:bg-red-900/40"
                             )}
                           >
                             <div className={cn("absolute top-0 right-0 p-12 transform translate-x-12 -translate-y-12 rounded-full blur-3xl group-hover:scale-150 transition-transform duration-700 pointer-events-none",

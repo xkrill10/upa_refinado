@@ -87,7 +87,7 @@ export function FugulinModal({ isOpen, onClose, onApply }: FugulinModalProps) {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[900px] rounded-2xl glass-card-premium shadow-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-[900px] rounded-xl glass-card-premium shadow-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-2xl mission-control-title flex items-center gap-2">
             <Activity className="h-6 w-6 text-cyan-500 animate-pulse" />
@@ -291,7 +291,7 @@ export function FugulinModal({ isOpen, onClose, onApply }: FugulinModalProps) {
                   </div>
                 </div>
 
-                <div className="p-3 rounded-2xl bg-slate-50/70 dark:bg-slate-900/40 backdrop-blur-md border border-slate-200/60 dark:border-slate-800/50 space-y-2 mt-4">
+                <div className="p-3 rounded-xl bg-slate-50/70 dark:bg-slate-900/40 backdrop-blur-md border border-slate-200/60 dark:border-slate-800/50 space-y-2 mt-4">
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-[10px] font-black uppercase text-muted-foreground tracking-wider">

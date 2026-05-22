@@ -71,7 +71,11 @@ import {
   FARMA_ADULT_ITEMS,
   FARMA_ADULT_PROCEDURES,
   FARMA_PED_ITEMS,
-  FARMA_PED_PROCEDURES
+  FARMA_PED_PROCEDURES,
+  PRESCRIPTION_MEDICATION_ITEMS,
+  PRESCRIPTION_DIET_ITEMS,
+  DISCHARGE_TYPE_ITEMS,
+  DISCHARGE_CONDUCT_ITEMS
 } from "@/data/evolutionTemplates";
 import { NANDA_DIAGNOSES, NandaDiagnosis } from "@/data/nanda";
 
@@ -140,6 +144,10 @@ export default function PatientEvolution() {
         setIsMovementDropdownOpen(false);
         setIsSaeAdmissionDropdownOpen(false);
         setIsSaeCareDropdownOpen(false);
+        setIsPrescMedicationDropdownOpen(false);
+        setIsPrescDietDropdownOpen(false);
+        setIsDischargeTypeDropdownOpen(false);
+        setIsDischargeConductDropdownOpen(false);
         setIsMedicalNeuroDropdownOpen(false);
         setIsMedicalSyndromeDropdownOpen(false);
         setIsMedicalConductDropdownOpen(false);
@@ -216,6 +224,14 @@ export default function PatientEvolution() {
   // Estados para os Dropdowns do Super Painel SAE (Enfermagem)
   const [isSaeAdmissionDropdownOpen, setIsSaeAdmissionDropdownOpen] = useState(false);
   const [isSaeCareDropdownOpen, setIsSaeCareDropdownOpen] = useState(false);
+
+  // Estados para os Dropdowns do Super Painel de Prescrição Médica
+  const [isPrescMedicationDropdownOpen, setIsPrescMedicationDropdownOpen] = useState(false);
+  const [isPrescDietDropdownOpen, setIsPrescDietDropdownOpen] = useState(false);
+
+  // Estados para os Dropdowns do Super Painel de Alta
+  const [isDischargeTypeDropdownOpen, setIsDischargeTypeDropdownOpen] = useState(false);
+  const [isDischargeConductDropdownOpen, setIsDischargeConductDropdownOpen] = useState(false);
   // Estados para os Dropdowns do Super Painel Médico (Evolução Médica)
   const [isMedicalNeuroDropdownOpen, setIsMedicalNeuroDropdownOpen] = useState(false);
   const [isMedicalSyndromeDropdownOpen, setIsMedicalSyndromeDropdownOpen] = useState(false);
@@ -578,7 +594,7 @@ export default function PatientEvolution() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card className="glass-card-premium border border-white/40 dark:border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.06)] rounded-2xl overflow-hidden transition-all duration-500">
+        <Card className="glass-card-premium border border-white/40 dark:border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.06)] rounded-xl overflow-hidden transition-all duration-500">
           <CardContent className="p-4 flex items-center gap-3">
             <div className="h-9 w-9 rounded-lg bg-blue-500/10 flex items-center justify-center shrink-0">
               <MessageSquare className="h-5 w-5 text-blue-500" />
@@ -592,7 +608,7 @@ export default function PatientEvolution() {
 
         <Card 
           className={cn(
-            "glass-card-premium border shadow-[0_8px_30px_rgba(0,0,0,0.06)] rounded-2xl overflow-hidden transition-all duration-500 cursor-pointer hover:scale-[1.02] active:scale-98",
+            "glass-card-premium border shadow-[0_8px_30px_rgba(0,0,0,0.06)] rounded-xl overflow-hidden transition-all duration-500 cursor-pointer hover:scale-[1.02] active:scale-98",
             patientBed 
               ? "border-emerald-500/30 bg-emerald-500/5 dark:bg-emerald-500/10 hover:border-emerald-500/50" 
               : "border-white/40 dark:border-white/10 hover:border-[#006699]/30"
@@ -615,7 +631,7 @@ export default function PatientEvolution() {
           </CardContent>
         </Card>
 
-        <Card className="glass-card-premium border border-white/40 dark:border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.06)] rounded-2xl overflow-hidden transition-all duration-500 lg:col-span-1">
+        <Card className="glass-card-premium border border-white/40 dark:border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.06)] rounded-xl overflow-hidden transition-all duration-500 lg:col-span-1">
           <CardContent className="p-4 flex flex-col justify-between h-full gap-2 font-black">
             <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Status Sinais Vitais</p>
             <div className="flex flex-wrap items-center gap-1.5">
@@ -635,7 +651,7 @@ export default function PatientEvolution() {
           </CardContent>
         </Card>
 
-        <Card className="glass-card-premium border border-white/40 dark:border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.06)] rounded-2xl overflow-hidden transition-all duration-500">
+        <Card className="glass-card-premium border border-white/40 dark:border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.06)] rounded-xl overflow-hidden transition-all duration-500">
           <CardContent className="p-4 flex items-center gap-3">
             <div className="h-9 w-9 rounded-lg bg-blue-500/10 flex items-center justify-center shrink-0">
               <History className="h-5 w-5 text-blue-500" />
@@ -668,7 +684,7 @@ export default function PatientEvolution() {
             exit={{ opacity: 0, height: 0, y: -10 }}
             className="overflow-hidden"
           >
-            <Card className="glass-card-premium border border-white/40 dark:border-white/10 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.3)] rounded-2xl md:rounded-[2rem] overflow-hidden transition-all duration-500 max-w-6xl mx-auto w-full">
+            <Card className="glass-card-premium border border-white/40 dark:border-white/10 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.3)] rounded-xl overflow-hidden transition-all duration-500 max-w-6xl mx-auto w-full">
               <CardContent className="p-4 space-y-4">
                 <div className="flex items-center justify-between border-b border-border/50 pb-2">
                   <h2 className="text-xs font-black flex items-center gap-2 text-primary uppercase tracking-wider">
@@ -722,7 +738,7 @@ export default function PatientEvolution() {
                   <motion.div 
                     initial={{ opacity: 0, y: -5 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="p-4 rounded-2xl border border-white/40 dark:border-white/10 bg-white/35 dark:bg-slate-900/35 backdrop-blur-md shadow-sm text-xs space-y-2"
+                    className="p-4 rounded-xl border border-white/40 dark:border-white/10 bg-white/35 dark:bg-slate-900/35 backdrop-blur-md shadow-sm text-xs space-y-2"
                   >
                     <div className="flex items-center justify-between">
                       <span className="font-extrabold text-[#006699] uppercase tracking-wider text-[10px]">
@@ -764,7 +780,7 @@ export default function PatientEvolution() {
                   <motion.div 
                     initial={{ opacity: 0, y: -5 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="p-5 rounded-2xl border border-white/40 dark:border-white/10 bg-white/35 dark:bg-slate-900/35 backdrop-blur-md shadow-sm space-y-4"
+                    className="p-5 rounded-xl border border-white/40 dark:border-white/10 bg-white/35 dark:bg-slate-900/35 backdrop-blur-md shadow-sm space-y-4"
                   >
                     <div className="flex items-center justify-between border-b pb-2">
                       <span className="font-extrabold text-[#006699] uppercase tracking-wider text-[10px] flex items-center gap-1.5">
@@ -889,211 +905,595 @@ export default function PatientEvolution() {
                   </motion.div>
                 )}
 
-                {/* Atalhos rápidos de Prescrição Médica */}
+                {/* Super Painel de Prescrição Médica */}
                 {evolutionType === "Prescrição" && (
                   <motion.div 
                     initial={{ opacity: 0, y: -5 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="p-4 rounded-2xl border border-white/40 dark:border-white/10 bg-white/35 dark:bg-slate-900/35 backdrop-blur-md shadow-sm text-xs space-y-2"
+                    className="p-5 rounded-xl border border-white/40 dark:border-white/10 bg-white/35 dark:bg-slate-900/35 backdrop-blur-md shadow-sm space-y-4 relative z-20"
                   >
-                    <div className="flex items-center justify-between">
-                      <span className="font-extrabold text-[#006699] uppercase tracking-wider text-[10px]">
-                        ⚡ Prescrição Expressa: Inserir Combos Rápidos (UPA 24h)
+                    <div className="flex items-center justify-between border-b border-slate-500/20 pb-2">
+                      <span className="font-extrabold text-[#006699] uppercase tracking-wider text-[11px] flex items-center gap-1.5">
+                        ⚡ Super Painel de Prescrição Médica (UPA 24h)
                       </span>
-                      <span className="text-[9px] font-bold text-muted-foreground/60 uppercase tracking-widest">
-                        Medicamentos Padronizados
+                      <span className="text-[9px] font-black text-muted-foreground/60 uppercase tracking-widest">
+                        Prescrição Expressa & Adaptativa
                       </span>
                     </div>
-                    <div className="flex flex-wrap gap-2 pt-1">
-                      <Button
-                        type="button"
-                        size="sm"
-                        variant="outline"
-                        className="h-8 rounded-lg text-[10px] font-bold border-blue-500/20 hover:border-blue-500 hover:bg-blue-500/5"
-                        onClick={() => {
-                          const combo = `1. Dipirona 1g EV diluído em Soro Fisiológico 0.9% 100ml - correr em 20 minutos (se febre > 37.8°C ou dor moderada/grave).`;
-                          setDescription(prev => prev ? `${prev}\n${combo}` : combo);
-                          toast.success("Combo de Analgesia inserido");
-                        }}
-                      >
-                        💊 + Analgesia Comum (Dipirona)
-                      </Button>
-                      <Button
-                        type="button"
-                        size="sm"
-                        variant="outline"
-                        className="h-8 rounded-lg text-[10px] font-bold border-red-500/20 hover:border-red-500 hover:bg-red-500/5"
-                        onClick={() => {
-                          const combo = `1. Tramadol 50mg EV + Escopolamina (Buscopan) 20mg EV diluídos em Soro Fisiológico 0.9% 100ml - correr lento em 30 minutos (se dor intensa ou cólica).`;
-                          setDescription(prev => prev ? `${prev}\n${combo}` : combo);
-                          toast.success("Combo de Analgesia Forte inserido");
-                        }}
-                      >
-                        🔥 + Analgesia Forte (Tramal+Buscopan)
-                      </Button>
-                      <Button
-                        type="button"
-                        size="sm"
-                        variant="outline"
-                        className="h-8 rounded-lg text-[10px] font-bold border-emerald-500/20 hover:border-emerald-500 hover:bg-emerald-500/5"
-                        onClick={() => {
-                          const combo = `1. Ondansetrona 8mg EV diluído em Soro Fisiológico 0.9% 100ml - correr em 20 minutos (se náuseas ou vômitos).\n2. Metoclopramida (Plasil) 10mg EV lento (se refratário).`;
-                          setDescription(prev => prev ? `${prev}\n${combo}` : combo);
-                          toast.success("Combo Gastrointestinal inserido");
-                        }}
-                      >
-                        🤢 + Combo Anti-vômito
-                      </Button>
-                      <Button
-                        type="button"
-                        size="sm"
-                        variant="outline"
-                        className="h-8 rounded-lg text-[10px] font-bold border-pink-500/20 hover:border-pink-500 hover:bg-pink-500/5"
-                        onClick={() => {
-                          const combo = `1. Prometazina (Fenergan) 50mg IM profundo.\n2. Dexametasona 10mg EV diluída em SF 0.9% 100ml.`;
-                          setDescription(prev => prev ? `${prev}\n${combo}` : combo);
-                          toast.success("Combo Antialérgico inserido");
-                        }}
-                      >
-                        🤧 + Antialérgico (Fenergan+Dexa)
-                      </Button>
-                      <Button
-                        type="button"
-                        size="sm"
-                        variant="outline"
-                        className="h-8 rounded-lg text-[10px] font-bold border-orange-500/20 hover:border-orange-500 hover:bg-orange-500/5"
-                        onClick={() => {
-                          const combo = `1. Captopril 25mg Via Oral (se PAS > 180 ou PAD > 110 sem sinais de alarme).\n2. Reavaliar PA em 40 minutos.`;
-                          setDescription(prev => prev ? `${prev}\n${combo}` : combo);
-                          toast.success("Combo Crise Hipertensiva inserido");
-                        }}
-                      >
-                        ❤️ + Crise Hipertensiva (Captopril)
-                      </Button>
-                      <Button
-                        type="button"
-                        size="sm"
-                        variant="outline"
-                        className="h-8 rounded-lg text-[10px] font-bold border-yellow-500/20 hover:border-yellow-500 hover:bg-yellow-500/5"
-                        onClick={() => {
-                          const combo = `1. Glicose 50% 4 ampolas (40ml) EV em bolus lento.\n2. Reavaliar HGT em 15 minutos.`;
-                          setDescription(prev => prev ? `${prev}\n${combo}` : combo);
-                          toast.success("Combo Hipoglicemia inserido");
-                        }}
-                      >
-                        🩸 + Hipoglicemia (Glicose 50%)
-                      </Button>
-                      <Button
-                        type="button"
-                        size="sm"
-                        variant="outline"
-                        className="h-8 rounded-lg text-[10px] font-bold border-amber-500/20 hover:border-amber-500 hover:bg-amber-500/5"
-                        onClick={() => {
-                          const combo = `1. Soro Fisiológico 0.9% 500ml EV - correr em 2 horas em bomba de infusão ou gotejamento rápido para hidratação endovenosa.`;
-                          setDescription(prev => prev ? `${prev}\n${combo}` : combo);
-                          toast.success("Combo de Hidratação inserido");
-                        }}
-                      >
-                        💧 + Hidratação Venosa 500ml
-                      </Button>
-                      <Button
-                        type="button"
-                        size="sm"
-                        variant="outline"
-                        className="h-8 rounded-lg text-[10px] font-bold border-purple-500/20 hover:border-purple-500 hover:bg-purple-500/5"
-                        onClick={() => {
-                          const combo = `1. Inalação com Soro Fisiológico 0.9% 5ml + Fenoterol (Berotec) 5 gotas + Ipratrópio (Atrovent) 10 gotas. Realizar a cada 20 minutos, até 3 vezes se broncoespasmo grave.`;
-                          setDescription(prev => prev ? `${prev}\n${combo}` : combo);
-                          toast.success("Combo de Nebulização inserido");
-                        }}
-                      >
-                        🫁 + Nebulização (Berotec/Atrovent)
-                      </Button>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {/* 1. Combos de Medicamentos */}
+                      <div className={cn("space-y-2 relative", isPrescMedicationDropdownOpen ? "z-30" : "z-10")}>
+                        <span className="text-[9px] font-black uppercase text-muted-foreground block">
+                          1. Combos de Medicamentos (Inserir no texto)
+                        </span>
+                        
+                        <div className="relative clinical-dropdown-container">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setIsPrescMedicationDropdownOpen(!isPrescMedicationDropdownOpen);
+                              setIsPrescDietDropdownOpen(false);
+                            }}
+                            className={cn(
+                              "flex items-center justify-between w-full px-4 py-2.5 rounded-xl border bg-white/45 dark:bg-slate-900/45 hover:bg-white/60 dark:hover:bg-slate-900/60 backdrop-blur-sm text-xs font-semibold shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-[#006699]/20",
+                              isPrescMedicationDropdownOpen ? "border-[#006699] text-foreground" : "border-white/60 dark:border-white/10 text-muted-foreground"
+                            )}
+                          >
+                            <div className="flex items-center gap-2">
+                              <span className="p-1 rounded-lg bg-blue-500/10 text-blue-600">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-pill"><path d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z"/><path d="m8.5 8.5 7 7"/></svg>
+                              </span>
+                              <span>Selecionar Combos...</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              {(() => {
+                                const count = PRESCRIPTION_MEDICATION_ITEMS.filter(item => normalizeText(description).includes(normalizeText(item.text).trim())).length;
+                                return count > 0 ? (
+                                  <Badge className="bg-blue-600 text-white font-black text-[9px] px-1.5 py-0.5 rounded-full border-none shadow-sm animate-in zoom-in-50 duration-200">
+                                    {count}
+                                  </Badge>
+                                ) : null;
+                              })()}
+                              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={cn("lucide lucide-chevron-down text-muted-foreground/60 transition-transform duration-200", isPrescMedicationDropdownOpen && "transform rotate-180")}><path d="m6 9 6 6 6-6"/></svg>
+                            </div>
+                          </button>
+
+                          <AnimatePresence>
+                            {isPrescMedicationDropdownOpen && (
+                              <motion.div
+                                initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                                animate={{ opacity: 1, y: 0, scale: 1 }}
+                                exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                                transition={{ duration: 0.15, ease: "easeOut" }}
+                                className="absolute left-0 right-0 mt-2 p-1.5 rounded-xl border border-blue-500/20 border-white/20 dark:border-white/10 bg-white/95 dark:bg-slate-950/95 text-slate-900 dark:text-slate-100 shadow-2xl backdrop-blur-md z-50 max-h-[280px] overflow-y-auto overflow-x-hidden space-y-1 scrollbar-thin scrollbar-thumb-muted"
+                              >
+                                {PRESCRIPTION_MEDICATION_ITEMS.map((item) => {
+                                  const isActive = normalizeText(description).includes(normalizeText(item.text).trim());
+                                  return (
+                                    <button
+                                      key={item.id}
+                                      type="button"
+                                      onClick={() => toggleCareItem(item.text, item.toastMsg)}
+                                      className={cn(
+                                        "group flex items-center justify-between w-full px-3 py-2 rounded-lg text-left text-xs transition-all",
+                                        isActive 
+                                          ? "bg-blue-500/5 text-blue-700 dark:text-blue-400 font-bold border border-blue-500/20" 
+                                          : "hover:bg-muted/70 text-slate-700 dark:text-slate-200 border border-transparent"
+                                      )}
+                                    >
+                                      <span className="truncate">{item.label}</span>
+                                      {isActive ? (
+                                        <span className="text-[10px] font-black text-blue-600 dark:text-blue-400 flex items-center gap-1">
+                                          Adicionado ✓
+                                        </span>
+                                      ) : (
+                                        <span className="text-[10px] text-slate-400 dark:text-slate-500 group-hover:text-[#006699] dark:group-hover:text-sky-400 font-bold transition-all">
+                                          + Inserir
+                                        </span>
+                                      )}
+                                    </button>
+                                  );
+                                })}
+                              </motion.div>
+                            )}
+                          </AnimatePresence>
+                        </div>
+                      </div>
+
+                      {/* 2. Dietas e Cuidados Clínicos */}
+                      <div className={cn("space-y-2 relative", isPrescDietDropdownOpen ? "z-30" : "z-10")}>
+                        <span className="text-[9px] font-black uppercase text-muted-foreground block">
+                          2. Dietas e Cuidados Clínicos (Inserir no texto)
+                        </span>
+                        
+                        <div className="relative clinical-dropdown-container">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setIsPrescDietDropdownOpen(!isPrescDietDropdownOpen);
+                              setIsPrescMedicationDropdownOpen(false);
+                            }}
+                            className={cn(
+                              "flex items-center justify-between w-full px-4 py-2.5 rounded-xl border bg-white/45 dark:bg-slate-900/45 hover:bg-white/60 dark:hover:bg-slate-900/60 backdrop-blur-sm text-xs font-semibold shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-[#006699]/20",
+                              isPrescDietDropdownOpen ? "border-[#006699] text-foreground" : "border-white/60 dark:border-white/10 text-muted-foreground"
+                            )}
+                          >
+                            <div className="flex items-center gap-2">
+                              <span className="p-1 rounded-lg bg-emerald-500/10 text-emerald-600">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-apple"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="M12 2v4"/></svg>
+                              </span>
+                              <span>Selecionar Dietas/Cuidados...</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              {(() => {
+                                const count = PRESCRIPTION_DIET_ITEMS.filter(item => normalizeText(description).includes(normalizeText(item.text).trim())).length;
+                                return count > 0 ? (
+                                  <Badge className="bg-emerald-600 text-white font-black text-[9px] px-1.5 py-0.5 rounded-full border-none shadow-sm animate-in zoom-in-50 duration-200">
+                                    {count}
+                                  </Badge>
+                                ) : null;
+                              })()}
+                              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={cn("lucide lucide-chevron-down text-muted-foreground/60 transition-transform duration-200", isPrescDietDropdownOpen && "transform rotate-180")}><path d="m6 9 6 6 6-6"/></svg>
+                            </div>
+                          </button>
+
+                          <AnimatePresence>
+                            {isPrescDietDropdownOpen && (
+                              <motion.div
+                                initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                                animate={{ opacity: 1, y: 0, scale: 1 }}
+                                exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                                transition={{ duration: 0.15, ease: "easeOut" }}
+                                className="absolute left-0 right-0 mt-2 p-1.5 rounded-xl border border-emerald-500/20 border-white/20 dark:border-white/10 bg-white/95 dark:bg-slate-950/95 text-slate-900 dark:text-slate-100 shadow-2xl backdrop-blur-md z-50 max-h-[280px] overflow-y-auto overflow-x-hidden space-y-1 scrollbar-thin scrollbar-thumb-muted"
+                              >
+                                {PRESCRIPTION_DIET_ITEMS.map((item) => {
+                                  const isActive = normalizeText(description).includes(normalizeText(item.text).trim());
+                                  return (
+                                    <button
+                                      key={item.id}
+                                      type="button"
+                                      onClick={() => toggleCareItem(item.text, item.toastMsg)}
+                                      className={cn(
+                                        "group flex items-center justify-between w-full px-3 py-2 rounded-lg text-left text-xs transition-all",
+                                        isActive 
+                                          ? "bg-emerald-500/5 text-emerald-700 dark:text-emerald-400 font-bold border border-emerald-500/20" 
+                                          : "hover:bg-muted/70 text-slate-700 dark:text-slate-200 border border-transparent"
+                                      )}
+                                    >
+                                      <span className="truncate">{item.label}</span>
+                                      {isActive ? (
+                                        <span className="text-[10px] font-black text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
+                                          Adicionado ✓
+                                        </span>
+                                      ) : (
+                                        <span className="text-[10px] text-slate-400 dark:text-slate-500 group-hover:text-[#006699] dark:group-hover:text-sky-400 font-bold transition-all">
+                                          + Inserir
+                                        </span>
+                                      )}
+                                    </button>
+                                  );
+                                })}
+                              </motion.div>
+                            )}
+                          </AnimatePresence>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* 3. Escalas Clínicas Adicionais para Prescrição */}
+                    <div className="space-y-3 pt-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[9px] font-black uppercase text-muted-foreground">3. Escalas Clínicas Úteis (Prescrição Adaptativa)</span>
+                        <Badge variant="outline" className="text-[8px] uppercase tracking-wider bg-primary/5 text-primary border-primary/20">Médicas</Badge>
+                      </div>
+
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                        {/* Card MEWS */}
+                        <button
+                          type="button"
+                          onClick={() => setOpenMewsCalc(true)}
+                          className={cn(
+                            "flex flex-col items-start p-2.5 rounded-xl border text-left transition-all relative overflow-hidden group",
+                            selectedMews 
+                              ? "bg-blue-500/5 border-blue-500/30 dark:bg-blue-500/10" 
+                              : "bg-white/45 dark:bg-slate-900/45 border-white/60 dark:border-white/10 hover:border-blue-500/40 hover:bg-blue-500/5 backdrop-blur-sm shadow-sm"
+                          )}
+                        >
+                          <div className="flex items-center justify-between w-full mb-1.5">
+                            <span className={cn("text-[9px] font-black uppercase tracking-wider transition-colors", selectedMews ? "text-blue-600 dark:text-blue-400" : "text-foreground/80 group-hover:text-blue-600 dark:group-hover:text-blue-400")}>MEWS (Alerta)</span>
+                            <div className={cn("w-5 h-5 rounded flex items-center justify-center flex-shrink-0 transition-colors", selectedMews ? "bg-blue-500" : "bg-blue-500/15")}>
+                              <Activity className={cn("h-3 w-3", selectedMews ? "text-white" : "text-blue-600")} />
+                            </div>
+                          </div>
+                          {selectedMews ? (
+                            <Badge className="h-4 text-[9px] font-bold bg-blue-600 hover:bg-blue-700 border-none text-white px-1.5 rounded truncate max-w-full">
+                              {selectedMews}
+                            </Badge>
+                          ) : (
+                            <span className="text-[9px] font-bold text-muted-foreground/60">Não Avaliado</span>
+                          )}
+                        </button>
+
+                        {/* Card NEWS2 */}
+                        <button
+                          type="button"
+                          onClick={() => setOpenNews2Calc(true)}
+                          className={cn(
+                            "flex flex-col items-start p-2.5 rounded-xl border text-left transition-all relative overflow-hidden group",
+                            selectedNews2 
+                              ? "bg-emerald-500/5 border-emerald-500/30 dark:bg-emerald-500/10" 
+                              : "bg-white/45 dark:bg-slate-900/45 border-white/60 dark:border-white/10 hover:border-emerald-500/40 hover:bg-emerald-500/5 backdrop-blur-sm shadow-sm"
+                          )}
+                        >
+                          <div className="flex items-center justify-between w-full mb-1.5">
+                            <span className={cn("text-[9px] font-black uppercase tracking-wider transition-colors", selectedNews2 ? "text-emerald-600 dark:text-emerald-400" : "text-foreground/80 group-hover:text-emerald-600 dark:group-hover:text-emerald-400")}>NEWS2</span>
+                            <div className={cn("w-5 h-5 rounded flex items-center justify-center flex-shrink-0 transition-colors", selectedNews2 ? "bg-emerald-500" : "bg-emerald-500/15")}>
+                              <Activity className={cn("h-3 w-3", selectedNews2 ? "text-white" : "text-emerald-600")} />
+                            </div>
+                          </div>
+                          {selectedNews2 ? (
+                            <Badge className="h-4 text-[9px] font-bold bg-emerald-500 hover:bg-emerald-600 border-none text-white px-1.5 rounded truncate max-w-full">
+                              {selectedNews2}
+                            </Badge>
+                          ) : (
+                            <span className="text-[9px] font-bold text-muted-foreground/60">Não Avaliado</span>
+                          )}
+                        </button>
+
+                        {/* Card qSOFA */}
+                        <button
+                          type="button"
+                          onClick={() => setOpenQsofaCalc(true)}
+                          className={cn(
+                            "flex flex-col items-start p-2.5 rounded-xl border text-left transition-all relative overflow-hidden group",
+                            selectedQsofa 
+                              ? "bg-purple-500/5 border-purple-500/30 dark:bg-purple-500/10" 
+                              : "bg-white/45 dark:bg-slate-900/45 border-white/60 dark:border-white/10 hover:border-purple-500/40 hover:bg-purple-500/5 backdrop-blur-sm shadow-sm"
+                          )}
+                        >
+                          <div className="flex items-center justify-between w-full mb-1.5">
+                            <span className={cn("text-[9px] font-black uppercase tracking-wider transition-colors", selectedQsofa ? "text-purple-600 dark:text-purple-400" : "text-foreground/80 group-hover:text-purple-600 dark:group-hover:text-purple-400")}>qSOFA (Sepse)</span>
+                            <div className={cn("w-5 h-5 rounded flex items-center justify-center flex-shrink-0 transition-colors", selectedQsofa ? "bg-purple-500" : "bg-purple-500/15")}>
+                              <ShieldAlert className={cn("h-3 w-3", selectedQsofa ? "text-white" : "text-purple-600")} />
+                            </div>
+                          </div>
+                          {selectedQsofa ? (
+                            <Badge className="h-4 text-[9px] font-bold bg-purple-600 hover:bg-purple-700 border-none text-white px-1.5 rounded truncate max-w-full">
+                              {selectedQsofa}
+                            </Badge>
+                          ) : (
+                            <span className="text-[9px] font-bold text-muted-foreground/60">Não Avaliado</span>
+                          )}
+                        </button>
+
+                        {/* Card Glasgow */}
+                        <button
+                          type="button"
+                          onClick={() => setOpenGlasgowCalc(true)}
+                          className={cn(
+                            "flex flex-col items-start p-2.5 rounded-xl border text-left transition-all relative overflow-hidden group",
+                            selectedGlasgow 
+                              ? "bg-indigo-500/5 border-indigo-500/30 dark:bg-indigo-500/10" 
+                              : "bg-white/45 dark:bg-slate-900/45 border-white/60 dark:border-white/10 hover:border-indigo-500/40 hover:bg-indigo-500/5 backdrop-blur-sm shadow-sm"
+                          )}
+                        >
+                          <div className="flex items-center justify-between w-full mb-1.5">
+                            <span className={cn("text-[9px] font-black uppercase tracking-wider transition-colors", selectedGlasgow ? "text-indigo-600 dark:text-indigo-400" : "text-foreground/80 group-hover:text-indigo-600 dark:group-hover:text-indigo-400")}>Glasgow (GCS)</span>
+                            <div className={cn("w-5 h-5 rounded flex items-center justify-center flex-shrink-0 transition-colors", selectedGlasgow ? "bg-indigo-500" : "bg-indigo-500/15")}>
+                              <Brain className={cn("h-3 w-3", selectedGlasgow ? "text-white" : "text-indigo-600")} />
+                            </div>
+                          </div>
+                          {selectedGlasgow ? (
+                            <Badge className="h-4 text-[9px] font-bold bg-indigo-600 hover:bg-indigo-700 border-none text-white px-1.5 rounded truncate max-w-full">
+                              {selectedGlasgow}
+                            </Badge>
+                          ) : (
+                            <span className="text-[9px] font-bold text-muted-foreground/60">Não Avaliado</span>
+                          )}
+                        </button>
+                      </div>
                     </div>
                   </motion.div>
                 )}
 
-                {/* Resumo de Alta Médica / Desfechos */}
+                {/* Super Painel de Desfecho Clínico & Alta */}
                 {evolutionType === "Alta" && (
                   <motion.div 
                     initial={{ opacity: 0, y: -5 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="p-4 rounded-2xl border border-white/40 dark:border-white/10 bg-white/35 dark:bg-slate-900/35 backdrop-blur-md shadow-sm text-xs space-y-2"
+                    className="p-5 rounded-xl border border-white/40 dark:border-white/10 bg-white/35 dark:bg-slate-900/35 backdrop-blur-md shadow-sm space-y-4 relative z-20"
                   >
-                    <div className="flex items-center justify-between">
-                      <span className="font-extrabold text-[#006699] uppercase tracking-wider text-[10px]">
-                        👋 Desfecho Clínico: Resumos Padrão de Alta (UPA 24h)
+                    <div className="flex items-center justify-between border-b border-slate-500/20 pb-2">
+                      <span className="font-extrabold text-[#006699] uppercase tracking-wider text-[11px] flex items-center gap-1.5">
+                        ⚡ Super Painel de Desfecho Clínico & Alta (UPA 24h)
                       </span>
-                      <span className="text-[9px] font-bold text-muted-foreground/60 uppercase tracking-widest">
-                        Modelos Estruturados
+                      <span className="text-[9px] font-black text-muted-foreground/60 uppercase tracking-widest">
+                        Fluxo de Alta Expresso & Adaptativo
                       </span>
                     </div>
-                    <div className="flex flex-wrap gap-2 pt-1">
-                      <Button
-                        type="button"
-                        size="sm"
-                        variant="outline"
-                        className="h-8 rounded-lg text-[10px] font-bold border-emerald-500/20 hover:border-emerald-500 hover:bg-emerald-500/5"
-                        onClick={() => {
-                          const combo = `DESFECHO: ALTA MÉDICA (MELHORADO)\n\nPaciente evoluiu com melhora clínica após medicações realizadas na unidade. No momento: hemodinamicamente estável, eupneico, acianótico, afebril, consciente e orientado. Sem queixas álgicas agudas.\n\nConduta: Alta com orientações de sinais de alarme e receituário médico em mãos. Orientado a retornar se piora do quadro.`;
-                          setDescription(combo);
-                          toast.success("Resumo de Alta inserido");
-                        }}
-                      >
-                        ✅ + Alta Médica (Melhorado)
-                      </Button>
-                      <Button
-                        type="button"
-                        size="sm"
-                        variant="outline"
-                        className="h-8 rounded-lg text-[10px] font-bold border-amber-500/20 hover:border-amber-500 hover:bg-amber-500/5"
-                        onClick={() => {
-                          const combo = `DESFECHO: ALTA A PEDIDO\n\nPaciente solicita alta a pedido, declarando-se ciente dos riscos de interromper a avaliação/tratamento clínico proposto. Orientado(a) quanto aos sinais de alarme e gravidade. \n\nConduta: Assina o Termo de Responsabilidade (Evasão/Alta a Pedido) que deverá ser anexado ao prontuário impresso.`;
-                          setDescription(combo);
-                          toast.success("Resumo de Alta a Pedido inserido");
-                        }}
-                      >
-                        📜 + Alta a Pedido (Contra Orientação)
-                      </Button>
-                      <Button
-                        type="button"
-                        size="sm"
-                        variant="outline"
-                        className="h-8 rounded-lg text-[10px] font-bold border-blue-500/20 hover:border-blue-500 hover:bg-blue-500/5"
-                        onClick={() => {
-                          const combo = `DESFECHO: TRANSFERÊNCIA HOSPITALAR\n\nPaciente necessita de avaliação de especialidade / internação não disponível nesta unidade. Vaga solicitada via CROSS/Central de Regulação.\n\nConduta: Transferido via ambulância acompanhado de equipe, monitorizado e com suporte adequado. Prontuário e exames entregues à equipe de transporte.`;
-                          setDescription(combo);
-                          toast.success("Resumo de Transferência inserido");
-                        }}
-                      >
-                        🚑 + Transferência Hospitalar
-                      </Button>
-                      <Button
-                        type="button"
-                        size="sm"
-                        variant="outline"
-                        className="h-8 rounded-lg text-[10px] font-bold border-red-500/20 hover:border-red-500 hover:bg-red-500/5"
-                        onClick={() => {
-                          const combo = `DESFECHO: EVASÃO\n\nPaciente evadiu-se da unidade antes do término do atendimento ou avaliação médica/reavaliação. Retirado acesso venoso (caso aplicável). \n\nComunicado à equipe de enfermagem e recepção. Prontuário encerrado administrativamente por evasão.`;
-                          setDescription(combo);
-                          toast.success("Resumo de Evasão inserido");
-                        }}
-                      >
-                        🏃 + Evasão
-                      </Button>
-                      <Button
-                        type="button"
-                        size="sm"
-                        variant="outline"
-                        className="h-8 rounded-lg text-[10px] font-bold border-stone-500/20 hover:border-stone-500 hover:bg-stone-500/5"
-                        onClick={() => {
-                          const combo = `DESFECHO: ÓBITO\n\nPaciente apresentou Parada Cardiorrespiratória (PCR). Iniciadas manobras de RCP avançada conforme protocolo ACLS. Sem retorno da circulação espontânea após [COMPLETAR] minutos de reanimação. Constatado óbito às [HORÁRIO].\n\nConduta: Encaminhado corpo para o morgue. Comunicado aos familiares presentes na unidade. Emitida Declaração de Óbito.`;
-                          setDescription(combo);
-                          toast.success("Resumo de Óbito inserido");
-                        }}
-                      >
-                        ✝️ + Óbito (PCR)
-                      </Button>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {/* 1. Tipo de Desfecho / Alta */}
+                      <div className={cn("space-y-2 relative", isDischargeTypeDropdownOpen ? "z-30" : "z-10")}>
+                        <span className="text-[9px] font-black uppercase text-muted-foreground block">
+                          1. Tipo de Desfecho / Alta (Inserir no texto)
+                        </span>
+                        
+                        <div className="relative clinical-dropdown-container">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setIsDischargeTypeDropdownOpen(!isDischargeTypeDropdownOpen);
+                              setIsDischargeConductDropdownOpen(false);
+                            }}
+                            className={cn(
+                              "flex items-center justify-between w-full px-4 py-2.5 rounded-xl border bg-white/45 dark:bg-slate-900/45 hover:bg-white/60 dark:hover:bg-slate-900/60 backdrop-blur-sm text-xs font-semibold shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-[#006699]/20",
+                              isDischargeTypeDropdownOpen ? "border-[#006699] text-foreground" : "border-white/60 dark:border-white/10 text-muted-foreground"
+                            )}
+                          >
+                            <div className="flex items-center gap-2">
+                              <span className="p-1 rounded-lg bg-emerald-500/10 text-emerald-600">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-check-square"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+                              </span>
+                              <span>
+                                {(() => {
+                                  const selectedItem = DISCHARGE_TYPE_ITEMS.find(item => normalizeText(description).includes(normalizeText(item.text).trim()));
+                                  return selectedItem ? selectedItem.label : "Selecionar Tipo de Alta...";
+                                })()}
+                              </span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              {(() => {
+                                const count = DISCHARGE_TYPE_ITEMS.filter(item => normalizeText(description).includes(normalizeText(item.text).trim())).length;
+                                return count > 0 ? (
+                                  <Badge className="bg-emerald-600 text-white font-black text-[9px] px-1.5 py-0.5 rounded-full border-none shadow-sm animate-in zoom-in-50 duration-200">
+                                    Selecionado ✓
+                                  </Badge>
+                                ) : null;
+                              })()}
+                              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={cn("lucide lucide-chevron-down text-muted-foreground/60 transition-transform duration-200", isDischargeTypeDropdownOpen && "transform rotate-180")}><path d="m6 9 6 6 6-6"/></svg>
+                            </div>
+                          </button>
+
+                          <AnimatePresence>
+                            {isDischargeTypeDropdownOpen && (
+                              <motion.div
+                                initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                                animate={{ opacity: 1, y: 0, scale: 1 }}
+                                exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                                transition={{ duration: 0.15, ease: "easeOut" }}
+                                className="absolute left-0 right-0 mt-2 p-1.5 rounded-xl border border-emerald-500/20 border-white/20 dark:border-white/10 bg-white/95 dark:bg-slate-950/95 text-slate-900 dark:text-slate-100 shadow-2xl backdrop-blur-md z-50 max-h-[280px] overflow-y-auto overflow-x-hidden space-y-1 scrollbar-thin scrollbar-thumb-muted"
+                              >
+                                {DISCHARGE_TYPE_ITEMS.map((item) => {
+                                  const isActive = normalizeText(description).includes(normalizeText(item.text).trim());
+                                  return (
+                                    <button
+                                      key={item.id}
+                                      type="button"
+                                      onClick={() => {
+                                        setDescription(item.text);
+                                        setIsDischargeTypeDropdownOpen(false);
+                                        toast.success(item.toastMsg + " definido");
+                                      }}
+                                      className={cn(
+                                        "group flex items-center justify-between w-full px-3 py-2 rounded-lg text-left text-xs transition-all",
+                                        isActive 
+                                          ? "bg-emerald-500/5 text-emerald-700 dark:text-emerald-400 font-bold border border-emerald-500/20" 
+                                          : "hover:bg-muted/70 text-slate-700 dark:text-slate-200 border border-transparent"
+                                      )}
+                                    >
+                                      <span className="truncate">{item.label}</span>
+                                      {isActive ? (
+                                        <span className="text-[10px] font-black text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
+                                          Ativo ✓
+                                        </span>
+                                      ) : (
+                                        <span className="text-[10px] text-slate-400 dark:text-slate-500 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 font-bold transition-all">
+                                          + Definir
+                                        </span>
+                                      )}
+                                    </button>
+                                  );
+                                })}
+                              </motion.div>
+                            )}
+                          </AnimatePresence>
+                        </div>
+                      </div>
+
+                      {/* 2. Condutas e Orientações Pós-Alta */}
+                      <div className={cn("space-y-2 relative", isDischargeConductDropdownOpen ? "z-30" : "z-10")}>
+                        <span className="text-[9px] font-black uppercase text-muted-foreground block">
+                          2. Condutas e Orientações (Inserir no texto)
+                        </span>
+                        
+                        <div className="relative clinical-dropdown-container">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setIsDischargeConductDropdownOpen(!isDischargeConductDropdownOpen);
+                              setIsDischargeTypeDropdownOpen(false);
+                            }}
+                            className={cn(
+                              "flex items-center justify-between w-full px-4 py-2.5 rounded-xl border bg-white/45 dark:bg-slate-900/45 hover:bg-white/60 dark:hover:bg-slate-900/60 backdrop-blur-sm text-xs font-semibold shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-[#006699]/20",
+                              isDischargeConductDropdownOpen ? "border-[#006699] text-foreground" : "border-white/60 dark:border-white/10 text-muted-foreground"
+                            )}
+                          >
+                            <div className="flex items-center gap-2">
+                              <span className="p-1 rounded-lg bg-blue-500/10 text-blue-600">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-heart-pulse"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/><path d="M3.22 12H9.5l1.5-3 2 6 1.5-3h4.28"/></svg>
+                              </span>
+                              <span>Selecionar Orientações...</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              {(() => {
+                                const count = DISCHARGE_CONDUCT_ITEMS.filter(item => normalizeText(description).includes(normalizeText(item.text).trim())).length;
+                                return count > 0 ? (
+                                  <Badge className="bg-blue-600 text-white font-black text-[9px] px-1.5 py-0.5 rounded-full border-none shadow-sm animate-in zoom-in-50 duration-200">
+                                    {count}
+                                  </Badge>
+                                ) : null;
+                              })()}
+                              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={cn("lucide lucide-chevron-down text-muted-foreground/60 transition-transform duration-200", isDischargeConductDropdownOpen && "transform rotate-180")}><path d="m6 9 6 6 6-6"/></svg>
+                            </div>
+                          </button>
+
+                          <AnimatePresence>
+                            {isDischargeConductDropdownOpen && (
+                              <motion.div
+                                initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                                animate={{ opacity: 1, y: 0, scale: 1 }}
+                                exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                                transition={{ duration: 0.15, ease: "easeOut" }}
+                                className="absolute left-0 right-0 mt-2 p-1.5 rounded-xl border border-blue-500/20 border-white/20 dark:border-white/10 bg-white/95 dark:bg-slate-950/95 text-slate-900 dark:text-slate-100 shadow-2xl backdrop-blur-md z-50 max-h-[280px] overflow-y-auto overflow-x-hidden space-y-1 scrollbar-thin scrollbar-thumb-muted"
+                              >
+                                {DISCHARGE_CONDUCT_ITEMS.map((item) => {
+                                  const isActive = normalizeText(description).includes(normalizeText(item.text).trim());
+                                  return (
+                                    <button
+                                      key={item.id}
+                                      type="button"
+                                      onClick={() => toggleCareItem(item.text, item.toastMsg)}
+                                      className={cn(
+                                        "group flex items-center justify-between w-full px-3 py-2 rounded-lg text-left text-xs transition-all",
+                                        isActive 
+                                          ? "bg-blue-500/5 text-blue-700 dark:text-blue-400 font-bold border border-blue-500/20" 
+                                          : "hover:bg-muted/70 text-slate-700 dark:text-slate-200 border border-transparent"
+                                      )}
+                                    >
+                                      <span className="truncate">{item.label}</span>
+                                      {isActive ? (
+                                        <span className="text-[10px] font-black text-blue-600 dark:text-blue-400 flex items-center gap-1">
+                                          Adicionado ✓
+                                        </span>
+                                      ) : (
+                                        <span className="text-[10px] text-slate-400 dark:text-slate-500 group-hover:text-blue-600 dark:group-hover:text-blue-400 font-bold transition-all">
+                                          + Inserir
+                                        </span>
+                                      )}
+                                    </button>
+                                  );
+                                })}
+                              </motion.div>
+                            )}
+                          </AnimatePresence>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* 3. Protocolos e Termos Obrigatórios */}
+                    <div className="space-y-3 pt-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[9px] font-black uppercase text-muted-foreground">3. Protocolos & Termos Obrigatórios (Desfecho Adaptativo)</span>
+                        <Badge variant="outline" className="text-[8px] uppercase tracking-wider bg-primary/5 text-primary border-primary/20">Regulação e Segurança</Badge>
+                      </div>
+
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                        {/* Termo de Responsabilidade */}
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const text = "TERMO DE RESPONSABILIDADE:\nDeclaro que o paciente e/ou responsável legal foram amplamente orientados sobre os riscos clínicos e complicações potenciais decorrentes da interrupção do tratamento proposto nesta data, assinando o termo impresso anexo ao prontuário.";
+                            toggleCareItem(text, "Termo de Responsabilidade");
+                          }}
+                          className={cn(
+                            "flex flex-col items-start p-2.5 rounded-xl border text-left transition-all relative overflow-hidden group",
+                            normalizeText(description).includes("termo de responsabilidade") 
+                              ? "bg-amber-500/5 border-amber-500/30 dark:bg-amber-500/10" 
+                              : "bg-white/45 dark:bg-slate-900/45 border-white/60 dark:border-white/10 hover:border-amber-500/40 hover:bg-amber-500/5 backdrop-blur-sm shadow-sm"
+                          )}
+                        >
+                          <div className="flex items-center justify-between w-full mb-1.5">
+                            <span className={cn("text-[9px] font-black uppercase tracking-wider transition-colors", normalizeText(description).includes("termo de responsabilidade") ? "text-amber-600 dark:text-amber-400" : "text-foreground/80 group-hover:text-amber-600 dark:group-hover:text-amber-400")}>TERMO ALTA/EVASÃO</span>
+                            <div className={cn("w-5 h-5 rounded flex items-center justify-center flex-shrink-0 transition-colors", normalizeText(description).includes("termo de responsabilidade") ? "bg-amber-500" : "bg-amber-500/15")}>
+                              <ShieldAlert className={cn("h-3 w-3", normalizeText(description).includes("termo de responsabilidade") ? "text-white" : "text-amber-600")} />
+                            </div>
+                          </div>
+                          <span className="text-[10px] font-bold">Termo de Responsab.</span>
+                          <span className="text-[8px] text-muted-foreground mt-0.5">
+                            {normalizeText(description).includes("termo de responsabilidade") ? "Anexado ✓" : "Não Inserido"}
+                          </span>
+                        </button>
+
+                        {/* Solicitação CROSS */}
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const text = "REGULAÇÃO CROSS:\n- Paciente regulado sob ID CROSS: [DIGITE AQUI]\n- Status regulatório: Aguardando vaga / Transferência autorizada\n- Condições de transporte: Estável para transporte em ambulância Tipo B / UTI móvel Tipo D com acompanhamento médico.";
+                            toggleCareItem(text, "Solicitação CROSS");
+                          }}
+                          className={cn(
+                            "flex flex-col items-start p-2.5 rounded-xl border text-left transition-all relative overflow-hidden group",
+                            normalizeText(description).includes("regulação cross") 
+                              ? "bg-blue-500/5 border-blue-500/30 dark:bg-blue-500/10" 
+                              : "bg-white/45 dark:bg-slate-900/45 border-white/60 dark:border-white/10 hover:border-blue-500/40 hover:bg-blue-500/5 backdrop-blur-sm shadow-sm"
+                          )}
+                        >
+                          <div className="flex items-center justify-between w-full mb-1.5">
+                            <span className={cn("text-[9px] font-black uppercase tracking-wider transition-colors", normalizeText(description).includes("regulação cross") ? "text-blue-600 dark:text-blue-400" : "text-foreground/80 group-hover:text-blue-600 dark:group-hover:text-blue-400")}>REGULAÇÃO CROSS</span>
+                            <div className={cn("w-5 h-5 rounded flex items-center justify-center flex-shrink-0 transition-colors", normalizeText(description).includes("regulação cross") ? "bg-blue-500" : "bg-blue-500/15")}>
+                              <Clock className={cn("h-3 w-3", normalizeText(description).includes("regulação cross") ? "text-white" : "text-blue-600")} />
+                            </div>
+                          </div>
+                          <span className="text-[10px] font-bold">Solicitação CROSS</span>
+                          <span className="text-[8px] text-muted-foreground mt-0.5">
+                            {normalizeText(description).includes("regulação cross") ? "Regulação Ativa ✓" : "Não Solicitada"}
+                          </span>
+                        </button>
+
+                        {/* Receituário e Atestado */}
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const text = "RECEITUÁRIO E ATESTADO:\n- Receita médica emitida e entregue ao paciente para uso domiciliar.\n- Atestado médico de afastamento de suas atividades laborais por [ ] dias emitido e carimbado conforme resolução do CFM.";
+                            toggleCareItem(text, "Receituário e Atestado");
+                          }}
+                          className={cn(
+                            "flex flex-col items-start p-2.5 rounded-xl border text-left transition-all relative overflow-hidden group",
+                            normalizeText(description).includes("receituário e atestado") 
+                              ? "bg-purple-500/5 border-purple-500/30 dark:bg-purple-500/10" 
+                              : "bg-white/45 dark:bg-slate-900/45 border-white/60 dark:border-white/10 hover:border-purple-500/40 hover:bg-purple-500/5 backdrop-blur-sm shadow-sm"
+                          )}
+                        >
+                          <div className="flex items-center justify-between w-full mb-1.5">
+                            <span className={cn("text-[9px] font-black uppercase tracking-wider transition-colors", normalizeText(description).includes("receituário e atestado") ? "text-purple-600 dark:text-purple-400" : "text-foreground/80 group-hover:text-purple-600 dark:group-hover:text-purple-400")}>RECEITAS & ATESTADOS</span>
+                            <div className={cn("w-5 h-5 rounded flex items-center justify-center flex-shrink-0 transition-colors", normalizeText(description).includes("receituário e atestado") ? "bg-purple-500" : "bg-purple-500/15")}>
+                              <Activity className={cn("h-3 w-3", normalizeText(description).includes("receituário e atestado") ? "text-white" : "text-purple-600")} />
+                            </div>
+                          </div>
+                          <span className="text-[10px] font-bold">Atestado / Receituário</span>
+                          <span className="text-[8px] text-muted-foreground mt-0.5">
+                            {normalizeText(description).includes("receituário e atestado") ? "Emitido ✓" : "Não Emitido"}
+                          </span>
+                        </button>
+
+                        {/* Declaração de Óbito */}
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const text = "DECLARAÇÃO DE ÓBITO:\n- Óbito constatado pelo médico assistente conforme critérios clínicos.\n- Declaração de Óbito (DO) número: [DIGITE AQUI] preenchida e entregue aos familiares.\n- Orientações de procedimentos fúnebres e assistência social realizadas.";
+                            toggleCareItem(text, "Declaração de Óbito");
+                          }}
+                          className={cn(
+                            "flex flex-col items-start p-2.5 rounded-xl border text-left transition-all relative overflow-hidden group",
+                            normalizeText(description).includes("declaração de óbito") 
+                              ? "bg-red-500/5 border-red-500/30 dark:bg-red-500/10" 
+                              : "bg-white/45 dark:bg-slate-900/45 border-white/60 dark:border-white/10 hover:border-red-500/40 hover:bg-red-500/5 backdrop-blur-sm shadow-sm"
+                          )}
+                        >
+                          <div className="flex items-center justify-between w-full mb-1.5">
+                            <span className={cn("text-[9px] font-black uppercase tracking-wider transition-colors", normalizeText(description).includes("declaração de óbito") ? "text-red-600 dark:text-red-400" : "text-foreground/80 group-hover:text-red-600 dark:group-hover:text-red-400")}>DECLARAÇÃO ÓBITO</span>
+                            <div className={cn("w-5 h-5 rounded flex items-center justify-center flex-shrink-0 transition-colors", normalizeText(description).includes("declaração de óbito") ? "bg-red-500" : "bg-red-500/15")}>
+                              <X className={cn("h-3 w-3", normalizeText(description).includes("declaração de óbito") ? "text-white" : "text-red-600")} />
+                            </div>
+                          </div>
+                          <span className="text-[10px] font-bold">Declaração de Óbito</span>
+                          <span className="text-[8px] text-muted-foreground mt-0.5">
+                            {normalizeText(description).includes("declaração de óbito") ? "Preenchida ✓" : "Não Preenchida"}
+                          </span>
+                        </button>
+                      </div>
                     </div>
                   </motion.div>
                 )}
@@ -1103,7 +1503,7 @@ export default function PatientEvolution() {
                   <motion.div 
                     initial={{ opacity: 0, y: -5 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="p-5 rounded-2xl border border-white/40 dark:border-white/10 bg-white/35 dark:bg-slate-900/35 backdrop-blur-md shadow-sm space-y-4 relative z-20"
+                    className="p-5 rounded-xl border border-white/40 dark:border-white/10 bg-white/35 dark:bg-slate-900/35 backdrop-blur-md shadow-sm space-y-4 relative z-20"
                   >
                     <div className="flex items-center justify-between border-b border-slate-500/20 pb-2">
                       <span className="font-extrabold text-[#006699] uppercase tracking-wider text-[11px]">
@@ -1366,7 +1766,7 @@ export default function PatientEvolution() {
                   <motion.div 
                     initial={{ opacity: 0, y: -5 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="p-5 rounded-2xl border border-white/40 dark:border-white/10 bg-white/35 dark:bg-slate-900/35 backdrop-blur-md shadow-sm space-y-4 relative z-20"
+                    className="p-5 rounded-xl border border-white/40 dark:border-white/10 bg-white/35 dark:bg-slate-900/35 backdrop-blur-md shadow-sm space-y-4 relative z-20"
                   >
                     <div className="flex items-center justify-between border-b border-slate-500/20 pb-2">
                       <span className="font-extrabold text-[#006699] uppercase tracking-wider text-[11px]">
@@ -1629,7 +2029,7 @@ export default function PatientEvolution() {
                   <motion.div 
                     initial={{ opacity: 0, y: -5 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="p-5 rounded-2xl border border-white/40 dark:border-white/10 bg-white/35 dark:bg-slate-900/35 backdrop-blur-md shadow-sm space-y-4 relative z-20"
+                    className="p-5 rounded-xl border border-white/40 dark:border-white/10 bg-white/35 dark:bg-slate-900/35 backdrop-blur-md shadow-sm space-y-4 relative z-20"
                   >
                     <div className="flex items-center justify-between border-b border-slate-500/20 pb-2">
                       <span className="font-extrabold text-[#006699] uppercase tracking-wider text-[11px]">
@@ -2077,7 +2477,7 @@ export default function PatientEvolution() {
                   <motion.div 
                     initial={{ opacity: 0, y: -5 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="p-5 rounded-2xl border border-white/40 dark:border-white/10 bg-white/35 dark:bg-slate-900/35 backdrop-blur-md shadow-sm space-y-4 relative z-20"
+                    className="p-5 rounded-xl border border-white/40 dark:border-white/10 bg-white/35 dark:bg-slate-900/35 backdrop-blur-md shadow-sm space-y-4 relative z-20"
                   >
                     <div className="flex items-center justify-between border-b border-slate-500/20 pb-2">
                       <span className="font-extrabold text-[#006699] uppercase tracking-wider text-[11px]">
@@ -2642,14 +3042,14 @@ export default function PatientEvolution() {
                   </div>
                   <Textarea 
                     placeholder={evolutionType === "Sinais Vitais" ? "Observações clínicas, aspecto geral do paciente, queixas, etc." : "Descreva a evolução do paciente..."} 
-                    className="min-h-[140px] bg-white/45 dark:bg-slate-900/45 border-white/60 dark:border-white/10 focus:bg-white/60 dark:focus:bg-slate-900/60 resize-none text-xs leading-relaxed rounded-2xl backdrop-blur-sm transition-all shadow-sm focus:ring-1 focus:ring-primary/20"
+                    className="min-h-[140px] bg-white/45 dark:bg-slate-900/45 border-white/60 dark:border-white/10 focus:bg-white/60 dark:focus:bg-slate-900/60 resize-none text-xs leading-relaxed rounded-xl backdrop-blur-sm transition-all shadow-sm focus:ring-1 focus:ring-primary/20"
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
                   />
                 </div>
 
                 {/* Carimbo Digital persistent configuration section */}
-                <div className="border border-white/40 dark:border-white/10 rounded-2xl bg-white/35 dark:bg-slate-900/35 backdrop-blur-md shadow-sm overflow-hidden">
+                <div className="border border-white/40 dark:border-white/10 rounded-xl bg-white/35 dark:bg-slate-900/35 backdrop-blur-md shadow-sm overflow-hidden">
                   <button
                     type="button"
                     onClick={() => setIsStampConfigOpen(!isStampConfigOpen)}
@@ -2743,7 +3143,7 @@ export default function PatientEvolution() {
         <h2 className="text-sm font-black tracking-widest text-[#006699] dark:text-sky-400 uppercase">Linha do Tempo de Atendimento</h2>
         
         {evolutions.length === 0 ? (
-          <Card className="glass-card-premium border border-white/40 dark:border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.06)] rounded-2xl overflow-hidden transition-all duration-500">
+          <Card className="glass-card-premium border border-white/40 dark:border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.06)] rounded-xl overflow-hidden transition-all duration-500">
             <CardContent className="h-36 flex items-center justify-center bg-muted/5">
               <p className="text-sm font-bold uppercase tracking-widest text-muted-foreground/30 px-8 text-center leading-relaxed">Nenhuma evolução registrada para este paciente.</p>
             </CardContent>
@@ -2762,7 +3162,7 @@ export default function PatientEvolution() {
                   <div className="h-1.5 w-1.5 rounded-full bg-[#006699] dark:bg-sky-400" />
                 </div>
 
-                <Card className="glass-card-premium border border-white/40 dark:border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.06)] rounded-2xl overflow-hidden hover:scale-[1.01] active:scale-[0.99] transition-all duration-300">
+                <Card className="glass-card-premium border border-white/40 dark:border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.06)] rounded-xl overflow-hidden hover:scale-[1.01] active:scale-[0.99] transition-all duration-300">
                   <CardContent className="p-4 space-y-3">
                     <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border/50 pb-2">
                       <div className="flex items-center gap-2.5">
@@ -2796,7 +3196,7 @@ export default function PatientEvolution() {
         )}
       </div>
       <Dialog open={isBedDialogOpen} onOpenChange={setIsBedDialogOpen}>
-        <DialogContent className="sm:max-w-[425px] rounded-2xl border border-slate-200/40 dark:border-slate-800/40 bg-white dark:bg-slate-950 shadow-2xl">
+        <DialogContent className="sm:max-w-[425px] rounded-xl border border-slate-200/40 dark:border-slate-800/40 bg-white dark:bg-slate-950 shadow-2xl">
           <DialogHeader>
             <DialogTitle className="text-2xl mission-control-title">Gerenciar Leito</DialogTitle>
             <DialogDescription className="font-bold uppercase text-[10px] tracking-widest">
@@ -2809,7 +3209,7 @@ export default function PatientEvolution() {
           <div className="grid gap-6 py-4">
             {patientBed ? (
               <div className="space-y-4">
-                <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/20">
+                <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
                   <p className="text-xs font-bold text-emerald-600 uppercase tracking-widest mb-1">Leito Atual</p>
                   <p className="text-lg font-bold">{patientBed.name}</p>
                   <p className="text-[10px] text-muted-foreground">{patientBed.ward} · {patientBed.room}</p>

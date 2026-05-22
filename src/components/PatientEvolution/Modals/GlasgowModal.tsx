@@ -63,7 +63,7 @@ export function GlasgowModal({ isOpen, onClose, onApply }: GlasgowModalProps) {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[500px] rounded-2xl glass-card-premium shadow-2xl max-h-[85vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-[500px] rounded-xl glass-card-premium shadow-2xl max-h-[85vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-2xl mission-control-title flex items-center gap-2">
             <Brain className="h-6 w-6 text-indigo-500 animate-pulse" />
@@ -127,7 +127,7 @@ export function GlasgowModal({ isOpen, onClose, onApply }: GlasgowModalProps) {
           </div>
 
           {/* Resultado e Ação */}
-          <div className="mt-6 p-4 rounded-2xl bg-slate-50/70 dark:bg-slate-900/40 backdrop-blur-md border border-slate-200/60 dark:border-slate-800/50 space-y-3">
+          <div className="mt-6 p-4 rounded-xl bg-slate-50/70 dark:bg-slate-900/40 backdrop-blur-md border border-slate-200/60 dark:border-slate-800/50 space-y-3">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-[10px] font-black uppercase text-muted-foreground tracking-wider">Pontuação ECG</p>
