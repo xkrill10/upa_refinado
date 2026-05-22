@@ -300,14 +300,79 @@ export default function PatientEvolution() {
   };
 
   // Estados locais para Sinais Vitais & MEWS
-  const [vsSystolic, setVsSystolic] = useState("");
-  const [vsDiastolic, setVsDiastolic] = useState("");
+  const [vsBloodPressure, setVsBloodPressure] = useState("");
   const [vsHeartRate, setVsHeartRate] = useState("");
   const [vsRespiratoryRate, setVsRespiratoryRate] = useState("");
   const [vsTemperature, setVsTemperature] = useState("");
   const [vsSpO2, setVsSpO2] = useState("");
   const [vsPain, setVsPain] = useState("0");
   const [vsConsciousness, setVsConsciousness] = useState("A"); // A: Alerta, V: Voz, D: Dor, I: Inconsciente
+
+  // Derivação de PAS e PAD baseada em vsBloodPressure
+  const vsSystolic = vsBloodPressure.split("/")[0] || "";
+  const vsDiastolic = vsBloodPressure.split("/")[1] || "";
+
+  // Estados de parâmetros normais (discretos)
+  const isDefaultBloodPressure = vsBloodPressure === "120/080" || vsBloodPressure === "120/80" || vsBloodPressure === "";
+  const isDefaultHeartRate = vsHeartRate === "80";
+  const isDefaultRespiratoryRate = vsRespiratoryRate === "16";
+  const isDefaultTemperature = vsTemperature === "36.5" || vsTemperature === "36,5";
+  const isDefaultSpO2 = vsSpO2 === "98";
+  const isDefaultPain = vsPain === "0";
+  const isDefaultConsciousness = vsConsciousness === "A";
+
+  // Função para aplicar máscara no formato 000/000 para Pressão Arterial
+  const handleBloodPressureChange = (val: string) => {
+    let clean = val.replace(/[^\d/]/g, "");
+    
+    // Deleção suave da barra usando backspace
+    const isDeleting = val.length < vsBloodPressure.length;
+    if (isDeleting && vsBloodPressure.endsWith("/") && !clean.includes("/")) {
+      setVsBloodPressure(clean.slice(0, -1));
+      return;
+    }
+    
+    // Se digitou número contínuo como 12080, injetar a barra automaticamente
+    if (!clean.includes("/") && clean.length > 3) {
+      clean = clean.slice(0, 3) + "/" + clean.slice(3);
+    }
+    
+    const parts = clean.split("/");
+    const sys = parts[0] ? parts[0].slice(0, 3) : "";
+    const dia = parts[1] ? parts[1].slice(0, 3) : "";
+    
+    if (clean.includes("/")) {
+      setVsBloodPressure(sys + "/" + dia);
+    } else {
+      if (sys.length >= 3) {
+        setVsBloodPressure(sys + "/");
+      } else {
+        setVsBloodPressure(sys);
+      }
+    }
+  };
+
+  const handleBloodPressureBlur = () => {
+    if (!vsBloodPressure) return;
+    
+    // Dividir em partes sistólica e diastólica
+    const parts = vsBloodPressure.split("/");
+    const sysPart = parts[0] ? parts[0].replace(/\D/g, "") : "";
+    const diaPart = parts[1] ? parts[1].replace(/\D/g, "") : "";
+    
+    if (!sysPart && !diaPart) {
+      setVsBloodPressure("");
+      return;
+    }
+    
+    // Pad sistólica para 3 dígitos (ex: 90 -> 090, 120 -> 120)
+    const formattedSys = sysPart ? sysPart.padStart(3, "0") : "120";
+    
+    // Pad diastólica para 3 dígitos (ex: 80 -> 080, 8 -> 008, vazio -> 080)
+    const formattedDia = diaPart ? diaPart.padStart(3, "0") : "080";
+    
+    setVsBloodPressure(`${formattedSys}/${formattedDia}`);
+  };
 
 
   // Estado local para Carimbo / Assinatura persistente
@@ -442,6 +507,15 @@ export default function PatientEvolution() {
     if (EVOLUTION_TEMPLATES[type] && !description) {
       setDescription(EVOLUTION_TEMPLATES[type]);
     }
+    if (type === "Sinais Vitais") {
+      setVsBloodPressure("120/080");
+      setVsHeartRate("80");
+      setVsSpO2("98");
+      setVsTemperature("36.5");
+      setVsRespiratoryRate("16");
+      setVsPain("0");
+      setVsConsciousness("A");
+    }
   };
 
   const handleSaveEvolution = () => {
@@ -458,12 +532,23 @@ export default function PatientEvolution() {
     }
 
     let finalDescription = description;
+    let finalBloodPressure = vsBloodPressure;
+
     if (evolutionType === "Sinais Vitais") {
+      // Pad to 3 digits on both sides
+      const parts = vsBloodPressure.split("/");
+      const sysPart = parts[0] ? parts[0].replace(/\D/g, "") : "";
+      const diaPart = parts[1] ? parts[1].replace(/\D/g, "") : "";
+      
+      const finalSystolic = sysPart ? sysPart.padStart(3, "0") : "120";
+      const finalDiastolic = diaPart ? diaPart.padStart(3, "0") : "080";
+      finalBloodPressure = `${finalSystolic}/${finalDiastolic}`;
+
       const mews = calculateMEWS();
       const mewsClass = getMEWSClassification(mews);
       finalDescription = 
         `REGISTRO DE SINAIS VITAIS:\n` +
-        `- Pressão Arterial (PA): ${vsSystolic || "--"}/${vsDiastolic || "--"} mmHg\n` +
+        `- Pressão Arterial (PA): ${finalSystolic}/${finalDiastolic} mmHg\n` +
         `- Frequência Cardíaca (FC): ${vsHeartRate || "--"} bpm\n` +
         `- Saturação de O2 (SpO2): ${vsSpO2 || "--"}%\n` +
         `- Temperatura Corporal: ${vsTemperature || "--"} °C\n` +
@@ -491,6 +576,16 @@ export default function PatientEvolution() {
       cid: selectedCid ? `${selectedCid.code} - ${selectedCid.name}` : undefined,
     });
 
+    if (evolutionType === "Sinais Vitais") {
+      updatePatient(id!, {
+        pa: finalBloodPressure,
+        fc: vsHeartRate,
+        spo2: vsSpO2,
+        temperature: vsTemperature,
+        fr: vsRespiratoryRate,
+      });
+    }
+
     setIsFormOpen(false);
     setEvolutionType("");
     setProfessional(localStorage.getItem("upa_stamp_name") || "");
@@ -498,8 +593,7 @@ export default function PatientEvolution() {
     setSelectedCid(null);
     
     // Limpar campos de sinais vitais
-    setVsSystolic("");
-    setVsDiastolic("");
+    setVsBloodPressure("");
     setVsHeartRate("");
     setVsRespiratoryRate("");
     setVsTemperature("");
@@ -954,30 +1048,57 @@ export default function PatientEvolution() {
                         <Activity className="h-4 w-4 animate-pulse text-[#006699]" />
                         Entrada Estruturada de Sinais Vitais (MEWS)
                       </span>
-                      <span className="text-[9px] font-black text-muted-foreground/60 uppercase tracking-widest">
-                        Protocolo de Alerta Precoce
-                      </span>
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setVsBloodPressure("120/080");
+                            setVsHeartRate("80");
+                            setVsSpO2("98");
+                            setVsTemperature("36.5");
+                            setVsRespiratoryRate("16");
+                            setVsPain("0");
+                            setVsConsciousness("A");
+                            toast.success("Parâmetros normais (estáveis) aplicados");
+                          }}
+                          className="text-[9px] font-extrabold text-[#006699] hover:underline uppercase tracking-wider bg-[#006699]/10 px-2 py-0.5 rounded border border-[#006699]/15 transition-all flex items-center gap-1 shrink-0"
+                        >
+                          ⚡ Parâmetros Normais
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setVsBloodPressure("");
+                            setVsHeartRate("");
+                            setVsSpO2("");
+                            setVsTemperature("");
+                            setVsRespiratoryRate("");
+                            setVsPain("0");
+                            setVsConsciousness("A");
+                            toast.info("Campos limpos");
+                          }}
+                          className="text-[9px] font-extrabold text-red-500 hover:underline uppercase tracking-wider bg-red-500/5 px-2 py-0.5 rounded border border-red-500/15 transition-all"
+                        >
+                          Limpar
+                        </button>
+                      </div>
                     </div>
 
-                    <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-7 gap-3">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
                       <div className="space-y-1">
-                        <Label className="text-[9px] font-black uppercase text-muted-foreground">PA Sistólica (PAS)</Label>
+                        <Label className="text-[9px] font-black uppercase text-muted-foreground">Pressão Arterial (PA)</Label>
                         <Input 
-                          type="number"
-                          placeholder="PAS mmHg" 
-                          className="h-8 text-xs bg-white/45 dark:bg-slate-900/45 border-white/60 dark:border-white/10 focus:bg-white/60 dark:focus:bg-slate-900/60 rounded-xl backdrop-blur-sm shadow-sm transition-all focus:ring-1 focus:ring-[#006699]/20"
-                          value={vsSystolic}
-                          onChange={(e) => setVsSystolic(e.target.value)}
-                        />
-                      </div>
-                      <div className="space-y-1">
-                        <Label className="text-[9px] font-black uppercase text-muted-foreground">PA Diastólica (PAD)</Label>
-                        <Input 
-                          type="number"
-                          placeholder="PAD mmHg" 
-                          className="h-8 text-xs bg-white/45 dark:bg-slate-900/45 border-white/60 dark:border-white/10 focus:bg-white/60 dark:focus:bg-slate-900/60 rounded-xl backdrop-blur-sm shadow-sm transition-all focus:ring-1 focus:ring-[#006699]/20"
-                          value={vsDiastolic}
-                          onChange={(e) => setVsDiastolic(e.target.value)}
+                          type="text"
+                          placeholder="120/080 mmHg" 
+                          className={cn(
+                            "h-8 text-xs bg-white/45 dark:bg-slate-900/45 border-white/60 dark:border-white/10 focus:bg-white/60 dark:focus:bg-slate-900/60 rounded-xl backdrop-blur-sm shadow-sm transition-all focus:ring-1 focus:ring-[#006699]/20 font-mono text-center",
+                            isDefaultBloodPressure 
+                              ? "text-slate-400 dark:text-slate-500 font-normal italic" 
+                              : "text-foreground font-semibold"
+                          )}
+                          value={vsBloodPressure}
+                          onChange={(e) => handleBloodPressureChange(e.target.value)}
+                          onBlur={handleBloodPressureBlur}
                         />
                       </div>
                       <div className="space-y-1">
@@ -985,7 +1106,12 @@ export default function PatientEvolution() {
                         <Input 
                           type="number"
                           placeholder="FC bpm" 
-                          className="h-8 text-xs bg-white/45 dark:bg-slate-900/45 border-white/60 dark:border-white/10 focus:bg-white/60 dark:focus:bg-slate-900/60 rounded-xl backdrop-blur-sm shadow-sm transition-all focus:ring-1 focus:ring-[#006699]/20"
+                          className={cn(
+                            "h-8 text-xs bg-white/45 dark:bg-slate-900/45 border-white/60 dark:border-white/10 focus:bg-white/60 dark:focus:bg-slate-900/60 rounded-xl backdrop-blur-sm shadow-sm transition-all focus:ring-1 focus:ring-[#006699]/20",
+                            isDefaultHeartRate 
+                              ? "text-slate-400 dark:text-slate-500 font-normal italic" 
+                              : "text-foreground font-semibold"
+                          )}
                           value={vsHeartRate}
                           onChange={(e) => setVsHeartRate(e.target.value)}
                         />
@@ -995,7 +1121,12 @@ export default function PatientEvolution() {
                         <Input 
                           type="number"
                           placeholder="SpO2 %" 
-                          className="h-8 text-xs bg-white/45 dark:bg-slate-900/45 border-white/60 dark:border-white/10 focus:bg-white/60 dark:focus:bg-slate-900/60 rounded-xl backdrop-blur-sm shadow-sm transition-all focus:ring-1 focus:ring-[#006699]/20"
+                          className={cn(
+                            "h-8 text-xs bg-white/45 dark:bg-slate-900/45 border-white/60 dark:border-white/10 focus:bg-white/60 dark:focus:bg-slate-900/60 rounded-xl backdrop-blur-sm shadow-sm transition-all focus:ring-1 focus:ring-[#006699]/20",
+                            isDefaultSpO2 
+                              ? "text-slate-400 dark:text-slate-500 font-normal italic" 
+                              : "text-foreground font-semibold"
+                          )}
                           value={vsSpO2}
                           onChange={(e) => setVsSpO2(e.target.value)}
                         />
@@ -1005,7 +1136,12 @@ export default function PatientEvolution() {
                         <Input 
                           type="text"
                           placeholder="Temp °C" 
-                          className="h-8 text-xs bg-white/45 dark:bg-slate-900/45 border-white/60 dark:border-white/10 focus:bg-white/60 dark:focus:bg-slate-900/60 rounded-xl backdrop-blur-sm shadow-sm transition-all focus:ring-1 focus:ring-[#006699]/20"
+                          className={cn(
+                            "h-8 text-xs bg-white/45 dark:bg-slate-900/45 border-white/60 dark:border-white/10 focus:bg-white/60 dark:focus:bg-slate-900/60 rounded-xl backdrop-blur-sm shadow-sm transition-all focus:ring-1 focus:ring-[#006699]/20",
+                            isDefaultTemperature 
+                              ? "text-slate-400 dark:text-slate-500 font-normal italic" 
+                              : "text-foreground font-semibold"
+                          )}
                           value={vsTemperature}
                           onChange={(e) => setVsTemperature(e.target.value)}
                         />
@@ -1015,7 +1151,12 @@ export default function PatientEvolution() {
                         <Input 
                           type="number"
                           placeholder="FR irpm" 
-                          className="h-8 text-xs bg-white/45 dark:bg-slate-900/45 border-white/60 dark:border-white/10 focus:bg-white/60 dark:focus:bg-slate-900/60 rounded-xl backdrop-blur-sm shadow-sm transition-all focus:ring-1 focus:ring-[#006699]/20"
+                          className={cn(
+                            "h-8 text-xs bg-white/45 dark:bg-slate-900/45 border-white/60 dark:border-white/10 focus:bg-white/60 dark:focus:bg-slate-900/60 rounded-xl backdrop-blur-sm shadow-sm transition-all focus:ring-1 focus:ring-[#006699]/20",
+                            isDefaultRespiratoryRate 
+                              ? "text-slate-400 dark:text-slate-500 font-normal italic" 
+                              : "text-foreground font-semibold"
+                          )}
                           value={vsRespiratoryRate}
                           onChange={(e) => setVsRespiratoryRate(e.target.value)}
                         />
@@ -1023,7 +1164,12 @@ export default function PatientEvolution() {
                       <div className="space-y-1">
                         <Label className="text-[9px] font-black uppercase text-muted-foreground">Escala de Dor</Label>
                         <Select value={vsPain} onValueChange={setVsPain}>
-                          <SelectTrigger className="h-8 text-xs bg-white/45 dark:bg-slate-900/45 border-white/60 dark:border-white/10 hover:bg-white/60 dark:hover:bg-slate-900/60 rounded-xl backdrop-blur-sm shadow-sm transition-all focus:ring-1 focus:ring-[#006699]/20">
+                          <SelectTrigger className={cn(
+                            "h-8 text-xs bg-white/45 dark:bg-slate-900/45 border-white/60 dark:border-white/10 hover:bg-white/60 dark:hover:bg-slate-900/60 rounded-xl backdrop-blur-sm shadow-sm transition-all focus:ring-1 focus:ring-[#006699]/20",
+                            isDefaultPain 
+                              ? "text-slate-400 dark:text-slate-500 font-normal italic" 
+                              : "text-foreground font-semibold"
+                          )}>
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
@@ -1039,7 +1185,12 @@ export default function PatientEvolution() {
                       <div className="space-y-1">
                         <Label className="text-[9px] font-black uppercase text-muted-foreground">Nível de Consciência (AVDI)</Label>
                         <Select value={vsConsciousness} onValueChange={setVsConsciousness}>
-                          <SelectTrigger className="h-8 text-xs bg-white/45 dark:bg-slate-900/45 border-white/60 dark:border-white/10 hover:bg-white/60 dark:hover:bg-slate-900/60 rounded-xl backdrop-blur-sm shadow-sm transition-all focus:ring-1 focus:ring-[#006699]/20">
+                          <SelectTrigger className={cn(
+                            "h-8 text-xs bg-white/45 dark:bg-slate-900/45 border-white/60 dark:border-white/10 hover:bg-white/60 dark:hover:bg-slate-900/60 rounded-xl backdrop-blur-sm shadow-sm transition-all focus:ring-1 focus:ring-[#006699]/20",
+                            isDefaultConsciousness 
+                              ? "text-slate-400 dark:text-slate-500 font-normal italic" 
+                              : "text-foreground font-semibold"
+                          )}>
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
