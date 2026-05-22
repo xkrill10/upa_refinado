@@ -91,12 +91,14 @@ import { MentalModal } from "@/components/PatientEvolution/Modals/MentalModal";
 import { UrgencyModal } from "@/components/PatientEvolution/Modals/UrgencyModal";
 import { FugulinModal } from "@/components/PatientEvolution/Modals/FugulinModal";
 import { NandaModal } from "@/components/PatientEvolution/Modals/NandaModal";
+import { ClinicalProfileModal } from "@/components/PatientEvolution/Modals/ClinicalProfileModal";
+import { VitalsHistoryModal } from "@/components/PatientEvolution/Modals/VitalsHistoryModal";
 
 export default function PatientEvolution() {
   const { id } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
-  const { patients, addEvolution } = usePatients();
+  const { patients, addEvolution, updatePatient } = usePatients();
   const { beds, assignPatient, releaseBed } = useBeds();
   const patient = patients.find(p => p.id === id);
 
@@ -116,10 +118,13 @@ export default function PatientEvolution() {
   const fromLabel = location.state?.label || "Pacientes";
 
   const [isBedDialogOpen, setIsBedDialogOpen] = useState(false);
+  const [isClinicalProfileOpen, setIsClinicalProfileOpen] = useState(false);
+  const [isVitalsHistoryOpen, setIsVitalsHistoryOpen] = useState(false);
   const patientBed = beds.find(b => b.patientId === id);
   const availableBeds = beds.filter(b => b.status === 'available');
 
   const [isFormOpen, setIsFormOpen] = useState(false);
+
   const [evolutionType, setEvolutionType] = useState("");
   const [activeTab, setActiveTab] = useState<"all" | "evolutions" | "prescriptions" | "vitals" | "exams" | "discharge">("all");
   const [professional, setProfessional] = useState(() => localStorage.getItem("upa_stamp_name") || "");
@@ -369,6 +374,10 @@ export default function PatientEvolution() {
 
   const evolutions = patient?.evolutions || [];
 
+  const medicalEvolutionsCount = evolutions.filter(e => e.type.includes("Médica")).length;
+  const nursingEvolutionsCount = evolutions.filter(e => e.type.includes("Enfermagem") || e.type.includes("Anotação")).length;
+  const multiEvolutionsCount = evolutions.length - medicalEvolutionsCount - nursingEvolutionsCount;
+
   const filteredEvolutions = (() => {
     if (activeTab === "all") return evolutions;
     if (activeTab === "evolutions") {
@@ -617,128 +626,174 @@ export default function PatientEvolution() {
         </div>
       </div>
 
-
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card className="glass-card-premium border border-white/40 dark:border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.06)] rounded-xl overflow-hidden transition-all duration-500">
+        {/* Card 1: Queixa Principal & Alergias */}
+        <Card 
+          className="group glass-card-premium border border-blue-500/15 dark:border-blue-500/20 bg-blue-500/[0.02] dark:bg-blue-500/[0.04] shadow-[0_8px_30px_rgba(0,0,0,0.02)] rounded-xl overflow-hidden transition-all duration-500 cursor-pointer hover:scale-[1.02] active:scale-[0.98] hover:bg-blue-500/[0.07] dark:hover:bg-blue-500/[0.10] hover:border-blue-500/40 hover:shadow-[0_12px_40px_rgba(59,130,246,0.12)]"
+          onClick={() => setIsClinicalProfileOpen(true)}
+        >
           <CardContent className="p-4 flex items-center gap-3">
-            <div className="h-9 w-9 rounded-lg bg-blue-500/10 flex items-center justify-center shrink-0">
-              <MessageSquare className="h-5 w-5 text-blue-500" />
+            <div className="h-9 w-9 rounded-lg bg-blue-500/10 dark:bg-blue-500/20 flex items-center justify-center shrink-0 transition-all duration-300 group-hover:bg-blue-500 group-hover:scale-105 group-hover:shadow-[0_4px_12px_rgba(59,130,246,0.25)]">
+              <MessageSquare className="h-5 w-5 text-blue-500 transition-colors duration-300 group-hover:text-white" />
             </div>
             <div className="min-w-0 flex-1">
-              <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Queixa Principal</p>
-              <p className="text-sm font-bold text-foreground truncate mt-0.5" title={patient.mainComplaint}>{patient.mainComplaint || "Não informada"}</p>
+              <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest group-hover:text-blue-500/80 transition-colors duration-300">Queixa & Alergias</p>
+              <p className="text-sm font-bold text-foreground truncate mt-0.5" title={patient.mainComplaint}>
+                {patient.mainComplaint || "Não informada"}
+              </p>
+              <div className="text-[9px] font-bold uppercase mt-1 truncate">
+                {patient.allergies && patient.allergies !== "Sem alergias conhecidas" ? (
+                  <span className="text-red-500 bg-red-500/10 px-1.5 py-0.5 rounded border border-red-500/15 transition-all duration-300 group-hover:bg-red-500 group-hover:text-white group-hover:border-red-500/30">
+                    ⚠️ {patient.allergies}
+                  </span>
+                ) : (
+                  <span className="text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/15 transition-all duration-300 group-hover:bg-emerald-500 group-hover:text-white group-hover:border-emerald-500/30">
+                    ✅ Sem Alergias
+                  </span>
+                )}
+              </div>
             </div>
           </CardContent>
         </Card>
 
+        {/* Card 2: Leito / Setor (MANTIDO E PROTEGIDO) */}
         <Card 
           className={cn(
-            "glass-card-premium border shadow-[0_8px_30px_rgba(0,0,0,0.06)] rounded-xl overflow-hidden transition-all duration-500 cursor-pointer hover:scale-[1.02] active:scale-98",
+            "group glass-card-premium border shadow-[0_8px_30px_rgba(0,0,0,0.02)] rounded-xl overflow-hidden transition-all duration-500 cursor-pointer hover:scale-[1.02] active:scale-[0.98]",
             patientBed 
-              ? "border-emerald-500/30 bg-emerald-500/5 dark:bg-emerald-500/10 hover:border-emerald-500/50" 
-              : "border-white/40 dark:border-white/10 hover:border-[#006699]/30"
+              ? "border-emerald-500/20 dark:border-emerald-500/25 bg-emerald-500/[0.03] dark:bg-emerald-500/[0.06] hover:bg-emerald-500/[0.08] dark:hover:bg-emerald-500/[0.12] hover:border-emerald-500/40 hover:shadow-[0_12px_40px_rgba(16,185,129,0.12)]" 
+              : "border-amber-500/15 dark:border-amber-500/20 bg-amber-500/[0.02] dark:bg-amber-500/[0.04] hover:bg-amber-500/[0.07] dark:hover:bg-amber-500/[0.10] hover:border-amber-500/40 hover:shadow-[0_12px_40px_rgba(245,158,11,0.12)]"
           )}
           onClick={() => setIsBedDialogOpen(true)}
         >
           <CardContent className="p-4 flex items-center gap-3">
             <div className={cn(
-              "h-9 w-9 rounded-lg flex items-center justify-center shrink-0",
-              patientBed ? "bg-emerald-500/15" : "bg-blue-500/10"
+              "h-9 w-9 rounded-lg flex items-center justify-center shrink-0 transition-all duration-300 group-hover:scale-105",
+              patientBed 
+                ? "bg-emerald-500/15 dark:bg-emerald-500/25 group-hover:bg-emerald-500 group-hover:shadow-[0_4px_12px_rgba(16,185,129,0.25)]" 
+                : "bg-amber-500/10 dark:bg-amber-500/20 group-hover:bg-amber-500 group-hover:shadow-[0_4px_12px_rgba(245,158,11,0.25)]"
             )}>
-              <BedIcon className={cn("h-5 w-5", patientBed ? "text-emerald-600 animate-pulse" : "text-blue-500")} />
+              <BedIcon className={cn(
+                "h-5 w-5 transition-colors duration-300",
+                patientBed ? "text-emerald-600 group-hover:text-white" : "text-amber-500 group-hover:text-white"
+              )} />
             </div>
             <div className="min-w-0 flex-1">
-              <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Leito / Setor</p>
-              <p className={cn("text-sm font-bold mt-0.5 truncate", patientBed ? "text-emerald-700 dark:text-emerald-400" : "text-foreground")}>
+              <p className={cn(
+                "text-[10px] font-bold uppercase tracking-widest transition-colors duration-300",
+                patientBed ? "text-slate-500 group-hover:text-emerald-600" : "text-slate-500 group-hover:text-amber-500"
+              )}>Leito / Setor</p>
+              <p className={cn("text-sm font-bold mt-0.5 truncate", patientBed ? "text-emerald-700 dark:text-emerald-450" : "text-foreground")}>
                 {patientBed ? patientBed.name : (patient.sector || "Sem leito")}
               </p>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="glass-card-premium border border-white/40 dark:border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.06)] rounded-xl overflow-hidden transition-all duration-500 lg:col-span-1">
+        {/* Card 3: Status Sinais Vitais */}
+        <Card 
+          className="group glass-card-premium border border-rose-500/15 dark:border-rose-500/20 bg-rose-500/[0.02] dark:bg-rose-500/[0.04] shadow-[0_8px_30px_rgba(0,0,0,0.02)] rounded-xl overflow-hidden transition-all duration-500 cursor-pointer hover:scale-[1.02] active:scale-[0.98] hover:bg-rose-500/[0.07] dark:hover:bg-rose-500/[0.10] hover:border-rose-500/40 hover:shadow-[0_12px_40px_rgba(244,63,94,0.12)] lg:col-span-1"
+          onClick={() => setIsVitalsHistoryOpen(true)}
+        >
           <CardContent className="p-4 flex flex-col justify-between h-full gap-2 font-black">
-            <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Status Sinais Vitais</p>
+            <div className="flex items-center justify-between">
+              <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest group-hover:text-rose-500/80 transition-colors duration-300">Status Sinais Vitais</p>
+              <span className="text-[9px] font-black text-rose-500 dark:text-rose-450 uppercase tracking-wider flex items-center gap-0.5 transition-all duration-300 group-hover:scale-105">
+                📈 Histórico
+              </span>
+            </div>
             <div className="flex flex-wrap items-center gap-1.5">
-              <span className="text-[11px] font-black text-[#006699] dark:text-sky-300 bg-[#006699]/10 px-2 py-0.5 rounded-md border border-[#006699]/15">
+              <span className="text-[11px] font-black text-[#006699] dark:text-sky-300 bg-[#006699]/10 px-2 py-0.5 rounded-md border border-[#006699]/15 transition-all duration-300 group-hover:bg-[#006699] group-hover:text-white group-hover:border-[#006699]/30">
                 PA: {patient.pa || '--'}
               </span>
-              <span className="text-[11px] font-black text-red-500 bg-red-500/10 px-2 py-0.5 rounded-md border border-red-500/15">
+              <span className="text-[11px] font-black text-red-500 bg-red-500/10 px-2 py-0.5 rounded-md border border-red-500/15 transition-all duration-300 group-hover:bg-red-500 group-hover:text-white group-hover:border-red-500/30">
                 FC: {patient.fc || '--'}
               </span>
-              <span className="text-[11px] font-black text-emerald-500 bg-emerald-500/10 px-2 py-0.5 rounded-md border border-emerald-500/15">
+              <span className="text-[11px] font-black text-emerald-500 bg-emerald-500/10 px-2 py-0.5 rounded-md border border-emerald-500/15 transition-all duration-300 group-hover:bg-emerald-500 group-hover:text-white group-hover:border-emerald-500/30">
                 SpO2: {patient.spo2 || '--'}%
               </span>
-              <span className="text-[11px] font-black text-orange-500 bg-orange-500/10 px-2 py-0.5 rounded-md border border-orange-500/15">
+              <span className="text-[11px] font-black text-orange-500 bg-orange-500/10 px-2 py-0.5 rounded-md border border-orange-500/15 transition-all duration-300 group-hover:bg-orange-500 group-hover:text-white group-hover:border-orange-500/30">
                 T: {patient.temperature || '--'}°C
               </span>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="glass-card-premium border border-white/40 dark:border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.06)] rounded-xl overflow-hidden transition-all duration-500">
+        {/* Card 4: Histórico de Evoluções */}
+        <Card 
+          className="group glass-card-premium border border-indigo-500/15 dark:border-indigo-500/20 bg-indigo-500/[0.02] dark:bg-indigo-500/[0.04] shadow-[0_8px_30px_rgba(0,0,0,0.02)] rounded-xl overflow-hidden transition-all duration-500 cursor-pointer hover:scale-[1.02] active:scale-[0.98] hover:bg-indigo-500/[0.07] dark:hover:bg-indigo-500/[0.10] hover:border-indigo-500/40 hover:shadow-[0_12px_40px_rgba(99,102,241,0.12)]"
+          onClick={() => {
+            setActiveTab("evolutions");
+            document.getElementById("timeline-section")?.scrollIntoView({ behavior: 'smooth' });
+          }}
+        >
           <CardContent className="p-4 flex items-center gap-3">
-            <div className="h-9 w-9 rounded-lg bg-blue-500/10 flex items-center justify-center shrink-0">
-              <History className="h-5 w-5 text-blue-500" />
+            <div className="h-9 w-9 rounded-lg bg-indigo-500/10 dark:bg-indigo-500/20 flex items-center justify-center shrink-0 transition-all duration-300 group-hover:bg-indigo-500 group-hover:scale-105 group-hover:shadow-[0_4px_12px_rgba(99,102,241,0.25)]">
+              <History className="h-5 w-5 text-indigo-500 transition-colors duration-300 group-hover:text-white" />
             </div>
             <div className="min-w-0 flex-1">
-              <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Evoluções</p>
+              <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest group-hover:text-indigo-500/80 transition-colors duration-300">Evoluções</p>
               <p className="text-sm font-bold text-foreground mt-0.5">{evolutions.length} registros</p>
+              <p className="text-[9px] font-semibold text-slate-500 dark:text-slate-400 mt-0.5">
+                {medicalEvolutionsCount} Méd · {nursingEvolutionsCount} Enf · {multiEvolutionsCount} Multi
+              </p>
             </div>
           </CardContent>
         </Card>
       </div>
 
       {/* Barra de Sub-Navegação Horizontal Glassmorphic Premium */}
-      <div className="glass-card-premium border border-white/40 dark:border-white/10 p-1.5 rounded-2xl flex flex-wrap gap-1.5 items-center bg-white/20 dark:bg-slate-900/20 backdrop-blur-md shadow-sm">
-        {[
-          { id: "all", label: "Histórico Geral", icon: <History className="h-3.5 w-3.5" /> },
-          { id: "vitals", label: "Sinais Vitais", icon: <Activity className="h-3.5 w-3.5" /> },
-          { id: "evolutions", label: "Evoluções", icon: <MessageSquare className="h-3.5 w-3.5" /> },
-          { id: "prescriptions", label: "Prescrições", icon: <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z"/><path d="m8.5 8.5 7 7"/></svg> },
-          { id: "exams", label: "Exames & Procedimentos", icon: <Search className="h-3.5 w-3.5" /> },
-          { id: "discharge", label: "Alta & Desfecho", icon: <CheckCircle2 className="h-3.5 w-3.5" /> },
-        ].map((tab) => {
-          const isActive = activeTab === tab.id;
-          return (
-            <button
-              key={tab.id}
-              onClick={() => {
-                setActiveTab(tab.id as any);
-                if (isFormOpen) {
-                  if (tab.id === "prescriptions") {
-                    handleEvolutionTypeChange("Prescrição");
-                  } else if (tab.id === "vitals") {
-                    handleEvolutionTypeChange("Sinais Vitais");
-                  } else if (tab.id === "discharge") {
-                    handleEvolutionTypeChange("Alta");
-                  } else if (tab.id === "exams") {
-                    handleEvolutionTypeChange("Procedimento");
-                  } else if (tab.id === "evolutions") {
-                    handleEvolutionTypeChange(isChild ? "Evolução Médica (Pediátrica)" : "Evolução Médica");
+      {isFormOpen && (
+        <div id="timeline-section" className="glass-card-premium border border-white/40 dark:border-white/10 p-1.5 rounded-2xl flex flex-wrap gap-1.5 items-center bg-white/20 dark:bg-slate-900/20 backdrop-blur-md shadow-sm animate-in fade-in duration-300">
+          {[
+            { id: "all", label: "Histórico Geral", icon: <History className="h-3.5 w-3.5" /> },
+            { id: "vitals", label: "Sinais Vitais", icon: <Activity className="h-3.5 w-3.5" /> },
+            { id: "evolutions", label: "Evoluções", icon: <MessageSquare className="h-3.5 w-3.5" /> },
+            { id: "prescriptions", label: "Prescrições", icon: <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z"/><path d="m8.5 8.5 7 7"/></svg> },
+            { id: "exams", label: "Exames & Procedimentos", icon: <Search className="h-3.5 w-3.5" /> },
+            { id: "discharge", label: "Alta & Desfecho", icon: <CheckCircle2 className="h-3.5 w-3.5" /> },
+          ].map((tab) => {
+            const isActive = activeTab === tab.id;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => {
+                  setActiveTab(tab.id as any);
+                  if (isFormOpen) {
+                    if (tab.id === "prescriptions") {
+                      handleEvolutionTypeChange("Prescrição");
+                    } else if (tab.id === "vitals") {
+                      handleEvolutionTypeChange("Sinais Vitais");
+                    } else if (tab.id === "discharge") {
+                      handleEvolutionTypeChange("Alta");
+                    } else if (tab.id === "exams") {
+                      handleEvolutionTypeChange("Procedimento");
+                    } else if (tab.id === "evolutions") {
+                      handleEvolutionTypeChange(isChild ? "Evolução Médica (Pediátrica)" : "Evolução Médica");
+                    }
                   }
-                }
-              }}
-              className={cn(
-                "flex items-center gap-2 px-4 py-2 text-xs font-black uppercase tracking-wider rounded-xl transition-all duration-300 relative overflow-hidden active:scale-95",
-                isActive
-                  ? "bg-[#006699] text-white dark:bg-sky-500/20 dark:text-sky-400 dark:border dark:border-sky-500/30 shadow-md"
-                  : "text-slate-600 dark:text-slate-300 hover:bg-white/40 dark:hover:bg-slate-800/40"
-              )}
-            >
-              {tab.icon}
-              {tab.label}
-              {isActive && (
-                <motion.div
-                  layoutId="activeTabIndicator"
-                  className="absolute inset-0 bg-[#006699]/10 dark:bg-sky-500/10 -z-10"
-                  transition={{ type: "spring", stiffness: 380, damping: 30 }}
-                />
-              )}
-            </button>
-          );
-        })}
-      </div>
+                }}
+                className={cn(
+                  "flex items-center gap-2 px-4 py-2 text-xs font-black uppercase tracking-wider rounded-xl transition-all duration-300 relative overflow-hidden active:scale-95",
+                  isActive
+                    ? "bg-[#006699] text-white dark:bg-sky-500/20 dark:text-sky-400 dark:border dark:border-sky-500/30 shadow-md"
+                    : "text-slate-600 dark:text-slate-300 hover:bg-white/40 dark:hover:bg-slate-800/40"
+                )}
+              >
+                {tab.icon}
+                {tab.label}
+                {isActive && (
+                  <motion.div
+                    layoutId="activeTabIndicator"
+                    className="absolute inset-0 bg-[#006699]/10 dark:bg-sky-500/10 -z-10"
+                    transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                  />
+                )}
+              </button>
+            );
+          })}
+        </div>
+      )}
 
       <div className="flex items-center justify-start pb-1">
         {!isFormOpen && (
@@ -3497,6 +3552,22 @@ export default function PatientEvolution() {
           setActiveNandaPlan(sum);
         }}
       />
+
+      {patient && (
+        <>
+          <ClinicalProfileModal
+            isOpen={isClinicalProfileOpen}
+            onClose={() => setIsClinicalProfileOpen(false)}
+            patient={patient}
+            onSave={(pid, updates) => updatePatient(pid, updates)}
+          />
+          <VitalsHistoryModal
+            isOpen={isVitalsHistoryOpen}
+            onClose={() => setIsVitalsHistoryOpen(false)}
+            patient={patient}
+          />
+        </>
+      )}
     </motion.div>
   );
 }

@@ -4,11 +4,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { UserPlus, ArrowLeft, Save, MapPin, Info } from "lucide-react";
+import { UserPlus, Save, MapPin, AlertTriangle } from "lucide-react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { motion } from "motion/react";
 import { toast } from "sonner";
 import { usePatients } from "@/hooks/use-patients";
+import { cn } from "@/lib/utils";
 
 export default function NewPatient() {
   const navigate = useNavigate();
@@ -243,9 +244,6 @@ export default function NewPatient() {
     >
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex items-center gap-3">
-          <Button variant="outline" size="icon" onClick={() => navigate(-1)} className="rounded-xl border-slate-200 dark:border-slate-800 text-foreground hover:bg-slate-100 dark:hover:bg-slate-850">
-            <ArrowLeft className="h-5 w-5" />
-          </Button>
           <div>
             <h1 className="text-4xl font-black tracking-tight text-[#006699] dark:text-sky-400 uppercase">Admissão de Paciente</h1>
             <p className="text-muted-foreground text-xs font-black uppercase tracking-[0.3em] flex items-center gap-2 mt-1">
@@ -261,8 +259,8 @@ export default function NewPatient() {
         <Card className="glass-card border border-slate-200/40 dark:border-slate-800/40 shadow-xl rounded-xl overflow-hidden bg-white/70 dark:bg-slate-900/45 transition-colors duration-500 relative">
           <CardHeader className="bg-primary/5 dark:bg-primary/10 border-b border-primary/10 dark:border-primary/20 p-8">
             <CardTitle className="text-xl mission-control-title flex items-center gap-3 text-foreground dark:text-white">
-              <div className="h-10 w-10 rounded-xl bg-primary/10 dark:bg-primary/20 flex items-center justify-center border border-primary/20 dark:border-primary/30">
-                <UserPlus className="h-6 w-6 text-primary dark:text-sky-450" />
+              <div className="h-10 w-10 rounded-xl bg-[#006699]/10 dark:bg-sky-500/20 flex items-center justify-center border border-[#006699]/20 dark:border-sky-500/30 shadow-sm backdrop-blur-md transition-all">
+                <UserPlus className="h-5.5 w-5.5 text-[#006699] dark:text-sky-400" />
               </div>
               DADOS DE IDENTIFICAÇÃO
             </CardTitle>
@@ -273,7 +271,7 @@ export default function NewPatient() {
               <Label className="text-xs font-black uppercase tracking-widest text-[#006699] dark:text-sky-400">Nome Completo *</Label>
               <Input 
                 placeholder="Insira o nome completo sem abreviações" 
-                className="h-12 rounded-xl border border-slate-200/60 dark:border-slate-800/60 bg-white/50 dark:bg-slate-900/40 focus:bg-white dark:focus:bg-slate-950 text-foreground transition-all duration-300"
+                className="h-12 rounded-xl border border-slate-200/60 dark:border-slate-800/60 text-foreground transition-all duration-300"
                 value={formData.name}
                 onChange={(e) => handleChange("name", e.target.value)}
               />
@@ -283,7 +281,7 @@ export default function NewPatient() {
               <Label className="text-xs font-black uppercase tracking-widest text-[#006699] dark:text-sky-400">Nome Social</Label>
               <Input 
                 placeholder="Como o paciente prefere ser chamado" 
-                className="h-12 rounded-xl border border-slate-200/60 dark:border-slate-800/60 bg-white/50 dark:bg-slate-900/40 focus:bg-white dark:focus:bg-slate-950 text-foreground transition-all duration-300"
+                className="h-12 rounded-xl border border-slate-200/60 dark:border-slate-800/60 text-foreground transition-all duration-300"
                 value={formData.socialName}
                 onChange={(e) => handleChange("socialName", e.target.value)}
               />
@@ -293,7 +291,7 @@ export default function NewPatient() {
               <Label className="text-xs font-black uppercase tracking-widest text-[#006699] dark:text-sky-400">CPF *</Label>
               <Input 
                 placeholder="000.000.000-00" 
-                className="h-12 rounded-xl border border-slate-200/60 dark:border-slate-800/60 bg-white/50 dark:bg-slate-900/40 focus:bg-white dark:focus:bg-slate-950 font-mono text-foreground transition-all duration-300"
+                className="h-12 rounded-xl border border-slate-200/60 dark:border-slate-800/60 font-mono text-foreground transition-all duration-300"
                 value={formData.cpf}
                 onChange={(e) => handleChange("cpf", e.target.value)}
               />
@@ -303,7 +301,7 @@ export default function NewPatient() {
               <Label className="text-xs font-black uppercase tracking-widest text-[#006699] dark:text-sky-400">Cartão do SUS</Label>
               <Input 
                 placeholder="000 0000 0000 0000" 
-                className="h-12 rounded-xl border border-slate-200/60 dark:border-slate-800/60 bg-white/50 dark:bg-slate-900/40 focus:bg-white dark:focus:bg-slate-950 font-mono text-foreground transition-all duration-300"
+                className="h-12 rounded-xl border border-slate-200/60 dark:border-slate-800/60 font-mono text-foreground transition-all duration-300"
                 value={formData.susCard}
                 onChange={(e) => handleChange("susCard", e.target.value)}
               />
@@ -313,7 +311,7 @@ export default function NewPatient() {
               <Label className="text-xs font-black uppercase tracking-widest text-[#006699] dark:text-sky-400">Data de Nascimento *</Label>
               <Input 
                 type="date"
-                className="h-12 rounded-xl border border-slate-200/60 dark:border-slate-800/60 bg-white/50 dark:bg-slate-900/40 focus:bg-white dark:focus:bg-slate-950 text-foreground transition-all duration-300"
+                className="h-12 rounded-xl border border-slate-200/60 dark:border-slate-800/60 text-foreground transition-all duration-300"
                 value={formData.birthDate}
                 onChange={(e) => handleChange("birthDate", e.target.value)}
               />
@@ -321,8 +319,15 @@ export default function NewPatient() {
 
             <div className="space-y-2">
               <Label className="text-xs font-black uppercase tracking-widest text-[#006699] dark:text-sky-400">Sexo</Label>
-              <Select onValueChange={(v) => handleChange("gender", v)}>
-                <SelectTrigger className="h-12 rounded-xl border border-slate-200/60 dark:border-slate-800/60 bg-white/50 dark:bg-slate-900/40 text-foreground transition-all duration-300">
+              <Select value={formData.gender} onValueChange={(v) => handleChange("gender", v)}>
+                <SelectTrigger 
+                  className={cn(
+                    "h-12 rounded-xl border border-slate-200/60 dark:border-slate-800/60 text-foreground transition-all duration-300",
+                    formData.gender 
+                      ? "bg-white dark:bg-slate-900 shadow-sm" 
+                      : "bg-white/50 dark:bg-slate-900/40 backdrop-blur-sm"
+                  )}
+                >
                   <SelectValue placeholder="Selecione" />
                 </SelectTrigger>
                 <SelectContent className="border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-foreground">
@@ -337,7 +342,7 @@ export default function NewPatient() {
               <Label className="text-xs font-black uppercase tracking-widest text-[#006699] dark:text-sky-400">Celular</Label>
               <Input 
                 placeholder="(00) 00000-0000" 
-                className="h-12 rounded-xl border border-slate-200/60 dark:border-slate-800/60 bg-white/50 dark:bg-slate-900/40 focus:bg-white dark:focus:bg-slate-950 text-foreground transition-all duration-300"
+                className="h-12 rounded-xl border border-slate-200/60 dark:border-slate-800/60 text-foreground transition-all duration-300"
                 value={formData.phone1}
                 onChange={(e) => handleChange("phone1", e.target.value)}
               />
@@ -347,7 +352,7 @@ export default function NewPatient() {
               <Label className="text-xs font-black uppercase tracking-widest text-[#006699] dark:text-sky-400">Telefone p/ Contato</Label>
               <Input 
                 placeholder="(00) 0000-0000" 
-                className="h-12 rounded-xl border border-slate-200/60 dark:border-slate-800/60 bg-white/50 dark:bg-slate-900/40 focus:bg-white dark:focus:bg-slate-950 text-foreground transition-all duration-300"
+                className="h-12 rounded-xl border border-slate-200/60 dark:border-slate-800/60 text-foreground transition-all duration-300"
                 value={formData.phone2}
                 onChange={(e) => handleChange("phone2", e.target.value)}
               />
@@ -358,7 +363,7 @@ export default function NewPatient() {
               <Input 
                 type="email"
                 placeholder="exemplo@email.com" 
-                className="h-12 rounded-xl border border-slate-200/60 dark:border-slate-800/60 bg-white/50 dark:bg-slate-900/40 focus:bg-white dark:focus:bg-slate-950 text-foreground transition-all duration-300"
+                className="h-12 rounded-xl border border-slate-200/60 dark:border-slate-800/60 text-foreground transition-all duration-300"
                 value={formData.email}
                 onChange={(e) => handleChange("email", e.target.value)}
               />
@@ -370,8 +375,8 @@ export default function NewPatient() {
         <Card className="glass-card border border-slate-200/40 dark:border-slate-800/40 shadow-xl rounded-xl overflow-hidden bg-white/70 dark:bg-slate-900/45 transition-colors duration-500 relative">
           <CardHeader className="bg-slate-105/30 dark:bg-slate-800/30 border-b border-slate-200/40 dark:border-slate-800/40 p-8">
             <CardTitle className="text-xl mission-control-title flex items-center gap-3 text-foreground dark:text-white">
-              <div className="h-10 w-10 rounded-xl bg-slate-100 dark:bg-slate-800/80 flex items-center justify-center border border-slate-200 dark:border-slate-700/80">
-                <MapPin className="h-6 w-6 text-muted-foreground dark:text-slate-400" />
+              <div className="h-10 w-10 rounded-xl bg-[#006699]/10 dark:bg-sky-500/20 flex items-center justify-center border border-[#006699]/20 dark:border-sky-500/30 shadow-sm backdrop-blur-md transition-all">
+                <MapPin className="h-5.5 w-5.5 text-[#006699] dark:text-sky-400" />
               </div>
               LOCALIZAÇÃO E CONTATO
             </CardTitle>
@@ -381,7 +386,7 @@ export default function NewPatient() {
               <Label className="text-xs font-black uppercase tracking-widest text-[#006699] dark:text-sky-400">CEP</Label>
               <Input 
                 placeholder="00000-000" 
-                className="h-12 rounded-xl border border-slate-200/60 dark:border-slate-800/60 bg-white/50 dark:bg-slate-900/40 focus:bg-white dark:focus:bg-slate-950 text-foreground transition-all duration-300"
+                className="h-12 rounded-xl border border-slate-200/60 dark:border-slate-800/60 text-foreground transition-all duration-300"
                 value={formData.cep}
                 onChange={(e) => handleChange("cep", e.target.value)}
               />
@@ -391,7 +396,7 @@ export default function NewPatient() {
               <Label className="text-xs font-black uppercase tracking-widest text-[#006699] dark:text-sky-400">Logradouro</Label>
               <Input 
                 placeholder="Rua, Avenida..." 
-                className="h-12 rounded-xl border-slate-200/60 dark:border-slate-800/60 bg-white/50 dark:bg-slate-900/40 focus:bg-white dark:focus:bg-slate-950 text-foreground transition-all duration-300"
+                className="h-12 rounded-xl border border-slate-200/60 dark:border-slate-800/60 text-foreground transition-all duration-300"
                 value={formData.street}
                 onChange={(e) => handleChange("street", e.target.value)}
               />
@@ -401,7 +406,7 @@ export default function NewPatient() {
               <Label className="text-xs font-black uppercase tracking-widest text-[#006699] dark:text-sky-400">Número</Label>
               <Input 
                 placeholder="Nº" 
-                className="h-12 rounded-xl border-slate-200/60 dark:border-slate-800/60 bg-white/50 dark:bg-slate-900/40 focus:bg-white dark:focus:bg-slate-950 text-foreground transition-all duration-300"
+                className="h-12 rounded-xl border border-slate-200/60 dark:border-slate-800/60 text-foreground transition-all duration-300"
                 value={formData.number}
                 onChange={(e) => handleChange("number", e.target.value)}
               />
@@ -411,7 +416,7 @@ export default function NewPatient() {
               <Label className="text-xs font-black uppercase tracking-widest text-[#006699] dark:text-sky-400">Complemento</Label>
               <Input 
                 placeholder="Apto, Bloco, etc." 
-                className="h-12 rounded-xl border-slate-200/60 dark:border-slate-800/60 bg-white/50 dark:bg-slate-900/40 focus:bg-white dark:focus:bg-slate-950 text-foreground transition-all duration-300"
+                className="h-12 rounded-xl border border-slate-200/60 dark:border-slate-800/60 text-foreground transition-all duration-300"
                 value={formData.complement}
                 onChange={(e) => handleChange("complement", e.target.value)}
               />
@@ -421,7 +426,7 @@ export default function NewPatient() {
               <Label className="text-xs font-black uppercase tracking-widest text-[#006699] dark:text-sky-400">Bairro</Label>
               <Input 
                 placeholder="Ex: Centro" 
-                className="h-12 rounded-xl border-slate-200/60 dark:border-slate-800/60 bg-white/50 dark:bg-slate-900/40 focus:bg-white dark:focus:bg-slate-950 text-foreground transition-all duration-300"
+                className="h-12 rounded-xl border border-slate-200/60 dark:border-slate-800/60 text-foreground transition-all duration-300"
                 value={formData.neighborhood}
                 onChange={(e) => handleChange("neighborhood", e.target.value)}
               />
@@ -431,7 +436,7 @@ export default function NewPatient() {
               <Label className="text-xs font-black uppercase tracking-widest text-[#006699] dark:text-sky-400">Cidade</Label>
               <Input 
                 placeholder="Cidade" 
-                className="h-12 rounded-xl border-slate-200/60 dark:border-slate-800/60 bg-white/50 dark:bg-slate-900/40 focus:bg-white dark:focus:bg-slate-950 text-foreground transition-all duration-300"
+                className="h-12 rounded-xl border border-slate-200/60 dark:border-slate-800/60 text-foreground transition-all duration-300"
                 value={formData.city}
                 onChange={(e) => handleChange("city", e.target.value)}
               />
@@ -442,7 +447,7 @@ export default function NewPatient() {
               <Input 
                 placeholder="UF" 
                 maxLength={2}
-                className="h-12 rounded-xl border-slate-200/60 dark:border-slate-800/60 bg-white/50 dark:bg-slate-900/40 focus:bg-white dark:focus:bg-slate-950 text-foreground uppercase transition-all duration-300"
+                className="h-12 rounded-xl border border-slate-200/60 dark:border-slate-800/60 text-foreground uppercase transition-all duration-300"
                 value={formData.state}
                 onChange={(e) => handleChange("state", e.target.value.toUpperCase())}
               />
@@ -452,10 +457,10 @@ export default function NewPatient() {
 
         <div className="flex flex-col md:flex-row justify-between items-center gap-4 p-4">
            <div className="flex items-center gap-2 text-muted-foreground dark:text-slate-400">
-              <div className="h-10 w-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
-                <Info className="h-5 w-5 text-[#006699] dark:text-sky-450" />
+              <div className="h-10 w-10 rounded-xl bg-orange-500/10 dark:bg-amber-500/15 flex items-center justify-center border border-orange-500/20 dark:border-amber-500/30 shadow-sm shadow-orange-500/5 backdrop-blur-sm transition-all">
+                <AlertTriangle className="h-5 w-5 text-orange-600 dark:text-amber-400" />
               </div>
-              <p className="text-xs font-medium italic">Confirme as informações antes de finalizar o registro.</p>
+              <p className="text-xs font-bold italic text-orange-700/90 dark:text-amber-300/90">Confirme as informações antes de finalizar o registro.</p>
            </div>
            <div className="flex gap-3 w-full md:w-auto">
               <Button type="button" variant="outline" onClick={() => navigate(-1)} className="rounded-xl px-8 h-12 font-bold uppercase tracking-wider border-slate-200 dark:border-slate-800 text-foreground hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors bg-transparent">
