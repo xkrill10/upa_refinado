@@ -10,7 +10,7 @@ import { ArrowLeft, Plus, MessageSquare, Bed as BedIcon, History, X, CheckCircle
 import { motion, AnimatePresence } from "motion/react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, SelectGroup, SelectLabel, SelectSeparator } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -121,6 +121,7 @@ export default function PatientEvolution() {
 
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [evolutionType, setEvolutionType] = useState("");
+  const [activeTab, setActiveTab] = useState<"all" | "evolutions" | "prescriptions" | "vitals" | "exams" | "discharge">("all");
   const [professional, setProfessional] = useState(() => localStorage.getItem("upa_stamp_name") || "");
   const [description, setDescription] = useState("");
   const [selectedCid, setSelectedCid] = useState<CID10Item | null>(null);
@@ -368,6 +369,29 @@ export default function PatientEvolution() {
 
   const evolutions = patient?.evolutions || [];
 
+  const filteredEvolutions = (() => {
+    if (activeTab === "all") return evolutions;
+    if (activeTab === "evolutions") {
+      return evolutions.filter(e => 
+        e.type.includes("Evolução") || 
+        e.type.includes("Anotação")
+      );
+    }
+    if (activeTab === "prescriptions") {
+      return evolutions.filter(e => e.type === "Prescrição");
+    }
+    if (activeTab === "vitals") {
+      return evolutions.filter(e => e.type === "Sinais Vitais");
+    }
+    if (activeTab === "exams") {
+      return evolutions.filter(e => e.type === "Procedimento");
+    }
+    if (activeTab === "discharge") {
+      return evolutions.filter(e => e.type === "Alta");
+    }
+    return evolutions;
+  })();
+
   if (!patient) return (
     <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-4">
       <h2 className="text-2xl font-bold">Paciente não encontrado</h2>
@@ -593,6 +617,57 @@ export default function PatientEvolution() {
         </div>
       </div>
 
+      {/* Barra de Sub-Navegação Horizontal Glassmorphic Premium */}
+      <div className="glass-card-premium border border-white/40 dark:border-white/10 p-1.5 rounded-2xl flex flex-wrap gap-1.5 items-center bg-white/20 dark:bg-slate-900/20 backdrop-blur-md shadow-sm">
+        {[
+          { id: "all", label: "Histórico Geral", icon: <History className="h-3.5 w-3.5" /> },
+          { id: "evolutions", label: "Evoluções", icon: <MessageSquare className="h-3.5 w-3.5" /> },
+          { id: "prescriptions", label: "Prescrições", icon: <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z"/><path d="m8.5 8.5 7 7"/></svg> },
+          { id: "vitals", label: "Sinais Vitais", icon: <Activity className="h-3.5 w-3.5" /> },
+          { id: "exams", label: "Exames & Procedimentos", icon: <Search className="h-3.5 w-3.5" /> },
+          { id: "discharge", label: "Alta & Desfecho", icon: <CheckCircle2 className="h-3.5 w-3.5" /> },
+        ].map((tab) => {
+          const isActive = activeTab === tab.id;
+          return (
+            <button
+              key={tab.id}
+              onClick={() => {
+                setActiveTab(tab.id as any);
+                if (isFormOpen) {
+                  if (tab.id === "prescriptions") {
+                    handleEvolutionTypeChange("Prescrição");
+                  } else if (tab.id === "vitals") {
+                    handleEvolutionTypeChange("Sinais Vitais");
+                  } else if (tab.id === "discharge") {
+                    handleEvolutionTypeChange("Alta");
+                  } else if (tab.id === "exams") {
+                    handleEvolutionTypeChange("Procedimento");
+                  } else if (tab.id === "evolutions") {
+                    handleEvolutionTypeChange(isChild ? "Evolução Médica (Pediátrica)" : "Evolução Médica");
+                  }
+                }
+              }}
+              className={cn(
+                "flex items-center gap-2 px-4 py-2 text-xs font-black uppercase tracking-wider rounded-xl transition-all duration-300 relative overflow-hidden active:scale-95",
+                isActive
+                  ? "bg-[#006699] text-white dark:bg-sky-500/20 dark:text-sky-400 dark:border dark:border-sky-500/30 shadow-md"
+                  : "text-slate-600 dark:text-slate-300 hover:bg-white/40 dark:hover:bg-slate-800/40"
+              )}
+            >
+              {tab.icon}
+              {tab.label}
+              {isActive && (
+                <motion.div
+                  layoutId="activeTabIndicator"
+                  className="absolute inset-0 bg-[#006699]/10 dark:bg-sky-500/10 -z-10"
+                  transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                />
+              )}
+            </button>
+          );
+        })}
+      </div>
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card className="glass-card-premium border border-white/40 dark:border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.06)] rounded-xl overflow-hidden transition-all duration-500">
           <CardContent className="p-4 flex items-center gap-3">
@@ -667,7 +742,22 @@ export default function PatientEvolution() {
       <div className="flex items-center justify-start pb-1">
         {!isFormOpen && (
           <Button 
-            onClick={() => setIsFormOpen(true)}
+            onClick={() => {
+              setIsFormOpen(true);
+              if (activeTab === "prescriptions") {
+                handleEvolutionTypeChange("Prescrição");
+              } else if (activeTab === "vitals") {
+                handleEvolutionTypeChange("Sinais Vitais");
+              } else if (activeTab === "discharge") {
+                handleEvolutionTypeChange("Alta");
+              } else if (activeTab === "exams") {
+                handleEvolutionTypeChange("Procedimento");
+              } else if (activeTab === "evolutions") {
+                handleEvolutionTypeChange(isChild ? "Evolução Médica (Pediátrica)" : "Evolução Médica");
+              } else {
+                handleEvolutionTypeChange(isChild ? "Evolução Médica (Pediátrica)" : "Evolução Médica");
+              }
+            }}
             className="bg-[#006699] hover:bg-[#005580] text-white gap-2 px-5 rounded-lg h-9 shadow-sm transition-all active:scale-95 text-xs font-bold uppercase tracking-wider"
           >
             <Plus className="h-4 w-4" />
@@ -702,22 +792,43 @@ export default function PatientEvolution() {
                       <SelectTrigger className="h-9 bg-white/45 dark:bg-slate-900/45 border-white/60 dark:border-white/10 hover:bg-white/60 dark:hover:bg-slate-900/60 text-xs rounded-xl backdrop-blur-sm shadow-sm transition-all focus:ring-1 focus:ring-primary/20">
                         <SelectValue placeholder="Selecionar tipo" />
                       </SelectTrigger>
-                      <SelectContent>
-                        {!isChild && <SelectItem value="Evolução Médica">Evolução Médica</SelectItem>}
-                        {isChild && <SelectItem value="Evolução Médica (Pediátrica)">Evolução Médica (Pediátrica)</SelectItem>}
-                        <SelectItem value="Evolução Enfermagem">Evolução Enfermagem (Privativo do Enfermeiro)</SelectItem>
-                        <SelectItem value="Anotação de Enfermagem">Anotação de Enfermagem (Técnicos e Equipe)</SelectItem>
-                        <SelectItem value="Evolução da Fisioterapia">Evolução da Fisioterapia</SelectItem>
-                        <SelectItem value="Evolução da Nutrição">Evolução da Nutrição</SelectItem>
-                        <SelectItem value="Evolução da Psicologia">Evolução da Psicologia</SelectItem>
-                        <SelectItem value="Evolução do Serviço Social">Evolução do Serviço Social</SelectItem>
-                        <SelectItem value="Evolução da Terapia Ocupacional">Evolução da Terapia Ocupacional</SelectItem>
-                        <SelectItem value="Evolução da Fonoaudiologia">Evolução da Fonoaudiologia</SelectItem>
-                        <SelectItem value="Evolução da Farmácia Clínica">Evolução da Farmácia Clínica</SelectItem>
-                        <SelectItem value="Sinais Vitais">Sinais Vitais</SelectItem>
-                        <SelectItem value="Prescrição">Prescrição</SelectItem>
-                        <SelectItem value="Procedimento">Procedimento</SelectItem>
-                        <SelectItem value="Alta">Alta</SelectItem>
+                      <SelectContent className="max-h-[300px] overflow-y-auto">
+                        <SelectGroup>
+                          <SelectLabel className="pl-3 text-[10px] font-black uppercase tracking-widest bg-sky-500/5 dark:bg-sky-500/10 rounded-md py-1 my-1 text-[#006699] dark:text-sky-400">
+                            Corpo Clínico
+                          </SelectLabel>
+                          {!isChild && <SelectItem value="Evolução Médica">Evolução Médica</SelectItem>}
+                          {isChild && <SelectItem value="Evolução Médica (Pediátrica)">Evolução Médica (Pediátrica)</SelectItem>}
+                          <SelectItem value="Evolução Enfermagem">Evolução Enfermagem (Privativo do Enfermeiro)</SelectItem>
+                          <SelectItem value="Anotação de Enfermagem">Anotação de Enfermagem (Técnicos e Equipe)</SelectItem>
+                        </SelectGroup>
+                        
+                        <SelectSeparator className="my-1" />
+                        
+                        <SelectGroup>
+                          <SelectLabel className="pl-3 text-[10px] font-black uppercase tracking-widest bg-sky-500/5 dark:bg-sky-500/10 rounded-md py-1 my-1 text-[#006699] dark:text-sky-400">
+                            Equipe Multidisciplinar
+                          </SelectLabel>
+                          <SelectItem value="Evolução da Fisioterapia">Evolução da Fisioterapia</SelectItem>
+                          <SelectItem value="Evolução da Nutrição">Evolução da Nutrição</SelectItem>
+                          <SelectItem value="Evolução da Psicologia">Evolução da Psicologia</SelectItem>
+                          <SelectItem value="Evolução do Serviço Social">Evolução do Serviço Social</SelectItem>
+                          <SelectItem value="Evolução da Terapia Ocupacional">Evolução da Terapia Ocupacional</SelectItem>
+                          <SelectItem value="Evolução da Fonoaudiologia">Evolução da Fonoaudiologia</SelectItem>
+                          <SelectItem value="Evolução da Farmácia Clínica">Evolução da Farmácia Clínica</SelectItem>
+                        </SelectGroup>
+                        
+                        <SelectSeparator className="my-1" />
+                        
+                        <SelectGroup>
+                          <SelectLabel className="pl-3 text-[10px] font-black uppercase tracking-widest bg-sky-500/5 dark:bg-sky-500/10 rounded-md py-1 my-1 text-[#006699] dark:text-sky-400">
+                            Condutas e Registros
+                          </SelectLabel>
+                          <SelectItem value="Sinais Vitais">Sinais Vitais</SelectItem>
+                          <SelectItem value="Prescrição">Prescrição</SelectItem>
+                          <SelectItem value="Procedimento">Procedimento</SelectItem>
+                          <SelectItem value="Alta">Alta</SelectItem>
+                        </SelectGroup>
                       </SelectContent>
                     </Select>
                   </div>
@@ -3142,15 +3253,24 @@ export default function PatientEvolution() {
       <div className="space-y-6">
         <h2 className="text-sm font-black tracking-widest text-[#006699] dark:text-sky-400 uppercase">Linha do Tempo de Atendimento</h2>
         
-        {evolutions.length === 0 ? (
+        {filteredEvolutions.length === 0 ? (
           <Card className="glass-card-premium border border-white/40 dark:border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.06)] rounded-xl overflow-hidden transition-all duration-500">
             <CardContent className="h-36 flex items-center justify-center bg-muted/5">
-              <p className="text-sm font-bold uppercase tracking-widest text-muted-foreground/30 px-8 text-center leading-relaxed">Nenhuma evolução registrada para este paciente.</p>
+              <p className="text-sm font-bold uppercase tracking-widest text-muted-foreground/30 px-8 text-center leading-relaxed">
+                {activeTab === "all" 
+                  ? "Nenhuma evolução registrada para este paciente." 
+                  : `Nenhum registro de ${
+                      activeTab === "evolutions" ? "Evolução" :
+                      activeTab === "prescriptions" ? "Prescrição" :
+                      activeTab === "vitals" ? "Sinais Vitais" :
+                      activeTab === "exams" ? "Exame/Procedimento" : "Alta"
+                    } para este paciente.`}
+              </p>
             </CardContent>
           </Card>
         ) : (
           <div className="relative pl-6 border-l-2 border-slate-200 dark:border-slate-800 ml-3 space-y-6">
-            {evolutions.map((record) => (
+            {filteredEvolutions.map((record) => (
               <motion.div 
                 key={record.id}
                 initial={{ opacity: 0, x: -10 }}
