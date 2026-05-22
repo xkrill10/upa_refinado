@@ -69,7 +69,7 @@ export function MorseModal({ isOpen, onClose, onApply }: MorseModalProps) {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[550px] rounded-2xl border border-slate-200/40 dark:border-slate-800/40 bg-white dark:bg-slate-950 shadow-2xl max-h-[85vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-[550px] rounded-2xl border border-slate-200/50 dark:border-slate-800/50 bg-white/80 dark:bg-slate-950/80 backdrop-blur-xl shadow-2xl max-h-[85vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-2xl mission-control-title flex items-center gap-2">
             <ShieldAlert className="h-6 w-6 text-amber-500" />
@@ -85,7 +85,7 @@ export function MorseModal({ isOpen, onClose, onApply }: MorseModalProps) {
           <div className="space-y-1">
             <Label className="text-xs font-black uppercase text-foreground/80">1. Histórico de Quedas nos últimos 3 meses</Label>
             <Select value={morseHistory} onValueChange={setMorseHistory}>
-              <SelectTrigger className="h-10 rounded-xl">
+              <SelectTrigger className="h-10 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
                 <SelectValue placeholder="Selecione..." />
               </SelectTrigger>
               <SelectContent className="rounded-xl">
@@ -99,7 +99,7 @@ export function MorseModal({ isOpen, onClose, onApply }: MorseModalProps) {
           <div className="space-y-1">
             <Label className="text-xs font-black uppercase text-foreground/80">2. Diagnóstico Secundário no prontuário</Label>
             <Select value={morseDiagnosis} onValueChange={setMorseDiagnosis}>
-              <SelectTrigger className="h-10 rounded-xl">
+              <SelectTrigger className="h-10 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
                 <SelectValue placeholder="Selecione..." />
               </SelectTrigger>
               <SelectContent className="rounded-xl">
@@ -113,7 +113,7 @@ export function MorseModal({ isOpen, onClose, onApply }: MorseModalProps) {
           <div className="space-y-1">
             <Label className="text-xs font-black uppercase text-foreground/80">3. Auxílio na Deambulação</Label>
             <Select value={morseAmbulation} onValueChange={setMorseAmbulation}>
-              <SelectTrigger className="h-10 rounded-xl">
+              <SelectTrigger className="h-10 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
                 <SelectValue placeholder="Selecione o auxílio..." />
               </SelectTrigger>
               <SelectContent className="rounded-xl">
@@ -128,7 +128,7 @@ export function MorseModal({ isOpen, onClose, onApply }: MorseModalProps) {
           <div className="space-y-1">
             <Label className="text-xs font-black uppercase text-foreground/80">4. Terapia Intravenosa / Dispositivo Endovenoso (Soro, Acesso)</Label>
             <Select value={morseIv} onValueChange={setMorseIv}>
-              <SelectTrigger className="h-10 rounded-xl">
+              <SelectTrigger className="h-10 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
                 <SelectValue placeholder="Selecione..." />
               </SelectTrigger>
               <SelectContent className="rounded-xl">
@@ -142,7 +142,7 @@ export function MorseModal({ isOpen, onClose, onApply }: MorseModalProps) {
           <div className="space-y-1">
             <Label className="text-xs font-black uppercase text-foreground/80">5. Marcha / Transferência</Label>
             <Select value={morseGait} onValueChange={setMorseGait}>
-              <SelectTrigger className="h-10 rounded-xl">
+              <SelectTrigger className="h-10 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
                 <SelectValue placeholder="Selecione o padrão de marcha..." />
               </SelectTrigger>
               <SelectContent className="rounded-xl">
@@ -157,7 +157,7 @@ export function MorseModal({ isOpen, onClose, onApply }: MorseModalProps) {
           <div className="space-y-1">
             <Label className="text-xs font-black uppercase text-foreground/80">6. Estado Mental</Label>
             <Select value={morseMental} onValueChange={setMorseMental}>
-              <SelectTrigger className="h-10 rounded-xl">
+              <SelectTrigger className="h-10 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
                 <SelectValue placeholder="Selecione o estado mental..." />
               </SelectTrigger>
               <SelectContent className="rounded-xl">
@@ -168,7 +168,7 @@ export function MorseModal({ isOpen, onClose, onApply }: MorseModalProps) {
           </div>
 
           {/* Resultado e Ação */}
-          <div className="mt-6 p-4 rounded-2xl bg-muted/30 border border-border space-y-3">
+          <div className="mt-6 p-4 rounded-2xl bg-slate-50/70 dark:bg-slate-900/40 backdrop-blur-md border border-slate-200/60 dark:border-slate-800/50 space-y-3">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-[10px] font-black uppercase text-muted-foreground tracking-wider">Pontuação Calculada</p>

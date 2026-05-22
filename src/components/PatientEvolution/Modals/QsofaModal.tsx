@@ -32,7 +32,7 @@ export function QsofaModal({ isOpen, onClose, onApply }: QsofaModalProps) {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[550px] rounded-2xl border border-slate-200/40 dark:border-slate-800/40 bg-white dark:bg-slate-950 shadow-2xl max-h-[85vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-[550px] rounded-2xl border border-slate-200/50 dark:border-slate-800/50 bg-white/80 dark:bg-slate-950/80 backdrop-blur-xl shadow-2xl max-h-[85vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-2xl mission-control-title flex items-center gap-2">
             <ShieldAlert className="h-6 w-6 text-purple-500 animate-bounce" />
@@ -78,7 +78,7 @@ export function QsofaModal({ isOpen, onClose, onApply }: QsofaModalProps) {
               <div className="space-y-1">
                 <Label className="text-xs font-black uppercase text-foreground/80">1. Frequência Respiratória &gt;= 22 irpm</Label>
                 <Select value={qsofaFr} onValueChange={setQsofaFr}>
-                  <SelectTrigger className="h-10 rounded-xl">
+                  <SelectTrigger className="h-10 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
                     <SelectValue placeholder="Selecione..." />
                   </SelectTrigger>
                   <SelectContent className="rounded-xl">
@@ -92,7 +92,7 @@ export function QsofaModal({ isOpen, onClose, onApply }: QsofaModalProps) {
               <div className="space-y-1">
                 <Label className="text-xs font-black uppercase text-foreground/80">2. Alteração do Estado Mental (Glasgow &lt; 15 ou Desorientação)</Label>
                 <Select value={qsofaMental} onValueChange={setQsofaMental}>
-                  <SelectTrigger className="h-10 rounded-xl">
+                  <SelectTrigger className="h-10 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
                     <SelectValue placeholder="Selecione..." />
                   </SelectTrigger>
                   <SelectContent className="rounded-xl">
@@ -106,7 +106,7 @@ export function QsofaModal({ isOpen, onClose, onApply }: QsofaModalProps) {
               <div className="space-y-1">
                 <Label className="text-xs font-black uppercase text-foreground/80">3. Pressão Arterial Sistólica &lt;= 100 mmHg</Label>
                 <Select value={qsofaPas} onValueChange={setQsofaPas}>
-                  <SelectTrigger className="h-10 rounded-xl">
+                  <SelectTrigger className="h-10 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
                     <SelectValue placeholder="Selecione..." />
                   </SelectTrigger>
                   <SelectContent className="rounded-xl">
@@ -133,7 +133,7 @@ export function QsofaModal({ isOpen, onClose, onApply }: QsofaModalProps) {
                 const isComplete = !!(qsofaFr && qsofaMental && qsofaPas);
 
                 return (
-                  <div className="mt-6 p-4 rounded-2xl bg-muted/30 border border-border space-y-3">
+                  <div className="mt-6 p-4 rounded-2xl bg-slate-50/70 dark:bg-slate-900/40 backdrop-blur-md border border-slate-200/60 dark:border-slate-800/50 space-y-3">
                     <div className="flex items-center justify-between">
                       <div>
                         <p className="text-[10px] font-black uppercase text-muted-foreground tracking-wider">Pontuação qSOFA</p>
@@ -193,7 +193,7 @@ export function QsofaModal({ isOpen, onClose, onApply }: QsofaModalProps) {
               <div className="space-y-1">
                 <Label className="text-xs font-black uppercase text-foreground/80">1. Temperatura corporal &lt; 36°C ou &gt; 38°C</Label>
                 <Select value={sirsTemp} onValueChange={setSirsTemp}>
-                  <SelectTrigger className="h-10 rounded-xl">
+                  <SelectTrigger className="h-10 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
                     <SelectValue placeholder="Selecione..." />
                   </SelectTrigger>
                   <SelectContent className="rounded-xl">
@@ -207,7 +207,7 @@ export function QsofaModal({ isOpen, onClose, onApply }: QsofaModalProps) {
               <div className="space-y-1">
                 <Label className="text-xs font-black uppercase text-foreground/80">2. Frequência Cardíaca &gt; 90 bpm</Label>
                 <Select value={sirsHr} onValueChange={setSirsHr}>
-                  <SelectTrigger className="h-10 rounded-xl">
+                  <SelectTrigger className="h-10 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
                     <SelectValue placeholder="Selecione..." />
                   </SelectTrigger>
                   <SelectContent className="rounded-xl">
@@ -221,7 +221,7 @@ export function QsofaModal({ isOpen, onClose, onApply }: QsofaModalProps) {
               <div className="space-y-1">
                 <Label className="text-xs font-black uppercase text-foreground/80">3. Frequência Respiratória &gt; 20 irpm ou PaCO2 &lt; 32 mmHg</Label>
                 <Select value={sirsRr} onValueChange={setSirsRr}>
-                  <SelectTrigger className="h-10 rounded-xl">
+                  <SelectTrigger className="h-10 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
                     <SelectValue placeholder="Selecione..." />
                   </SelectTrigger>
                   <SelectContent className="rounded-xl">
@@ -235,7 +235,7 @@ export function QsofaModal({ isOpen, onClose, onApply }: QsofaModalProps) {
               <div className="space-y-1">
                 <Label className="text-xs font-black uppercase text-foreground/80">4. Leucócitos &lt; 4000 ou &gt; 12000 ou &gt; 10% de Bastões</Label>
                 <Select value={sirsWbc} onValueChange={setSirsWbc}>
-                  <SelectTrigger className="h-10 rounded-xl">
+                  <SelectTrigger className="h-10 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
                     <SelectValue placeholder="Selecione..." />
                   </SelectTrigger>
                   <SelectContent className="rounded-xl">
@@ -249,7 +249,7 @@ export function QsofaModal({ isOpen, onClose, onApply }: QsofaModalProps) {
               <div className="space-y-1">
                 <Label className="text-xs font-black uppercase text-purple-600 dark:text-purple-400">5. Suspeita de Foco Infeccioso Ativo?</Label>
                 <Select value={sirsFocus} onValueChange={setSirsFocus}>
-                  <SelectTrigger className="h-10 rounded-xl">
+                  <SelectTrigger className="h-10 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
                     <SelectValue placeholder="Selecione..." />
                   </SelectTrigger>
                   <SelectContent className="rounded-xl">
@@ -263,7 +263,7 @@ export function QsofaModal({ isOpen, onClose, onApply }: QsofaModalProps) {
               <div className="space-y-1">
                 <Label className="text-xs font-black uppercase text-purple-600 dark:text-purple-400">6. Evidência de Disfunção Orgânica de Início Recente?</Label>
                 <Select value={sirsDysfunction} onValueChange={setSirsDysfunction}>
-                  <SelectTrigger className="h-10 rounded-xl">
+                  <SelectTrigger className="h-10 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
                     <SelectValue placeholder="Selecione..." />
                   </SelectTrigger>
                   <SelectContent className="rounded-xl">
@@ -306,7 +306,7 @@ export function QsofaModal({ isOpen, onClose, onApply }: QsofaModalProps) {
                 const isComplete = !!(sirsTemp && sirsHr && sirsRr && sirsWbc && sirsFocus && sirsDysfunction);
 
                 return (
-                  <div className="mt-6 p-4 rounded-2xl bg-muted/30 border border-border space-y-3">
+                  <div className="mt-6 p-4 rounded-2xl bg-slate-50/70 dark:bg-slate-900/40 backdrop-blur-md border border-slate-200/60 dark:border-slate-800/50 space-y-3">
                     <div className="flex items-center justify-between">
                       <div>
                         <p className="text-[10px] font-black uppercase text-muted-foreground tracking-wider">Critérios SIRS</p>

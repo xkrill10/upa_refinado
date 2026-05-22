@@ -87,7 +87,7 @@ export function FugulinModal({ isOpen, onClose, onApply }: FugulinModalProps) {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[900px] rounded-2xl border border-slate-200/40 dark:border-slate-800/40 bg-white dark:bg-slate-950 shadow-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-[900px] rounded-2xl border border-slate-200/50 dark:border-slate-800/50 bg-white/80 dark:bg-slate-950/80 backdrop-blur-xl shadow-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-2xl mission-control-title flex items-center gap-2">
             <Activity className="h-6 w-6 text-cyan-500 animate-pulse" />
@@ -156,7 +156,7 @@ export function FugulinModal({ isOpen, onClose, onApply }: FugulinModalProps) {
                   <div className="space-y-1">
                     <Label className="text-[10px] font-black uppercase text-foreground/80">Estado Mental</Label>
                     <Select value={fugulinMental} onValueChange={setFugulinMental}>
-                      <SelectTrigger className="h-9 rounded-xl text-xs">
+                      <SelectTrigger className="h-9 rounded-xl text-xs bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent className="rounded-xl">
@@ -171,7 +171,7 @@ export function FugulinModal({ isOpen, onClose, onApply }: FugulinModalProps) {
                   <div className="space-y-1">
                     <Label className="text-[10px] font-black uppercase text-foreground/80">Oxigenação</Label>
                     <Select value={fugulinOxy} onValueChange={setFugulinOxy}>
-                      <SelectTrigger className="h-9 rounded-xl text-xs">
+                      <SelectTrigger className="h-9 rounded-xl text-xs bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent className="rounded-xl">
@@ -186,7 +186,7 @@ export function FugulinModal({ isOpen, onClose, onApply }: FugulinModalProps) {
                   <div className="space-y-1">
                     <Label className="text-[10px] font-black uppercase text-foreground/80">Sinais Vitais</Label>
                     <Select value={fugulinVitals} onValueChange={setFugulinVitals}>
-                      <SelectTrigger className="h-9 rounded-xl text-xs">
+                      <SelectTrigger className="h-9 rounded-xl text-xs bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent className="rounded-xl">
@@ -201,7 +201,7 @@ export function FugulinModal({ isOpen, onClose, onApply }: FugulinModalProps) {
                   <div className="space-y-1">
                     <Label className="text-[10px] font-black uppercase text-foreground/80">Motilidade</Label>
                     <Select value={fugulinMotility} onValueChange={setFugulinMotility}>
-                      <SelectTrigger className="h-9 rounded-xl text-xs">
+                      <SelectTrigger className="h-9 rounded-xl text-xs bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent className="rounded-xl">
@@ -216,7 +216,7 @@ export function FugulinModal({ isOpen, onClose, onApply }: FugulinModalProps) {
                   <div className="space-y-1">
                     <Label className="text-[10px] font-black uppercase text-foreground/80">Deambulação</Label>
                     <Select value={fugulinAmbulation} onValueChange={setFugulinAmbulation}>
-                      <SelectTrigger className="h-9 rounded-xl text-xs">
+                      <SelectTrigger className="h-9 rounded-xl text-xs bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent className="rounded-xl">
@@ -231,7 +231,7 @@ export function FugulinModal({ isOpen, onClose, onApply }: FugulinModalProps) {
                   <div className="space-y-1">
                     <Label className="text-[10px] font-black uppercase text-foreground/80">Alimentação</Label>
                     <Select value={fugulinFeeding} onValueChange={setFugulinFeeding}>
-                      <SelectTrigger className="h-9 rounded-xl text-xs">
+                      <SelectTrigger className="h-9 rounded-xl text-xs bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent className="rounded-xl">
@@ -246,7 +246,7 @@ export function FugulinModal({ isOpen, onClose, onApply }: FugulinModalProps) {
                   <div className="space-y-1">
                     <Label className="text-[10px] font-black uppercase text-foreground/80">Cuidado Corporal</Label>
                     <Select value={fugulinBodyCare} onValueChange={setFugulinBodyCare}>
-                      <SelectTrigger className="h-9 rounded-xl text-xs">
+                      <SelectTrigger className="h-9 rounded-xl text-xs bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent className="rounded-xl">
@@ -261,7 +261,7 @@ export function FugulinModal({ isOpen, onClose, onApply }: FugulinModalProps) {
                   <div className="space-y-1">
                     <Label className="text-[10px] font-black uppercase text-foreground/80">Eliminação</Label>
                     <Select value={fugulinElimination} onValueChange={setFugulinElimination}>
-                      <SelectTrigger className="h-9 rounded-xl text-xs">
+                      <SelectTrigger className="h-9 rounded-xl text-xs bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent className="rounded-xl">
@@ -278,7 +278,7 @@ export function FugulinModal({ isOpen, onClose, onApply }: FugulinModalProps) {
                       Terapêutica / Medicamentos
                     </Label>
                     <Select value={fugulinTherapy} onValueChange={setFugulinTherapy}>
-                      <SelectTrigger className="h-9 rounded-xl text-xs">
+                      <SelectTrigger className="h-9 rounded-xl text-xs bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent className="rounded-xl">
@@ -291,7 +291,7 @@ export function FugulinModal({ isOpen, onClose, onApply }: FugulinModalProps) {
                   </div>
                 </div>
 
-                <div className="p-3 rounded-2xl bg-muted/30 border border-border space-y-2 mt-4">
+                <div className="p-3 rounded-2xl bg-slate-50/70 dark:bg-slate-900/40 backdrop-blur-md border border-slate-200/60 dark:border-slate-800/50 space-y-2 mt-4">
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-[10px] font-black uppercase text-muted-foreground tracking-wider">

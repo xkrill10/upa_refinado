@@ -63,7 +63,7 @@ export function GlasgowModal({ isOpen, onClose, onApply }: GlasgowModalProps) {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[500px] rounded-2xl border border-slate-200/40 dark:border-slate-800/40 bg-white dark:bg-slate-950 shadow-2xl max-h-[85vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-[500px] rounded-2xl border border-slate-200/50 dark:border-slate-800/50 bg-white/80 dark:bg-slate-950/80 backdrop-blur-xl shadow-2xl max-h-[85vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-2xl mission-control-title flex items-center gap-2">
             <Brain className="h-6 w-6 text-indigo-500 animate-pulse" />
@@ -79,7 +79,7 @@ export function GlasgowModal({ isOpen, onClose, onApply }: GlasgowModalProps) {
           <div className="space-y-1">
             <Label className="text-xs font-black uppercase text-foreground/80">1. Abertura Ocular (AO)</Label>
             <Select value={gcsEye} onValueChange={setGcsEye}>
-              <SelectTrigger className="h-10 rounded-xl">
+              <SelectTrigger className="h-10 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
                 <SelectValue placeholder="Selecione a abertura ocular..." />
               </SelectTrigger>
               <SelectContent className="rounded-xl">
@@ -95,7 +95,7 @@ export function GlasgowModal({ isOpen, onClose, onApply }: GlasgowModalProps) {
           <div className="space-y-1">
             <Label className="text-xs font-black uppercase text-foreground/80">2. Resposta Verbal (RV)</Label>
             <Select value={gcsVerbal} onValueChange={setGcsVerbal}>
-              <SelectTrigger className="h-10 rounded-xl">
+              <SelectTrigger className="h-10 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
                 <SelectValue placeholder="Selecione a resposta verbal..." />
               </SelectTrigger>
               <SelectContent className="rounded-xl">
@@ -112,7 +112,7 @@ export function GlasgowModal({ isOpen, onClose, onApply }: GlasgowModalProps) {
           <div className="space-y-1">
             <Label className="text-xs font-black uppercase text-foreground/80">3. Resposta Motora (RM)</Label>
             <Select value={gcsMotor} onValueChange={setGcsMotor}>
-              <SelectTrigger className="h-10 rounded-xl">
+              <SelectTrigger className="h-10 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
                 <SelectValue placeholder="Selecione a resposta motora..." />
               </SelectTrigger>
               <SelectContent className="rounded-xl">
@@ -127,7 +127,7 @@ export function GlasgowModal({ isOpen, onClose, onApply }: GlasgowModalProps) {
           </div>
 
           {/* Resultado e Ação */}
-          <div className="mt-6 p-4 rounded-2xl bg-muted/30 border border-border space-y-3">
+          <div className="mt-6 p-4 rounded-2xl bg-slate-50/70 dark:bg-slate-900/40 backdrop-blur-md border border-slate-200/60 dark:border-slate-800/50 space-y-3">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-[10px] font-black uppercase text-muted-foreground tracking-wider">Pontuação ECG</p>

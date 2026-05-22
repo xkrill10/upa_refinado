@@ -46,7 +46,7 @@ export function EvaModal({ isOpen, onClose, onApply }: EvaModalProps) {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[500px] rounded-2xl border border-slate-200/40 dark:border-slate-800/40 bg-white dark:bg-slate-950 shadow-2xl">
+      <DialogContent className="sm:max-w-[500px] rounded-2xl border border-slate-200/50 dark:border-slate-800/50 bg-white/80 dark:bg-slate-950/80 backdrop-blur-xl shadow-2xl">
         <DialogHeader>
           <DialogTitle className="text-2xl mission-control-title flex items-center gap-2">
             <Heart className="h-6 w-6 text-red-500 animate-pulse" />

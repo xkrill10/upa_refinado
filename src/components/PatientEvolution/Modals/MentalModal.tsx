@@ -78,7 +78,7 @@ export function MentalModal({ isOpen, onClose, onApply }: MentalModalProps) {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[800px] rounded-2xl border border-slate-200/40 dark:border-slate-800/40 bg-white dark:bg-slate-950 shadow-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-[800px] rounded-2xl border border-slate-200/50 dark:border-slate-800/50 bg-white/80 dark:bg-slate-950/80 backdrop-blur-xl shadow-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-2xl mission-control-title flex items-center gap-2">
             <Brain className="h-6 w-6 text-violet-500 animate-pulse" />
@@ -267,7 +267,7 @@ export function MentalModal({ isOpen, onClose, onApply }: MentalModalProps) {
                 <div className="space-y-1">
                   <Label className="text-xs font-black uppercase text-foreground/80">Richmond Agitation-Sedation Scale (RASS)</Label>
                   <Select value={rassVal} onValueChange={setRassVal}>
-                    <SelectTrigger className="h-10 rounded-xl">
+                    <SelectTrigger className="h-10 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
                       <SelectValue placeholder="Selecione o nível RASS..." />
                     </SelectTrigger>
                     <SelectContent className="rounded-xl">
@@ -333,7 +333,7 @@ export function MentalModal({ isOpen, onClose, onApply }: MentalModalProps) {
                   }
 
                   return (
-                    <div className="mt-4 p-4 rounded-2xl bg-muted/30 border border-border space-y-3">
+                    <div className="mt-4 p-4 rounded-2xl bg-slate-50/70 dark:bg-slate-900/40 backdrop-blur-md border border-slate-200/60 dark:border-slate-800/50 space-y-3">
                       <div className="flex items-center justify-between">
                         <div>
                           <p className="text-[10px] font-black uppercase text-muted-foreground tracking-wider">Escore RASS</p>
@@ -382,7 +382,7 @@ export function MentalModal({ isOpen, onClose, onApply }: MentalModalProps) {
                   <div className="space-y-1">
                     <Label className="text-[10px] font-black uppercase text-foreground/80">S - Sexo Masculino</Label>
                     <Select value={sadSex} onValueChange={sadSex => setSadSex(sadSex)}>
-                      <SelectTrigger className="h-9 rounded-xl">
+                      <SelectTrigger className="h-9 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent className="rounded-xl">
@@ -395,7 +395,7 @@ export function MentalModal({ isOpen, onClose, onApply }: MentalModalProps) {
                   <div className="space-y-1">
                     <Label className="text-[10px] font-black uppercase text-foreground/80">A - Idade (&lt;19 ou &gt;45 anos)</Label>
                     <Select value={sadAge} onValueChange={sadAge => setSadAge(sadAge)}>
-                      <SelectTrigger className="h-9 rounded-xl">
+                      <SelectTrigger className="h-9 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent className="rounded-xl">
@@ -408,7 +408,7 @@ export function MentalModal({ isOpen, onClose, onApply }: MentalModalProps) {
                   <div className="space-y-1">
                     <Label className="text-[10px] font-black uppercase text-foreground/80">D - Depressão ou Desespero</Label>
                     <Select value={sadDepression} onValueChange={sadDepression => setSadDepression(sadDepression)}>
-                      <SelectTrigger className="h-9 rounded-xl">
+                      <SelectTrigger className="h-9 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent className="rounded-xl">
@@ -421,7 +421,7 @@ export function MentalModal({ isOpen, onClose, onApply }: MentalModalProps) {
                   <div className="space-y-1">
                     <Label className="text-[10px] font-black uppercase text-foreground/80">P - Tentativa Prévia de Suicídio</Label>
                     <Select value={sadPrevAttempt} onValueChange={sadPrev => setSadPrevAttempt(sadPrev)}>
-                      <SelectTrigger className="h-9 rounded-xl">
+                      <SelectTrigger className="h-9 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent className="rounded-xl">
@@ -434,7 +434,7 @@ export function MentalModal({ isOpen, onClose, onApply }: MentalModalProps) {
                   <div className="space-y-1">
                     <Label className="text-[10px] font-black uppercase text-foreground/80">E - Abuso de Álcool/Etanol</Label>
                     <Select value={sadEthanol} onValueChange={sadEthanol => setSadEthanol(sadEthanol)}>
-                      <SelectTrigger className="h-9 rounded-xl">
+                      <SelectTrigger className="h-9 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent className="rounded-xl">
@@ -447,7 +447,7 @@ export function MentalModal({ isOpen, onClose, onApply }: MentalModalProps) {
                   <div className="space-y-1">
                     <Label className="text-[10px] font-black uppercase text-foreground/80">R - Perda de Razão (Psicose)</Label>
                     <Select value={sadRationalLoss} onValueChange={sadRat => setSadRationalLoss(sadRat)}>
-                      <SelectTrigger className="h-9 rounded-xl">
+                      <SelectTrigger className="h-9 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent className="rounded-xl">
@@ -460,7 +460,7 @@ export function MentalModal({ isOpen, onClose, onApply }: MentalModalProps) {
                   <div className="space-y-1">
                     <Label className="text-[10px] font-black uppercase text-foreground/80">S - Sem Suporte Social (Solitário)</Label>
                     <Select value={sadSocialSupport} onValueChange={sadSoc => setSadSocialSupport(sadSoc)}>
-                      <SelectTrigger className="h-9 rounded-xl">
+                      <SelectTrigger className="h-9 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent className="rounded-xl">
@@ -473,7 +473,7 @@ export function MentalModal({ isOpen, onClose, onApply }: MentalModalProps) {
                   <div className="space-y-1">
                     <Label className="text-[10px] font-black uppercase text-foreground/80">O - Plano Organizado de Suicídio</Label>
                     <Select value={sadOrganizedPlan} onValueChange={sadOrg => setSadOrganizedPlan(sadOrg)}>
-                      <SelectTrigger className="h-9 rounded-xl">
+                      <SelectTrigger className="h-9 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent className="rounded-xl">
@@ -486,7 +486,7 @@ export function MentalModal({ isOpen, onClose, onApply }: MentalModalProps) {
                   <div className="space-y-1">
                     <Label className="text-[10px] font-black uppercase text-foreground/80">N - Sem Cônjuge (Divorciado/Viúvo)</Label>
                     <Select value={sadNoSpouse} onValueChange={sadNo => setSadNoSpouse(sadNo)}>
-                      <SelectTrigger className="h-9 rounded-xl">
+                      <SelectTrigger className="h-9 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent className="rounded-xl">
@@ -499,7 +499,7 @@ export function MentalModal({ isOpen, onClose, onApply }: MentalModalProps) {
                   <div className="space-y-1">
                     <Label className="text-[10px] font-black uppercase text-foreground/80">S - Doença Crônica/Grave (Sickness)</Label>
                     <Select value={sadSickness} onValueChange={sadSick => setSadSickness(sadSick)}>
-                      <SelectTrigger className="h-9 rounded-xl">
+                      <SelectTrigger className="h-9 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent className="rounded-xl">
@@ -542,7 +542,7 @@ export function MentalModal({ isOpen, onClose, onApply }: MentalModalProps) {
                   }
 
                   return (
-                    <div className="mt-4 p-4 rounded-2xl bg-muted/30 border border-border space-y-3">
+                    <div className="mt-4 p-4 rounded-2xl bg-slate-50/70 dark:bg-slate-900/40 backdrop-blur-md border border-slate-200/60 dark:border-slate-800/50 space-y-3">
                       <div className="flex items-center justify-between">
                         <div>
                           <p className="text-[10px] font-black uppercase text-muted-foreground tracking-wider">Pontuação SAD PERSONS</p>
@@ -606,7 +606,7 @@ export function MentalModal({ isOpen, onClose, onApply }: MentalModalProps) {
                   <div className="space-y-1">
                     <Label className="text-[10px] font-black uppercase text-foreground/80">1. Náuseas e Vômitos</Label>
                     <Select value={ciwaNausea} onValueChange={setCiwaNausea}>
-                      <SelectTrigger className="h-9 rounded-xl">
+                      <SelectTrigger className="h-9 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent className="rounded-xl">
@@ -621,7 +621,7 @@ export function MentalModal({ isOpen, onClose, onApply }: MentalModalProps) {
                   <div className="space-y-1">
                     <Label className="text-[10px] font-black uppercase text-foreground/80">2. Tremores (Mãos estendidas)</Label>
                     <Select value={ciwaTremor} onValueChange={setCiwaTremor}>
-                      <SelectTrigger className="h-9 rounded-xl">
+                      <SelectTrigger className="h-9 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent className="rounded-xl">
@@ -636,7 +636,7 @@ export function MentalModal({ isOpen, onClose, onApply }: MentalModalProps) {
                   <div className="space-y-1">
                     <Label className="text-[10px] font-black uppercase text-foreground/80">3. Sudorese Paroxística</Label>
                     <Select value={ciwaSweat} onValueChange={setCiwaSweat}>
-                      <SelectTrigger className="h-9 rounded-xl">
+                      <SelectTrigger className="h-9 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent className="rounded-xl">
@@ -651,7 +651,7 @@ export function MentalModal({ isOpen, onClose, onApply }: MentalModalProps) {
                   <div className="space-y-1">
                     <Label className="text-[10px] font-black uppercase text-foreground/80">4. Ansiedade / Inquietude</Label>
                     <Select value={ciwaAnxiety} onValueChange={setCiwaAnxiety}>
-                      <SelectTrigger className="h-9 rounded-xl">
+                      <SelectTrigger className="h-9 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent className="rounded-xl">
@@ -666,7 +666,7 @@ export function MentalModal({ isOpen, onClose, onApply }: MentalModalProps) {
                   <div className="space-y-1">
                     <Label className="text-[10px] font-black uppercase text-foreground/80">5. Agitação Psicomotora</Label>
                     <Select value={ciwaAgitation} onValueChange={setCiwaAgitation}>
-                      <SelectTrigger className="h-9 rounded-xl">
+                      <SelectTrigger className="h-9 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent className="rounded-xl">
@@ -681,7 +681,7 @@ export function MentalModal({ isOpen, onClose, onApply }: MentalModalProps) {
                   <div className="space-y-1">
                     <Label className="text-[10px] font-black uppercase text-foreground/80">6. Alterações Tácteis (Coceira/Queimação)</Label>
                     <Select value={ciwaTactile} onValueChange={setCiwaTactile}>
-                      <SelectTrigger className="h-9 rounded-xl">
+                      <SelectTrigger className="h-9 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent className="rounded-xl">
@@ -696,7 +696,7 @@ export function MentalModal({ isOpen, onClose, onApply }: MentalModalProps) {
                   <div className="space-y-1">
                     <Label className="text-[10px] font-black uppercase text-foreground/80">7. Alterações Auditivas</Label>
                     <Select value={ciwaAuditory} onValueChange={setCiwaAuditory}>
-                      <SelectTrigger className="h-9 rounded-xl">
+                      <SelectTrigger className="h-9 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent className="rounded-xl">
@@ -711,7 +711,7 @@ export function MentalModal({ isOpen, onClose, onApply }: MentalModalProps) {
                   <div className="space-y-1">
                     <Label className="text-[10px] font-black uppercase text-foreground/80">8. Alterações Visuais</Label>
                     <Select value={ciwaVisual} onValueChange={setCiwaVisual}>
-                      <SelectTrigger className="h-9 rounded-xl">
+                      <SelectTrigger className="h-9 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent className="rounded-xl">
@@ -726,7 +726,7 @@ export function MentalModal({ isOpen, onClose, onApply }: MentalModalProps) {
                   <div className="space-y-1">
                     <Label className="text-[10px] font-black uppercase text-foreground/80">9. Cefaleia / Sensação de Aperto</Label>
                     <Select value={ciwaHeadache} onValueChange={setCiwaHeadache}>
-                      <SelectTrigger className="h-9 rounded-xl">
+                      <SelectTrigger className="h-9 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent className="rounded-xl">
@@ -741,7 +741,7 @@ export function MentalModal({ isOpen, onClose, onApply }: MentalModalProps) {
                   <div className="space-y-1">
                     <Label className="text-[10px] font-black uppercase text-foreground/80">10. Orientação e Sensório</Label>
                     <Select value={ciwaOrientation} onValueChange={setCiwaOrientation}>
-                      <SelectTrigger className="h-9 rounded-xl">
+                      <SelectTrigger className="h-9 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent className="rounded-xl">
@@ -782,7 +782,7 @@ export function MentalModal({ isOpen, onClose, onApply }: MentalModalProps) {
                   }
 
                   return (
-                    <div className="mt-4 p-4 rounded-2xl bg-muted/30 border border-border space-y-3">
+                    <div className="mt-4 p-4 rounded-2xl bg-slate-50/70 dark:bg-slate-900/40 backdrop-blur-md border border-slate-200/60 dark:border-slate-800/50 space-y-3">
                       <div className="flex items-center justify-between">
                         <div>
                           <p className="text-[10px] font-black uppercase text-muted-foreground tracking-wider">Pontuação CIWA-Ar</p>
@@ -831,7 +831,7 @@ export function MentalModal({ isOpen, onClose, onApply }: MentalModalProps) {
                   <div className="space-y-1">
                     <Label className="text-xs font-black uppercase text-foreground/80">1. C - Já sentiu necessidade de diminuir (Cut down) o consumo de álcool?</Label>
                     <Select value={cageCut} onValueChange={setCageCut}>
-                      <SelectTrigger className="h-10 rounded-xl">
+                      <SelectTrigger className="h-10 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent className="rounded-xl">
@@ -844,7 +844,7 @@ export function MentalModal({ isOpen, onClose, onApply }: MentalModalProps) {
                   <div className="space-y-1">
                     <Label className="text-xs font-black uppercase text-foreground/80">2. A - As pessoas já o irritaram (Annoyed) ao criticar seu hábito de beber?</Label>
                     <Select value={cageAnnoyed} onValueChange={setCageAnnoyed}>
-                      <SelectTrigger className="h-10 rounded-xl">
+                      <SelectTrigger className="h-10 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent className="rounded-xl">
@@ -857,7 +857,7 @@ export function MentalModal({ isOpen, onClose, onApply }: MentalModalProps) {
                   <div className="space-y-1">
                     <Label className="text-xs font-black uppercase text-foreground/80">3. G - Já se sentiu culpado (Guilty) pela maneira como costuma beber?</Label>
                     <Select value={cageGuilty} onValueChange={setCageGuilty}>
-                      <SelectTrigger className="h-10 rounded-xl">
+                      <SelectTrigger className="h-10 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent className="rounded-xl">
@@ -870,7 +870,7 @@ export function MentalModal({ isOpen, onClose, onApply }: MentalModalProps) {
                   <div className="space-y-1">
                     <Label className="text-xs font-black uppercase text-foreground/80">4. E - Já precisou beber logo pela manhã para acalmar os nervos ou combater ressaca (Eye-opener)?</Label>
                     <Select value={cageEyeOpener} onValueChange={setCageEyeOpener}>
-                      <SelectTrigger className="h-10 rounded-xl">
+                      <SelectTrigger className="h-10 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent className="rounded-xl">
@@ -899,7 +899,7 @@ export function MentalModal({ isOpen, onClose, onApply }: MentalModalProps) {
                   }
 
                   return (
-                    <div className="mt-4 p-4 rounded-2xl bg-muted/30 border border-border space-y-3">
+                    <div className="mt-4 p-4 rounded-2xl bg-slate-50/70 dark:bg-slate-900/40 backdrop-blur-md border border-slate-200/60 dark:border-slate-800/50 space-y-3">
                       <div className="flex items-center justify-between">
                         <div>
                           <p className="text-[10px] font-black uppercase text-muted-foreground tracking-wider">Pontuação CAGE</p>
@@ -983,7 +983,7 @@ export function MentalModal({ isOpen, onClose, onApply }: MentalModalProps) {
                       </div>
                     ))}
                   </div>
-                  <div className="p-3 rounded-2xl bg-muted/30 border border-border space-y-2">
+                  <div className="p-3 rounded-2xl bg-slate-50/70 dark:bg-slate-900/40 backdrop-blur-md border border-slate-200/60 dark:border-slate-800/50 space-y-2">
                     <div className="flex items-center justify-between">
                       <div><p className="text-[10px] font-black uppercase text-muted-foreground tracking-wider">Escore PHQ-9</p><p className="text-3xl font-black">{score} <span className="text-sm font-bold text-muted-foreground">/ 27 pts</span></p></div>
                       <Badge className={cn("h-7 rounded-lg text-[9px] font-black uppercase tracking-wider px-2", sevColor)}>{severity}</Badge>
@@ -1036,7 +1036,7 @@ export function MentalModal({ isOpen, onClose, onApply }: MentalModalProps) {
                       </div>
                     ))}
                   </div>
-                  <div className="p-3 rounded-2xl bg-muted/30 border border-border space-y-2">
+                  <div className="p-3 rounded-2xl bg-slate-50/70 dark:bg-slate-900/40 backdrop-blur-md border border-slate-200/60 dark:border-slate-800/50 space-y-2">
                     <div className="flex items-center justify-between">
                       <div><p className="text-[10px] font-black uppercase text-muted-foreground tracking-wider">Escore GAD-7</p><p className="text-3xl font-black">{score} <span className="text-sm font-bold text-muted-foreground">/ 21 pts</span></p></div>
                       <Badge className={cn("h-7 rounded-lg text-[9px] font-black uppercase tracking-wider px-2", sevColor)}>{severity}</Badge>
@@ -1060,7 +1060,7 @@ export function MentalModal({ isOpen, onClose, onApply }: MentalModalProps) {
                     <Label className="text-[10px] font-black uppercase text-foreground/80">🔑 Critério 1 (OBRIGATÓRIO) — Início Agudo e Flutuante</Label>
                     <p className="text-[10px] text-muted-foreground mb-1">Houve mudança aguda no estado mental em relação ao basal? O comportamento flutua ao longo do dia?</p>
                     <Select value={camAcuteOnset} onValueChange={setCamAcuteOnset}>
-                      <SelectTrigger className="h-9 rounded-xl"><SelectValue /></SelectTrigger>
+                      <SelectTrigger className="h-9 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium"><SelectValue /></SelectTrigger>
                       <SelectContent className="rounded-xl">
                         <SelectItem value="no">Não / Incerto</SelectItem>
                         <SelectItem value="yes">Sim — Presente</SelectItem>
@@ -1071,7 +1071,7 @@ export function MentalModal({ isOpen, onClose, onApply }: MentalModalProps) {
                     <Label className="text-[10px] font-black uppercase text-foreground/80">🔑 Critério 2 (OBRIGATÓRIO) — Desatenção</Label>
                     <p className="text-[10px] text-muted-foreground mb-1">O paciente tem dificuldade de manter a atenção? Facilmente distraído? Perde o fio da meada?</p>
                     <Select value={camInattention} onValueChange={setCamInattention}>
-                      <SelectTrigger className="h-9 rounded-xl"><SelectValue /></SelectTrigger>
+                      <SelectTrigger className="h-9 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium"><SelectValue /></SelectTrigger>
                       <SelectContent className="rounded-xl">
                         <SelectItem value="no">Não / Incerto</SelectItem>
                         <SelectItem value="yes">Sim — Presente</SelectItem>
@@ -1082,7 +1082,7 @@ export function MentalModal({ isOpen, onClose, onApply }: MentalModalProps) {
                     <Label className="text-[10px] font-black uppercase text-foreground/80">Critério 3 — Pensamento Desorganizado</Label>
                     <p className="text-[10px] text-muted-foreground mb-1">Discurso incoerente, pensamento ilógico ou muda de assunto de forma imprevisível?</p>
                     <Select value={camDisorganized} onValueChange={setCamDisorganized}>
-                      <SelectTrigger className="h-9 rounded-xl"><SelectValue /></SelectTrigger>
+                      <SelectTrigger className="h-9 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium"><SelectValue /></SelectTrigger>
                       <SelectContent className="rounded-xl">
                         <SelectItem value="no">Não / Incerto</SelectItem>
                         <SelectItem value="yes">Sim — Presente</SelectItem>
@@ -1093,7 +1093,7 @@ export function MentalModal({ isOpen, onClose, onApply }: MentalModalProps) {
                     <Label className="text-[10px] font-black uppercase text-foreground/80">Critério 4 — Alteração do Nível de Consciência</Label>
                     <p className="text-[10px] text-muted-foreground mb-1">O nível de consciência está alterado (agitado, letárgico, estupor ou coma)?</p>
                     <Select value={camAlteredConsciousness} onValueChange={setCamAlteredConsciousness}>
-                      <SelectTrigger className="h-9 rounded-xl"><SelectValue /></SelectTrigger>
+                      <SelectTrigger className="h-9 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium"><SelectValue /></SelectTrigger>
                       <SelectContent className="rounded-xl">
                         <SelectItem value="no">Não — Alerta e normal</SelectItem>
                         <SelectItem value="yes">Sim — Alterado</SelectItem>
@@ -1111,7 +1111,7 @@ export function MentalModal({ isOpen, onClose, onApply }: MentalModalProps) {
                     ? "Critérios obrigatórios (1 e 2) não preenchidos. Delirium improvável. Continuar monitoramento de rotina."
                     : "Critérios 1 e 2 presentes, mas nenhum dos complementares (3 ou 4). Delirium improvável — monitorar.";
                   return (
-                    <div className="p-3 rounded-2xl bg-muted/30 border border-border space-y-2">
+                    <div className="p-3 rounded-2xl bg-slate-50/70 dark:bg-slate-900/40 backdrop-blur-md border border-slate-200/60 dark:border-slate-800/50 space-y-2">
                       <div className="flex items-center justify-between">
                         <div><p className="text-[10px] font-black uppercase text-muted-foreground tracking-wider">Resultado CAM</p></div>
                         <Badge className={cn("h-7 rounded-lg text-[9px] font-black uppercase tracking-wider px-2", positiveCAM ? "bg-red-600 text-white animate-pulse" : "bg-emerald-500 text-white")}>

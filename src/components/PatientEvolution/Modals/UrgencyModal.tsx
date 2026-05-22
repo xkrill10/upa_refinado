@@ -85,7 +85,7 @@ export function UrgencyModal({ isOpen, onClose, onApply }: UrgencyModalProps) {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[850px] rounded-2xl border border-slate-200/40 dark:border-slate-800/40 bg-white dark:bg-slate-950 shadow-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-[850px] rounded-2xl border border-slate-200/50 dark:border-slate-800/50 bg-white/80 dark:bg-slate-950/80 backdrop-blur-xl shadow-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-2xl mission-control-title flex items-center gap-2">
             <ShieldAlert className="h-6 w-6 text-rose-500 animate-pulse" />
@@ -275,7 +275,7 @@ export function UrgencyModal({ isOpen, onClose, onApply }: UrgencyModalProps) {
                   <div className="space-y-1">
                     <Label className="text-[10px] font-black uppercase text-foreground/80">H - História Clínica</Label>
                     <Select value={heartHistory} onValueChange={setHeartHistory}>
-                      <SelectTrigger className="h-9 rounded-xl">
+                      <SelectTrigger className="h-9 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent className="rounded-xl">
@@ -289,7 +289,7 @@ export function UrgencyModal({ isOpen, onClose, onApply }: UrgencyModalProps) {
                   <div className="space-y-1">
                     <Label className="text-[10px] font-black uppercase text-foreground/80">E - Eletrocardiograma (ECG)</Label>
                     <Select value={heartEcg} onValueChange={setHeartEcg}>
-                      <SelectTrigger className="h-9 rounded-xl">
+                      <SelectTrigger className="h-9 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent className="rounded-xl">
@@ -303,7 +303,7 @@ export function UrgencyModal({ isOpen, onClose, onApply }: UrgencyModalProps) {
                   <div className="space-y-1">
                     <Label className="text-[10px] font-black uppercase text-foreground/80">A - Idade (Anos)</Label>
                     <Select value={heartAge} onValueChange={setHeartAge}>
-                      <SelectTrigger className="h-9 rounded-xl">
+                      <SelectTrigger className="h-9 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent className="rounded-xl">
@@ -317,7 +317,7 @@ export function UrgencyModal({ isOpen, onClose, onApply }: UrgencyModalProps) {
                   <div className="space-y-1">
                     <Label className="text-[10px] font-black uppercase text-foreground/80">R - Fatores de Risco</Label>
                     <Select value={heartRisk} onValueChange={setHeartRisk}>
-                      <SelectTrigger className="h-9 rounded-xl">
+                      <SelectTrigger className="h-9 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent className="rounded-xl">
@@ -331,7 +331,7 @@ export function UrgencyModal({ isOpen, onClose, onApply }: UrgencyModalProps) {
                   <div className="space-y-1 sm:col-span-2">
                     <Label className="text-[10px] font-black uppercase text-foreground/80">T - Troponina inicial</Label>
                     <Select value={heartTroponin} onValueChange={setHeartTroponin}>
-                      <SelectTrigger className="h-9 rounded-xl">
+                      <SelectTrigger className="h-9 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent className="rounded-xl">
@@ -360,7 +360,7 @@ export function UrgencyModal({ isOpen, onClose, onApply }: UrgencyModalProps) {
                   }
 
                   return (
-                    <div className="mt-4 p-4 rounded-2xl bg-muted/30 border border-border space-y-3">
+                    <div className="mt-4 p-4 rounded-2xl bg-slate-50/70 dark:bg-slate-900/40 backdrop-blur-md border border-slate-200/60 dark:border-slate-800/50 space-y-3">
                       <div className="flex items-center justify-between">
                         <div>
                           <p className="text-[10px] font-black uppercase text-muted-foreground tracking-wider">Escore HEART</p>
@@ -371,7 +371,7 @@ export function UrgencyModal({ isOpen, onClose, onApply }: UrgencyModalProps) {
                         </Badge>
                       </div>
 
-                      <div className="text-[11px] text-muted-foreground p-3 rounded-xl bg-card border border-border">
+                      <div className="text-[11px] text-muted-foreground p-3 rounded-xl bg-white/80 dark:bg-slate-950/40 backdrop-blur-sm border border-slate-200/60 dark:border-slate-800/50">
                         <span className="font-bold text-foreground">Conduta sugerida:</span> {recommendation}
                       </div>
 
@@ -664,7 +664,7 @@ export function UrgencyModal({ isOpen, onClose, onApply }: UrgencyModalProps) {
                   }
 
                   return (
-                    <div className="mt-4 p-4 mb-6 rounded-2xl bg-muted/30 border border-border space-y-3">
+                    <div className="mt-4 p-4 mb-6 rounded-2xl bg-slate-50/70 dark:bg-slate-900/40 backdrop-blur-md border border-slate-200/60 dark:border-slate-800/50 space-y-3">
                       <div className="flex items-center justify-between">
                         <div>
                           <p className="text-[10px] font-black uppercase text-muted-foreground tracking-wider">Pontuação Total NIHSS</p>
@@ -675,7 +675,7 @@ export function UrgencyModal({ isOpen, onClose, onApply }: UrgencyModalProps) {
                         </Badge>
                       </div>
 
-                      <div className="text-[11px] text-muted-foreground p-3 rounded-xl bg-card border border-border">
+                      <div className="text-[11px] text-muted-foreground p-3 rounded-xl bg-white/80 dark:bg-slate-950/40 backdrop-blur-sm border border-slate-200/60 dark:border-slate-800/50">
                         <span className="font-bold text-foreground">Conduta sugerida:</span> {recommendation}
                       </div>
 
@@ -717,7 +717,7 @@ export function UrgencyModal({ isOpen, onClose, onApply }: UrgencyModalProps) {
                   <div className="space-y-1">
                     <Label className="text-[10px] font-black uppercase text-foreground/80">C - Confusão Mental aguda</Label>
                     <Select value={crbConfusion} onValueChange={setCrbConfusion}>
-                      <SelectTrigger className="h-9 rounded-xl">
+                      <SelectTrigger className="h-9 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent className="rounded-xl">
@@ -730,7 +730,7 @@ export function UrgencyModal({ isOpen, onClose, onApply }: UrgencyModalProps) {
                   <div className="space-y-1">
                     <Label className="text-[10px] font-black uppercase text-foreground/80">R - Frequência Respiratória (FR &gt;= 30 irpm)</Label>
                     <Select value={crbRate} onValueChange={setCrbRate}>
-                      <SelectTrigger className="h-9 rounded-xl">
+                      <SelectTrigger className="h-9 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent className="rounded-xl">
@@ -743,7 +743,7 @@ export function UrgencyModal({ isOpen, onClose, onApply }: UrgencyModalProps) {
                   <div className="space-y-1">
                     <Label className="text-[10px] font-black uppercase text-foreground/80">B - Pressão Baixa (PAS &lt; 90 ou PAD &le; 60)</Label>
                     <Select value={crbBp} onValueChange={setCrbBp}>
-                      <SelectTrigger className="h-9 rounded-xl">
+                      <SelectTrigger className="h-9 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent className="rounded-xl">
@@ -756,7 +756,7 @@ export function UrgencyModal({ isOpen, onClose, onApply }: UrgencyModalProps) {
                   <div className="space-y-1">
                     <Label className="text-[10px] font-black uppercase text-foreground/80">65 - Idade &gt;= 65 anos</Label>
                     <Select value={crbAge} onValueChange={setCrbAge}>
-                      <SelectTrigger className="h-9 rounded-xl">
+                      <SelectTrigger className="h-9 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent className="rounded-xl">
@@ -784,7 +784,7 @@ export function UrgencyModal({ isOpen, onClose, onApply }: UrgencyModalProps) {
                   }
 
                   return (
-                    <div className="mt-4 p-4 rounded-2xl bg-muted/30 border border-border space-y-3">
+                    <div className="mt-4 p-4 rounded-2xl bg-slate-50/70 dark:bg-slate-900/40 backdrop-blur-md border border-slate-200/60 dark:border-slate-800/50 space-y-3">
                       <div className="flex items-center justify-between">
                         <div>
                           <p className="text-[10px] font-black uppercase text-muted-foreground tracking-wider">Pontuação CRB-65</p>
@@ -795,7 +795,7 @@ export function UrgencyModal({ isOpen, onClose, onApply }: UrgencyModalProps) {
                         </Badge>
                       </div>
 
-                      <div className="text-[11px] text-muted-foreground p-3 rounded-xl bg-card border border-border">
+                      <div className="text-[11px] text-muted-foreground p-3 rounded-xl bg-white/80 dark:bg-slate-950/40 backdrop-blur-sm border border-slate-200/60 dark:border-slate-800/50">
                         <span className="font-bold text-foreground">Conduta sugerida:</span> {recommendation}
                       </div>
 
@@ -837,7 +837,7 @@ export function UrgencyModal({ isOpen, onClose, onApply }: UrgencyModalProps) {
                   <div className="space-y-1">
                     <Label className="text-[10px] font-black uppercase text-foreground/80">Sinais clínicos ou sintomas de TVP</Label>
                     <Select value={wellsTvp} onValueChange={setWellsTvp}>
-                      <SelectTrigger className="h-9 rounded-xl">
+                      <SelectTrigger className="h-9 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent className="rounded-xl">
@@ -850,7 +850,7 @@ export function UrgencyModal({ isOpen, onClose, onApply }: UrgencyModalProps) {
                   <div className="space-y-1">
                     <Label className="text-[10px] font-black uppercase text-foreground/80">Outro diagnóstico menos provável que TEP</Label>
                     <Select value={wellsAlternative} onValueChange={setWellsAlternative}>
-                      <SelectTrigger className="h-9 rounded-xl">
+                      <SelectTrigger className="h-9 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent className="rounded-xl">
@@ -863,7 +863,7 @@ export function UrgencyModal({ isOpen, onClose, onApply }: UrgencyModalProps) {
                   <div className="space-y-1">
                     <Label className="text-[10px] font-black uppercase text-foreground/80">Frequência Cardíaca &gt; 100 bpm</Label>
                     <Select value={wellsHr} onValueChange={setWellsHr}>
-                      <SelectTrigger className="h-9 rounded-xl">
+                      <SelectTrigger className="h-9 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent className="rounded-xl">
@@ -876,7 +876,7 @@ export function UrgencyModal({ isOpen, onClose, onApply }: UrgencyModalProps) {
                   <div className="space-y-1">
                     <Label className="text-[10px] font-black uppercase text-foreground/80">Imobilização ( &ge; 3d) ou Cirurgia ( &le; 4s)</Label>
                     <Select value={wellsImmobility} onValueChange={setWellsImmobility}>
-                      <SelectTrigger className="h-9 rounded-xl">
+                      <SelectTrigger className="h-9 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent className="rounded-xl">
@@ -889,7 +889,7 @@ export function UrgencyModal({ isOpen, onClose, onApply }: UrgencyModalProps) {
                   <div className="space-y-1">
                     <Label className="text-[10px] font-black uppercase text-foreground/80">Episódio prévio documentado de TVP ou TEP</Label>
                     <Select value={wellsPrev} onValueChange={setWellsPrev}>
-                      <SelectTrigger className="h-9 rounded-xl">
+                      <SelectTrigger className="h-9 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent className="rounded-xl">
@@ -902,7 +902,7 @@ export function UrgencyModal({ isOpen, onClose, onApply }: UrgencyModalProps) {
                   <div className="space-y-1">
                     <Label className="text-[10px] font-black uppercase text-foreground/80">Hemoptise</Label>
                     <Select value={wellsHemoptysis} onValueChange={setWellsHemoptysis}>
-                      <SelectTrigger className="h-9 rounded-xl">
+                      <SelectTrigger className="h-9 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent className="rounded-xl">
@@ -915,7 +915,7 @@ export function UrgencyModal({ isOpen, onClose, onApply }: UrgencyModalProps) {
                   <div className="space-y-1 sm:col-span-2">
                     <Label className="text-[10px] font-black uppercase text-foreground/80">Cânser / Neoplasia ativa (em tratamento ou paliativo)</Label>
                     <Select value={wellsCancer} onValueChange={setWellsCancer}>
-                      <SelectTrigger className="h-9 rounded-xl">
+                      <SelectTrigger className="h-9 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent className="rounded-xl">
@@ -947,7 +947,7 @@ export function UrgencyModal({ isOpen, onClose, onApply }: UrgencyModalProps) {
                   const twoTierClass = score > 4 ? "TEP Provável" : "TEP Improvável";
 
                   return (
-                    <div className="mt-4 p-4 rounded-2xl bg-muted/30 border border-border space-y-3">
+                    <div className="mt-4 p-4 rounded-2xl bg-slate-50/70 dark:bg-slate-900/40 backdrop-blur-md border border-slate-200/60 dark:border-slate-800/50 space-y-3">
                       <div className="flex items-center justify-between">
                         <div>
                           <p className="text-[10px] font-black uppercase text-muted-foreground tracking-wider">Escore de Wells</p>
@@ -958,7 +958,7 @@ export function UrgencyModal({ isOpen, onClose, onApply }: UrgencyModalProps) {
                         </Badge>
                       </div>
 
-                      <div className="text-[11px] text-muted-foreground p-3 rounded-xl bg-card border border-border">
+                      <div className="text-[11px] text-muted-foreground p-3 rounded-xl bg-white/80 dark:bg-slate-950/40 backdrop-blur-sm border border-slate-200/60 dark:border-slate-800/50">
                         <span className="font-bold text-foreground">Conduta sugerida:</span> {recommendation}
                       </div>
 
@@ -1000,7 +1000,7 @@ export function UrgencyModal({ isOpen, onClose, onApply }: UrgencyModalProps) {
                   <div className="space-y-1">
                     <Label className="text-[10px] font-black uppercase text-foreground/80">Migração da dor para fossa ilíaca direita (FID)</Label>
                     <Select value={alvaradoMigration} onValueChange={setAlvaradoMigration}>
-                      <SelectTrigger className="h-9 rounded-xl">
+                      <SelectTrigger className="h-9 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent className="rounded-xl">
@@ -1013,7 +1013,7 @@ export function UrgencyModal({ isOpen, onClose, onApply }: UrgencyModalProps) {
                   <div className="space-y-1">
                     <Label className="text-[10px] font-black uppercase text-foreground/80">Anorexia (Perda de apetite)</Label>
                     <Select value={alvaradoAnorexia} onValueChange={setAlvaradoAnorexia}>
-                      <SelectTrigger className="h-9 rounded-xl">
+                      <SelectTrigger className="h-9 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent className="rounded-xl">
@@ -1026,7 +1026,7 @@ export function UrgencyModal({ isOpen, onClose, onApply }: UrgencyModalProps) {
                   <div className="space-y-1">
                     <Label className="text-[10px] font-black uppercase text-foreground/80">Náuseas ou Vômitos</Label>
                     <Select value={alvaradoNausea} onValueChange={setAlvaradoNausea}>
-                      <SelectTrigger className="h-9 rounded-xl">
+                      <SelectTrigger className="h-9 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent className="rounded-xl">
@@ -1039,7 +1039,7 @@ export function UrgencyModal({ isOpen, onClose, onApply }: UrgencyModalProps) {
                   <div className="space-y-1">
                     <Label className="text-[10px] font-black uppercase text-foreground/80">Defesa / Palpação muito dolorosa em FID</Label>
                     <Select value={alvaradoTenderness} onValueChange={setAlvaradoTenderness}>
-                      <SelectTrigger className="h-9 rounded-xl">
+                      <SelectTrigger className="h-9 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent className="rounded-xl">
@@ -1052,7 +1052,7 @@ export function UrgencyModal({ isOpen, onClose, onApply }: UrgencyModalProps) {
                   <div className="space-y-1">
                     <Label className="text-[10px] font-black uppercase text-foreground/80">Descompressão dolorosa em FID (Blumberg)</Label>
                     <Select value={alvaradoRebound} onValueChange={setAlvaradoRebound}>
-                      <SelectTrigger className="h-9 rounded-xl">
+                      <SelectTrigger className="h-9 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent className="rounded-xl">
@@ -1065,7 +1065,7 @@ export function UrgencyModal({ isOpen, onClose, onApply }: UrgencyModalProps) {
                   <div className="space-y-1">
                     <Label className="text-[10px] font-black uppercase text-foreground/80">Elevação da Temperatura corporal (&ge; 37.3°C)</Label>
                     <Select value={alvaradoFever} onValueChange={setAlvaradoFever}>
-                      <SelectTrigger className="h-9 rounded-xl">
+                      <SelectTrigger className="h-9 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent className="rounded-xl">
@@ -1078,7 +1078,7 @@ export function UrgencyModal({ isOpen, onClose, onApply }: UrgencyModalProps) {
                   <div className="space-y-1">
                     <Label className="text-[10px] font-black uppercase text-foreground/80">Leucocitose (&ge; 10.000 /mm³ no Hemograma)</Label>
                     <Select value={alvaradoLeukocytosis} onValueChange={setAlvaradoLeukocytosis}>
-                      <SelectTrigger className="h-9 rounded-xl">
+                      <SelectTrigger className="h-9 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent className="rounded-xl">
@@ -1091,7 +1091,7 @@ export function UrgencyModal({ isOpen, onClose, onApply }: UrgencyModalProps) {
                   <div className="space-y-1">
                     <Label className="text-[10px] font-black uppercase text-foreground/80">Desvia à esquerda de neutrófilos (&gt; 75%)</Label>
                     <Select value={alvaradoShift} onValueChange={setAlvaradoShift}>
-                      <SelectTrigger className="h-9 rounded-xl">
+                      <SelectTrigger className="h-9 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent className="rounded-xl">
@@ -1122,7 +1122,7 @@ export function UrgencyModal({ isOpen, onClose, onApply }: UrgencyModalProps) {
                   }
 
                   return (
-                    <div className="mt-4 p-4 rounded-2xl bg-muted/30 border border-border space-y-3">
+                    <div className="mt-4 p-4 rounded-2xl bg-slate-50/70 dark:bg-slate-900/40 backdrop-blur-md border border-slate-200/60 dark:border-slate-800/50 space-y-3">
                       <div className="flex items-center justify-between">
                         <div>
                           <p className="text-[10px] font-black uppercase text-muted-foreground tracking-wider">Escore de Alvarado</p>
@@ -1133,7 +1133,7 @@ export function UrgencyModal({ isOpen, onClose, onApply }: UrgencyModalProps) {
                         </Badge>
                       </div>
 
-                      <div className="text-[11px] text-muted-foreground p-3 rounded-xl bg-card border border-border">
+                      <div className="text-[11px] text-muted-foreground p-3 rounded-xl bg-white/80 dark:bg-slate-950/40 backdrop-blur-sm border border-slate-200/60 dark:border-slate-800/50">
                         <span className="font-bold text-foreground">Conduta sugerida:</span> {recommendation}
                       </div>
 
@@ -1189,7 +1189,7 @@ export function UrgencyModal({ isOpen, onClose, onApply }: UrgencyModalProps) {
                     <div className="space-y-1">
                       <Label className="text-[10px] font-black uppercase text-foreground/80">Idade</Label>
                       <Select value={graceAge} onValueChange={setGraceAge}>
-                        <SelectTrigger className="h-9 rounded-xl"><SelectValue /></SelectTrigger>
+                        <SelectTrigger className="h-9 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium"><SelectValue /></SelectTrigger>
                         <SelectContent className="rounded-xl">
                           <SelectItem value="0">&lt; 30 anos (0)</SelectItem>
                           <SelectItem value="8">30-39 anos (8)</SelectItem>
@@ -1205,7 +1205,7 @@ export function UrgencyModal({ isOpen, onClose, onApply }: UrgencyModalProps) {
                     <div className="space-y-1">
                       <Label className="text-[10px] font-black uppercase text-foreground/80">Frequência Cardíaca</Label>
                       <Select value={graceHr} onValueChange={setGraceHr}>
-                        <SelectTrigger className="h-9 rounded-xl"><SelectValue /></SelectTrigger>
+                        <SelectTrigger className="h-9 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium"><SelectValue /></SelectTrigger>
                         <SelectContent className="rounded-xl">
                           <SelectItem value="0">&lt; 50 bpm (0)</SelectItem>
                           <SelectItem value="3">50-69 bpm (3)</SelectItem>
@@ -1220,7 +1220,7 @@ export function UrgencyModal({ isOpen, onClose, onApply }: UrgencyModalProps) {
                     <div className="space-y-1">
                       <Label className="text-[10px] font-black uppercase text-foreground/80">Pressão Sistólica</Label>
                       <Select value={graceSbp} onValueChange={setGraceSbp}>
-                        <SelectTrigger className="h-9 rounded-xl"><SelectValue /></SelectTrigger>
+                        <SelectTrigger className="h-9 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium"><SelectValue /></SelectTrigger>
                         <SelectContent className="rounded-xl">
                           <SelectItem value="58">&lt; 80 mmHg (58)</SelectItem>
                           <SelectItem value="53">80-99 mmHg (53)</SelectItem>
@@ -1235,7 +1235,7 @@ export function UrgencyModal({ isOpen, onClose, onApply }: UrgencyModalProps) {
                     <div className="space-y-1">
                       <Label className="text-[10px] font-black uppercase text-foreground/80">Creatinina (mg/dL)</Label>
                       <Select value={graceCreatinine} onValueChange={setGraceCreatinine}>
-                        <SelectTrigger className="h-9 rounded-xl"><SelectValue /></SelectTrigger>
+                        <SelectTrigger className="h-9 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium"><SelectValue /></SelectTrigger>
                         <SelectContent className="rounded-xl">
                           <SelectItem value="1">0 - 0.39 (1)</SelectItem>
                           <SelectItem value="4">0.4 - 0.79 (4)</SelectItem>
@@ -1250,7 +1250,7 @@ export function UrgencyModal({ isOpen, onClose, onApply }: UrgencyModalProps) {
                     <div className="space-y-1">
                       <Label className="text-[10px] font-black uppercase text-foreground/80">Classe Killip</Label>
                       <Select value={graceKillip} onValueChange={setGraceKillip}>
-                        <SelectTrigger className="h-9 rounded-xl"><SelectValue /></SelectTrigger>
+                        <SelectTrigger className="h-9 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium"><SelectValue /></SelectTrigger>
                         <SelectContent className="rounded-xl">
                           <SelectItem value="0">I - Sem IC (0)</SelectItem>
                           <SelectItem value="20">II - B3, estertores basais (20)</SelectItem>
@@ -1262,7 +1262,7 @@ export function UrgencyModal({ isOpen, onClose, onApply }: UrgencyModalProps) {
                     <div className="space-y-1">
                       <Label className="text-[10px] font-black uppercase text-foreground/80">Parada Cardíaca na Admissão</Label>
                       <Select value={graceCardiacArrest} onValueChange={setGraceCardiacArrest}>
-                        <SelectTrigger className="h-9 rounded-xl"><SelectValue /></SelectTrigger>
+                        <SelectTrigger className="h-9 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium"><SelectValue /></SelectTrigger>
                         <SelectContent className="rounded-xl">
                           <SelectItem value="0">Não (0)</SelectItem>
                           <SelectItem value="39">Sim (39)</SelectItem>
@@ -1272,7 +1272,7 @@ export function UrgencyModal({ isOpen, onClose, onApply }: UrgencyModalProps) {
                     <div className="space-y-1">
                       <Label className="text-[10px] font-black uppercase text-foreground/80">Desvio de ST no ECG</Label>
                       <Select value={graceStDeviation} onValueChange={setGraceStDeviation}>
-                        <SelectTrigger className="h-9 rounded-xl"><SelectValue /></SelectTrigger>
+                        <SelectTrigger className="h-9 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium"><SelectValue /></SelectTrigger>
                         <SelectContent className="rounded-xl">
                           <SelectItem value="0">Não (0)</SelectItem>
                           <SelectItem value="28">Sim (28)</SelectItem>
@@ -1282,7 +1282,7 @@ export function UrgencyModal({ isOpen, onClose, onApply }: UrgencyModalProps) {
                     <div className="space-y-1">
                       <Label className="text-[10px] font-black uppercase text-foreground/80">Marcadores de Necrose Elevados</Label>
                       <Select value={graceEnzymes} onValueChange={setGraceEnzymes}>
-                        <SelectTrigger className="h-9 rounded-xl"><SelectValue /></SelectTrigger>
+                        <SelectTrigger className="h-9 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium"><SelectValue /></SelectTrigger>
                         <SelectContent className="rounded-xl">
                           <SelectItem value="0">Não (0)</SelectItem>
                           <SelectItem value="14">Sim (14)</SelectItem>
@@ -1290,7 +1290,7 @@ export function UrgencyModal({ isOpen, onClose, onApply }: UrgencyModalProps) {
                       </Select>
                     </div>
                   </div>
-                  <div className="p-3 rounded-2xl bg-muted/30 border border-border space-y-2">
+                  <div className="p-3 rounded-2xl bg-slate-50/70 dark:bg-slate-900/40 backdrop-blur-md border border-slate-200/60 dark:border-slate-800/50 space-y-2">
                     <div className="flex items-center justify-between">
                       <div>
                         <p className="text-[10px] font-black uppercase text-muted-foreground tracking-wider">Escore GRACE</p>
@@ -1352,7 +1352,7 @@ export function UrgencyModal({ isOpen, onClose, onApply }: UrgencyModalProps) {
                     <div className="space-y-1">
                       <Label className="text-[10px] font-black uppercase text-foreground/80">Idade</Label>
                       <Select value={ransonAge} onValueChange={setRansonAge}>
-                        <SelectTrigger className="h-9 rounded-xl"><SelectValue /></SelectTrigger>
+                        <SelectTrigger className="h-9 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium"><SelectValue /></SelectTrigger>
                         <SelectContent className="rounded-xl">
                           <SelectItem value="0">&lt; 55 anos</SelectItem>
                           <SelectItem value="1">&ge; 55 anos (+1)</SelectItem>
@@ -1362,7 +1362,7 @@ export function UrgencyModal({ isOpen, onClose, onApply }: UrgencyModalProps) {
                     <div className="space-y-1">
                       <Label className="text-[10px] font-black uppercase text-foreground/80">Leucócitos</Label>
                       <Select value={ransonWbc} onValueChange={setRansonWbc}>
-                        <SelectTrigger className="h-9 rounded-xl"><SelectValue /></SelectTrigger>
+                        <SelectTrigger className="h-9 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium"><SelectValue /></SelectTrigger>
                         <SelectContent className="rounded-xl">
                           <SelectItem value="0">&lt; 16.000 /mm³</SelectItem>
                           <SelectItem value="1">&ge; 16.000 /mm³ (+1)</SelectItem>
@@ -1372,7 +1372,7 @@ export function UrgencyModal({ isOpen, onClose, onApply }: UrgencyModalProps) {
                     <div className="space-y-1">
                       <Label className="text-[10px] font-black uppercase text-foreground/80">Glicemia</Label>
                       <Select value={ransonGlucose} onValueChange={setRansonGlucose}>
-                        <SelectTrigger className="h-9 rounded-xl"><SelectValue /></SelectTrigger>
+                        <SelectTrigger className="h-9 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium"><SelectValue /></SelectTrigger>
                         <SelectContent className="rounded-xl">
                           <SelectItem value="0">&lt; 200 mg/dL</SelectItem>
                           <SelectItem value="1">&ge; 200 mg/dL (+1)</SelectItem>
@@ -1382,7 +1382,7 @@ export function UrgencyModal({ isOpen, onClose, onApply }: UrgencyModalProps) {
                     <div className="space-y-1">
                       <Label className="text-[10px] font-black uppercase text-foreground/80">LDH</Label>
                       <Select value={ransonLdh} onValueChange={setRansonLdh}>
-                        <SelectTrigger className="h-9 rounded-xl"><SelectValue /></SelectTrigger>
+                        <SelectTrigger className="h-9 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium"><SelectValue /></SelectTrigger>
                         <SelectContent className="rounded-xl">
                           <SelectItem value="0">&lt; 350 UI/L</SelectItem>
                           <SelectItem value="1">&ge; 350 UI/L (+1)</SelectItem>
@@ -1392,7 +1392,7 @@ export function UrgencyModal({ isOpen, onClose, onApply }: UrgencyModalProps) {
                     <div className="space-y-1">
                       <Label className="text-[10px] font-black uppercase text-foreground/80">AST / TGO</Label>
                       <Select value={ransonAst} onValueChange={setRansonAst}>
-                        <SelectTrigger className="h-9 rounded-xl"><SelectValue /></SelectTrigger>
+                        <SelectTrigger className="h-9 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium"><SelectValue /></SelectTrigger>
                         <SelectContent className="rounded-xl">
                           <SelectItem value="0">&lt; 250 UI/L</SelectItem>
                           <SelectItem value="1">&ge; 250 UI/L (+1)</SelectItem>
@@ -1400,7 +1400,7 @@ export function UrgencyModal({ isOpen, onClose, onApply }: UrgencyModalProps) {
                       </Select>
                     </div>
                   </div>
-                  <div className="p-3 rounded-2xl bg-muted/30 border border-border space-y-2 mt-4">
+                  <div className="p-3 rounded-2xl bg-slate-50/70 dark:bg-slate-900/40 backdrop-blur-md border border-slate-200/60 dark:border-slate-800/50 space-y-2 mt-4">
                     <div className="flex items-center justify-between">
                       <div>
                         <p className="text-[10px] font-black uppercase text-muted-foreground tracking-wider">Escore de Ranson</p>

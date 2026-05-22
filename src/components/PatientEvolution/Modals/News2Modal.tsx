@@ -70,7 +70,7 @@ export function News2Modal({ isOpen, onClose, onApply }: News2ModalProps) {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[750px] rounded-2xl border border-slate-200/40 dark:border-slate-800/40 bg-white dark:bg-slate-950 shadow-2xl max-h-[95vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-[750px] rounded-2xl border border-slate-200/50 dark:border-slate-800/50 bg-white/80 dark:bg-slate-950/80 backdrop-blur-xl shadow-2xl max-h-[95vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-2xl mission-control-title flex items-center gap-2">
             <Activity className="h-6 w-6 text-emerald-500" />
@@ -103,7 +103,7 @@ export function News2Modal({ isOpen, onClose, onApply }: News2ModalProps) {
           <div className="space-y-1">
             <Label className="text-xs font-black uppercase text-foreground/80">1. Frequência Respiratória (irpm)</Label>
             <Select value={news2Fr} onValueChange={setNews2Fr}>
-              <SelectTrigger className="h-10 rounded-xl">
+              <SelectTrigger className="h-10 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
                 <SelectValue placeholder="Selecione a faixa de FR..." />
               </SelectTrigger>
               <SelectContent className="rounded-xl">
@@ -120,7 +120,7 @@ export function News2Modal({ isOpen, onClose, onApply }: News2ModalProps) {
           <div className="space-y-1">
             <Label className="text-xs font-black uppercase text-foreground/80">2. Saturação de Oxigênio (SpO2 %)</Label>
             <Select value={news2Spo2} onValueChange={setNews2Spo2}>
-              <SelectTrigger className="h-10 rounded-xl">
+              <SelectTrigger className="h-10 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
                 <SelectValue placeholder={`Selecione SpO2 (Escala ${news2Scale})...`} />
               </SelectTrigger>
               <SelectContent className="rounded-xl">
@@ -150,7 +150,7 @@ export function News2Modal({ isOpen, onClose, onApply }: News2ModalProps) {
           <div className="space-y-1">
             <Label className="text-xs font-black uppercase text-foreground/80">3. Uso de Oxigênio Suplementar</Label>
             <Select value={news2O2} onValueChange={setNews2O2}>
-              <SelectTrigger className="h-10 rounded-xl">
+              <SelectTrigger className="h-10 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
                 <SelectValue placeholder="Selecione o uso de O2..." />
               </SelectTrigger>
               <SelectContent className="rounded-xl">
@@ -164,7 +164,7 @@ export function News2Modal({ isOpen, onClose, onApply }: News2ModalProps) {
           <div className="space-y-1">
             <Label className="text-xs font-black uppercase text-foreground/80">4. Pressão Arterial Sistólica (mmHg)</Label>
             <Select value={news2Pas} onValueChange={setNews2Pas}>
-              <SelectTrigger className="h-10 rounded-xl">
+              <SelectTrigger className="h-10 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
                 <SelectValue placeholder="Selecione a faixa de PAS..." />
               </SelectTrigger>
               <SelectContent className="rounded-xl">
@@ -181,7 +181,7 @@ export function News2Modal({ isOpen, onClose, onApply }: News2ModalProps) {
           <div className="space-y-1">
             <Label className="text-xs font-black uppercase text-foreground/80">5. Frequência Cardíaca (bpm)</Label>
             <Select value={news2Fc} onValueChange={setNews2Fc}>
-              <SelectTrigger className="h-10 rounded-xl">
+              <SelectTrigger className="h-10 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
                 <SelectValue placeholder="Selecione a faixa de FC..." />
               </SelectTrigger>
               <SelectContent className="rounded-xl">
@@ -199,7 +199,7 @@ export function News2Modal({ isOpen, onClose, onApply }: News2ModalProps) {
           <div className="space-y-1">
             <Label className="text-xs font-black uppercase text-foreground/80">6. Nível de Consciência (ACVPU)</Label>
             <Select value={news2Acvpu} onValueChange={setNews2Acvpu}>
-              <SelectTrigger className="h-10 rounded-xl">
+              <SelectTrigger className="h-10 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
                 <SelectValue placeholder="Selecione o nível de consciência..." />
               </SelectTrigger>
               <SelectContent className="rounded-xl">
@@ -216,7 +216,7 @@ export function News2Modal({ isOpen, onClose, onApply }: News2ModalProps) {
           <div className="space-y-1">
             <Label className="text-xs font-black uppercase text-foreground/80">7. Temperatura Corporal (°C)</Label>
             <Select value={news2Temp} onValueChange={setNews2Temp}>
-              <SelectTrigger className="h-10 rounded-xl">
+              <SelectTrigger className="h-10 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
                 <SelectValue placeholder="Selecione a faixa de temperatura..." />
               </SelectTrigger>
               <SelectContent className="rounded-xl">

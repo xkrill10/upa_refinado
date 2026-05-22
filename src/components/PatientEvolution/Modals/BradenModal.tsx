@@ -76,7 +76,7 @@ export function BradenModal({ isOpen, onClose, onApply }: BradenModalProps) {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[550px] rounded-2xl border border-slate-200/40 dark:border-slate-800/40 bg-white dark:bg-slate-950 shadow-2xl max-h-[85vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-[550px] rounded-2xl border border-slate-200/50 dark:border-slate-800/50 bg-white/80 dark:bg-slate-950/80 backdrop-blur-xl shadow-2xl max-h-[85vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-2xl mission-control-title flex items-center gap-2">
             <Activity className="h-6 w-6 text-orange-500" />
@@ -92,7 +92,7 @@ export function BradenModal({ isOpen, onClose, onApply }: BradenModalProps) {
           <div className="space-y-1">
             <Label className="text-xs font-black uppercase text-foreground/80">1. Percepção Sensorial</Label>
             <Select value={bradenSensory} onValueChange={setBradenSensory}>
-              <SelectTrigger className="h-10 rounded-xl">
+              <SelectTrigger className="h-10 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
                 <SelectValue placeholder="Selecione o nível de percepção..." />
               </SelectTrigger>
               <SelectContent className="rounded-xl">
@@ -108,7 +108,7 @@ export function BradenModal({ isOpen, onClose, onApply }: BradenModalProps) {
           <div className="space-y-1">
             <Label className="text-xs font-black uppercase text-foreground/80">2. Umidade da Pele</Label>
             <Select value={bradenMoisture} onValueChange={setBradenMoisture}>
-              <SelectTrigger className="h-10 rounded-xl">
+              <SelectTrigger className="h-10 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
                 <SelectValue placeholder="Selecione o nível de umidade..." />
               </SelectTrigger>
               <SelectContent className="rounded-xl">
@@ -124,7 +124,7 @@ export function BradenModal({ isOpen, onClose, onApply }: BradenModalProps) {
           <div className="space-y-1">
             <Label className="text-xs font-black uppercase text-foreground/80">3. Atividade Física</Label>
             <Select value={bradenActivity} onValueChange={setBradenActivity}>
-              <SelectTrigger className="h-10 rounded-xl">
+              <SelectTrigger className="h-10 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
                 <SelectValue placeholder="Selecione a atividade física..." />
               </SelectTrigger>
               <SelectContent className="rounded-xl">
@@ -140,7 +140,7 @@ export function BradenModal({ isOpen, onClose, onApply }: BradenModalProps) {
           <div className="space-y-1">
             <Label className="text-xs font-black uppercase text-foreground/80">4. Mobilidade (Capacidade de mudar posição)</Label>
             <Select value={bradenMobility} onValueChange={setBradenMobility}>
-              <SelectTrigger className="h-10 rounded-xl">
+              <SelectTrigger className="h-10 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
                 <SelectValue placeholder="Selecione o nível de mobilidade..." />
               </SelectTrigger>
               <SelectContent className="rounded-xl">
@@ -156,7 +156,7 @@ export function BradenModal({ isOpen, onClose, onApply }: BradenModalProps) {
           <div className="space-y-1">
             <Label className="text-xs font-black uppercase text-foreground/80">5. Padrão de Nutrição</Label>
             <Select value={bradenNutrition} onValueChange={setBradenNutrition}>
-              <SelectTrigger className="h-10 rounded-xl">
+              <SelectTrigger className="h-10 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
                 <SelectValue placeholder="Selecione o padrão nutricional..." />
               </SelectTrigger>
               <SelectContent className="rounded-xl">
@@ -172,7 +172,7 @@ export function BradenModal({ isOpen, onClose, onApply }: BradenModalProps) {
           <div className="space-y-1">
             <Label className="text-xs font-black uppercase text-foreground/80">6. Fricção e Cisalhamento</Label>
             <Select value={bradenFriction} onValueChange={setBradenFriction}>
-              <SelectTrigger className="h-10 rounded-xl">
+              <SelectTrigger className="h-10 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
                 <SelectValue placeholder="Selecione fricção/cisalhamento..." />
               </SelectTrigger>
               <SelectContent className="rounded-xl">
@@ -184,7 +184,7 @@ export function BradenModal({ isOpen, onClose, onApply }: BradenModalProps) {
           </div>
 
           {/* Resultado e Ação */}
-          <div className="mt-6 p-4 rounded-2xl bg-muted/30 border border-border space-y-3">
+          <div className="mt-6 p-4 rounded-2xl bg-slate-50/70 dark:bg-slate-900/40 backdrop-blur-md border border-slate-200/60 dark:border-slate-800/50 space-y-3">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-[10px] font-black uppercase text-muted-foreground tracking-wider">Pontuação Calculada</p>
