@@ -279,13 +279,17 @@ export default function Arrival() {
                             key={key}
                             onClick={() => setPriority(key)}
                             className={cn(
-                              "p-5 rounded-xl border transition-all duration-500 flex flex-col gap-3 text-left group cursor-pointer relative overflow-hidden backdrop-blur-md",
-                              !active && "border-white/40 dark:border-slate-800/40 bg-white/30 dark:bg-slate-900/30 hover:border-white/80 hover:bg-white/50 dark:hover:bg-slate-800/50 hover:shadow-lg text-muted-foreground",
-                              active && "glass-card-premium scale-[1.02] text-foreground",
-                              active && key === 'normal' && "border-blue-400/80 shadow-[0_0_30px_rgba(59,130,246,0.35),inset_0_1px_2px_rgba(255,255,255,0.95)] dark:border-blue-500/50 dark:shadow-[0_0_35px_rgba(59,130,246,0.45),inset_0_1px_1px_rgba(255,255,255,0.12)] bg-gradient-to-br from-blue-200/90 to-blue-50/50 dark:from-blue-900/60 dark:to-slate-900/80",
-                              active && key === 'preferential' && "border-amber-400/80 shadow-[0_0_30px_rgba(245,158,11,0.35),inset_0_1px_2px_rgba(255,255,255,0.95)] dark:border-amber-500/50 dark:shadow-[0_0_35px_rgba(245,158,11,0.45),inset_0_1px_1px_rgba(255,255,255,0.12)] bg-gradient-to-br from-amber-200/90 to-amber-50/50 dark:from-amber-900/60 dark:to-slate-900/80",
-                              active && key === 'pediatric' && "border-orange-400/80 shadow-[0_0_30px_rgba(249,115,22,0.35),inset_0_1px_2px_rgba(255,255,255,0.95)] dark:border-orange-500/50 dark:shadow-[0_0_35px_rgba(249,115,22,0.45),inset_0_1px_1px_rgba(255,255,255,0.12)] bg-gradient-to-br from-orange-200/90 to-orange-50/50 dark:from-orange-900/60 dark:to-slate-900/80",
-                              active && key === 'emergency' && "border-red-400/80 shadow-[0_0_30px_rgba(239,68,68,0.35),inset_0_1px_2px_rgba(255,255,255,0.95)] dark:border-red-500/50 dark:shadow-[0_0_35px_rgba(239,68,68,0.45),inset_0_1px_1px_rgba(255,255,255,0.12)] bg-gradient-to-br from-red-200/90 to-red-50/50 dark:from-red-900/60 dark:to-slate-900/80"
+                              "p-5 rounded-xl border-2 transition-all duration-500 flex flex-col gap-3 text-left group cursor-pointer relative overflow-hidden backdrop-blur-md",
+                              !active && "border-transparent bg-white/40 dark:bg-slate-900/40 hover:bg-white/70 dark:hover:bg-slate-800/70 text-muted-foreground shadow-sm",
+                              !active && key === 'normal' && "hover:border-blue-400 hover:shadow-[0_8px_20px_rgba(59,130,246,0.15)]",
+                              !active && key === 'preferential' && "hover:border-amber-400 hover:shadow-[0_8px_20px_rgba(245,158,11,0.15)]",
+                              !active && key === 'pediatric' && "hover:border-orange-400 hover:shadow-[0_8px_20px_rgba(249,115,22,0.15)]",
+                              !active && key === 'emergency' && "hover:border-red-400 hover:shadow-[0_8px_20px_rgba(239,68,68,0.15)]",
+                              active && "scale-[1.02] text-foreground font-medium",
+                              active && key === 'normal' && "border-blue-500 shadow-[0_10px_30px_rgba(59,130,246,0.3)] bg-blue-50/80 dark:bg-blue-900/30",
+                              active && key === 'preferential' && "border-amber-500 shadow-[0_10px_30px_rgba(245,158,11,0.3)] bg-amber-50/80 dark:bg-amber-900/30",
+                              active && key === 'pediatric' && "border-orange-500 shadow-[0_10px_30px_rgba(249,115,22,0.3)] bg-orange-50/80 dark:bg-orange-900/30",
+                              active && key === 'emergency' && "border-red-500 shadow-[0_10px_30px_rgba(239,68,68,0.3)] bg-red-50/80 dark:bg-red-900/30"
                             )}
                           >
                             <div className={cn("absolute top-0 right-0 p-12 transform translate-x-12 -translate-y-12 rounded-full blur-3xl group-hover:scale-150 transition-transform duration-700 pointer-events-none",
