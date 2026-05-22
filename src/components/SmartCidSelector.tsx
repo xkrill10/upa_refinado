@@ -1,5 +1,20 @@
 import React, { useState, useMemo } from "react";
-import { Search, ChevronDown, Activity, X } from "lucide-react";
+import { 
+  Search, 
+  ChevronDown, 
+  ChevronRight,
+  Activity, 
+  X,
+  Heart,
+  Wind,
+  Brain,
+  ClipboardList,
+  Thermometer,
+  ShieldAlert,
+  Bone,
+  Pill,
+  Stethoscope
+} from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { CID10_DATABASE, CID10Item } from "@/data/cid10";
@@ -10,27 +25,109 @@ interface SmartCidSelectorProps {
   onSelectCid: (cid: CID10Item | null) => void;
 }
 
-// Function to return medical emojis and description subtitles for CID-10 categories
-function getCategoryMeta(category: string) {
+interface CategoryMeta {
+  icon: React.ComponentType<any>;
+  description: string;
+  color: string;
+  bgGradient: string;
+  borderClass: string;
+  glowClass: string;
+  iconColor: string;
+}
+
+// Dynamic medical visual metadata mapping using Lucide React icons styled inside premium glassy containers
+function getCategoryMeta(category: string): CategoryMeta {
   switch (category) {
     case "Cardiovascular":
-      return { emoji: "🫀", description: "Doenças cardíacas, hipertensão e vasos" };
+      return { 
+        icon: Heart, 
+        description: "Doenças cardíacas, hipertensão e vasos",
+        color: "#ef4444",
+        bgGradient: "from-red-500/20 to-rose-500/5 dark:from-red-500/25 dark:to-rose-500/10",
+        borderClass: "border-red-500/30 dark:border-red-500/20",
+        glowClass: "shadow-[0_0_15px_rgba(239,68,68,0.15)]",
+        iconColor: "text-red-500 dark:text-red-400"
+      };
     case "Gastrointestinal":
-      return { emoji: "🍏", description: "Estômago, fígado, vesícula e intestinos" };
+      return { 
+        icon: Pill, 
+        description: "Estômago, fígado, vesícula e intestinos",
+        color: "#10b981",
+        bgGradient: "from-emerald-500/20 to-teal-500/5 dark:from-emerald-500/25 dark:to-teal-500/10",
+        borderClass: "border-emerald-500/30 dark:border-emerald-500/20",
+        glowClass: "shadow-[0_0_15px_rgba(16,185,129,0.15)]",
+        iconColor: "text-emerald-500 dark:text-emerald-400"
+      };
     case "Geral/Outros":
-      return { emoji: "📋", description: "Virose, exames, check-ups e profilaxia" };
+      return { 
+        icon: Stethoscope, 
+        description: "Virose, exames, check-ups e profilaxia",
+        color: "#3b82f6",
+        bgGradient: "from-blue-500/20 to-indigo-500/5 dark:from-blue-500/25 dark:to-indigo-500/10",
+        borderClass: "border-blue-500/30 dark:border-blue-500/20",
+        glowClass: "shadow-[0_0_15px_rgba(59,130,246,0.15)]",
+        iconColor: "text-blue-500 dark:text-blue-400"
+      };
     case "Psiquiatria/Geral":
-      return { emoji: "🧠", description: "Saúde mental, ansiedade, depressão e sono" };
+      return { 
+        icon: Brain, 
+        description: "Saúde mental, ansiedade, depressão e sono",
+        color: "#a855f7",
+        bgGradient: "from-purple-500/20 to-fuchsia-500/5 dark:from-purple-500/25 dark:to-fuchsia-500/10",
+        borderClass: "border-purple-500/30 dark:border-purple-500/20",
+        glowClass: "shadow-[0_0_15px_rgba(168,85,247,0.15)]",
+        iconColor: "text-purple-500 dark:text-purple-400"
+      };
     case "Respiratório":
-      return { emoji: "🫁", description: "Gripe, asma, pneumonia e vias aéreas" };
+      return { 
+        icon: Wind, 
+        description: "Gripe, asma, pneumonia e vias aéreas",
+        color: "#06b6d4",
+        bgGradient: "from-cyan-500/20 to-sky-500/5 dark:from-cyan-500/25 dark:to-sky-500/10",
+        borderClass: "border-cyan-500/30 dark:border-cyan-500/20",
+        glowClass: "shadow-[0_0_15px_rgba(6,182,212,0.15)]",
+        iconColor: "text-cyan-500 dark:text-cyan-400"
+      };
     case "Sintomas Gerais":
-      return { emoji: "🤒", description: "Febre, dores, tontura, náusea e mal-estar" };
+      return { 
+        icon: Thermometer, 
+        description: "Febre, dores, tontura, náusea e mal-estar",
+        color: "#f59e0b",
+        bgGradient: "from-amber-500/20 to-orange-500/5 dark:from-amber-500/25 dark:to-orange-500/10",
+        borderClass: "border-amber-500/30 dark:border-amber-500/20",
+        glowClass: "shadow-[0_0_15px_rgba(245,158,11,0.15)]",
+        iconColor: "text-amber-500 dark:text-amber-400"
+      };
     case "Trauma / Causas Externas":
-      return { emoji: "🩹", description: "Acidentes, queimaduras e lesões" };
+      return { 
+        icon: ShieldAlert, 
+        description: "Acidentes, queimaduras e lesões",
+        color: "#ef4444",
+        bgGradient: "from-red-500/20 to-orange-500/5 dark:from-red-500/25 dark:to-orange-500/10",
+        borderClass: "border-red-500/30 dark:border-red-500/20",
+        glowClass: "shadow-[0_0_15px_rgba(239,68,68,0.15)]",
+        iconColor: "text-red-500 dark:text-red-400"
+      };
     case "Trauma / Externas":
-      return { emoji: "🦴", description: "Fraturas, entorses, mialgias e traumas" };
+      return { 
+        icon: Bone, 
+        description: "Fraturas, entorses, mialgias e traumas",
+        color: "#64748b",
+        bgGradient: "from-slate-500/20 to-zinc-500/5 dark:from-slate-500/25 dark:to-zinc-500/10",
+        borderClass: "border-slate-500/30 dark:border-slate-500/20",
+        glowClass: "shadow-[0_0_15px_rgba(100,116,139,0.15)]",
+        iconColor: "text-slate-500 dark:text-slate-400"
+      };
     default:
-      return { emoji: "🩺", description: "Consultas e diagnósticos gerais" };
+      return { 
+        icon: ClipboardList, 
+        description: "Consultas e diagnósticos gerais",
+        color: "#0ea5e9",
+        bgGradient: "from-sky-500/20 to-blue-500/5 dark:from-sky-500/25 dark:to-blue-500/10",
+        borderClass: "border-sky-500/30 dark:border-sky-500/20",
+        glowClass: "shadow-[0_0_15px_rgba(14,165,233,0.15)]",
+        iconColor: "text-sky-500 dark:text-sky-400"
+      };
   }
 }
 
@@ -71,75 +168,92 @@ export function SmartCidSelector({ selectedCid, onSelectCid }: SmartCidSelectorP
       <DialogTrigger asChild>
         <button
           type="button"
-          className="w-full h-12 px-4 rounded-xl border border-border bg-background/40 dark:bg-background/20 backdrop-blur-md text-left flex items-center justify-between hover:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all shadow-sm"
+          className="w-full h-13 px-4.5 rounded-2xl border border-white/50 dark:border-white/10 bg-white/45 dark:bg-slate-900/45 backdrop-blur-md text-left flex items-center justify-between hover:border-primary/40 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all shadow-sm hover:scale-[1.005] group"
         >
           {selectedCid ? (
-            <div className="flex items-center gap-2 truncate">
-              <span className="font-bold text-primary">{selectedCid.code}</span>
-              <span className="text-foreground truncate">{selectedCid.name}</span>
+            <div className="flex items-center gap-2.5 truncate">
+              <span className="font-extrabold text-xs uppercase tracking-wider px-2.5 py-1 rounded-lg bg-primary/10 text-primary border border-primary/20 shadow-sm shrink-0">
+                {selectedCid.code}
+              </span>
+              <span className="text-sm font-semibold text-foreground truncate">{selectedCid.name}</span>
             </div>
           ) : (
-            <span className="text-muted-foreground text-sm">
-              Buscar e selecionar CID-10...
-            </span>
+            <div className="flex items-center gap-2.5 text-muted-foreground">
+              <Search className="w-4.5 h-4.5 text-muted-foreground/50 group-hover:text-primary transition-colors duration-300" />
+              <span className="text-sm font-medium">Buscar e selecionar CID-10...</span>
+            </div>
           )}
           {selectedCid ? (
             <div 
               role="button"
-              className="p-1 hover:bg-muted rounded-md z-10"
+              className="p-1.5 hover:bg-red-500/10 dark:hover:bg-red-500/20 text-muted-foreground hover:text-red-500 rounded-lg z-10 transition-colors"
               onClick={(e) => {
                 e.stopPropagation();
                 onSelectCid(null);
               }}
             >
-              <X className="w-4 h-4 text-muted-foreground" />
+              <X className="w-4 h-4" />
             </div>
           ) : (
-            <ChevronDown className="w-4 h-4 text-muted-foreground/50" />
+            <ChevronDown className="w-4 h-4 text-muted-foreground/30 group-hover:text-muted-foreground transition-colors duration-300" />
           )}
         </button>
       </DialogTrigger>
       
       <DialogContent className="sm:max-w-[850px] p-0 overflow-hidden flex flex-col h-[85vh] sm:h-[600px] rounded-2xl glass-card-premium border border-white/40 dark:border-white/10 bg-transparent shadow-[0_30px_60px_-15px_rgba(0,0,0,0.3)] backdrop-blur-2xl">
-        <DialogHeader className="p-4 border-b border-white/20 dark:border-white/5 bg-white/30 dark:bg-slate-900/30 backdrop-blur-md">
+        <DialogHeader className="p-5 border-b border-white/20 dark:border-white/5 bg-white/30 dark:bg-slate-900/30 backdrop-blur-md">
           <DialogTitle className="text-lg font-black uppercase tracking-wider flex items-center gap-2 text-foreground">
-            <Activity className="w-5 h-5 text-primary" />
+            <Activity className="w-5.5 h-5.5 text-primary animate-pulse" />
             Diagnóstico / CID-10
           </DialogTitle>
-          <div className="relative mt-2">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <div className="relative mt-3">
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-muted-foreground/60" />
             <input
               type="text"
               placeholder="Digite o código ou nome da doença (ex: Hipertensão, I10)..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full h-10 pl-9 pr-4 rounded-lg bg-white/30 dark:bg-slate-900/30 border border-white/30 dark:border-slate-800/50 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all text-sm text-foreground placeholder-muted-foreground"
+              className="w-full h-11 pl-10 pr-4 rounded-xl bg-white/40 dark:bg-slate-900/40 border border-white/40 dark:border-slate-800/60 focus:border-primary/50 focus:outline-none focus:ring-4 focus:ring-primary/10 transition-all text-sm text-foreground placeholder-muted-foreground/75"
             />
           </div>
         </DialogHeader>
 
-        <div className="flex-1 overflow-hidden flex flex-row">
+        <div className="flex-1 overflow-hidden flex flex-row bg-white/5 dark:bg-slate-950/5">
           {search.trim() ? (
             <div className="flex-1 overflow-hidden bg-white/10 dark:bg-slate-950/10 backdrop-blur-sm">
               <ScrollArea className="h-full">
-                <div className="p-3 space-y-1 pb-6">
+                <div className="p-3.5 space-y-1.5 pb-8">
                   {filteredItems.length > 0 ? (
                     filteredItems.map(item => (
                       <button
                         key={item.code}
                         onClick={() => handleSelect(item)}
-                        className="w-full text-left px-4 py-3 rounded-xl hover:bg-white/40 dark:hover:bg-slate-800/40 transition-colors flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3 border border-transparent hover:border-white/30 dark:hover:border-slate-800/40 text-foreground"
+                        className="w-full text-left px-5 py-4 rounded-2xl transition-all duration-300 hover:scale-[1.01] active:scale-[0.99] flex items-center justify-between border border-transparent hover:border-white/35 dark:hover:border-slate-800/40 hover:bg-white/45 dark:hover:bg-slate-900/45 text-foreground hover:shadow-[0_10px_20px_-8px_rgba(0,0,0,0.04)] group"
                       >
-                        <span className="font-bold text-primary w-14 shrink-0">{item.code}</span>
-                        <span className="text-sm font-medium">{item.name}</span>
-                        <span className="text-[10px] uppercase text-muted-foreground font-bold tracking-wider sm:ml-auto shrink-0 bg-muted px-2 py-0.5 rounded-full">
-                          {item.category}
-                        </span>
+                        <div className="flex items-center gap-4 min-w-0">
+                          <span className="font-bold text-xs uppercase tracking-wider px-3 py-1.5 rounded-lg bg-primary/10 text-primary border border-primary/20 group-hover:bg-primary group-hover:text-primary-foreground group-hover:border-transparent transition-all duration-300 shadow-sm shrink-0">
+                            {item.code}
+                          </span>
+                          <span className="text-sm font-semibold truncate group-hover:text-primary transition-colors duration-300">
+                            {item.name}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-3 shrink-0">
+                          <span className="text-[9px] uppercase font-black tracking-widest text-muted-foreground bg-white/40 dark:bg-slate-800/40 px-2.5 py-1 rounded-full border border-border/40">
+                            {item.category}
+                          </span>
+                          <div className="w-6 h-6 rounded-full flex items-center justify-center bg-muted/40 opacity-0 group-hover:opacity-100 group-hover:bg-primary/10 group-hover:text-primary transition-all duration-300 translate-x-2 group-hover:translate-x-0">
+                            <ChevronRight className="w-3.5 h-3.5" />
+                          </div>
+                        </div>
                       </button>
                     ))
                   ) : (
-                    <div className="text-center py-10 text-muted-foreground">
-                      <p className="text-sm">Nenhum resultado encontrado para "{search}".</p>
+                    <div className="text-center py-16 text-muted-foreground flex flex-col items-center justify-center gap-3">
+                      <div className="w-12 h-12 rounded-full bg-muted/30 flex items-center justify-center border border-dashed border-muted-foreground/30">
+                        <Search className="w-5 h-5 text-muted-foreground/50" />
+                      </div>
+                      <p className="text-sm font-medium">Nenhum resultado encontrado para "{search}".</p>
                     </div>
                   )}
                 </div>
@@ -147,12 +261,12 @@ export function SmartCidSelector({ selectedCid, onSelectCid }: SmartCidSelectorP
             </div>
           ) : (
             <>
-              {/* Coluna Esquerda: Menu Lateral de Categorias */}
-              <div className="w-[320px] shrink-0 border-r border-white/20 dark:border-white/5 flex flex-col bg-white/20 dark:bg-slate-950/20 backdrop-blur-md">
+              {/* Left Column: Category Sidebar with Premium Interactive Glassmorphic Icon Buttons */}
+              <div className="w-[325px] shrink-0 border-r border-white/20 dark:border-white/5 flex flex-col bg-white/20 dark:bg-slate-950/20 backdrop-blur-md">
                 <ScrollArea className="flex-1">
-                  <div className="flex flex-col gap-2 p-3 w-full">
+                  <div className="flex flex-col gap-2.5 p-4 w-full">
                     {categories.map(cat => {
-                      const { emoji, description } = getCategoryMeta(cat);
+                      const { icon: CategoryIcon, description, color, bgGradient, borderClass, glowClass, iconColor } = getCategoryMeta(cat);
                       const isActive = activeTab === cat;
                       return (
                         <button
@@ -160,21 +274,42 @@ export function SmartCidSelector({ selectedCid, onSelectCid }: SmartCidSelectorP
                           key={cat}
                           onClick={() => setActiveTab(cat)}
                           className={cn(
-                            "w-full p-3 rounded-xl border text-left flex items-center gap-3.5 transition-all duration-300 hover:scale-[1.01] hover:bg-white/40 dark:hover:bg-slate-800/40",
+                            "w-full p-3.5 rounded-2xl border text-left flex items-center gap-4 transition-all duration-500 hover:scale-[1.02] active:scale-[0.98] group relative overflow-hidden",
                             isActive
-                              ? "bg-primary/10 dark:bg-primary/20 border-primary text-primary shadow-[0_0_15px_rgba(59,130,246,0.15)]"
-                              : "bg-white/40 dark:bg-slate-900/40 border-white/40 dark:border-slate-800/40 text-foreground/80 hover:border-primary/30"
+                              ? "bg-white/60 dark:bg-slate-900/60 border-primary/40 text-primary shadow-[0_15px_30px_-10px_rgba(59,130,246,0.15)] dark:shadow-[0_15px_35px_-10px_rgba(0,0,0,0.4)] z-10"
+                              : "bg-white/20 dark:bg-slate-900/20 border-white/25 dark:border-slate-800/15 text-foreground/80 hover:border-primary/25 hover:bg-white/40 dark:hover:bg-slate-900/40"
                           )}
                         >
+                          {/* Active Indicating Glowing Line */}
+                          {isActive && (
+                            <span 
+                              className="absolute left-0 top-3.5 bottom-3.5 w-1 rounded-r-full shadow-lg"
+                              style={{ 
+                                backgroundColor: color,
+                                boxShadow: `0 0 10px ${color}`
+                              }}
+                            />
+                          )}
+
+                          {/* Glossy / 3D Specular Glass Icon Container */}
                           <div className={cn(
-                            "w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 text-xl transition-all shadow-sm",
-                            isActive ? "bg-primary text-white" : "bg-primary/10 dark:bg-primary/15 text-primary"
+                            "relative w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 transition-all duration-500 overflow-hidden border",
+                            isActive 
+                              ? `bg-gradient-to-br ${bgGradient} ${borderClass} ${glowClass} scale-110 rotate-3` 
+                              : "bg-white/30 dark:bg-slate-800/20 border-white/50 dark:border-white/5 shadow-inner"
                           )}>
-                            <span>{emoji}</span>
+                            {/* Specular Diagonal Reflection Glare */}
+                            <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/25 to-transparent pointer-events-none rounded-xl" />
+                            
+                            <CategoryIcon className={cn(
+                              "w-5 h-5 transition-transform duration-500",
+                              isActive ? `${iconColor} scale-110 drop-shadow-[0_2px_8px_rgba(255,255,255,0.4)]` : "text-muted-foreground/80 group-hover:scale-110"
+                            )} />
                           </div>
+
                           <div className="flex-1 min-w-0 flex flex-col justify-center leading-tight">
                             <span className={cn(
-                              "font-black text-xs uppercase tracking-wider text-left truncate w-full",
+                              "font-black text-[11px] uppercase tracking-wider text-left truncate w-full transition-colors duration-300",
                               isActive ? "text-primary" : "text-foreground/80"
                             )}>
                               {cat}
@@ -190,18 +325,27 @@ export function SmartCidSelector({ selectedCid, onSelectCid }: SmartCidSelectorP
                 </ScrollArea>
               </div>
 
-              {/* Coluna Direita: Lista de Diagnósticos da Categoria Ativa */}
+              {/* Right Column: Diagnosis List matching the active category with glossy layout items */}
               <div className="flex-1 overflow-hidden bg-white/10 dark:bg-slate-950/10 backdrop-blur-sm">
                 <ScrollArea className="h-full">
-                  <div className="p-3 space-y-1 pb-6">
+                  <div className="p-3.5 space-y-1.5 pb-8">
                     {getItemsByCategory(activeTab).map(item => (
                       <button
                         key={item.code}
                         onClick={() => handleSelect(item)}
-                        className="w-full text-left px-4 py-3 rounded-xl hover:bg-white/40 dark:hover:bg-slate-800/40 transition-colors flex items-center gap-3 border border-transparent hover:border-white/30 dark:hover:border-slate-800/40 text-foreground"
+                        className="w-full text-left px-5 py-4 rounded-2xl transition-all duration-300 hover:scale-[1.01] active:scale-[0.99] flex items-center justify-between border border-transparent hover:border-white/35 dark:hover:border-slate-800/40 hover:bg-white/45 dark:hover:bg-slate-900/45 text-foreground hover:shadow-[0_10px_20px_-8px_rgba(0,0,0,0.04)] group"
                       >
-                        <span className="font-bold text-primary w-14 shrink-0">{item.code}</span>
-                        <span className="text-sm font-medium">{item.name}</span>
+                        <div className="flex items-center gap-4 min-w-0">
+                          <span className="font-bold text-xs uppercase tracking-wider px-3 py-1.5 rounded-lg bg-primary/10 text-primary border border-primary/20 group-hover:bg-primary group-hover:text-primary-foreground group-hover:border-transparent transition-all duration-300 shadow-sm shrink-0">
+                            {item.code}
+                          </span>
+                          <span className="text-sm font-semibold truncate group-hover:text-primary transition-colors duration-300">
+                            {item.name}
+                          </span>
+                        </div>
+                        <div className="w-6 h-6 rounded-full flex items-center justify-center bg-muted/40 opacity-0 group-hover:opacity-100 group-hover:bg-primary/10 group-hover:text-primary transition-all duration-300 translate-x-2 group-hover:translate-x-0">
+                          <ChevronRight className="w-3.5 h-3.5" />
+                        </div>
                       </button>
                     ))}
                   </div>
