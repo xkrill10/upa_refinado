@@ -33,6 +33,12 @@ interface CategoryMeta {
   borderClass: string;
   glowClass: string;
   iconColor: string;
+  inactiveBg: string;
+  inactiveBorder: string;
+  inactiveIconColor: string;
+  hoverBg: string;
+  hoverBorder: string;
+  hoverIconColor: string;
 }
 
 // Dynamic medical visual metadata mapping using Lucide React icons styled inside premium glassy containers
@@ -46,7 +52,13 @@ function getCategoryMeta(category: string): CategoryMeta {
         bgGradient: "from-red-500/20 to-rose-500/5 dark:from-red-500/25 dark:to-rose-500/10",
         borderClass: "border-red-500/30 dark:border-red-500/20",
         glowClass: "shadow-[0_0_15px_rgba(239,68,68,0.15)]",
-        iconColor: "text-red-500 dark:text-red-400"
+        iconColor: "text-red-500 dark:text-red-400",
+        inactiveBg: "bg-red-500/[0.03] dark:bg-red-500/[0.06]",
+        inactiveBorder: "border-red-500/10 dark:border-red-500/10",
+        inactiveIconColor: "text-red-500/40 dark:text-red-400/40",
+        hoverBg: "hover:bg-red-500/[0.08] dark:hover:bg-red-500/[0.12]",
+        hoverBorder: "hover:border-red-500/25 dark:hover:border-red-500/20",
+        hoverIconColor: "group-hover:text-red-500 dark:group-hover:text-red-400"
       };
     case "Gastrointestinal":
       return { 
@@ -56,7 +68,13 @@ function getCategoryMeta(category: string): CategoryMeta {
         bgGradient: "from-emerald-500/20 to-teal-500/5 dark:from-emerald-500/25 dark:to-teal-500/10",
         borderClass: "border-emerald-500/30 dark:border-emerald-500/20",
         glowClass: "shadow-[0_0_15px_rgba(16,185,129,0.15)]",
-        iconColor: "text-emerald-500 dark:text-emerald-400"
+        iconColor: "text-emerald-500 dark:text-emerald-400",
+        inactiveBg: "bg-emerald-500/[0.03] dark:bg-emerald-500/[0.06]",
+        inactiveBorder: "border-emerald-500/10 dark:border-emerald-500/10",
+        inactiveIconColor: "text-emerald-500/40 dark:text-emerald-400/40",
+        hoverBg: "hover:bg-emerald-500/[0.08] dark:hover:bg-emerald-500/[0.12]",
+        hoverBorder: "hover:border-emerald-500/25 dark:hover:border-emerald-500/20",
+        hoverIconColor: "group-hover:text-emerald-500 dark:group-hover:text-emerald-400"
       };
     case "Geral/Outros":
       return { 
@@ -66,7 +84,13 @@ function getCategoryMeta(category: string): CategoryMeta {
         bgGradient: "from-blue-500/20 to-indigo-500/5 dark:from-blue-500/25 dark:to-indigo-500/10",
         borderClass: "border-blue-500/30 dark:border-blue-500/20",
         glowClass: "shadow-[0_0_15px_rgba(59,130,246,0.15)]",
-        iconColor: "text-blue-500 dark:text-blue-400"
+        iconColor: "text-blue-500 dark:text-blue-400",
+        inactiveBg: "bg-blue-500/[0.03] dark:bg-blue-500/[0.06]",
+        inactiveBorder: "border-blue-500/10 dark:border-blue-500/10",
+        inactiveIconColor: "text-blue-500/40 dark:text-blue-400/40",
+        hoverBg: "hover:bg-blue-500/[0.08] dark:hover:bg-blue-500/[0.12]",
+        hoverBorder: "hover:border-blue-500/25 dark:hover:border-blue-500/20",
+        hoverIconColor: "group-hover:text-blue-500 dark:group-hover:text-blue-400"
       };
     case "Psiquiatria/Geral":
       return { 
@@ -76,7 +100,13 @@ function getCategoryMeta(category: string): CategoryMeta {
         bgGradient: "from-purple-500/20 to-fuchsia-500/5 dark:from-purple-500/25 dark:to-fuchsia-500/10",
         borderClass: "border-purple-500/30 dark:border-purple-500/20",
         glowClass: "shadow-[0_0_15px_rgba(168,85,247,0.15)]",
-        iconColor: "text-purple-500 dark:text-purple-400"
+        iconColor: "text-purple-500 dark:text-purple-400",
+        inactiveBg: "bg-purple-500/[0.03] dark:bg-purple-500/[0.06]",
+        inactiveBorder: "border-purple-500/10 dark:border-purple-500/10",
+        inactiveIconColor: "text-purple-500/40 dark:text-purple-400/40",
+        hoverBg: "hover:bg-purple-500/[0.08] dark:hover:bg-purple-500/[0.12]",
+        hoverBorder: "hover:border-purple-500/25 dark:hover:border-purple-500/20",
+        hoverIconColor: "group-hover:text-purple-500 dark:group-hover:text-purple-400"
       };
     case "Respiratório":
       return { 
@@ -86,7 +116,13 @@ function getCategoryMeta(category: string): CategoryMeta {
         bgGradient: "from-cyan-500/20 to-sky-500/5 dark:from-cyan-500/25 dark:to-sky-500/10",
         borderClass: "border-cyan-500/30 dark:border-cyan-500/20",
         glowClass: "shadow-[0_0_15px_rgba(6,182,212,0.15)]",
-        iconColor: "text-cyan-500 dark:text-cyan-400"
+        iconColor: "text-cyan-500 dark:text-cyan-400",
+        inactiveBg: "bg-cyan-500/[0.03] dark:bg-cyan-500/[0.06]",
+        inactiveBorder: "border-cyan-500/10 dark:border-cyan-500/10",
+        inactiveIconColor: "text-cyan-500/40 dark:text-cyan-400/40",
+        hoverBg: "hover:bg-cyan-500/[0.08] dark:hover:bg-cyan-500/[0.12]",
+        hoverBorder: "hover:border-cyan-500/25 dark:hover:border-cyan-500/20",
+        hoverIconColor: "group-hover:text-cyan-500 dark:group-hover:text-cyan-400"
       };
     case "Sintomas Gerais":
       return { 
@@ -96,7 +132,13 @@ function getCategoryMeta(category: string): CategoryMeta {
         bgGradient: "from-amber-500/20 to-orange-500/5 dark:from-amber-500/25 dark:to-orange-500/10",
         borderClass: "border-amber-500/30 dark:border-amber-500/20",
         glowClass: "shadow-[0_0_15px_rgba(245,158,11,0.15)]",
-        iconColor: "text-amber-500 dark:text-amber-400"
+        iconColor: "text-amber-500 dark:text-amber-400",
+        inactiveBg: "bg-amber-500/[0.03] dark:bg-amber-500/[0.06]",
+        inactiveBorder: "border-amber-500/10 dark:border-amber-500/10",
+        inactiveIconColor: "text-amber-500/40 dark:text-amber-400/40",
+        hoverBg: "hover:bg-amber-500/[0.08] dark:hover:bg-amber-500/[0.12]",
+        hoverBorder: "hover:border-amber-500/25 dark:hover:border-amber-500/20",
+        hoverIconColor: "group-hover:text-amber-500 dark:group-hover:text-amber-400"
       };
     case "Trauma / Causas Externas":
       return { 
@@ -106,7 +148,13 @@ function getCategoryMeta(category: string): CategoryMeta {
         bgGradient: "from-red-500/20 to-orange-500/5 dark:from-red-500/25 dark:to-orange-500/10",
         borderClass: "border-red-500/30 dark:border-red-500/20",
         glowClass: "shadow-[0_0_15px_rgba(239,68,68,0.15)]",
-        iconColor: "text-red-500 dark:text-red-400"
+        iconColor: "text-red-500 dark:text-red-400",
+        inactiveBg: "bg-red-500/[0.03] dark:bg-red-500/[0.06]",
+        inactiveBorder: "border-red-500/10 dark:border-red-500/10",
+        inactiveIconColor: "text-red-500/40 dark:text-red-400/40",
+        hoverBg: "hover:bg-red-500/[0.08] dark:hover:bg-red-500/[0.12]",
+        hoverBorder: "hover:border-red-500/25 dark:hover:border-red-500/20",
+        hoverIconColor: "group-hover:text-red-500 dark:group-hover:text-red-400"
       };
     case "Trauma / Externas":
       return { 
@@ -116,7 +164,13 @@ function getCategoryMeta(category: string): CategoryMeta {
         bgGradient: "from-slate-500/20 to-zinc-500/5 dark:from-slate-500/25 dark:to-zinc-500/10",
         borderClass: "border-slate-500/30 dark:border-slate-500/20",
         glowClass: "shadow-[0_0_15px_rgba(100,116,139,0.15)]",
-        iconColor: "text-slate-500 dark:text-slate-400"
+        iconColor: "text-slate-500 dark:text-slate-400",
+        inactiveBg: "bg-slate-500/[0.03] dark:bg-slate-500/[0.06]",
+        inactiveBorder: "border-slate-500/10 dark:border-slate-500/10",
+        inactiveIconColor: "text-slate-500/40 dark:text-slate-400/40",
+        hoverBg: "hover:bg-slate-500/[0.08] dark:hover:bg-slate-500/[0.12]",
+        hoverBorder: "hover:border-slate-500/25 dark:hover:border-slate-500/20",
+        hoverIconColor: "group-hover:text-slate-500 dark:group-hover:text-slate-400"
       };
     default:
       return { 
@@ -126,7 +180,13 @@ function getCategoryMeta(category: string): CategoryMeta {
         bgGradient: "from-sky-500/20 to-blue-500/5 dark:from-sky-500/25 dark:to-blue-500/10",
         borderClass: "border-sky-500/30 dark:border-sky-500/20",
         glowClass: "shadow-[0_0_15px_rgba(14,165,233,0.15)]",
-        iconColor: "text-sky-500 dark:text-sky-400"
+        iconColor: "text-sky-500 dark:text-sky-400",
+        inactiveBg: "bg-sky-500/[0.03] dark:bg-sky-500/[0.06]",
+        inactiveBorder: "border-sky-500/10 dark:border-sky-500/10",
+        inactiveIconColor: "text-sky-500/40 dark:text-sky-400/40",
+        hoverBg: "hover:bg-sky-500/[0.08] dark:hover:bg-sky-500/[0.12]",
+        hoverBorder: "hover:border-sky-500/25 dark:hover:border-sky-500/20",
+        hoverIconColor: "group-hover:text-sky-500 dark:group-hover:text-sky-400"
       };
   }
 }
@@ -266,7 +326,21 @@ export function SmartCidSelector({ selectedCid, onSelectCid }: SmartCidSelectorP
                 <ScrollArea className="flex-1">
                   <div className="flex flex-col gap-2.5 p-4 w-full">
                     {categories.map(cat => {
-                      const { icon: CategoryIcon, description, color, bgGradient, borderClass, glowClass, iconColor } = getCategoryMeta(cat);
+                      const { 
+                        icon: CategoryIcon, 
+                        description, 
+                        color, 
+                        bgGradient, 
+                        borderClass, 
+                        glowClass, 
+                        iconColor,
+                        inactiveBg,
+                        inactiveBorder,
+                        inactiveIconColor,
+                        hoverBg,
+                        hoverBorder,
+                        hoverIconColor
+                      } = getCategoryMeta(cat);
                       const isActive = activeTab === cat;
                       return (
                         <button
@@ -276,8 +350,14 @@ export function SmartCidSelector({ selectedCid, onSelectCid }: SmartCidSelectorP
                           className={cn(
                             "w-full p-3.5 rounded-2xl border text-left flex items-center gap-4 transition-all duration-500 hover:scale-[1.02] active:scale-[0.98] group relative overflow-hidden",
                             isActive
-                              ? "bg-white/60 dark:bg-slate-900/60 border-primary/40 text-primary shadow-[0_15px_30px_-10px_rgba(59,130,246,0.15)] dark:shadow-[0_15px_35px_-10px_rgba(0,0,0,0.4)] z-10"
-                              : "bg-white/20 dark:bg-slate-900/20 border-white/25 dark:border-slate-800/15 text-foreground/80 hover:border-primary/25 hover:bg-white/40 dark:hover:bg-slate-900/40"
+                              ? "bg-white/75 dark:bg-slate-900/80 border-primary text-primary shadow-[0_15px_30px_-10px_rgba(0,102,153,0.15)] dark:shadow-[0_15px_35px_-10px_rgba(0,0,0,0.5)] z-10 scale-[1.01]"
+                              : cn(
+                                  "bg-white/20 dark:bg-slate-900/20 border-white/25 dark:border-slate-800/15 text-foreground/80",
+                                  inactiveBg,
+                                  inactiveBorder,
+                                  hoverBg,
+                                  hoverBorder
+                                )
                           )}
                         >
                           {/* Active Indicating Glowing Line */}
@@ -293,17 +373,22 @@ export function SmartCidSelector({ selectedCid, onSelectCid }: SmartCidSelectorP
 
                           {/* Glossy / 3D Specular Glass Icon Container */}
                           <div className={cn(
-                            "relative w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 transition-all duration-500 overflow-hidden border",
+                            "relative w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 transition-all duration-500 overflow-hidden border shadow-sm",
                             isActive 
                               ? `bg-gradient-to-br ${bgGradient} ${borderClass} ${glowClass} scale-110 rotate-3` 
-                              : "bg-white/30 dark:bg-slate-800/20 border-white/50 dark:border-white/5 shadow-inner"
+                              : cn(
+                                  "bg-white/40 dark:bg-slate-800/10 border-white/50 dark:border-white/5",
+                                  inactiveBorder
+                                )
                           )}>
                             {/* Specular Diagonal Reflection Glare */}
                             <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/25 to-transparent pointer-events-none rounded-xl" />
                             
                             <CategoryIcon className={cn(
-                              "w-5 h-5 transition-transform duration-500",
-                              isActive ? `${iconColor} scale-110 drop-shadow-[0_2px_8px_rgba(255,255,255,0.4)]` : "text-muted-foreground/80 group-hover:scale-110"
+                              "w-5 h-5 transition-all duration-500",
+                              isActive 
+                                ? `${iconColor} scale-110 drop-shadow-[0_2px_8px_rgba(255,255,255,0.4)]` 
+                                : `${inactiveIconColor} ${hoverIconColor} group-hover:scale-110`
                             )} />
                           </div>
 
