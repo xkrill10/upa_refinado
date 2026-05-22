@@ -195,23 +195,22 @@ export default function Arrival() {
               </CardHeader>
               <CardContent className="p-8 pt-2">
                 <form onSubmit={handleSubmit} className="space-y-6">
-                  <div className="flex items-center gap-4 p-5 rounded-2xl bg-white/40 dark:bg-slate-900/40 border border-white/50 dark:border-slate-800/40 mb-2 shadow-inner backdrop-blur-md transition-colors duration-500">
+                  <div className="flex items-center gap-4 p-5 rounded-2xl glass-card-premium border-white/40 dark:border-white/10 shadow-[0_8px_30px_rgb(0,0,0,0.12)] mb-4 transition-all group cursor-pointer hover:shadow-[0_12px_40px_rgb(0,0,0,0.15)]" onClick={() => setIsUnidentified(!isUnidentified)}>
                     <button
                       type="button"
-                      onClick={() => setIsUnidentified(!isUnidentified)}
                       className={cn(
-                        "h-6 w-11 rounded-full transition-all relative flex items-center shrink-0 cursor-pointer",
-                        isUnidentified ? "bg-[#006699]" : "bg-slate-300 dark:bg-slate-700"
+                        "h-6 w-11 rounded-full transition-all relative flex items-center shrink-0 shadow-inner",
+                        isUnidentified ? "bg-primary shadow-[inset_0_2px_4px_rgba(0,0,0,0.3)]" : "bg-black/10 dark:bg-white/10 shadow-[inset_0_2px_4px_rgba(0,0,0,0.1)]"
                       )}
                     >
                       <div className={cn(
-                        "absolute h-4 w-4 rounded-full bg-white transition-all shadow-sm",
+                        "absolute h-4 w-4 rounded-full bg-white transition-all shadow-md",
                         isUnidentified ? "right-1" : "left-1"
                       )} />
                     </button>
-                    <div className="flex flex-col cursor-pointer" onClick={() => setIsUnidentified(!isUnidentified)}>
-                      <span className="text-sm font-bold text-slate-850 dark:text-slate-200 transition-colors">Paciente Não Identificado</span>
-                      <span className="text-[10px] text-slate-500 dark:text-slate-400 uppercase font-bold tracking-wider transition-colors">Ativação para casos de emergência sem documentos</span>
+                    <div className="flex flex-col">
+                      <span className="text-sm font-bold text-foreground transition-colors">Paciente Não Identificado</span>
+                      <span className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider transition-colors">Ativação para casos de emergência sem documentos</span>
                     </div>
                   </div>
 
@@ -230,7 +229,7 @@ export default function Arrival() {
                               placeholder="000.000.000-00"
                               value={cpf}
                               onChange={(e) => setCpf(maskCPF(e.target.value))}
-                              className="h-14 font-mono text-lg focus-visible:ring-offset-0 focus-visible:border-primary transition-all bg-white/50 dark:bg-slate-900/50 border-white/50 dark:border-slate-800/50 backdrop-blur-sm shadow-inner rounded-2xl"
+                              className="h-14 font-mono text-lg focus-visible:ring-offset-0 focus-visible:ring-2 focus-visible:ring-primary/20 transition-all bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 backdrop-blur-md shadow-[inset_0_2px_8px_rgba(0,0,0,0.05)] dark:shadow-[inset_0_2px_8px_rgba(0,0,0,0.2)] focus:bg-white/40 dark:focus:bg-slate-900/40 rounded-2xl placeholder:text-muted-foreground/50"
                             />
                           </div>
                           <div className="space-y-2">
@@ -239,7 +238,7 @@ export default function Arrival() {
                               type="date"
                               value={birthDate}
                               onChange={(e) => setBirthDate(e.target.value)}
-                              className="h-14 focus-visible:ring-offset-0 focus-visible:border-primary transition-all bg-white/50 dark:bg-slate-900/50 border-white/50 dark:border-slate-800/50 backdrop-blur-sm shadow-inner rounded-2xl"
+                              className="h-14 focus-visible:ring-offset-0 focus-visible:ring-2 focus-visible:ring-primary/20 transition-all bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 backdrop-blur-md shadow-[inset_0_2px_8px_rgba(0,0,0,0.05)] dark:shadow-[inset_0_2px_8px_rgba(0,0,0,0.2)] focus:bg-white/40 dark:focus:bg-slate-900/40 rounded-2xl placeholder:text-muted-foreground/50"
                             />
                           </div>
                           <div className="space-y-2 md:col-span-2">
@@ -248,7 +247,7 @@ export default function Arrival() {
                                placeholder="000 0000 0000 0000"
                                value={susCard}
                                onChange={(e) => setSusCard(maskSUS(e.target.value))}
-                               className="h-14 font-mono focus-visible:ring-offset-0 focus-visible:border-primary transition-all bg-white/50 dark:bg-slate-900/50 border-white/50 dark:border-slate-800/50 backdrop-blur-sm shadow-inner rounded-2xl"
+                               className="h-14 font-mono focus-visible:ring-offset-0 focus-visible:ring-2 focus-visible:ring-primary/20 transition-all bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 backdrop-blur-md shadow-[inset_0_2px_8px_rgba(0,0,0,0.05)] dark:shadow-[inset_0_2px_8px_rgba(0,0,0,0.2)] focus:bg-white/40 dark:focus:bg-slate-900/40 rounded-2xl placeholder:text-muted-foreground/50"
                              />
                              <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider">Necessário para atendimento gratuito (SUS)</p>
                           </div>
@@ -258,7 +257,7 @@ export default function Arrival() {
                               placeholder="Nome completo da mãe"
                               value={motherName}
                               onChange={(e) => setMotherName(formatWords(e.target.value))}
-                              className="h-14 focus-visible:ring-offset-0 focus-visible:border-primary transition-all bg-white/50 dark:bg-slate-900/50 border-white/50 dark:border-slate-800/50 backdrop-blur-sm shadow-inner rounded-2xl"
+                              className="h-14 focus-visible:ring-offset-0 focus-visible:ring-2 focus-visible:ring-primary/20 transition-all bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 backdrop-blur-md shadow-[inset_0_2px_8px_rgba(0,0,0,0.05)] dark:shadow-[inset_0_2px_8px_rgba(0,0,0,0.2)] focus:bg-white/40 dark:focus:bg-slate-900/40 rounded-2xl placeholder:text-muted-foreground/50"
                             />
                           </div>
                         </div>

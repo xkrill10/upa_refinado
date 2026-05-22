@@ -44,6 +44,9 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { TimeTracker } from "@/components/hr/TimeTracker";
 import { NewStaffModal } from "@/components/hr/NewStaffModal";
+import { SwapRequestsModal, SwapRequest } from "@/components/hr/SwapRequestsModal";
+import { StaffDocumentsModal } from "@/components/hr/StaffDocumentsModal";
+import { StaffDetailsModal } from "@/components/hr/StaffDetailsModal";
 
 export default function HR() {
   const [isScheduleOpen, setIsScheduleOpen] = useState(false);
@@ -59,10 +62,25 @@ export default function HR() {
     { id: 5, name: 'Soraia Alves', role: 'Gestão/Adm', status: 'In-Shift', shift: '08:00 - 18:00', specialty: 'Recursos Humanos', category: 'administrativo', docStatus: 'active', training: 100 },
   ]);
 
-  const swapRequests = [
-    { id: 1, from: "Dr. João Mendes", to: "Dra. Maria Clara", date: "15/05/2030", shift: "Diurno", status: "pending" },
-    { id: 2, from: "Ricardo Silva", to: "Ana Paula", date: "18/05/2030", shift: "Noturno", status: "pending" }
-  ];
+  const [isSwapModalOpen, setIsSwapModalOpen] = useState(false);
+  const [isDocModalOpen, setIsDocModalOpen] = useState(false);
+  const [selectedStaffForDoc, setSelectedStaffForDoc] = useState<{name: string, role: string} | null>(null);
+
+  const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
+  const [detailsModalTab, setDetailsModalTab] = useState<'details' | 'history'>('details');
+  const [selectedStaffForDetails, setSelectedStaffForDetails] = useState<any>(null);
+
+  const [swapRequests, setSwapRequests] = useState<SwapRequest[]>([
+    { id: 1, from: "Dr. João Mendes", to: "Dra. Maria Clara", date: "15/05/2030", shift: "Diurno", status: "pending", reason: "Participação em congresso médico internacional" },
+    { id: 2, from: "Ricardo Silva", to: "Ana Paula", date: "18/05/2030", shift: "Noturno", status: "pending", reason: "Motivos pessoais familiares" },
+    { id: 3, from: "Enf. Carla", to: "Soraia Alves", date: "20/05/2030", shift: "Noturno", status: "approved", reason: "Consulta médica agendada" }
+  ]);
+
+  const pendingSwaps = swapRequests.filter(r => r.status === 'pending');
+
+  const handleSwapAction = (id: number, status: 'approved' | 'denied') => {
+    setSwapRequests(prev => prev.map(req => req.id === id ? { ...req, status } : req));
+  };
 
   const notifications = [
     { id: 1, text: "CRM vencendo em 15 dias: Dra. Maria Clara", type: "warning" },
@@ -393,7 +411,7 @@ export default function HR() {
                     <TableHead className="p-5 text-[10px] font-black uppercase tracking-widest text-muted-foreground">Cargo/Especialidade</TableHead>
                     <TableHead className="p-5 text-[10px] font-black uppercase tracking-widest text-muted-foreground text-center">Treinamento</TableHead>
                     <TableHead className="p-5 text-[10px] font-black uppercase tracking-widest text-muted-foreground text-center">Documentos</TableHead>
-                    <TableHead className="p-5 text-[10px] font-black uppercase tracking-widest text-muted-foreground">Status</TableHead>
+                    <TableHead className="p-5 text-[10px] font-black uppercase tracking-widest text-muted-foreground text-center">Status</TableHead>
                     <TableHead className="p-5 text-right text-[10px] font-black uppercase tracking-widest text-muted-foreground pr-10">Ações</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -423,8 +441,8 @@ export default function HR() {
                           </div>
                         </TableCell>
                         <TableCell className="p-5">
-                          <div className="flex flex-col items-center gap-1 min-w-[80px]">
-                            <div className="h-1 w-full bg-muted rounded-full overflow-hidden">
+                          <div className="flex flex-col items-center gap-1.5 w-24 mx-auto">
+                            <div className="h-1.5 w-full bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden shadow-inner">
                               <div 
                                 className={cn(
                                   "h-full transition-all",
@@ -446,10 +464,11 @@ export default function HR() {
                           </div>
                         </TableCell>
                         <TableCell className="p-5">
-                          <Badge 
-                            variant="outline" 
-                            className={cn(
-                              "text-[9px] font-black uppercase px-2 shadow-sm rounded-full border-none",
+                          <div className="flex justify-center">
+                            <Badge 
+                              variant="outline" 
+                              className={cn(
+                                "text-[9px] font-black uppercase px-2 py-1 shadow-sm rounded-full border-none w-24 flex justify-center",
                               member.status === 'In-Shift' ? 'bg-emerald-500 text-white shadow-emerald-500/20' : 
                               member.status === 'On-Call' ? 'bg-amber-500 text-white shadow-amber-500/20' : 
                               'bg-slate-400 text-white'
@@ -457,7 +476,8 @@ export default function HR() {
                           >
                             {member.status === 'In-Shift' ? 'Em Plantão' : 
                              member.status === 'On-Call' ? 'Sobreaviso' : 'Off-Shift'}
-                          </Badge>
+                            </Badge>
+                          </div>
                         </TableCell>
                         <TableCell className="p-5 text-right pr-10">
                           <DropdownMenu>
@@ -466,14 +486,25 @@ export default function HR() {
                                 <MoreHorizontal className="h-4 w-4" />
                               </Button>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent className="rounded-xl p-2" align="end">
-                              <DropdownMenuItem className="rounded-lg font-bold text-xs uppercase" onClick={() => toast.info(`Perfil: ${member.name}`)}>
+                            <DropdownMenuContent className="rounded-2xl p-2 glass-card-premium border-white/40 dark:border-white/10 shadow-[0_8px_30px_rgb(0,0,0,0.12)] min-w-[160px] animate-in fade-in-0 zoom-in-95" align="end" sideOffset={8}>
+                              <DropdownMenuItem className="rounded-xl font-bold text-xs uppercase cursor-pointer transition-colors focus:bg-black/5 dark:focus:bg-white/5 py-2.5 px-3" onClick={() => {
+                                setSelectedStaffForDetails(member);
+                                setDetailsModalTab('details');
+                                setIsDetailsModalOpen(true);
+                              }}>
                                 <User className="h-3 w-3 mr-2" /> Detalhes
                               </DropdownMenuItem>
-                              <DropdownMenuItem className="rounded-lg font-bold text-xs uppercase">
+                              <DropdownMenuItem className="rounded-xl font-bold text-xs uppercase cursor-pointer transition-colors focus:bg-black/5 dark:focus:bg-white/5 py-2.5 px-3" onClick={() => {
+                                setSelectedStaffForDetails(member);
+                                setDetailsModalTab('history');
+                                setIsDetailsModalOpen(true);
+                              }}>
                                 <History className="h-3 w-3 mr-2" /> Histórico
                               </DropdownMenuItem>
-                              <DropdownMenuItem className="rounded-lg font-bold text-xs uppercase text-red-600">
+                              <DropdownMenuItem className="rounded-xl font-bold text-xs uppercase text-red-600 focus:text-red-700 cursor-pointer transition-colors focus:bg-red-500/10 py-2.5 px-3" onClick={() => {
+                                setSelectedStaffForDoc({ name: member.name, role: member.role });
+                                setIsDocModalOpen(true);
+                              }}>
                                 <ShieldAlert className="h-3 w-3 mr-2" /> Documentação
                               </DropdownMenuItem>
                             </DropdownMenuContent>
@@ -517,25 +548,30 @@ export default function HR() {
               </CardTitle>
             </CardHeader>
             <CardContent className="p-6 pt-2 space-y-4">
-              {swapRequests.map((req) => (
-                <div key={req.id} className="p-3 rounded-2xl bg-white/40 dark:bg-slate-800/25 border border-white/40 dark:border-slate-800/30 hover:bg-white/70 dark:hover:bg-slate-700/40 transition-all hover:shadow-lg hover:shadow-sky-500/5 group/req relative backdrop-blur-sm">
-                  <div className="flex flex-col gap-2">
-                    <div className="flex items-center justify-between">
-                      <span className="text-[10px] font-black uppercase tracking-wider text-muted-foreground">Ref #{req.id}</span>
-                      <Badge variant="secondary" className="text-[8px] font-black bg-white/50 dark:bg-slate-800">{req.shift}</Badge>
+              <AnimatePresence>
+                {pendingSwaps.slice(0, 3).map((req) => (
+                  <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} key={req.id} className="p-3 rounded-2xl bg-white/40 dark:bg-slate-800/25 border border-white/40 dark:border-slate-800/30 hover:bg-white/70 dark:hover:bg-slate-700/40 transition-all hover:shadow-lg hover:shadow-sky-500/5 group/req relative backdrop-blur-sm">
+                    <div className="flex flex-col gap-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[10px] font-black uppercase tracking-wider text-muted-foreground">Ref #{req.id}</span>
+                        <Badge variant="secondary" className="text-[8px] font-black bg-white/50 dark:bg-slate-800">{req.shift}</Badge>
+                      </div>
+                      <div className="text-[11px] font-bold">
+                        {req.from.split(" ")[1] || req.from.split(" ")[0]} <ArrowRight className="inline h-2 w-2 opacity-30" /> {req.to.split(" ")[1] || req.to.split(" ")[0]}
+                      </div>
+                      <div className="flex gap-2 mt-1">
+                        <Button variant="outline" className="h-7 px-2 text-[8px] font-black uppercase flex-1 border-white/50 dark:border-slate-700 bg-white/35 dark:bg-slate-800/35 hover:bg-white/60 dark:hover:bg-slate-700" onClick={() => { handleSwapAction(req.id, 'approved'); toast.success("Troca aprovada!"); }}>Aprovar</Button>
+                        <Button variant="ghost" className="h-7 px-2 text-[8px] font-black uppercase flex-1 text-red-500 hover:bg-red-500/10" onClick={() => { handleSwapAction(req.id, 'denied'); toast.error("Troca rejeitada"); }}>Negar</Button>
+                      </div>
                     </div>
-                    <div className="text-[11px] font-bold">
-                      {req.from.split(" ")[1]} <ArrowRight className="inline h-2 w-2 opacity-30" /> {req.to.split(" ")[1]}
-                    </div>
-                    <div className="flex gap-2 mt-1">
-                      <Button variant="outline" className="h-7 px-2 text-[8px] font-black uppercase flex-1 border-white/50 dark:border-slate-700 bg-white/35 dark:bg-slate-800/35 hover:bg-white/60 dark:hover:bg-slate-700" onClick={() => toast.success("Troca aprovada!")}>Aprovar</Button>
-                      <Button variant="ghost" className="h-7 px-2 text-[8px] font-black uppercase flex-1 text-red-500 hover:bg-red-500/10" onClick={() => toast.error("Troca rejeitada")}>Negar</Button>
-                    </div>
-                  </div>
-                </div>
-              ))}
-              <Button variant="ghost" className="w-full h-8 text-[9px] font-black uppercase tracking-widest hover:bg-primary/5">
-                Ver Todas ({swapRequests.length + 3})
+                  </motion.div>
+                ))}
+              </AnimatePresence>
+              {pendingSwaps.length === 0 && (
+                <div className="text-center p-4 text-xs font-bold text-muted-foreground">Sem trocas pendentes</div>
+              )}
+              <Button variant="ghost" className="w-full h-8 text-[9px] font-black uppercase tracking-widest hover:bg-primary/5" onClick={() => setIsSwapModalOpen(true)}>
+                Ver Todas ({swapRequests.length})
               </Button>
             </CardContent>
           </Card>
@@ -581,6 +617,29 @@ export default function HR() {
       <NewStaffModal 
         open={isNewStaffModalOpen} 
         onOpenChange={setIsNewStaffModalOpen} 
+      />
+
+      <SwapRequestsModal
+        open={isSwapModalOpen}
+        onOpenChange={setIsSwapModalOpen}
+        requests={swapRequests}
+        onUpdateStatus={handleSwapAction}
+      />
+
+      {selectedStaffForDoc && (
+        <StaffDocumentsModal
+          open={isDocModalOpen}
+          onOpenChange={setIsDocModalOpen}
+          staffName={selectedStaffForDoc.name}
+          staffRole={selectedStaffForDoc.role}
+        />
+      )}
+
+      <StaffDetailsModal
+        open={isDetailsModalOpen}
+        onOpenChange={setIsDetailsModalOpen}
+        staff={selectedStaffForDetails}
+        defaultTab={detailsModalTab}
       />
     </motion.div>
   );

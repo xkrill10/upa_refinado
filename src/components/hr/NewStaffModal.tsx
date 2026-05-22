@@ -12,7 +12,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import { UserPlus, User, Briefcase, Calendar, CheckCircle2, Phone, Fingerprint, Award, CreditCard } from "lucide-react";
+import { UserPlus, User, Briefcase, Calendar, CheckCircle2, Phone, Fingerprint, MapPin, Mail } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
 interface NewStaffModalProps {
@@ -25,9 +25,20 @@ export function NewStaffModal({ open, onOpenChange, onSuccess }: NewStaffModalPr
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
+    socialName: "",
     cpf: "",
-    phone: "",
     birth: "",
+    gender: "",
+    mobile: "",
+    phone: "",
+    email: "",
+    cep: "",
+    street: "",
+    number: "",
+    complement: "",
+    district: "",
+    city: "",
+    uf: "",
     role: "",
     specialty: "",
     registry: "",
@@ -53,7 +64,9 @@ export function NewStaffModal({ open, onOpenChange, onSuccess }: NewStaffModalPr
       
       // Reset form
       setFormData({
-        name: "", cpf: "", phone: "", birth: "", role: "", specialty: "", registry: "", shift: ""
+        name: "", socialName: "", cpf: "", birth: "", gender: "", mobile: "", phone: "", email: "",
+        cep: "", street: "", number: "", complement: "", district: "", city: "", uf: "",
+        role: "", specialty: "", registry: "", shift: ""
       });
       
       if (onSuccess) onSuccess();
@@ -62,8 +75,8 @@ export function NewStaffModal({ open, onOpenChange, onSuccess }: NewStaffModalPr
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[700px] p-0 overflow-hidden glass-card-premium border-white/40 dark:border-white/10 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.3)] rounded-[2rem]">
-        <div className="bg-gradient-to-br from-blue-600 to-blue-800 p-8 text-white relative">
+      <DialogContent className="sm:max-w-[800px] p-0 overflow-hidden glass-card-premium border-white/40 dark:border-white/10 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.3)] rounded-[2rem] flex flex-col max-h-[90vh]">
+        <div className="bg-gradient-to-br from-blue-600 to-blue-800 p-8 text-white relative flex-shrink-0">
           <div className="absolute top-0 right-0 -mr-10 -mt-10 w-40 h-40 bg-white/10 rounded-full blur-2xl pointer-events-none" />
           <UserPlus className="absolute right-8 top-1/2 -translate-y-1/2 h-24 w-24 text-white/10 pointer-events-none" />
           
@@ -81,71 +94,180 @@ export function NewStaffModal({ open, onOpenChange, onSuccess }: NewStaffModalPr
           </DialogDescription>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-8 space-y-8 bg-transparent">
+        <form onSubmit={handleSubmit} className="p-8 space-y-8 bg-transparent overflow-y-auto custom-scrollbar">
           
           {/* Section 1: Personal Data */}
           <div className="space-y-4">
             <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-400 flex items-center gap-2 border-b border-slate-200 dark:border-slate-800 pb-2">
               <User className="h-4 w-4 text-blue-500" />
-              Dados Pessoais
+              Dados de Identificação
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2 md:col-span-2">
-                <Label className="text-[10px] font-black uppercase tracking-widest text-slate-500">Nome Completo</Label>
-                <div className="relative">
-                  <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                  <Input 
-                    required
-                    placeholder="Ex: João da Silva Santos" 
-                    className="pl-10 h-12 rounded-xl border-slate-200/50 dark:border-slate-800/50 bg-white/40 dark:bg-slate-900/40 backdrop-blur-sm shadow-sm"
-                    value={formData.name}
-                    onChange={(e) => handleChange('name', e.target.value)}
-                  />
-                </div>
+              <div className="space-y-2">
+                <Label className="text-[10px] font-black uppercase tracking-widest text-slate-500">Nome Completo *</Label>
+                <Input 
+                  required
+                  placeholder="Insira o nome completo sem abreviações" 
+                  className="h-12 rounded-xl border-slate-200/50 dark:border-slate-800/50 bg-white/40 dark:bg-slate-900/40 backdrop-blur-sm shadow-sm"
+                  value={formData.name}
+                  onChange={(e) => handleChange('name', e.target.value)}
+                />
               </div>
               <div className="space-y-2">
-                <Label className="text-[10px] font-black uppercase tracking-widest text-slate-500">CPF</Label>
-                <div className="relative">
-                  <Fingerprint className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                  <Input 
-                    required
-                    placeholder="000.000.000-00" 
-                    className="pl-10 h-12 rounded-xl border-slate-200/50 dark:border-slate-800/50 bg-white/40 dark:bg-slate-900/40 backdrop-blur-sm shadow-sm"
-                    value={formData.cpf}
-                    onChange={(e) => handleChange('cpf', e.target.value)}
-                  />
-                </div>
+                <Label className="text-[10px] font-black uppercase tracking-widest text-slate-500">Nome Social</Label>
+                <Input 
+                  placeholder="Como o profissional prefere ser chamado" 
+                  className="h-12 rounded-xl border-slate-200/50 dark:border-slate-800/50 bg-white/40 dark:bg-slate-900/40 backdrop-blur-sm shadow-sm"
+                  value={formData.socialName}
+                  onChange={(e) => handleChange('socialName', e.target.value)}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label className="text-[10px] font-black uppercase tracking-widest text-slate-500">CPF *</Label>
+                <Input 
+                  required
+                  placeholder="000.000.000-00" 
+                  className="h-12 rounded-xl border-slate-200/50 dark:border-slate-800/50 bg-white/40 dark:bg-slate-900/40 backdrop-blur-sm shadow-sm"
+                  value={formData.cpf}
+                  onChange={(e) => handleChange('cpf', e.target.value)}
+                />
               </div>
               <div className="space-y-2">
-                <Label className="text-[10px] font-black uppercase tracking-widest text-slate-500">Nascimento</Label>
+                <Label className="text-[10px] font-black uppercase tracking-widest text-slate-500">Data de Nascimento *</Label>
                 <div className="relative">
-                  <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                  <Calendar className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                   <Input 
                     type="date"
                     required
-                    className="pl-10 h-12 rounded-xl border-slate-200/50 dark:border-slate-800/50 bg-white/40 dark:bg-slate-900/40 backdrop-blur-sm shadow-sm"
+                    className="h-12 pr-10 rounded-xl border-slate-200/50 dark:border-slate-800/50 bg-white/40 dark:bg-slate-900/40 backdrop-blur-sm shadow-sm"
                     value={formData.birth}
                     onChange={(e) => handleChange('birth', e.target.value)}
                   />
                 </div>
               </div>
-              <div className="space-y-2 md:col-span-2">
-                <Label className="text-[10px] font-black uppercase tracking-widest text-slate-500">Telefone / WhatsApp</Label>
-                <div className="relative">
-                  <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                  <Input 
-                    required
-                    placeholder="(00) 00000-0000" 
-                    className="pl-10 h-12 rounded-xl border-slate-200/50 dark:border-slate-800/50 bg-white/40 dark:bg-slate-900/40 backdrop-blur-sm shadow-sm"
-                    value={formData.phone}
-                    onChange={(e) => handleChange('phone', e.target.value)}
-                  />
-                </div>
+
+              <div className="space-y-2">
+                <Label className="text-[10px] font-black uppercase tracking-widest text-slate-500">Sexo</Label>
+                <Select value={formData.gender} onValueChange={(v) => handleChange('gender', v)}>
+                  <SelectTrigger className="h-12 rounded-xl border-slate-200/50 dark:border-slate-800/50 bg-white/40 dark:bg-slate-900/40 backdrop-blur-sm shadow-sm">
+                    <SelectValue placeholder="Selecione" />
+                  </SelectTrigger>
+                  <SelectContent className="rounded-xl border-slate-200 dark:border-slate-800 dark:bg-slate-950">
+                    <SelectItem value="M">Masculino</SelectItem>
+                    <SelectItem value="F">Feminino</SelectItem>
+                    <SelectItem value="O">Outro</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label className="text-[10px] font-black uppercase tracking-widest text-slate-500">Celular</Label>
+                <Input 
+                  placeholder="(00) 00000-0000" 
+                  className="h-12 rounded-xl border-slate-200/50 dark:border-slate-800/50 bg-white/40 dark:bg-slate-900/40 backdrop-blur-sm shadow-sm"
+                  value={formData.mobile}
+                  onChange={(e) => handleChange('mobile', e.target.value)}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label className="text-[10px] font-black uppercase tracking-widest text-slate-500">Telefone p/ Contato</Label>
+                <Input 
+                  placeholder="(00) 0000-0000" 
+                  className="h-12 rounded-xl border-slate-200/50 dark:border-slate-800/50 bg-white/40 dark:bg-slate-900/40 backdrop-blur-sm shadow-sm"
+                  value={formData.phone}
+                  onChange={(e) => handleChange('phone', e.target.value)}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label className="text-[10px] font-black uppercase tracking-widest text-slate-500">E-mail</Label>
+                <Input 
+                  type="email"
+                  placeholder="exemplo@email.com" 
+                  className="h-12 rounded-xl border-slate-200/50 dark:border-slate-800/50 bg-white/40 dark:bg-slate-900/40 backdrop-blur-sm shadow-sm"
+                  value={formData.email}
+                  onChange={(e) => handleChange('email', e.target.value)}
+                />
               </div>
             </div>
           </div>
 
-          {/* Section 2: Professional Data */}
+          {/* Section 2: Address Data */}
+          <div className="space-y-4">
+            <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-400 flex items-center gap-2 border-b border-slate-200 dark:border-slate-800 pb-2">
+              <MapPin className="h-4 w-4 text-blue-500" />
+              Localização e Contato
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <div className="space-y-2 md:col-span-1">
+                <Label className="text-[10px] font-black uppercase tracking-widest text-slate-500">CEP</Label>
+                <Input 
+                  placeholder="00000-000" 
+                  className="h-12 rounded-xl border-slate-200/50 dark:border-slate-800/50 bg-white/40 dark:bg-slate-900/40 backdrop-blur-sm shadow-sm"
+                  value={formData.cep}
+                  onChange={(e) => handleChange('cep', e.target.value)}
+                />
+              </div>
+              <div className="space-y-2 md:col-span-3">
+                <Label className="text-[10px] font-black uppercase tracking-widest text-slate-500">Logradouro</Label>
+                <Input 
+                  placeholder="Rua, Avenida..." 
+                  className="h-12 rounded-xl border-slate-200/50 dark:border-slate-800/50 bg-white/40 dark:bg-slate-900/40 backdrop-blur-sm shadow-sm"
+                  value={formData.street}
+                  onChange={(e) => handleChange('street', e.target.value)}
+                />
+              </div>
+
+              <div className="space-y-2 md:col-span-1">
+                <Label className="text-[10px] font-black uppercase tracking-widest text-slate-500">Número</Label>
+                <Input 
+                  placeholder="Nº" 
+                  className="h-12 rounded-xl border-slate-200/50 dark:border-slate-800/50 bg-white/40 dark:bg-slate-900/40 backdrop-blur-sm shadow-sm"
+                  value={formData.number}
+                  onChange={(e) => handleChange('number', e.target.value)}
+                />
+              </div>
+              <div className="space-y-2 md:col-span-2">
+                <Label className="text-[10px] font-black uppercase tracking-widest text-slate-500">Complemento</Label>
+                <Input 
+                  placeholder="Apto, Bloco, etc." 
+                  className="h-12 rounded-xl border-slate-200/50 dark:border-slate-800/50 bg-white/40 dark:bg-slate-900/40 backdrop-blur-sm shadow-sm"
+                  value={formData.complement}
+                  onChange={(e) => handleChange('complement', e.target.value)}
+                />
+              </div>
+              <div className="space-y-2 md:col-span-1">
+                <Label className="text-[10px] font-black uppercase tracking-widest text-slate-500">Bairro</Label>
+                <Input 
+                  placeholder="Ex: Centro" 
+                  className="h-12 rounded-xl border-slate-200/50 dark:border-slate-800/50 bg-white/40 dark:bg-slate-900/40 backdrop-blur-sm shadow-sm"
+                  value={formData.district}
+                  onChange={(e) => handleChange('district', e.target.value)}
+                />
+              </div>
+
+              <div className="space-y-2 md:col-span-3">
+                <Label className="text-[10px] font-black uppercase tracking-widest text-slate-500">Cidade</Label>
+                <Input 
+                  placeholder="Cidade" 
+                  className="h-12 rounded-xl border-slate-200/50 dark:border-slate-800/50 bg-white/40 dark:bg-slate-900/40 backdrop-blur-sm shadow-sm"
+                  value={formData.city}
+                  onChange={(e) => handleChange('city', e.target.value)}
+                />
+              </div>
+              <div className="space-y-2 md:col-span-1">
+                <Label className="text-[10px] font-black uppercase tracking-widest text-slate-500">UF</Label>
+                <Input 
+                  placeholder="UF" 
+                  className="h-12 rounded-xl border-slate-200/50 dark:border-slate-800/50 bg-white/40 dark:bg-slate-900/40 backdrop-blur-sm shadow-sm"
+                  value={formData.uf}
+                  onChange={(e) => handleChange('uf', e.target.value)}
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Section 3: Professional Data */}
           <div className="space-y-4">
             <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-400 flex items-center gap-2 border-b border-slate-200 dark:border-slate-800 pb-2">
               <Briefcase className="h-4 w-4 text-blue-500" />
@@ -186,15 +308,12 @@ export function NewStaffModal({ open, onOpenChange, onSuccess }: NewStaffModalPr
 
               <div className="space-y-2">
                 <Label className="text-[10px] font-black uppercase tracking-widest text-slate-500">Registro (CRM/COREN)</Label>
-                <div className="relative">
-                  <CreditCard className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                  <Input 
-                    placeholder="000000-XX" 
-                    className="pl-10 h-12 rounded-xl border-slate-200/50 dark:border-slate-800/50 bg-white/40 dark:bg-slate-900/40 backdrop-blur-sm shadow-sm"
-                    value={formData.registry}
-                    onChange={(e) => handleChange('registry', e.target.value)}
-                  />
-                </div>
+                <Input 
+                  placeholder="000000-XX" 
+                  className="h-12 rounded-xl border-slate-200/50 dark:border-slate-800/50 bg-white/40 dark:bg-slate-900/40 backdrop-blur-sm shadow-sm"
+                  value={formData.registry}
+                  onChange={(e) => handleChange('registry', e.target.value)}
+                />
               </div>
 
               <div className="space-y-2">
