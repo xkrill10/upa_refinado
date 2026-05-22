@@ -1,4 +1,4 @@
-import { LayoutDashboard, Users, UserPlus, Activity, ClipboardList, Building2, BedDouble, Stethoscope, HeartPulse, FileText, Pill, UserCog, Globe, Megaphone, LogIn, Archive, Baby } from "lucide-react";
+import { LayoutDashboard, Users, UserPlus, Activity, ClipboardList, Building2, BedDouble, Stethoscope, HeartPulse, FileText, Pill, UserCog, Globe, Megaphone, LogIn, Archive, Baby, FlaskConical, PackageOpen, Syringe, DollarSign, Sparkles } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -34,7 +34,9 @@ const menuGroups = [
       { title: "Fila de Atendimento", url: "/fila", icon: ClipboardList },
       { title: "Clínico", url: "/atendimentos", icon: HeartPulse },
       { title: "Pediátrico", url: "/atendimentos-pediatrico", icon: Baby },
+      { title: "Laboratório", url: "/laboratorio", icon: FlaskConical },
       { title: "Leitos", url: "/leitos", icon: BedDouble },
+      { title: "Checagem Leito", url: "/checagem-enfermagem", icon: Syringe },
     ]
   },
   {
@@ -44,6 +46,7 @@ const menuGroups = [
       { title: "Setores", url: "/setores", icon: Building2 },
       { title: "SAME", url: "/same", icon: Archive },
       { title: "Recursos Humanos", url: "/rh", icon: UserCog },
+      { title: "Faturamento", url: "/faturamento", icon: DollarSign },
       { title: "Relatórios", url: "/relatorios", icon: FileText },
     ]
   },
@@ -52,6 +55,8 @@ const menuGroups = [
     items: [
       { title: "Painel de Chamadas", url: "/painel-chamadas", icon: Megaphone },
       { title: "Farmácia", url: "/farmacia", icon: Pill },
+      { title: "Almoxarifado", url: "/almoxarifado", icon: PackageOpen },
+      { title: "Governança", url: "/governanca", icon: Sparkles },
       { title: "SUS Cross Vagas", url: "/sus", icon: Globe },
     ]
   }

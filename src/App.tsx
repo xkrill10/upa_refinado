@@ -26,6 +26,13 @@ const NotFound = React.lazy(() => import("./pages/NotFound"));
 const Pediatria = React.lazy(() => import("./pages/Pediatria"));
 const AtendimentosPediatrico = React.lazy(() => import("./pages/AtendimentosPediatrico"));
 
+// Novas Telas
+const Laboratory = React.lazy(() => import("./pages/Laboratory"));
+const Inventory = React.lazy(() => import("./pages/Inventory"));
+const NursingCheck = React.lazy(() => import("./pages/NursingCheck"));
+const Billing = React.lazy(() => import("./pages/Billing"));
+const Governance = React.lazy(() => import("./pages/Governance"));
+
 import { ThemeProvider } from "./components/ThemeProvider";
 import { ThemeToggle } from "./components/ThemeToggle";
 import { PatientsProvider } from "@/context/PatientsContext";
@@ -100,6 +107,13 @@ const AppContent = () => {
                 <Route path="/paciente/:id/evolucao" element={<PatientEvolution />} />
                 <Route path="/pediatria" element={<Pediatria />} />
                 <Route path="/atendimentos-pediatrico" element={<AtendimentosPediatrico />} />
+                
+                {/* Novas Rotas (Esqueletos) */}
+                <Route path="/laboratorio" element={<Laboratory />} />
+                <Route path="/almoxarifado" element={<Inventory />} />
+                <Route path="/checagem-enfermagem" element={<NursingCheck />} />
+                <Route path="/faturamento" element={<Billing />} />
+                <Route path="/governanca" element={<Governance />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </Suspense>

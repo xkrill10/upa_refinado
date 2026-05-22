@@ -206,11 +206,11 @@ export function PatientsProvider({ children }: { children: ReactNode }) {
     }
   });
   const [isAudioEnabled, setIsAudioEnabled] = useState<boolean>(() => {
-    const saved = localStorage.getItem('upa_audio_enabled_v5');
+    const saved = localStorage.getItem('upa_audio_enabled_v6');
     try {
-      return saved ? JSON.parse(saved) : true;
+      return saved ? JSON.parse(saved) : false;
     } catch (e) {
-      return true;
+      return false;
     }
   });
   const [isAnnouncing, setIsAnnouncing] = useState(false);
@@ -229,7 +229,7 @@ export function PatientsProvider({ children }: { children: ReactNode }) {
   }, [callHistory]);
 
   useEffect(() => {
-    localStorage.setItem('upa_audio_enabled_v5', JSON.stringify(isAudioEnabled));
+    localStorage.setItem('upa_audio_enabled_v6', JSON.stringify(isAudioEnabled));
   }, [isAudioEnabled]);
 
   // Listen for changes from other tabs and sync context state
@@ -241,7 +241,7 @@ export function PatientsProvider({ children }: { children: ReactNode }) {
         const pSavedStr = localStorage.getItem('upa_patients');
         const cSavedStr = localStorage.getItem('upa_current_call');
         const hSavedStr = localStorage.getItem('upa_call_history');
-        const aSavedStr = localStorage.getItem('upa_audio_enabled_v5');
+        const aSavedStr = localStorage.getItem('upa_audio_enabled_v6');
         const coSavedStr = localStorage.getItem('upa_counters');
 
         if (pSavedStr) {
