@@ -125,8 +125,41 @@ export default function PatientEvolution() {
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent | TouchEvent) {
-      if (cidContainerRef.current && !cidContainerRef.current.contains(event.target as Node)) {
+      const target = event.target as HTMLElement;
+      
+      if (cidContainerRef.current && !cidContainerRef.current.contains(target)) {
         setIsCidDropdownOpen(false);
+      }
+
+      // Fechar todos os dropdowns clínicos/multidisciplinares ao clicar fora
+      const clickedDropdown = target.closest('.clinical-dropdown-container');
+      if (!clickedDropdown) {
+        setIsMedicationDropdownOpen(false);
+        setIsCareDropdownOpen(false);
+        setIsComfortDropdownOpen(false);
+        setIsMovementDropdownOpen(false);
+        setIsSaeAdmissionDropdownOpen(false);
+        setIsSaeCareDropdownOpen(false);
+        setIsMedicalNeuroDropdownOpen(false);
+        setIsMedicalSyndromeDropdownOpen(false);
+        setIsMedicalConductDropdownOpen(false);
+        setIsPediatricNeuroDropdownOpen(false);
+        setIsPediatricSyndromeDropdownOpen(false);
+        setIsPediatricConductDropdownOpen(false);
+        setIsFisioEvalDropdownOpen(false);
+        setIsFisioProcDropdownOpen(false);
+        setIsNutriEvalDropdownOpen(false);
+        setIsNutriProcDropdownOpen(false);
+        setIsPsicoEvalDropdownOpen(false);
+        setIsPsicoProcDropdownOpen(false);
+        setIsSocialEvalDropdownOpen(false);
+        setIsSocialProcDropdownOpen(false);
+        setIsToEvalDropdownOpen(false);
+        setIsToProcDropdownOpen(false);
+        setIsFonoEvalDropdownOpen(false);
+        setIsFonoProcDropdownOpen(false);
+        setIsFarmaEvalDropdownOpen(false);
+        setIsFarmaProcDropdownOpen(false);
       }
     }
     document.addEventListener("mousedown", handleClickOutside);
@@ -457,10 +490,10 @@ export default function PatientEvolution() {
     }
 
     return (
-      <div className="space-y-2 relative">
+      <div className={cn("space-y-2 relative", isOpen ? "z-30" : "z-10")}>
         <span className="text-[9px] font-black uppercase text-muted-foreground block">{title}</span>
-        <div className="relative">
-          <button type="button" onClick={toggleOpen} className={cn("flex items-center justify-between w-full px-4 py-2.5 rounded-xl border bg-background hover:bg-muted/50 text-xs font-semibold shadow-sm transition-all focus:outline-none focus:ring-2", focusRing, isOpen ? `${borderOpen} text-foreground` : "border-muted-foreground/20 text-muted-foreground")}>
+        <div className="relative clinical-dropdown-container">
+          <button type="button" onClick={toggleOpen} className={cn("flex items-center justify-between w-full px-4 py-2.5 rounded-xl border bg-white/45 dark:bg-slate-900/45 hover:bg-white/60 dark:hover:bg-slate-900/60 backdrop-blur-sm text-xs font-semibold shadow-sm transition-all focus:outline-none focus:ring-2", focusRing, isOpen ? `${borderOpen} text-foreground` : "border-white/60 dark:border-white/10 text-muted-foreground")}>
             <div className="flex items-center gap-2">
               <span className={cn("p-1 rounded-lg", bgLight, textMain)}>{icon}</span>
               <span>Selecionar...</span>
@@ -477,20 +510,17 @@ export default function PatientEvolution() {
           </button>
           <AnimatePresence>
             {isOpen && (
-              <>
-                <div className="fixed inset-0 z-40" onClick={toggleOpen} />
-                <motion.div initial={{ opacity: 0, y: 10, scale: 0.95 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 10, scale: 0.95 }} transition={{ duration: 0.15, ease: "easeOut" }} className={cn("absolute left-0 right-0 mt-2 p-1.5 rounded-xl border bg-popover text-popover-foreground shadow-xl z-50 max-h-[280px] overflow-y-auto overflow-x-hidden space-y-1 scrollbar-thin scrollbar-thumb-muted", borderLight)}>
-                  {items.map((item) => {
-                    const isActive = normalizeText(description).includes(normalizeText(item.text).trim());
-                    return (
-                      <button key={item.id} type="button" onClick={() => toggleCareItem(item.text, item.toastMsg)} className={cn("flex items-center justify-between w-full px-3 py-2 rounded-lg text-left text-xs transition-all", isActive ? `${hoverLight} ${textDark} font-bold border ${borderLight}` : "hover:bg-muted/70 text-foreground border border-transparent")}>
-                        <span className="truncate">{item.label}</span>
-                        {isActive ? <span className={cn("text-[10px] font-black flex items-center gap-1", textDark)}>Adicionado ✓</span> : <span className="text-[10px] text-muted-foreground/40 font-semibold group-hover:text-muted-foreground/60 transition-colors">+ Inserir</span>}
-                      </button>
-                    );
-                  })}
-                </motion.div>
-              </>
+              <motion.div initial={{ opacity: 0, y: 10, scale: 0.95 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 10, scale: 0.95 }} transition={{ duration: 0.15, ease: "easeOut" }} className={cn("absolute left-0 right-0 mt-2 p-1.5 rounded-xl border border-white/20 dark:border-white/10 bg-white/90 dark:bg-slate-950/90 text-popover-foreground shadow-2xl z-50 max-h-[280px] overflow-y-auto overflow-x-hidden space-y-1 backdrop-blur-md", borderLight)}>
+                {items.map((item) => {
+                  const isActive = normalizeText(description).includes(normalizeText(item.text).trim());
+                  return (
+                    <button key={item.id} type="button" onClick={() => toggleCareItem(item.text, item.toastMsg)} className={cn("group flex items-center justify-between w-full px-3 py-2 rounded-lg text-left text-xs transition-all", isActive ? `${hoverLight} ${textDark} font-bold border ${borderLight}` : "hover:bg-muted/70 text-slate-700 dark:text-slate-200 border border-transparent")}>
+                      <span className="truncate">{item.label}</span>
+                      {isActive ? <span className={cn("text-[10px] font-black flex items-center gap-1", textDark)}>Adicionado ✓</span> : <span className="text-[10px] text-slate-400 dark:text-slate-500 group-hover:text-[#006699] dark:group-hover:text-sky-400 font-bold transition-all">+ Inserir</span>}
+                    </button>
+                  );
+                })}
+              </motion.div>
             )}
           </AnimatePresence>
         </div>
@@ -548,7 +578,7 @@ export default function PatientEvolution() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card className="glass-card border border-slate-200/40 dark:border-slate-800/40 shadow-xl rounded-xl overflow-hidden bg-white/70 dark:bg-slate-900/45 transition-colors duration-500">
+        <Card className="glass-card-premium border border-white/40 dark:border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.06)] rounded-2xl overflow-hidden transition-all duration-500">
           <CardContent className="p-4 flex items-center gap-3">
             <div className="h-9 w-9 rounded-lg bg-blue-500/10 flex items-center justify-center shrink-0">
               <MessageSquare className="h-5 w-5 text-blue-500" />
@@ -562,10 +592,10 @@ export default function PatientEvolution() {
 
         <Card 
           className={cn(
-            "glass-card border shadow-xl rounded-xl overflow-hidden transition-all duration-500 cursor-pointer active:scale-98",
+            "glass-card-premium border shadow-[0_8px_30px_rgba(0,0,0,0.06)] rounded-2xl overflow-hidden transition-all duration-500 cursor-pointer hover:scale-[1.02] active:scale-98",
             patientBed 
-              ? "bg-emerald-500/5 dark:bg-emerald-500/10 border-emerald-500/20 dark:border-emerald-500/30" 
-              : "bg-white/70 dark:bg-slate-900/45 border-slate-200/40 dark:border-slate-800/40 hover:bg-muted/50"
+              ? "border-emerald-500/30 bg-emerald-500/5 dark:bg-emerald-500/10 hover:border-emerald-500/50" 
+              : "border-white/40 dark:border-white/10 hover:border-[#006699]/30"
           )}
           onClick={() => setIsBedDialogOpen(true)}
         >
@@ -585,7 +615,7 @@ export default function PatientEvolution() {
           </CardContent>
         </Card>
 
-        <Card className="glass-card border border-slate-200/40 dark:border-slate-800/40 shadow-xl rounded-xl overflow-hidden bg-white/70 dark:bg-slate-900/45 transition-colors duration-500 lg:col-span-1 border-slate-200/40 dark:border-slate-800/40">
+        <Card className="glass-card-premium border border-white/40 dark:border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.06)] rounded-2xl overflow-hidden transition-all duration-500 lg:col-span-1">
           <CardContent className="p-4 flex flex-col justify-between h-full gap-2 font-black">
             <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Status Sinais Vitais</p>
             <div className="flex flex-wrap items-center gap-1.5">
@@ -605,7 +635,7 @@ export default function PatientEvolution() {
           </CardContent>
         </Card>
 
-        <Card className="glass-card border border-slate-200/40 dark:border-slate-800/40 shadow-xl rounded-xl overflow-hidden bg-white/70 dark:bg-slate-900/45 transition-colors duration-500">
+        <Card className="glass-card-premium border border-white/40 dark:border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.06)] rounded-2xl overflow-hidden transition-all duration-500">
           <CardContent className="p-4 flex items-center gap-3">
             <div className="h-9 w-9 rounded-lg bg-blue-500/10 flex items-center justify-center shrink-0">
               <History className="h-5 w-5 text-blue-500" />
@@ -638,7 +668,7 @@ export default function PatientEvolution() {
             exit={{ opacity: 0, height: 0, y: -10 }}
             className="overflow-hidden"
           >
-            <Card className="glass-card border border-slate-200/40 dark:border-slate-800/40 shadow-2xl rounded-xl overflow-hidden bg-white/80 dark:bg-slate-950/45 backdrop-blur-md transition-colors duration-500 max-w-6xl mx-auto w-full">
+            <Card className="glass-card-premium border border-white/40 dark:border-white/10 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.3)] rounded-2xl md:rounded-[2rem] overflow-hidden transition-all duration-500 max-w-6xl mx-auto w-full">
               <CardContent className="p-4 space-y-4">
                 <div className="flex items-center justify-between border-b border-border/50 pb-2">
                   <h2 className="text-xs font-black flex items-center gap-2 text-primary uppercase tracking-wider">
@@ -653,7 +683,7 @@ export default function PatientEvolution() {
                   <div className="space-y-1">
                     <Label className="text-[10px] font-black uppercase tracking-wider text-muted-foreground">Tipo de Registro *</Label>
                     <Select value={evolutionType} onValueChange={handleEvolutionTypeChange}>
-                      <SelectTrigger className="h-9 bg-background border-muted-foreground/20 text-xs">
+                      <SelectTrigger className="h-9 bg-white/45 dark:bg-slate-900/45 border-white/60 dark:border-white/10 hover:bg-white/60 dark:hover:bg-slate-900/60 text-xs rounded-xl backdrop-blur-sm shadow-sm transition-all focus:ring-1 focus:ring-primary/20">
                         <SelectValue placeholder="Selecionar tipo" />
                       </SelectTrigger>
                       <SelectContent>
@@ -680,7 +710,7 @@ export default function PatientEvolution() {
                     <Label className="text-[10px] font-black uppercase tracking-wider text-muted-foreground">Profissional Responsável *</Label>
                     <Input 
                       placeholder="Nome do profissional" 
-                      className="h-9 bg-background border-muted-foreground/20 text-xs" 
+                      className="h-9 bg-white/45 dark:bg-slate-900/45 border-white/60 dark:border-white/10 focus:bg-white/60 dark:focus:bg-slate-900/60 text-xs rounded-xl backdrop-blur-sm shadow-sm transition-all focus:ring-1 focus:ring-primary/20" 
                       value={professional}
                       onChange={(e) => setProfessional(e.target.value)}
                     />
@@ -692,7 +722,7 @@ export default function PatientEvolution() {
                   <motion.div 
                     initial={{ opacity: 0, y: -5 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="p-3.5 rounded-xl border bg-slate-500/5 dark:bg-slate-500/10 border-slate-500/20 text-xs space-y-2"
+                    className="p-4 rounded-2xl border border-white/40 dark:border-white/10 bg-white/35 dark:bg-slate-900/35 backdrop-blur-md shadow-sm text-xs space-y-2"
                   >
                     <div className="flex items-center justify-between">
                       <span className="font-extrabold text-[#006699] uppercase tracking-wider text-[10px]">
@@ -734,7 +764,7 @@ export default function PatientEvolution() {
                   <motion.div 
                     initial={{ opacity: 0, y: -5 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="p-4 rounded-xl border bg-slate-500/5 dark:bg-slate-500/10 border-slate-500/20 space-y-4"
+                    className="p-5 rounded-2xl border border-white/40 dark:border-white/10 bg-white/35 dark:bg-slate-900/35 backdrop-blur-md shadow-sm space-y-4"
                   >
                     <div className="flex items-center justify-between border-b pb-2">
                       <span className="font-extrabold text-[#006699] uppercase tracking-wider text-[10px] flex items-center gap-1.5">
@@ -752,7 +782,7 @@ export default function PatientEvolution() {
                         <Input 
                           type="number"
                           placeholder="PAS mmHg" 
-                          className="h-8 text-xs bg-background"
+                          className="h-8 text-xs bg-white/45 dark:bg-slate-900/45 border-white/60 dark:border-white/10 focus:bg-white/60 dark:focus:bg-slate-900/60 rounded-xl backdrop-blur-sm shadow-sm transition-all focus:ring-1 focus:ring-[#006699]/20"
                           value={vsSystolic}
                           onChange={(e) => setVsSystolic(e.target.value)}
                         />
@@ -762,7 +792,7 @@ export default function PatientEvolution() {
                         <Input 
                           type="number"
                           placeholder="PAD mmHg" 
-                          className="h-8 text-xs bg-background"
+                          className="h-8 text-xs bg-white/45 dark:bg-slate-900/45 border-white/60 dark:border-white/10 focus:bg-white/60 dark:focus:bg-slate-900/60 rounded-xl backdrop-blur-sm shadow-sm transition-all focus:ring-1 focus:ring-[#006699]/20"
                           value={vsDiastolic}
                           onChange={(e) => setVsDiastolic(e.target.value)}
                         />
@@ -772,7 +802,7 @@ export default function PatientEvolution() {
                         <Input 
                           type="number"
                           placeholder="FC bpm" 
-                          className="h-8 text-xs bg-background"
+                          className="h-8 text-xs bg-white/45 dark:bg-slate-900/45 border-white/60 dark:border-white/10 focus:bg-white/60 dark:focus:bg-slate-900/60 rounded-xl backdrop-blur-sm shadow-sm transition-all focus:ring-1 focus:ring-[#006699]/20"
                           value={vsHeartRate}
                           onChange={(e) => setVsHeartRate(e.target.value)}
                         />
@@ -782,7 +812,7 @@ export default function PatientEvolution() {
                         <Input 
                           type="number"
                           placeholder="SpO2 %" 
-                          className="h-8 text-xs bg-background"
+                          className="h-8 text-xs bg-white/45 dark:bg-slate-900/45 border-white/60 dark:border-white/10 focus:bg-white/60 dark:focus:bg-slate-900/60 rounded-xl backdrop-blur-sm shadow-sm transition-all focus:ring-1 focus:ring-[#006699]/20"
                           value={vsSpO2}
                           onChange={(e) => setVsSpO2(e.target.value)}
                         />
@@ -792,7 +822,7 @@ export default function PatientEvolution() {
                         <Input 
                           type="text"
                           placeholder="Temp °C" 
-                          className="h-8 text-xs bg-background"
+                          className="h-8 text-xs bg-white/45 dark:bg-slate-900/45 border-white/60 dark:border-white/10 focus:bg-white/60 dark:focus:bg-slate-900/60 rounded-xl backdrop-blur-sm shadow-sm transition-all focus:ring-1 focus:ring-[#006699]/20"
                           value={vsTemperature}
                           onChange={(e) => setVsTemperature(e.target.value)}
                         />
@@ -802,7 +832,7 @@ export default function PatientEvolution() {
                         <Input 
                           type="number"
                           placeholder="FR irpm" 
-                          className="h-8 text-xs bg-background"
+                          className="h-8 text-xs bg-white/45 dark:bg-slate-900/45 border-white/60 dark:border-white/10 focus:bg-white/60 dark:focus:bg-slate-900/60 rounded-xl backdrop-blur-sm shadow-sm transition-all focus:ring-1 focus:ring-[#006699]/20"
                           value={vsRespiratoryRate}
                           onChange={(e) => setVsRespiratoryRate(e.target.value)}
                         />
@@ -810,7 +840,7 @@ export default function PatientEvolution() {
                       <div className="space-y-1">
                         <Label className="text-[9px] font-black uppercase text-muted-foreground">Escala de Dor</Label>
                         <Select value={vsPain} onValueChange={setVsPain}>
-                          <SelectTrigger className="h-8 text-xs bg-background">
+                          <SelectTrigger className="h-8 text-xs bg-white/45 dark:bg-slate-900/45 border-white/60 dark:border-white/10 hover:bg-white/60 dark:hover:bg-slate-900/60 rounded-xl backdrop-blur-sm shadow-sm transition-all focus:ring-1 focus:ring-[#006699]/20">
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
@@ -826,7 +856,7 @@ export default function PatientEvolution() {
                       <div className="space-y-1">
                         <Label className="text-[9px] font-black uppercase text-muted-foreground">Nível de Consciência (AVDI)</Label>
                         <Select value={vsConsciousness} onValueChange={setVsConsciousness}>
-                          <SelectTrigger className="h-8 text-xs bg-background">
+                          <SelectTrigger className="h-8 text-xs bg-white/45 dark:bg-slate-900/45 border-white/60 dark:border-white/10 hover:bg-white/60 dark:hover:bg-slate-900/60 rounded-xl backdrop-blur-sm shadow-sm transition-all focus:ring-1 focus:ring-[#006699]/20">
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
@@ -864,7 +894,7 @@ export default function PatientEvolution() {
                   <motion.div 
                     initial={{ opacity: 0, y: -5 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="p-3.5 rounded-xl border bg-slate-500/5 dark:bg-slate-500/10 border-slate-500/20 text-xs space-y-2"
+                    className="p-4 rounded-2xl border border-white/40 dark:border-white/10 bg-white/35 dark:bg-slate-900/35 backdrop-blur-md shadow-sm text-xs space-y-2"
                   >
                     <div className="flex items-center justify-between">
                       <span className="font-extrabold text-[#006699] uppercase tracking-wider text-[10px]">
@@ -988,7 +1018,7 @@ export default function PatientEvolution() {
                   <motion.div 
                     initial={{ opacity: 0, y: -5 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="p-3.5 rounded-xl border bg-slate-500/5 dark:bg-slate-500/10 border-slate-500/20 text-xs space-y-2"
+                    className="p-4 rounded-2xl border border-white/40 dark:border-white/10 bg-white/35 dark:bg-slate-900/35 backdrop-blur-md shadow-sm text-xs space-y-2"
                   >
                     <div className="flex items-center justify-between">
                       <span className="font-extrabold text-[#006699] uppercase tracking-wider text-[10px]">
@@ -1073,7 +1103,7 @@ export default function PatientEvolution() {
                   <motion.div 
                     initial={{ opacity: 0, y: -5 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="p-4 rounded-xl border bg-slate-500/5 dark:bg-slate-500/10 border-slate-500/20 space-y-4"
+                    className="p-5 rounded-2xl border border-white/40 dark:border-white/10 bg-white/35 dark:bg-slate-900/35 backdrop-blur-md shadow-sm space-y-4 relative z-20"
                   >
                     <div className="flex items-center justify-between border-b border-slate-500/20 pb-2">
                       <span className="font-extrabold text-[#006699] uppercase tracking-wider text-[11px]">
@@ -1083,12 +1113,12 @@ export default function PatientEvolution() {
 
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                       {/* 1. Exame Físico & Neuro */}
-                      <div className="space-y-2 relative">
+                      <div className={cn("space-y-2 relative", isMedicalNeuroDropdownOpen ? "z-30" : "z-10")}>
                         <span className="text-[9px] font-black uppercase text-muted-foreground block">
                           1. Exame Físico & Neuro
                         </span>
                         
-                        <div className="relative">
+                        <div className="relative clinical-dropdown-container">
                           <button
                             type="button"
                             onClick={() => {
@@ -1097,7 +1127,7 @@ export default function PatientEvolution() {
                               setIsMedicalConductDropdownOpen(false);
                             }}
                             className={cn(
-                              "flex items-center justify-between w-full px-4 py-2.5 rounded-xl border bg-background hover:bg-muted/50 text-xs font-semibold shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-green-500/20",
+                              "flex items-center justify-between w-full px-4 py-2.5 rounded-xl border bg-white/45 dark:bg-slate-900/45 hover:bg-white/60 dark:hover:bg-slate-900/60 backdrop-blur-sm text-xs font-semibold shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-green-500/20",
                               isMedicalNeuroDropdownOpen ? "border-green-500 text-foreground" : "border-muted-foreground/20 text-muted-foreground"
                             )}
                           >
@@ -1123,13 +1153,12 @@ export default function PatientEvolution() {
                           <AnimatePresence>
                             {isMedicalNeuroDropdownOpen && (
                               <>
-                                <div className="fixed inset-0 z-40" onClick={() => setIsMedicalNeuroDropdownOpen(false)} />
                                 <motion.div
                                   initial={{ opacity: 0, y: 10, scale: 0.95 }}
                                   animate={{ opacity: 1, y: 0, scale: 1 }}
                                   exit={{ opacity: 0, y: 10, scale: 0.95 }}
                                   transition={{ duration: 0.15, ease: "easeOut" }}
-                                  className="absolute left-0 right-0 mt-2 p-1.5 rounded-xl border border-green-500/20 bg-popover text-popover-foreground shadow-xl z-50 max-h-[280px] overflow-y-auto overflow-x-hidden space-y-1 scrollbar-thin scrollbar-thumb-muted"
+                                  className="absolute left-0 right-0 mt-2 p-1.5 rounded-xl border border-green-500/20 border-white/20 dark:border-white/10 bg-white/90 dark:bg-slate-950/90 text-slate-900 dark:text-slate-100 shadow-2xl backdrop-blur-md z-50 max-h-[280px] overflow-y-auto overflow-x-hidden space-y-1 scrollbar-thin scrollbar-thumb-muted"
                                 >
                                   {MEDICAL_PHYSICAL_NEURO_ITEMS.map((item) => {
                                     const isActive = normalizeText(description).includes(normalizeText(item.text).trim());
@@ -1139,10 +1168,10 @@ export default function PatientEvolution() {
                                         type="button"
                                         onClick={() => toggleCareItem(item.text, item.toastMsg)}
                                         className={cn(
-                                          "flex items-center justify-between w-full px-3 py-2 rounded-lg text-left text-xs transition-all",
+                                          "group flex items-center justify-between w-full px-3 py-2 rounded-lg text-left text-xs transition-all",
                                           isActive 
                                             ? "bg-green-500/5 text-green-700 dark:text-green-400 font-bold border border-green-500/20" 
-                                            : "hover:bg-muted/70 text-foreground border border-transparent"
+                                            : "hover:bg-muted/70 text-slate-700 dark:text-slate-200 border border-transparent"
                                         )}
                                       >
                                         <span className="truncate">{item.label}</span>
@@ -1151,7 +1180,7 @@ export default function PatientEvolution() {
                                             Adicionado ✓
                                           </span>
                                         ) : (
-                                          <span className="text-[10px] text-muted-foreground/40 font-semibold group-hover:text-muted-foreground/60 transition-colors">
+                                          <span className="text-[10px] text-slate-400 dark:text-slate-500 group-hover:text-[#006699] dark:group-hover:text-sky-400 font-bold transition-all">
                                             + Inserir
                                           </span>
                                         )}
@@ -1166,12 +1195,12 @@ export default function PatientEvolution() {
                       </div>
 
                       {/* 2. Síndromes Clínicas Comuns */}
-                      <div className="space-y-2 relative">
+                      <div className={cn("space-y-2 relative", isMedicalSyndromeDropdownOpen ? "z-30" : "z-10")}>
                         <span className="text-[9px] font-black uppercase text-muted-foreground block">
                           2. Síndromes Clínicas Comuns
                         </span>
                         
-                        <div className="relative">
+                        <div className="relative clinical-dropdown-container">
                           <button
                             type="button"
                             onClick={() => {
@@ -1180,7 +1209,7 @@ export default function PatientEvolution() {
                               setIsMedicalConductDropdownOpen(false);
                             }}
                             className={cn(
-                              "flex items-center justify-between w-full px-4 py-2.5 rounded-xl border bg-background hover:bg-muted/50 text-xs font-semibold shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-red-500/20",
+                              "flex items-center justify-between w-full px-4 py-2.5 rounded-xl border bg-white/45 dark:bg-slate-900/45 hover:bg-white/60 dark:hover:bg-slate-900/60 backdrop-blur-sm text-xs font-semibold shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-red-500/20",
                               isMedicalSyndromeDropdownOpen ? "border-red-500 text-foreground" : "border-muted-foreground/20 text-muted-foreground"
                             )}
                           >
@@ -1206,13 +1235,12 @@ export default function PatientEvolution() {
                           <AnimatePresence>
                             {isMedicalSyndromeDropdownOpen && (
                               <>
-                                <div className="fixed inset-0 z-40" onClick={() => setIsMedicalSyndromeDropdownOpen(false)} />
                                 <motion.div
                                   initial={{ opacity: 0, y: 10, scale: 0.95 }}
                                   animate={{ opacity: 1, y: 0, scale: 1 }}
                                   exit={{ opacity: 0, y: 10, scale: 0.95 }}
                                   transition={{ duration: 0.15, ease: "easeOut" }}
-                                  className="absolute left-0 right-0 mt-2 p-1.5 rounded-xl border border-red-500/20 bg-popover text-popover-foreground shadow-xl z-50 max-h-[280px] overflow-y-auto overflow-x-hidden space-y-1 scrollbar-thin scrollbar-thumb-muted"
+                                  className="absolute left-0 right-0 mt-2 p-1.5 rounded-xl border border-red-500/20 border-white/20 dark:border-white/10 bg-white/90 dark:bg-slate-950/90 text-slate-900 dark:text-slate-100 shadow-2xl backdrop-blur-md z-50 max-h-[280px] overflow-y-auto overflow-x-hidden space-y-1 scrollbar-thin scrollbar-thumb-muted"
                                 >
                                   {MEDICAL_SYNDROME_ITEMS.map((item) => {
                                     const isActive = normalizeText(description).includes(normalizeText(item.text).trim());
@@ -1222,10 +1250,10 @@ export default function PatientEvolution() {
                                         type="button"
                                         onClick={() => toggleCareItem(item.text, item.toastMsg)}
                                         className={cn(
-                                          "flex items-center justify-between w-full px-3 py-2 rounded-lg text-left text-xs transition-all",
+                                          "group flex items-center justify-between w-full px-3 py-2 rounded-lg text-left text-xs transition-all",
                                           isActive 
                                             ? "bg-red-500/5 text-red-700 dark:text-red-400 font-bold border border-red-500/20" 
-                                            : "hover:bg-muted/70 text-foreground border border-transparent"
+                                            : "hover:bg-muted/70 text-slate-700 dark:text-slate-200 border border-transparent"
                                         )}
                                       >
                                         <span className="truncate">{item.label}</span>
@@ -1234,7 +1262,7 @@ export default function PatientEvolution() {
                                             Adicionado ✓
                                           </span>
                                         ) : (
-                                          <span className="text-[10px] text-muted-foreground/40 font-semibold group-hover:text-muted-foreground/60 transition-colors">
+                                          <span className="text-[10px] text-slate-400 dark:text-slate-500 group-hover:text-[#006699] dark:group-hover:text-sky-400 font-bold transition-all">
                                             + Inserir
                                           </span>
                                         )}
@@ -1249,12 +1277,12 @@ export default function PatientEvolution() {
                       </div>
 
                       {/* 3. Solicitações e Condutas Rápidas */}
-                      <div className="space-y-2 relative">
+                      <div className={cn("space-y-2 relative", isMedicalConductDropdownOpen ? "z-30" : "z-10")}>
                         <span className="text-[9px] font-black uppercase text-muted-foreground block">
                           3. Solicitações e Condutas Rápidas
                         </span>
                         
-                        <div className="relative">
+                        <div className="relative clinical-dropdown-container">
                           <button
                             type="button"
                             onClick={() => {
@@ -1263,7 +1291,7 @@ export default function PatientEvolution() {
                               setIsMedicalSyndromeDropdownOpen(false);
                             }}
                             className={cn(
-                              "flex items-center justify-between w-full px-4 py-2.5 rounded-xl border bg-background hover:bg-muted/50 text-xs font-semibold shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-blue-500/20",
+                              "flex items-center justify-between w-full px-4 py-2.5 rounded-xl border bg-white/45 dark:bg-slate-900/45 hover:bg-white/60 dark:hover:bg-slate-900/60 backdrop-blur-sm text-xs font-semibold shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-blue-500/20",
                               isMedicalConductDropdownOpen ? "border-blue-500 text-foreground" : "border-muted-foreground/20 text-muted-foreground"
                             )}
                           >
@@ -1289,13 +1317,12 @@ export default function PatientEvolution() {
                           <AnimatePresence>
                             {isMedicalConductDropdownOpen && (
                               <>
-                                <div className="fixed inset-0 z-40" onClick={() => setIsMedicalConductDropdownOpen(false)} />
                                 <motion.div
                                   initial={{ opacity: 0, y: 10, scale: 0.95 }}
                                   animate={{ opacity: 1, y: 0, scale: 1 }}
                                   exit={{ opacity: 0, y: 10, scale: 0.95 }}
                                   transition={{ duration: 0.15, ease: "easeOut" }}
-                                  className="absolute left-0 right-0 mt-2 p-1.5 rounded-xl border border-blue-500/20 bg-popover text-popover-foreground shadow-xl z-50 max-h-[280px] overflow-y-auto overflow-x-hidden space-y-1 scrollbar-thin scrollbar-thumb-muted"
+                                  className="absolute left-0 right-0 mt-2 p-1.5 rounded-xl border border-blue-500/20 border-white/20 dark:border-white/10 bg-white/90 dark:bg-slate-950/90 text-slate-900 dark:text-slate-100 shadow-2xl backdrop-blur-md z-50 max-h-[280px] overflow-y-auto overflow-x-hidden space-y-1 scrollbar-thin scrollbar-thumb-muted"
                                 >
                                   {MEDICAL_CONDUCT_ITEMS.map((item) => {
                                     const isActive = normalizeText(description).includes(normalizeText(item.text).trim());
@@ -1305,10 +1332,10 @@ export default function PatientEvolution() {
                                         type="button"
                                         onClick={() => toggleCareItem(item.text, item.toastMsg)}
                                         className={cn(
-                                          "flex items-center justify-between w-full px-3 py-2 rounded-lg text-left text-xs transition-all",
+                                          "group flex items-center justify-between w-full px-3 py-2 rounded-lg text-left text-xs transition-all",
                                           isActive 
                                             ? "bg-blue-500/5 text-blue-700 dark:text-blue-400 font-bold border border-blue-500/20" 
-                                            : "hover:bg-muted/70 text-foreground border border-transparent"
+                                            : "hover:bg-muted/70 text-slate-700 dark:text-slate-200 border border-transparent"
                                         )}
                                       >
                                         <span className="truncate">{item.label}</span>
@@ -1317,7 +1344,7 @@ export default function PatientEvolution() {
                                             Adicionado ✓
                                           </span>
                                         ) : (
-                                          <span className="text-[10px] text-muted-foreground/40 font-semibold group-hover:text-muted-foreground/60 transition-colors">
+                                          <span className="text-[10px] text-slate-400 dark:text-slate-500 group-hover:text-[#006699] dark:group-hover:text-sky-400 font-bold transition-all">
                                             + Inserir
                                           </span>
                                         )}
@@ -1339,7 +1366,7 @@ export default function PatientEvolution() {
                   <motion.div 
                     initial={{ opacity: 0, y: -5 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="p-4 rounded-xl border bg-slate-500/5 dark:bg-slate-500/10 border-slate-500/20 space-y-4"
+                    className="p-5 rounded-2xl border border-white/40 dark:border-white/10 bg-white/35 dark:bg-slate-900/35 backdrop-blur-md shadow-sm space-y-4 relative z-20"
                   >
                     <div className="flex items-center justify-between border-b border-slate-500/20 pb-2">
                       <span className="font-extrabold text-[#006699] uppercase tracking-wider text-[11px]">
@@ -1349,12 +1376,12 @@ export default function PatientEvolution() {
 
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                       {/* 1. Exame Físico Inicial & Traumas */}
-                      <div className="space-y-2 relative">
+                      <div className={cn("space-y-2 relative", isPediatricNeuroDropdownOpen ? "z-30" : "z-10")}>
                         <span className="text-[9px] font-black uppercase text-muted-foreground block">
                           1. Exame Físico Inicial & Traumas
                         </span>
                         
-                        <div className="relative">
+                        <div className="relative clinical-dropdown-container">
                           <button
                             type="button"
                             onClick={() => {
@@ -1363,7 +1390,7 @@ export default function PatientEvolution() {
                               setIsPediatricConductDropdownOpen(false);
                             }}
                             className={cn(
-                              "flex items-center justify-between w-full px-4 py-2.5 rounded-xl border bg-background hover:bg-muted/50 text-xs font-semibold shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-green-500/20",
+                              "flex items-center justify-between w-full px-4 py-2.5 rounded-xl border bg-white/45 dark:bg-slate-900/45 hover:bg-white/60 dark:hover:bg-slate-900/60 backdrop-blur-sm text-xs font-semibold shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-green-500/20",
                               isPediatricNeuroDropdownOpen ? "border-green-500 text-foreground" : "border-muted-foreground/20 text-muted-foreground"
                             )}
                           >
@@ -1389,13 +1416,12 @@ export default function PatientEvolution() {
                           <AnimatePresence>
                             {isPediatricNeuroDropdownOpen && (
                               <>
-                                <div className="fixed inset-0 z-40" onClick={() => setIsPediatricNeuroDropdownOpen(false)} />
                                 <motion.div
                                   initial={{ opacity: 0, y: 10, scale: 0.95 }}
                                   animate={{ opacity: 1, y: 0, scale: 1 }}
                                   exit={{ opacity: 0, y: 10, scale: 0.95 }}
                                   transition={{ duration: 0.15, ease: "easeOut" }}
-                                  className="absolute left-0 right-0 mt-2 p-1.5 rounded-xl border border-green-500/20 bg-popover text-popover-foreground shadow-xl z-50 max-h-[280px] overflow-y-auto overflow-x-hidden space-y-1 scrollbar-thin scrollbar-thumb-muted"
+                                  className="absolute left-0 right-0 mt-2 p-1.5 rounded-xl border border-green-500/20 border-white/20 dark:border-white/10 bg-white/90 dark:bg-slate-950/90 text-slate-900 dark:text-slate-100 shadow-2xl backdrop-blur-md z-50 max-h-[280px] overflow-y-auto overflow-x-hidden space-y-1 scrollbar-thin scrollbar-thumb-muted"
                                 >
                                   {PEDIATRIC_PHYSICAL_NEURO_ITEMS.map((item) => {
                                     const isActive = normalizeText(description).includes(normalizeText(item.text).trim());
@@ -1405,10 +1431,10 @@ export default function PatientEvolution() {
                                         type="button"
                                         onClick={() => toggleCareItem(item.text, item.toastMsg)}
                                         className={cn(
-                                          "flex items-center justify-between w-full px-3 py-2 rounded-lg text-left text-xs transition-all",
+                                          "group flex items-center justify-between w-full px-3 py-2 rounded-lg text-left text-xs transition-all",
                                           isActive 
                                             ? "bg-green-500/5 text-green-700 dark:text-green-400 font-bold border border-green-500/20" 
-                                            : "hover:bg-muted/70 text-foreground border border-transparent"
+                                            : "hover:bg-muted/70 text-slate-700 dark:text-slate-200 border border-transparent"
                                         )}
                                       >
                                         <span className="truncate">{item.label}</span>
@@ -1417,7 +1443,7 @@ export default function PatientEvolution() {
                                             Adicionado ✓
                                           </span>
                                         ) : (
-                                          <span className="text-[10px] text-muted-foreground/40 font-semibold group-hover:text-muted-foreground/60 transition-colors">
+                                          <span className="text-[10px] text-slate-400 dark:text-slate-500 group-hover:text-[#006699] dark:group-hover:text-sky-400 font-bold transition-all">
                                             + Inserir
                                           </span>
                                         )}
@@ -1432,12 +1458,12 @@ export default function PatientEvolution() {
                       </div>
 
                       {/* 2. Síndromes Pediátricas Comuns */}
-                      <div className="space-y-2 relative">
+                      <div className={cn("space-y-2 relative", isPediatricSyndromeDropdownOpen ? "z-30" : "z-10")}>
                         <span className="text-[9px] font-black uppercase text-muted-foreground block">
                           2. Síndromes Pediátricas Comuns
                         </span>
                         
-                        <div className="relative">
+                        <div className="relative clinical-dropdown-container">
                           <button
                             type="button"
                             onClick={() => {
@@ -1446,7 +1472,7 @@ export default function PatientEvolution() {
                               setIsPediatricConductDropdownOpen(false);
                             }}
                             className={cn(
-                              "flex items-center justify-between w-full px-4 py-2.5 rounded-xl border bg-background hover:bg-muted/50 text-xs font-semibold shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-red-500/20",
+                              "flex items-center justify-between w-full px-4 py-2.5 rounded-xl border bg-white/45 dark:bg-slate-900/45 hover:bg-white/60 dark:hover:bg-slate-900/60 backdrop-blur-sm text-xs font-semibold shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-red-500/20",
                               isPediatricSyndromeDropdownOpen ? "border-red-500 text-foreground" : "border-muted-foreground/20 text-muted-foreground"
                             )}
                           >
@@ -1472,13 +1498,12 @@ export default function PatientEvolution() {
                           <AnimatePresence>
                             {isPediatricSyndromeDropdownOpen && (
                               <>
-                                <div className="fixed inset-0 z-40" onClick={() => setIsPediatricSyndromeDropdownOpen(false)} />
                                 <motion.div
                                   initial={{ opacity: 0, y: 10, scale: 0.95 }}
                                   animate={{ opacity: 1, y: 0, scale: 1 }}
                                   exit={{ opacity: 0, y: 10, scale: 0.95 }}
                                   transition={{ duration: 0.15, ease: "easeOut" }}
-                                  className="absolute left-0 right-0 mt-2 p-1.5 rounded-xl border border-red-500/20 bg-popover text-popover-foreground shadow-xl z-50 max-h-[280px] overflow-y-auto overflow-x-hidden space-y-1 scrollbar-thin scrollbar-thumb-muted"
+                                  className="absolute left-0 right-0 mt-2 p-1.5 rounded-xl border border-red-500/20 border-white/20 dark:border-white/10 bg-white/90 dark:bg-slate-950/90 text-slate-900 dark:text-slate-100 shadow-2xl backdrop-blur-md z-50 max-h-[280px] overflow-y-auto overflow-x-hidden space-y-1 scrollbar-thin scrollbar-thumb-muted"
                                 >
                                   {PEDIATRIC_SYNDROME_ITEMS.map((item) => {
                                     const isActive = normalizeText(description).includes(normalizeText(item.text).trim());
@@ -1488,10 +1513,10 @@ export default function PatientEvolution() {
                                         type="button"
                                         onClick={() => toggleCareItem(item.text, item.toastMsg)}
                                         className={cn(
-                                          "flex items-center justify-between w-full px-3 py-2 rounded-lg text-left text-xs transition-all",
+                                          "group flex items-center justify-between w-full px-3 py-2 rounded-lg text-left text-xs transition-all",
                                           isActive 
                                             ? "bg-red-500/5 text-red-700 dark:text-red-400 font-bold border border-red-500/20" 
-                                            : "hover:bg-muted/70 text-foreground border border-transparent"
+                                            : "hover:bg-muted/70 text-slate-700 dark:text-slate-200 border border-transparent"
                                         )}
                                       >
                                         <span className="truncate">{item.label}</span>
@@ -1500,7 +1525,7 @@ export default function PatientEvolution() {
                                             Adicionado ✓
                                           </span>
                                         ) : (
-                                          <span className="text-[10px] text-muted-foreground/40 font-semibold group-hover:text-muted-foreground/60 transition-colors">
+                                          <span className="text-[10px] text-slate-400 dark:text-slate-500 group-hover:text-[#006699] dark:group-hover:text-sky-400 font-bold transition-all">
                                             + Inserir
                                           </span>
                                         )}
@@ -1515,12 +1540,12 @@ export default function PatientEvolution() {
                       </div>
 
                       {/* 3. Condutas Rápidas (Pediatria) */}
-                      <div className="space-y-2 relative">
+                      <div className={cn("space-y-2 relative", isPediatricConductDropdownOpen ? "z-30" : "z-10")}>
                         <span className="text-[9px] font-black uppercase text-muted-foreground block">
                           3. Condutas Rápidas (Pediatria)
                         </span>
                         
-                        <div className="relative">
+                        <div className="relative clinical-dropdown-container">
                           <button
                             type="button"
                             onClick={() => {
@@ -1529,7 +1554,7 @@ export default function PatientEvolution() {
                               setIsPediatricSyndromeDropdownOpen(false);
                             }}
                             className={cn(
-                              "flex items-center justify-between w-full px-4 py-2.5 rounded-xl border bg-background hover:bg-muted/50 text-xs font-semibold shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-blue-500/20",
+                              "flex items-center justify-between w-full px-4 py-2.5 rounded-xl border bg-white/45 dark:bg-slate-900/45 hover:bg-white/60 dark:hover:bg-slate-900/60 backdrop-blur-sm text-xs font-semibold shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-blue-500/20",
                               isPediatricConductDropdownOpen ? "border-blue-500 text-foreground" : "border-muted-foreground/20 text-muted-foreground"
                             )}
                           >
@@ -1555,13 +1580,12 @@ export default function PatientEvolution() {
                           <AnimatePresence>
                             {isPediatricConductDropdownOpen && (
                               <>
-                                <div className="fixed inset-0 z-40" onClick={() => setIsPediatricConductDropdownOpen(false)} />
                                 <motion.div
                                   initial={{ opacity: 0, y: 10, scale: 0.95 }}
                                   animate={{ opacity: 1, y: 0, scale: 1 }}
                                   exit={{ opacity: 0, y: 10, scale: 0.95 }}
                                   transition={{ duration: 0.15, ease: "easeOut" }}
-                                  className="absolute left-0 right-0 mt-2 p-1.5 rounded-xl border border-blue-500/20 bg-popover text-popover-foreground shadow-xl z-50 max-h-[280px] overflow-y-auto overflow-x-hidden space-y-1 scrollbar-thin scrollbar-thumb-muted"
+                                  className="absolute left-0 right-0 mt-2 p-1.5 rounded-xl border border-blue-500/20 border-white/20 dark:border-white/10 bg-white/90 dark:bg-slate-950/90 text-slate-900 dark:text-slate-100 shadow-2xl backdrop-blur-md z-50 max-h-[280px] overflow-y-auto overflow-x-hidden space-y-1 scrollbar-thin scrollbar-thumb-muted"
                                 >
                                   {PEDIATRIC_CONDUCT_ITEMS.map((item) => {
                                     const isActive = normalizeText(description).includes(normalizeText(item.text).trim());
@@ -1571,10 +1595,10 @@ export default function PatientEvolution() {
                                         type="button"
                                         onClick={() => toggleCareItem(item.text, item.toastMsg)}
                                         className={cn(
-                                          "flex items-center justify-between w-full px-3 py-2 rounded-lg text-left text-xs transition-all",
+                                          "group flex items-center justify-between w-full px-3 py-2 rounded-lg text-left text-xs transition-all",
                                           isActive 
                                             ? "bg-blue-500/5 text-blue-700 dark:text-blue-400 font-bold border border-blue-500/20" 
-                                            : "hover:bg-muted/70 text-foreground border border-transparent"
+                                            : "hover:bg-muted/70 text-slate-700 dark:text-slate-200 border border-transparent"
                                         )}
                                       >
                                         <span className="truncate">{item.label}</span>
@@ -1583,7 +1607,7 @@ export default function PatientEvolution() {
                                             Adicionado ✓
                                           </span>
                                         ) : (
-                                          <span className="text-[10px] text-muted-foreground/40 font-semibold group-hover:text-muted-foreground/60 transition-colors">
+                                          <span className="text-[10px] text-slate-400 dark:text-slate-500 group-hover:text-[#006699] dark:group-hover:text-sky-400 font-bold transition-all">
                                             + Inserir
                                           </span>
                                         )}
@@ -1605,7 +1629,7 @@ export default function PatientEvolution() {
                   <motion.div 
                     initial={{ opacity: 0, y: -5 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="p-4 rounded-xl border bg-slate-500/5 dark:bg-slate-500/10 border-slate-500/20 space-y-4"
+                    className="p-5 rounded-2xl border border-white/40 dark:border-white/10 bg-white/35 dark:bg-slate-900/35 backdrop-blur-md shadow-sm space-y-4 relative z-20"
                   >
                     <div className="flex items-center justify-between border-b border-slate-500/20 pb-2">
                       <span className="font-extrabold text-[#006699] uppercase tracking-wider text-[11px]">
@@ -1615,12 +1639,12 @@ export default function PatientEvolution() {
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       {/* 1. Rotinas de Medicação e Acesso */}
-                      <div className="space-y-2 relative">
+                      <div className={cn("space-y-2 relative", isMedicationDropdownOpen ? "z-30" : "z-10")}>
                         <span className="text-[9px] font-black uppercase text-muted-foreground block">
                           1. Rotinas de Medicação e Acesso
                         </span>
                         
-                        <div className="relative">
+                        <div className="relative clinical-dropdown-container">
                           <button
                             type="button"
                             onClick={() => {
@@ -1630,7 +1654,7 @@ export default function PatientEvolution() {
                               setIsMovementDropdownOpen(false);
                             }}
                             className={cn(
-                              "flex items-center justify-between w-full px-4 py-2.5 rounded-xl border bg-background hover:bg-muted/50 text-xs font-semibold shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-red-500/20",
+                              "flex items-center justify-between w-full px-4 py-2.5 rounded-xl border bg-white/45 dark:bg-slate-900/45 hover:bg-white/60 dark:hover:bg-slate-900/60 backdrop-blur-sm text-xs font-semibold shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-red-500/20",
                               isMedicationDropdownOpen ? "border-red-500 text-foreground" : "border-muted-foreground/20 text-muted-foreground"
                             )}
                           >
@@ -1656,13 +1680,12 @@ export default function PatientEvolution() {
                           <AnimatePresence>
                             {isMedicationDropdownOpen && (
                               <>
-                                <div className="fixed inset-0 z-40" onClick={() => setIsMedicationDropdownOpen(false)} />
                                 <motion.div
                                   initial={{ opacity: 0, y: 10, scale: 0.95 }}
                                   animate={{ opacity: 1, y: 0, scale: 1 }}
                                   exit={{ opacity: 0, y: 10, scale: 0.95 }}
                                   transition={{ duration: 0.15, ease: "easeOut" }}
-                                  className="absolute left-0 right-0 mt-2 p-1.5 rounded-xl border border-red-500/20 bg-popover text-popover-foreground shadow-xl z-50 max-h-[280px] overflow-y-auto overflow-x-hidden space-y-1 scrollbar-thin scrollbar-thumb-muted"
+                                  className="absolute left-0 right-0 mt-2 p-1.5 rounded-xl border border-red-500/20 border-white/20 dark:border-white/10 bg-white/90 dark:bg-slate-950/90 text-slate-900 dark:text-slate-100 shadow-2xl backdrop-blur-md z-50 max-h-[280px] overflow-y-auto overflow-x-hidden space-y-1 scrollbar-thin scrollbar-thumb-muted"
                                 >
                                   {medicationItems.map((item) => {
                                     const isActive = normalizeText(description).includes(normalizeText(item.text).trim());
@@ -1672,10 +1695,10 @@ export default function PatientEvolution() {
                                         type="button"
                                         onClick={() => toggleCareItem(item.text, item.toastMsg)}
                                         className={cn(
-                                          "flex items-center justify-between w-full px-3 py-2 rounded-lg text-left text-xs transition-all",
+                                          "group flex items-center justify-between w-full px-3 py-2 rounded-lg text-left text-xs transition-all",
                                           isActive 
                                             ? "bg-red-500/5 text-red-700 dark:text-red-400 font-bold border border-red-500/20" 
-                                            : "hover:bg-muted/70 text-foreground border border-transparent"
+                                            : "hover:bg-muted/70 text-slate-700 dark:text-slate-200 border border-transparent"
                                         )}
                                       >
                                         <span className="truncate">{item.label}</span>
@@ -1684,7 +1707,7 @@ export default function PatientEvolution() {
                                             Adicionado ✓
                                           </span>
                                         ) : (
-                                          <span className="text-[10px] text-muted-foreground/40 font-semibold group-hover:text-muted-foreground/60 transition-colors">
+                                          <span className="text-[10px] text-slate-400 dark:text-slate-500 group-hover:text-[#006699] dark:group-hover:text-sky-400 font-bold transition-all">
                                             + Inserir
                                           </span>
                                         )}
@@ -1699,12 +1722,12 @@ export default function PatientEvolution() {
                       </div>
 
                       {/* 2. Checklist de Cuidados de Enfermagem */}
-                      <div className="space-y-2 relative">
+                      <div className={cn("space-y-2 relative", isCareDropdownOpen ? "z-30" : "z-10")}>
                         <span className="text-[9px] font-black uppercase text-muted-foreground block">
                           2. Checklist de Cuidados de Enfermagem
                         </span>
                         
-                        <div className="relative">
+                        <div className="relative clinical-dropdown-container">
                           <button
                             type="button"
                             onClick={() => {
@@ -1714,7 +1737,7 @@ export default function PatientEvolution() {
                               setIsMovementDropdownOpen(false);
                             }}
                             className={cn(
-                              "flex items-center justify-between w-full px-4 py-2.5 rounded-xl border bg-background hover:bg-muted/50 text-xs font-semibold shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-blue-500/20",
+                              "flex items-center justify-between w-full px-4 py-2.5 rounded-xl border bg-white/45 dark:bg-slate-900/45 hover:bg-white/60 dark:hover:bg-slate-900/60 backdrop-blur-sm text-xs font-semibold shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-blue-500/20",
                               isCareDropdownOpen ? "border-blue-500 text-foreground" : "border-muted-foreground/20 text-muted-foreground"
                             )}
                           >
@@ -1740,13 +1763,12 @@ export default function PatientEvolution() {
                           <AnimatePresence>
                             {isCareDropdownOpen && (
                               <>
-                                <div className="fixed inset-0 z-40" onClick={() => setIsCareDropdownOpen(false)} />
                                 <motion.div
                                   initial={{ opacity: 0, y: 10, scale: 0.95 }}
                                   animate={{ opacity: 1, y: 0, scale: 1 }}
                                   exit={{ opacity: 0, y: 10, scale: 0.95 }}
                                   transition={{ duration: 0.15, ease: "easeOut" }}
-                                  className="absolute left-0 right-0 mt-2 p-1.5 rounded-xl border border-blue-500/20 bg-popover text-popover-foreground shadow-xl z-50 max-h-[280px] overflow-y-auto overflow-x-hidden space-y-1 scrollbar-thin scrollbar-thumb-muted"
+                                  className="absolute left-0 right-0 mt-2 p-1.5 rounded-xl border border-blue-500/20 border-white/20 dark:border-white/10 bg-white/90 dark:bg-slate-950/90 text-slate-900 dark:text-slate-100 shadow-2xl backdrop-blur-md z-50 max-h-[280px] overflow-y-auto overflow-x-hidden space-y-1 scrollbar-thin scrollbar-thumb-muted"
                                 >
                                   {careItems.map((item) => {
                                     const isActive = normalizeText(description).includes(normalizeText(item.text).trim());
@@ -1756,10 +1778,10 @@ export default function PatientEvolution() {
                                         type="button"
                                         onClick={() => toggleCareItem(item.text, item.toastMsg)}
                                         className={cn(
-                                          "flex items-center justify-between w-full px-3 py-2 rounded-lg text-left text-xs transition-all",
+                                          "group flex items-center justify-between w-full px-3 py-2 rounded-lg text-left text-xs transition-all",
                                           isActive 
                                             ? "bg-blue-500/5 text-blue-700 dark:text-blue-400 font-bold border border-blue-500/20" 
-                                            : "hover:bg-muted/70 text-foreground border border-transparent"
+                                            : "hover:bg-muted/70 text-slate-700 dark:text-slate-200 border border-transparent"
                                         )}
                                       >
                                         <span className="truncate">{item.label}</span>
@@ -1768,7 +1790,7 @@ export default function PatientEvolution() {
                                             Adicionado ✓
                                           </span>
                                         ) : (
-                                          <span className="text-[10px] text-muted-foreground/40 font-semibold group-hover:text-muted-foreground/60 transition-colors">
+                                          <span className="text-[10px] text-slate-400 dark:text-slate-500 group-hover:text-[#006699] dark:group-hover:text-sky-400 font-bold transition-all">
                                             + Inserir
                                           </span>
                                         )}
@@ -1783,12 +1805,12 @@ export default function PatientEvolution() {
                       </div>
 
                       {/* 3. Cuidados, Conforto e Dieta Padrão */}
-                      <div className="space-y-2 relative">
+                      <div className={cn("space-y-2 relative", isComfortDropdownOpen ? "z-30" : "z-10")}>
                         <span className="text-[9px] font-black uppercase text-muted-foreground block">
                           3. Cuidados, Conforto e Dieta Padrão
                         </span>
                         
-                        <div className="relative">
+                        <div className="relative clinical-dropdown-container">
                           <button
                             type="button"
                             onClick={() => {
@@ -1798,7 +1820,7 @@ export default function PatientEvolution() {
                               setIsMovementDropdownOpen(false);
                             }}
                             className={cn(
-                              "flex items-center justify-between w-full px-4 py-2.5 rounded-xl border bg-background hover:bg-muted/50 text-xs font-semibold shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-orange-500/20",
+                              "flex items-center justify-between w-full px-4 py-2.5 rounded-xl border bg-white/45 dark:bg-slate-900/45 hover:bg-white/60 dark:hover:bg-slate-900/60 backdrop-blur-sm text-xs font-semibold shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-orange-500/20",
                               isComfortDropdownOpen ? "border-orange-500 text-foreground" : "border-muted-foreground/20 text-muted-foreground"
                             )}
                           >
@@ -1824,13 +1846,12 @@ export default function PatientEvolution() {
                           <AnimatePresence>
                             {isComfortDropdownOpen && (
                               <>
-                                <div className="fixed inset-0 z-40" onClick={() => setIsComfortDropdownOpen(false)} />
                                 <motion.div
                                   initial={{ opacity: 0, y: 10, scale: 0.95 }}
                                   animate={{ opacity: 1, y: 0, scale: 1 }}
                                   exit={{ opacity: 0, y: 10, scale: 0.95 }}
                                   transition={{ duration: 0.15, ease: "easeOut" }}
-                                  className="absolute left-0 right-0 mt-2 p-1.5 rounded-xl border border-orange-500/20 bg-popover text-popover-foreground shadow-xl z-50 max-h-[280px] overflow-y-auto overflow-x-hidden space-y-1 scrollbar-thin scrollbar-thumb-muted"
+                                  className="absolute left-0 right-0 mt-2 p-1.5 rounded-xl border border-orange-500/20 border-white/20 dark:border-white/10 bg-white/90 dark:bg-slate-950/90 text-slate-900 dark:text-slate-100 shadow-2xl backdrop-blur-md z-50 max-h-[280px] overflow-y-auto overflow-x-hidden space-y-1 scrollbar-thin scrollbar-thumb-muted"
                                 >
                                   {comfortItems.map((item) => {
                                     const isActive = normalizeText(description).includes(normalizeText(item.text).trim());
@@ -1840,10 +1861,10 @@ export default function PatientEvolution() {
                                         type="button"
                                         onClick={() => toggleCareItem(item.text, item.toastMsg)}
                                         className={cn(
-                                          "flex items-center justify-between w-full px-3 py-2 rounded-lg text-left text-xs transition-all",
+                                          "group flex items-center justify-between w-full px-3 py-2 rounded-lg text-left text-xs transition-all",
                                           isActive 
                                             ? "bg-orange-500/5 text-orange-700 dark:text-orange-400 font-bold border border-orange-500/20" 
-                                            : "hover:bg-muted/70 text-foreground border border-transparent"
+                                            : "hover:bg-muted/70 text-slate-700 dark:text-slate-200 border border-transparent"
                                         )}
                                       >
                                         <span className="truncate">{item.label}</span>
@@ -1852,7 +1873,7 @@ export default function PatientEvolution() {
                                             Adicionado ✓
                                           </span>
                                         ) : (
-                                          <span className="text-[10px] text-muted-foreground/40 font-semibold group-hover:text-muted-foreground/60 transition-colors">
+                                          <span className="text-[10px] text-slate-400 dark:text-slate-500 group-hover:text-[#006699] dark:group-hover:text-sky-400 font-bold transition-all">
                                             + Inserir
                                           </span>
                                         )}
@@ -1867,12 +1888,12 @@ export default function PatientEvolution() {
                       </div>
 
                       {/* 4. Movimentação e Ocorrências */}
-                      <div className="space-y-2 relative">
+                      <div className={cn("space-y-2 relative", isMovementDropdownOpen ? "z-30" : "z-10")}>
                         <span className="text-[9px] font-black uppercase text-muted-foreground block">
                           4. Movimentação e Ocorrências
                         </span>
                         
-                        <div className="relative">
+                        <div className="relative clinical-dropdown-container">
                           <button
                             type="button"
                             onClick={() => {
@@ -1882,7 +1903,7 @@ export default function PatientEvolution() {
                               setIsComfortDropdownOpen(false);
                             }}
                             className={cn(
-                              "flex items-center justify-between w-full px-4 py-2.5 rounded-xl border bg-background hover:bg-muted/50 text-xs font-semibold shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-indigo-500/20",
+                              "flex items-center justify-between w-full px-4 py-2.5 rounded-xl border bg-white/45 dark:bg-slate-900/45 hover:bg-white/60 dark:hover:bg-slate-900/60 backdrop-blur-sm text-xs font-semibold shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-indigo-500/20",
                               isMovementDropdownOpen ? "border-indigo-500 text-foreground" : "border-muted-foreground/20 text-muted-foreground"
                             )}
                           >
@@ -1908,13 +1929,12 @@ export default function PatientEvolution() {
                           <AnimatePresence>
                             {isMovementDropdownOpen && (
                               <>
-                                <div className="fixed inset-0 z-40" onClick={() => setIsMovementDropdownOpen(false)} />
                                 <motion.div
                                   initial={{ opacity: 0, y: 10, scale: 0.95 }}
                                   animate={{ opacity: 1, y: 0, scale: 1 }}
                                   exit={{ opacity: 0, y: 10, scale: 0.95 }}
                                   transition={{ duration: 0.15, ease: "easeOut" }}
-                                  className="absolute left-0 right-0 mt-2 p-1.5 rounded-xl border border-indigo-500/20 bg-popover text-popover-foreground shadow-xl z-50 max-h-[280px] overflow-y-auto overflow-x-hidden space-y-1 scrollbar-thin scrollbar-thumb-muted"
+                                  className="absolute left-0 right-0 mt-2 p-1.5 rounded-xl border border-indigo-500/20 border-white/20 dark:border-white/10 bg-white/90 dark:bg-slate-950/90 text-slate-900 dark:text-slate-100 shadow-2xl backdrop-blur-md z-50 max-h-[280px] overflow-y-auto overflow-x-hidden space-y-1 scrollbar-thin scrollbar-thumb-muted"
                                 >
                                   {movementItems.map((item) => {
                                     const isActive = normalizeText(description).includes(normalizeText(item.text).trim());
@@ -1924,10 +1944,10 @@ export default function PatientEvolution() {
                                         type="button"
                                         onClick={() => toggleCareItem(item.text, item.toastMsg)}
                                         className={cn(
-                                          "flex items-center justify-between w-full px-3 py-2 rounded-lg text-left text-xs transition-all",
+                                          "group flex items-center justify-between w-full px-3 py-2 rounded-lg text-left text-xs transition-all",
                                           isActive 
                                             ? "bg-indigo-500/5 text-indigo-700 dark:text-indigo-400 font-bold border border-indigo-500/20" 
-                                            : "hover:bg-muted/70 text-foreground border border-transparent"
+                                            : "hover:bg-muted/70 text-slate-700 dark:text-slate-200 border border-transparent"
                                         )}
                                       >
                                         <span className="truncate">{item.label}</span>
@@ -1936,7 +1956,7 @@ export default function PatientEvolution() {
                                             Adicionado ✓
                                           </span>
                                         ) : (
-                                          <span className="text-[10px] text-muted-foreground/40 font-semibold group-hover:text-muted-foreground/60 transition-colors">
+                                          <span className="text-[10px] text-slate-400 dark:text-slate-500 group-hover:text-[#006699] dark:group-hover:text-sky-400 font-bold transition-all">
                                             + Inserir
                                           </span>
                                         )}
@@ -1955,7 +1975,7 @@ export default function PatientEvolution() {
 
                 {/* ---------------- MULTIDISCIPLINAR PANELS ---------------- */}
                 {evolutionType === "Evolução da Fisioterapia" && (
-                  <motion.div initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }} className="p-4 rounded-xl border bg-slate-500/5 dark:bg-slate-500/10 border-slate-500/20 space-y-4">
+                  <motion.div initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }} className="p-4 rounded-xl border bg-slate-500/5 dark:bg-slate-500/10 border-slate-500/20 space-y-4 relative z-20">
                     <div className="flex items-center justify-between border-b border-slate-500/20 pb-2">
                       <span className="font-extrabold text-[#006699] uppercase tracking-wider text-[11px]">
                         🫁 Super Painel da Fisioterapia {isChild && "(Pediatria)"}
@@ -1969,7 +1989,7 @@ export default function PatientEvolution() {
                 )}
 
                 {evolutionType === "Evolução da Nutrição" && (
-                  <motion.div initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }} className="p-4 rounded-xl border bg-slate-500/5 dark:bg-slate-500/10 border-slate-500/20 space-y-4">
+                  <motion.div initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }} className="p-4 rounded-xl border bg-slate-500/5 dark:bg-slate-500/10 border-slate-500/20 space-y-4 relative z-20">
                     <div className="flex items-center justify-between border-b border-slate-500/20 pb-2">
                       <span className="font-extrabold text-[#006699] uppercase tracking-wider text-[11px]">
                         🥗 Super Painel da Nutrição {isChild && "(Pediatria)"}
@@ -1983,7 +2003,7 @@ export default function PatientEvolution() {
                 )}
 
                 {evolutionType === "Evolução da Psicologia" && (
-                  <motion.div initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }} className="p-4 rounded-xl border bg-slate-500/5 dark:bg-slate-500/10 border-slate-500/20 space-y-4">
+                  <motion.div initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }} className="p-4 rounded-xl border bg-slate-500/5 dark:bg-slate-500/10 border-slate-500/20 space-y-4 relative z-20">
                     <div className="flex items-center justify-between border-b border-slate-500/20 pb-2">
                       <span className="font-extrabold text-[#006699] uppercase tracking-wider text-[11px]">
                         🧠 Super Painel da Psicologia {isChild && "(Pediatria)"}
@@ -1997,7 +2017,7 @@ export default function PatientEvolution() {
                 )}
 
                 {evolutionType === "Evolução do Serviço Social" && (
-                  <motion.div initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }} className="p-4 rounded-xl border bg-slate-500/5 dark:bg-slate-500/10 border-slate-500/20 space-y-4">
+                  <motion.div initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }} className="p-4 rounded-xl border bg-slate-500/5 dark:bg-slate-500/10 border-slate-500/20 space-y-4 relative z-20">
                     <div className="flex items-center justify-between border-b border-slate-500/20 pb-2">
                       <span className="font-extrabold text-[#006699] uppercase tracking-wider text-[11px]">
                         🤝 Super Painel do Serviço Social {isChild && "(Pediatria)"}
@@ -2011,7 +2031,7 @@ export default function PatientEvolution() {
                 )}
 
                 {evolutionType === "Evolução da Terapia Ocupacional" && (
-                  <motion.div initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }} className="p-4 rounded-xl border bg-slate-500/5 dark:bg-slate-500/10 border-slate-500/20 space-y-4">
+                  <motion.div initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }} className="p-4 rounded-xl border bg-slate-500/5 dark:bg-slate-500/10 border-slate-500/20 space-y-4 relative z-20">
                     <div className="flex items-center justify-between border-b border-slate-500/20 pb-2">
                       <span className="font-extrabold text-[#006699] uppercase tracking-wider text-[11px]">
                         🧩 Super Painel da Terapia Ocupacional {isChild && "(Pediatria)"}
@@ -2025,7 +2045,7 @@ export default function PatientEvolution() {
                 )}
 
                 {evolutionType === "Evolução da Fonoaudiologia" && (
-                  <motion.div initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }} className="p-4 rounded-xl border bg-slate-500/5 dark:bg-slate-500/10 border-slate-500/20 space-y-4">
+                  <motion.div initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }} className="p-4 rounded-xl border bg-slate-500/5 dark:bg-slate-500/10 border-slate-500/20 space-y-4 relative z-20">
                     <div className="flex items-center justify-between border-b border-slate-500/20 pb-2">
                       <span className="font-extrabold text-[#006699] uppercase tracking-wider text-[11px]">
                         🗣️ Super Painel da Fonoaudiologia {isChild && "(Pediatria)"}
@@ -2039,7 +2059,7 @@ export default function PatientEvolution() {
                 )}
 
                 {evolutionType === "Evolução da Farmácia Clínica" && (
-                  <motion.div initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }} className="p-4 rounded-xl border bg-slate-500/5 dark:bg-slate-500/10 border-slate-500/20 space-y-4">
+                  <motion.div initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }} className="p-4 rounded-xl border bg-slate-500/5 dark:bg-slate-500/10 border-slate-500/20 space-y-4 relative z-20">
                     <div className="flex items-center justify-between border-b border-slate-500/20 pb-2">
                       <span className="font-extrabold text-[#006699] uppercase tracking-wider text-[11px]">
                         💊 Super Painel da Farmácia Clínica {isChild && "(Pediatria)"}
@@ -2057,7 +2077,7 @@ export default function PatientEvolution() {
                   <motion.div 
                     initial={{ opacity: 0, y: -5 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="p-4 rounded-xl border bg-slate-500/5 dark:bg-slate-500/10 border-slate-500/20 space-y-4"
+                    className="p-5 rounded-2xl border border-white/40 dark:border-white/10 bg-white/35 dark:bg-slate-900/35 backdrop-blur-md shadow-sm space-y-4 relative z-20"
                   >
                     <div className="flex items-center justify-between border-b border-slate-500/20 pb-2">
                       <span className="font-extrabold text-[#006699] uppercase tracking-wider text-[11px]">
@@ -2067,12 +2087,12 @@ export default function PatientEvolution() {
                     
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       {/* 1. Rotinas de Admissão por Setor */}
-                      <div className="space-y-2 relative">
+                      <div className={cn("space-y-2 relative", isSaeAdmissionDropdownOpen ? "z-30" : "z-10")}>
                         <span className="text-[9px] font-black uppercase text-muted-foreground block">
                           1. Rotinas de Admissão por Setor
                         </span>
                         
-                        <div className="relative">
+                        <div className="relative clinical-dropdown-container">
                           <button
                             type="button"
                             onClick={() => {
@@ -2080,8 +2100,8 @@ export default function PatientEvolution() {
                               setIsSaeCareDropdownOpen(false);
                             }}
                             className={cn(
-                              "flex items-center justify-between w-full px-4 py-2.5 rounded-xl border bg-background hover:bg-muted/50 text-xs font-semibold shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-red-500/20",
-                              isSaeAdmissionDropdownOpen ? "border-red-500 text-foreground" : "border-muted-foreground/20 text-muted-foreground"
+                              "flex items-center justify-between w-full px-4 py-2.5 rounded-xl border bg-white/45 dark:bg-slate-900/45 hover:bg-white/60 dark:hover:bg-slate-900/60 backdrop-blur-sm text-xs font-semibold shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-red-500/20",
+                              isSaeAdmissionDropdownOpen ? "border-red-500 text-foreground" : "border-white/60 dark:border-white/10 text-muted-foreground"
                             )}
                           >
                             <div className="flex items-center gap-2">
@@ -2106,13 +2126,12 @@ export default function PatientEvolution() {
                           <AnimatePresence>
                             {isSaeAdmissionDropdownOpen && (
                               <>
-                                <div className="fixed inset-0 z-40" onClick={() => setIsSaeAdmissionDropdownOpen(false)} />
                                 <motion.div
                                   initial={{ opacity: 0, y: 10, scale: 0.95 }}
                                   animate={{ opacity: 1, y: 0, scale: 1 }}
                                   exit={{ opacity: 0, y: 10, scale: 0.95 }}
                                   transition={{ duration: 0.15, ease: "easeOut" }}
-                                  className="absolute left-0 right-0 mt-2 p-1.5 rounded-xl border border-red-500/20 bg-popover text-popover-foreground shadow-xl z-50 max-h-[280px] overflow-y-auto overflow-x-hidden space-y-1 scrollbar-thin scrollbar-thumb-muted"
+                                  className="absolute left-0 right-0 mt-2 p-1.5 rounded-xl border border-red-500/20 bg-white/95 dark:bg-slate-950/95 text-popover-foreground shadow-xl z-50 max-h-[280px] overflow-y-auto overflow-x-hidden space-y-1 backdrop-blur-md"
                                 >
                                   {admissionItems.map((item) => {
                                     const isActive = normalizeText(description).includes(normalizeText(item.text).trim());
@@ -2122,10 +2141,10 @@ export default function PatientEvolution() {
                                         type="button"
                                         onClick={() => toggleCareItem(item.text, item.toastMsg)}
                                         className={cn(
-                                          "flex items-center justify-between w-full px-3 py-2 rounded-lg text-left text-xs transition-all",
+                                          "group flex items-center justify-between w-full px-3 py-2 rounded-lg text-left text-xs transition-all",
                                           isActive 
                                             ? "bg-red-500/5 text-red-700 dark:text-red-400 font-bold border border-red-500/20" 
-                                            : "hover:bg-muted/70 text-foreground border border-transparent"
+                                            : "hover:bg-muted/70 text-slate-700 dark:text-slate-200 border border-transparent"
                                         )}
                                       >
                                         <span className="truncate">{item.label}</span>
@@ -2134,7 +2153,7 @@ export default function PatientEvolution() {
                                             Adicionado ✓
                                           </span>
                                         ) : (
-                                          <span className="text-[10px] text-muted-foreground/40 font-semibold group-hover:text-muted-foreground/60 transition-colors">
+                                          <span className="text-[10px] text-slate-400 dark:text-slate-500 group-hover:text-[#006699] dark:group-hover:text-sky-400 font-bold transition-all">
                                             + Inserir
                                           </span>
                                         )}
@@ -2149,12 +2168,12 @@ export default function PatientEvolution() {
                       </div>
 
                       {/* 2. Checklist de Cuidados de Enfermagem */}
-                      <div className="space-y-2 relative">
+                      <div className={cn("space-y-2 relative", isSaeCareDropdownOpen ? "z-30" : "z-10")}>
                         <span className="text-[9px] font-black uppercase text-muted-foreground block">
                           2. Checklist de Cuidados de Enfermagem (Inserir no text)
                         </span>
                         
-                        <div className="relative">
+                        <div className="relative clinical-dropdown-container">
                           <button
                             type="button"
                             onClick={() => {
@@ -2162,8 +2181,8 @@ export default function PatientEvolution() {
                               setIsSaeAdmissionDropdownOpen(false);
                             }}
                             className={cn(
-                              "flex items-center justify-between w-full px-4 py-2.5 rounded-xl border bg-background hover:bg-muted/50 text-xs font-semibold shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-blue-500/20",
-                              isSaeCareDropdownOpen ? "border-blue-500 text-foreground" : "border-muted-foreground/20 text-muted-foreground"
+                              "flex items-center justify-between w-full px-4 py-2.5 rounded-xl border bg-white/45 dark:bg-slate-900/45 hover:bg-white/60 dark:hover:bg-slate-900/60 backdrop-blur-sm text-xs font-semibold shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-blue-500/20",
+                              isSaeCareDropdownOpen ? "border-blue-500 text-foreground" : "border-white/60 dark:border-white/10 text-muted-foreground"
                             )}
                           >
                             <div className="flex items-center gap-2">
@@ -2188,13 +2207,12 @@ export default function PatientEvolution() {
                           <AnimatePresence>
                             {isSaeCareDropdownOpen && (
                               <>
-                                <div className="fixed inset-0 z-40" onClick={() => setIsSaeCareDropdownOpen(false)} />
                                 <motion.div
                                   initial={{ opacity: 0, y: 10, scale: 0.95 }}
                                   animate={{ opacity: 1, y: 0, scale: 1 }}
                                   exit={{ opacity: 0, y: 10, scale: 0.95 }}
                                   transition={{ duration: 0.15, ease: "easeOut" }}
-                                  className="absolute left-0 right-0 mt-2 p-1.5 rounded-xl border border-blue-500/20 bg-popover text-popover-foreground shadow-xl z-50 max-h-[280px] overflow-y-auto overflow-x-hidden space-y-1 scrollbar-thin scrollbar-thumb-muted"
+                                  className="absolute left-0 right-0 mt-2 p-1.5 rounded-xl border border-blue-500/20 bg-white/95 dark:bg-slate-950/95 text-popover-foreground shadow-xl z-50 max-h-[280px] overflow-y-auto overflow-x-hidden space-y-1 backdrop-blur-md"
                                 >
                                   {careItems.map((item) => {
                                     const isActive = normalizeText(description).includes(normalizeText(item.text).trim());
@@ -2204,10 +2222,10 @@ export default function PatientEvolution() {
                                         type="button"
                                         onClick={() => toggleCareItem(item.text, item.toastMsg)}
                                         className={cn(
-                                          "flex items-center justify-between w-full px-3 py-2 rounded-lg text-left text-xs transition-all",
+                                          "group flex items-center justify-between w-full px-3 py-2 rounded-lg text-left text-xs transition-all",
                                           isActive 
                                             ? "bg-blue-500/5 text-blue-700 dark:text-blue-400 font-bold border border-blue-500/20" 
-                                            : "hover:bg-muted/70 text-foreground border border-transparent"
+                                            : "hover:bg-muted/70 text-slate-700 dark:text-slate-200 border border-transparent"
                                         )}
                                       >
                                         <span className="truncate">{item.label}</span>
@@ -2216,7 +2234,7 @@ export default function PatientEvolution() {
                                             Adicionado ✓
                                           </span>
                                         ) : (
-                                          <span className="text-[10px] text-muted-foreground/40 font-semibold group-hover:text-muted-foreground/60 transition-colors">
+                                          <span className="text-[10px] text-slate-400 dark:text-slate-500 group-hover:text-[#006699] dark:group-hover:text-sky-400 font-bold transition-all">
                                             + Inserir
                                           </span>
                                         )}
@@ -2250,7 +2268,7 @@ export default function PatientEvolution() {
                               "flex flex-col items-start p-2.5 rounded-xl border text-left transition-all relative overflow-hidden group",
                               selectedMorse 
                                 ? "bg-amber-500/5 border-amber-500/30 dark:bg-amber-500/10" 
-                                : "bg-card border-border hover:border-amber-500/40 hover:bg-amber-500/5"
+                                : "bg-white/45 dark:bg-slate-900/45 border-white/60 dark:border-white/10 hover:border-amber-500/40 hover:bg-amber-500/5 backdrop-blur-sm shadow-sm"
                             )}
                           >
                             <div className="flex items-center justify-between w-full mb-1.5">
@@ -2276,7 +2294,7 @@ export default function PatientEvolution() {
                               "flex flex-col items-start p-2.5 rounded-xl border text-left transition-all relative overflow-hidden group",
                               selectedBraden 
                                 ? "bg-orange-500/5 border-orange-500/30 dark:bg-orange-500/10" 
-                                : "bg-card border-border hover:border-orange-500/40 hover:bg-orange-500/5"
+                                : "bg-white/45 dark:bg-slate-900/45 border-white/60 dark:border-white/10 hover:border-orange-500/40 hover:bg-orange-500/5 backdrop-blur-sm shadow-sm"
                             )}
                           >
                             <div className="flex items-center justify-between w-full mb-1.5">
@@ -2302,7 +2320,7 @@ export default function PatientEvolution() {
                               "flex flex-col items-start p-2.5 rounded-xl border text-left transition-all relative overflow-hidden group",
                               selectedEva 
                                 ? "bg-red-500/5 border-red-500/30 dark:bg-red-500/10" 
-                                : "bg-card border-border hover:border-red-500/40 hover:bg-red-500/5"
+                                : "bg-white/45 dark:bg-slate-900/45 border-white/60 dark:border-white/10 hover:border-red-500/40 hover:bg-red-500/5 backdrop-blur-sm shadow-sm"
                             )}
                           >
                             <div className="flex items-center justify-between w-full mb-1.5">
@@ -2328,7 +2346,7 @@ export default function PatientEvolution() {
                               "flex flex-col items-start p-2.5 rounded-xl border text-left transition-all relative overflow-hidden group",
                               selectedMews 
                                 ? "bg-blue-500/5 border-blue-500/30 dark:bg-blue-500/10" 
-                                : "bg-card border-border hover:border-blue-500/40 hover:bg-blue-500/5"
+                                : "bg-white/45 dark:bg-slate-900/45 border-white/60 dark:border-white/10 hover:border-blue-500/40 hover:bg-blue-500/5 backdrop-blur-sm shadow-sm"
                             )}
                           >
                             <div className="flex items-center justify-between w-full mb-1.5">
@@ -2354,7 +2372,7 @@ export default function PatientEvolution() {
                               "flex flex-col items-start p-2.5 rounded-xl border text-left transition-all relative overflow-hidden group",
                               selectedNews2 
                                 ? "bg-emerald-500/5 border-emerald-500/30 dark:bg-emerald-500/10" 
-                                : "bg-card border-border hover:border-emerald-500/40 hover:bg-emerald-500/5"
+                                : "bg-white/45 dark:bg-slate-900/45 border-white/60 dark:border-white/10 hover:border-emerald-500/40 hover:bg-emerald-500/5 backdrop-blur-sm shadow-sm"
                             )}
                           >
                             <div className="flex items-center justify-between w-full mb-1.5">
@@ -2380,7 +2398,7 @@ export default function PatientEvolution() {
                               "flex flex-col items-start p-2.5 rounded-xl border text-left transition-all relative overflow-hidden group",
                               selectedQsofa 
                                 ? "bg-purple-500/5 border-purple-500/30 dark:bg-purple-500/10" 
-                                : "bg-card border-border hover:border-purple-500/40 hover:bg-purple-500/5"
+                                : "bg-white/45 dark:bg-slate-900/45 border-white/60 dark:border-white/10 hover:border-purple-500/40 hover:bg-purple-500/5 backdrop-blur-sm shadow-sm"
                             )}
                           >
                             <div className="flex items-center justify-between w-full mb-1.5">
@@ -2406,7 +2424,7 @@ export default function PatientEvolution() {
                               "flex flex-col items-start p-2.5 rounded-xl border text-left transition-all relative overflow-hidden group",
                               selectedGlasgow 
                                 ? "bg-indigo-500/5 border-indigo-500/30 dark:bg-indigo-500/10" 
-                                : "bg-card border-border hover:border-indigo-500/40 hover:bg-indigo-500/5"
+                                : "bg-white/45 dark:bg-slate-900/45 border-white/60 dark:border-white/10 hover:border-indigo-500/40 hover:bg-indigo-500/5 backdrop-blur-sm shadow-sm"
                             )}
                           >
                             <div className="flex items-center justify-between w-full mb-1.5">
@@ -2432,7 +2450,7 @@ export default function PatientEvolution() {
                               "flex flex-col items-start p-2.5 rounded-xl border text-left transition-all relative overflow-hidden group",
                               selectedMentalSummary 
                                 ? "bg-violet-500/5 border-violet-500/30 dark:bg-violet-500/10" 
-                                : "bg-card border-border hover:border-violet-500/40 hover:bg-violet-500/5"
+                                : "bg-white/45 dark:bg-slate-900/45 border-white/60 dark:border-white/10 hover:border-violet-500/40 hover:bg-violet-500/5 backdrop-blur-sm shadow-sm"
                             )}
                           >
                             <div className="flex items-center justify-between w-full mb-1.5">
@@ -2458,7 +2476,7 @@ export default function PatientEvolution() {
                               "flex flex-col items-start p-2.5 rounded-xl border text-left transition-all relative overflow-hidden group",
                               selectedUrgencySummary 
                                 ? "bg-rose-500/5 border-rose-500/30 dark:bg-rose-500/10" 
-                                : "bg-card border-border hover:border-rose-500/40 hover:bg-rose-500/5"
+                                : "bg-white/45 dark:bg-slate-900/45 border-white/60 dark:border-white/10 hover:border-rose-500/40 hover:bg-rose-500/5 backdrop-blur-sm shadow-sm"
                             )}
                           >
                             <div className="flex items-center justify-between w-full mb-1.5">
@@ -2484,7 +2502,7 @@ export default function PatientEvolution() {
                               "flex flex-col items-start p-2.5 rounded-xl border text-left transition-all relative overflow-hidden group",
                               selectedNursingSummary 
                                 ? "bg-cyan-500/5 border-cyan-500/30 dark:bg-cyan-500/10" 
-                                : "bg-card border-border hover:border-cyan-500/40 hover:bg-cyan-500/5"
+                                : "bg-white/45 dark:bg-slate-900/45 border-white/60 dark:border-white/10 hover:border-cyan-500/40 hover:bg-cyan-500/5 backdrop-blur-sm shadow-sm"
                             )}
                           >
                             <div className="flex items-center justify-between w-full mb-1.5">
@@ -2515,7 +2533,7 @@ export default function PatientEvolution() {
                               "flex flex-col items-start p-3 rounded-xl border text-left transition-all relative overflow-hidden group",
                               selectedPews 
                                 ? "bg-teal-500/5 border-teal-500/30 dark:bg-teal-500/10" 
-                                : "bg-card border-border hover:border-teal-500/40 hover:bg-teal-500/5"
+                                : "bg-white/45 dark:bg-slate-900/45 border-white/60 dark:border-white/10 hover:border-teal-500/40 hover:bg-teal-500/5 backdrop-blur-sm shadow-sm"
                             )}
                           >
                             <div className="flex items-center justify-between w-full mb-1.5">
@@ -2541,7 +2559,7 @@ export default function PatientEvolution() {
                               "flex flex-col items-start p-3 rounded-xl border text-left transition-all relative overflow-hidden group",
                               selectedEva 
                                 ? "bg-red-500/5 border-red-500/30 dark:bg-red-500/10" 
-                                : "bg-card border-border hover:border-red-500/40 hover:bg-red-500/5"
+                                : "bg-white/45 dark:bg-slate-900/45 border-white/60 dark:border-white/10 hover:border-red-500/40 hover:bg-red-500/5 backdrop-blur-sm shadow-sm"
                             )}
                           >
                             <div className="flex items-center justify-between w-full mb-1.5">
@@ -2577,7 +2595,7 @@ export default function PatientEvolution() {
                             "flex items-center gap-2.5 px-3 py-2 rounded-xl border text-left transition-all hover:border-primary/40 hover:bg-muted/30 group w-full sm:w-auto",
                             activeNandaPlan 
                               ? "bg-primary/5 border-primary/30 text-primary" 
-                              : "bg-card border-border"
+                              : "bg-white/45 dark:bg-slate-900/45 border-white/60 dark:border-white/10 backdrop-blur-sm shadow-sm"
                           )}
                         >
                           <Activity className="h-4 w-4 text-primary group-hover:animate-pulse" />
@@ -2596,7 +2614,7 @@ export default function PatientEvolution() {
                   </motion.div>
                 )}
 
-                <div className="space-y-1">
+                <div className="space-y-1 relative z-10">
                   <div className="flex items-center justify-between">
                     <Label className="text-[10px] font-black uppercase tracking-wider text-muted-foreground">
                       {evolutionType === "Sinais Vitais" ? "Observações Clínicas Adicionais (opcional)" : "Descrição *"}
@@ -2624,29 +2642,29 @@ export default function PatientEvolution() {
                   </div>
                   <Textarea 
                     placeholder={evolutionType === "Sinais Vitais" ? "Observações clínicas, aspecto geral do paciente, queixas, etc." : "Descreva a evolução do paciente..."} 
-                    className="min-h-[140px] bg-background border-muted-foreground/20 resize-none text-xs leading-relaxed"
+                    className="min-h-[140px] bg-white/45 dark:bg-slate-900/45 border-white/60 dark:border-white/10 focus:bg-white/60 dark:focus:bg-slate-900/60 resize-none text-xs leading-relaxed rounded-2xl backdrop-blur-sm transition-all shadow-sm focus:ring-1 focus:ring-primary/20"
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
                   />
                 </div>
 
                 {/* Carimbo Digital persistent configuration section */}
-                <div className="border border-border/50 rounded-xl bg-slate-500/5 dark:bg-slate-500/10 overflow-hidden">
+                <div className="border border-white/40 dark:border-white/10 rounded-2xl bg-white/35 dark:bg-slate-900/35 backdrop-blur-md shadow-sm overflow-hidden">
                   <button
                     type="button"
                     onClick={() => setIsStampConfigOpen(!isStampConfigOpen)}
-                    className="w-full px-4 py-2.5 bg-muted/40 hover:bg-muted/60 transition-colors flex items-center justify-between text-[10px] font-black uppercase tracking-wider text-muted-foreground"
+                    className="w-full px-4 py-2.5 bg-white/20 dark:bg-slate-800/20 hover:bg-white/35 dark:hover:bg-slate-800/35 transition-all flex items-center justify-between text-[10px] font-black uppercase tracking-wider text-muted-foreground"
                   >
                     <span>🖋️ Carimbo Digital & Assinatura (COREN / CRM)</span>
                     <span className="font-mono text-xs">{isStampConfigOpen ? "Recolher ▲" : "Configurar ▼"}</span>
                   </button>
                   {isStampConfigOpen && (
-                    <div className="p-4 grid grid-cols-1 sm:grid-cols-4 gap-3 bg-card border-t border-border/50">
+                    <div className="p-4 grid grid-cols-1 sm:grid-cols-4 gap-3 bg-white/25 dark:bg-slate-950/25 border-t border-white/40 dark:border-white/10">
                       <div className="space-y-1">
                         <Label className="text-[9px] font-black uppercase text-muted-foreground">Nome Completo</Label>
                         <Input 
                           placeholder="Dr(a). / Enf." 
-                          className="h-8 text-xs bg-background"
+                          className="h-8 text-xs bg-white/45 dark:bg-slate-900/45 border-white/60 dark:border-white/10 focus:bg-white/60 dark:focus:bg-slate-900/60 rounded-xl backdrop-blur-sm transition-all shadow-sm"
                           value={stampName}
                           onChange={(e) => {
                             setStampName(e.target.value);
@@ -2664,7 +2682,7 @@ export default function PatientEvolution() {
                             localStorage.setItem("upa_stamp_council", val);
                           }}
                         >
-                          <SelectTrigger className="h-8 text-xs bg-background">
+                          <SelectTrigger className="h-8 text-xs bg-white/45 dark:bg-slate-900/45 border-white/60 dark:border-white/10 hover:bg-white/60 dark:hover:bg-slate-900/60 rounded-xl backdrop-blur-sm transition-all shadow-sm">
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
@@ -2679,7 +2697,7 @@ export default function PatientEvolution() {
                         <Label className="text-[9px] font-black uppercase text-muted-foreground">Número de Registro</Label>
                         <Input 
                           placeholder="Apenas números" 
-                          className="h-8 text-xs bg-background"
+                          className="h-8 text-xs bg-white/45 dark:bg-slate-900/45 border-white/60 dark:border-white/10 focus:bg-white/60 dark:focus:bg-slate-900/60 rounded-xl backdrop-blur-sm transition-all shadow-sm"
                           value={stampNumber}
                           onChange={(e) => {
                             setStampNumber(e.target.value);
@@ -2691,7 +2709,7 @@ export default function PatientEvolution() {
                         <Label className="text-[9px] font-black uppercase text-muted-foreground">UF</Label>
                         <Input 
                           placeholder="Ex: SP" 
-                          className="h-8 text-xs bg-background uppercase"
+                          className="h-8 text-xs bg-white/45 dark:bg-slate-900/45 border-white/60 dark:border-white/10 focus:bg-white/60 dark:focus:bg-slate-900/60 rounded-xl backdrop-blur-sm transition-all shadow-sm uppercase"
                           value={stampState}
                           onChange={(e) => {
                             const val = e.target.value.toUpperCase().slice(0, 2);
@@ -2725,7 +2743,7 @@ export default function PatientEvolution() {
         <h2 className="text-sm font-black tracking-widest text-[#006699] dark:text-sky-400 uppercase">Linha do Tempo de Atendimento</h2>
         
         {evolutions.length === 0 ? (
-          <Card className="glass-card border border-slate-200/40 dark:border-slate-800/40 shadow-xl rounded-xl overflow-hidden bg-white/70 dark:bg-slate-900/45 transition-colors duration-500">
+          <Card className="glass-card-premium border border-white/40 dark:border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.06)] rounded-2xl overflow-hidden transition-all duration-500">
             <CardContent className="h-36 flex items-center justify-center bg-muted/5">
               <p className="text-sm font-bold uppercase tracking-widest text-muted-foreground/30 px-8 text-center leading-relaxed">Nenhuma evolução registrada para este paciente.</p>
             </CardContent>
@@ -2744,7 +2762,7 @@ export default function PatientEvolution() {
                   <div className="h-1.5 w-1.5 rounded-full bg-[#006699] dark:bg-sky-400" />
                 </div>
 
-                <Card className="glass-card border border-slate-200/40 dark:border-slate-800/40 shadow-xl rounded-xl overflow-hidden bg-white/70 dark:bg-slate-900/45 hover:bg-white/90 dark:hover:bg-slate-900/60 transition-all duration-300">
+                <Card className="glass-card-premium border border-white/40 dark:border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.06)] rounded-2xl overflow-hidden hover:scale-[1.01] active:scale-[0.99] transition-all duration-300">
                   <CardContent className="p-4 space-y-3">
                     <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border/50 pb-2">
                       <div className="flex items-center gap-2.5">

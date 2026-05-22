@@ -33,35 +33,39 @@ DialogOverlay.displayName = DialogPrimitive.Overlay.displayName
 const DialogContent = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content>
->(({ className, children, ...props }, ref) => (
-  <DialogPortal>
-    <DialogOverlay />
-    <DialogPrimitive.Content
-      ref={ref}
-      asChild
-      {...props}
-    >
-      <motion.div
-        drag
-        dragMomentum={false}
-        dragElastic={0}
-        dragTransition={{ bounceStiffness: 1000, bounceDamping: 50 }}
-        whileDrag={{ cursor: "grabbing" }}
-        style={{ x: "-50%", y: "-50%", touchAction: "none", transitionProperty: "none" }}
-        className={cn(
-          "fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg gap-4 border bg-background p-6 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] sm:rounded-lg",
-          className
-        )}
+>(({ className, children, ...props }, ref) => {
+  const hasCustomBg = className && (className.includes("bg-") || className.includes("backdrop-blur"));
+  return (
+    <DialogPortal>
+      <DialogOverlay />
+      <DialogPrimitive.Content
+        ref={ref}
+        asChild
+        {...props}
       >
-        {children}
-        <DialogPrimitive.Close className="absolute right-4 top-4 z-50 flex h-8 w-8 items-center justify-center rounded-full bg-slate-100/50 dark:bg-slate-900/50 border border-slate-200/50 dark:border-white/10 opacity-70 backdrop-blur-md ring-offset-background transition-all hover:opacity-100 hover:scale-110 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none text-foreground shadow-sm">
-          <X className="h-4 w-4" />
-          <span className="sr-only">Close</span>
-        </DialogPrimitive.Close>
-      </motion.div>
-    </DialogPrimitive.Content>
-  </DialogPortal>
-))
+        <motion.div
+          drag
+          dragMomentum={false}
+          dragElastic={0}
+          dragTransition={{ bounceStiffness: 1000, bounceDamping: 50 }}
+          whileDrag={{ cursor: "grabbing" }}
+          style={{ x: "-50%", y: "-50%", touchAction: "none", transitionProperty: "none" }}
+          className={cn(
+            "fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg gap-4 border p-6 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] sm:rounded-lg",
+            !hasCustomBg && "bg-background",
+            className
+          )}
+        >
+          {children}
+          <DialogPrimitive.Close className="absolute right-4 top-4 z-50 flex h-8 w-8 items-center justify-center rounded-full bg-slate-100/50 dark:bg-slate-900/50 border border-slate-200/50 dark:border-white/10 opacity-70 backdrop-blur-md ring-offset-background transition-all hover:opacity-100 hover:scale-110 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none text-foreground shadow-sm">
+            <X className="h-4 w-4" />
+            <span className="sr-only">Close</span>
+          </DialogPrimitive.Close>
+        </motion.div>
+      </DialogPrimitive.Content>
+    </DialogPortal>
+  )
+})
 DialogContent.displayName = DialogPrimitive.Content.displayName
 
 const DialogHeader = ({

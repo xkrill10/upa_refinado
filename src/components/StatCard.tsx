@@ -25,12 +25,12 @@ const inactiveStyles = {
 };
 
 const activeStyles = {
-  default: 'glass-card-premium stat-card-active-default text-slate-955 dark:text-slate-50',
-  primary: 'glass-card-premium stat-card-active-primary text-blue-955 dark:text-blue-50',
-  accent: 'glass-card-premium stat-card-active-accent text-purple-955 dark:text-purple-50',
-  warning: 'glass-card-premium stat-card-active-warning text-amber-955 dark:text-amber-50',
-  danger: 'glass-card-premium stat-card-active-danger text-red-955 dark:text-red-50',
-  success: 'glass-card-premium stat-card-active-success text-emerald-955 dark:text-emerald-50',
+  default: 'glass-card-premium stat-card-active-default text-slate-950 dark:text-slate-50',
+  primary: 'glass-card-premium stat-card-active-primary text-blue-950 dark:text-blue-50',
+  accent: 'glass-card-premium stat-card-active-accent text-purple-950 dark:text-purple-50',
+  warning: 'glass-card-premium stat-card-active-warning text-amber-950 dark:text-amber-50',
+  danger: 'glass-card-premium stat-card-active-danger text-red-950 dark:text-red-50',
+  success: 'glass-card-premium stat-card-active-success text-emerald-950 dark:text-emerald-50',
 };
 
 const labelStylesInactive = {
