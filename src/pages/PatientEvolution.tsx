@@ -3317,27 +3317,35 @@ export default function PatientEvolution() {
         )}
       </div>
       <Dialog open={isBedDialogOpen} onOpenChange={setIsBedDialogOpen}>
-        <DialogContent className="sm:max-w-[425px] rounded-xl border border-slate-200/40 dark:border-slate-800/40 bg-white dark:bg-slate-950 shadow-2xl">
+        <DialogContent className="sm:max-w-[425px] rounded-[2rem] p-6 overflow-hidden glass-card-premium bg-white/70 dark:bg-slate-900/80 backdrop-blur-xl border border-white/40 dark:border-white/10 shadow-[0_25px_50px_-12px_rgba(0,0,0,0.25)]">
           <DialogHeader>
-            <DialogTitle className="text-2xl mission-control-title">Gerenciar Leito</DialogTitle>
-            <DialogDescription className="font-bold uppercase text-[10px] tracking-widest">
+            <DialogTitle className="text-xl font-black uppercase tracking-tight text-[#006699] dark:text-sky-400">Gerenciar Leito</DialogTitle>
+            <DialogDescription className="font-bold uppercase text-[10px] tracking-widest text-slate-500 dark:text-slate-400 mt-1">
               {patient.name.toUpperCase().includes('NÃO IDENTIFICADO') || patient.name.toUpperCase().includes('DESCONHECIDO') 
                 ? "PACIENTE NÃO IDENTIFICADO" 
                 : patient.name}
             </DialogDescription>
           </DialogHeader>
 
-          <div className="grid gap-6 py-4">
+          <div className="grid gap-5 py-2">
             {patientBed ? (
               <div className="space-y-4">
-                <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
-                  <p className="text-xs font-bold text-emerald-600 uppercase tracking-widest mb-1">Leito Atual</p>
-                  <p className="text-lg font-bold">{patientBed.name}</p>
-                  <p className="text-[10px] text-muted-foreground">{patientBed.ward} · {patientBed.room}</p>
+                <div className="p-4 rounded-2xl bg-emerald-500/10 dark:bg-emerald-500/20 border border-emerald-500/30 dark:border-emerald-500/25 flex items-center gap-4 shadow-sm backdrop-blur-md">
+                  <div className="h-12 w-12 rounded-xl bg-emerald-500/20 dark:bg-emerald-500/30 flex items-center justify-center shrink-0">
+                    <BedIcon className="h-6 w-6 text-emerald-600 dark:text-emerald-400 animate-pulse" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-widest flex items-center gap-1.5 leading-none mb-1">
+                      <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-ping" />
+                      Leito Ativo
+                    </p>
+                    <p className="text-base font-black text-emerald-700 dark:text-emerald-300 leading-tight">{patientBed.name}</p>
+                    <p className="text-[10px] font-semibold text-emerald-600/70 dark:text-emerald-400/70 mt-0.5 truncate">{patientBed.ward} · {patientBed.room}</p>
+                  </div>
                 </div>
                 <Button 
                   variant="outline" 
-                  className="w-full h-12 rounded-xl border-red-500/30 text-red-600 hover:bg-red-500/5 font-bold uppercase tracking-widest text-[10px]"
+                  className="w-full h-11 rounded-xl bg-red-500/10 dark:bg-red-500/20 border border-red-500/30 dark:border-red-500/25 text-red-600 dark:text-red-400 hover:bg-red-500 hover:text-white dark:hover:bg-red-650 dark:hover:text-white font-bold uppercase tracking-widest text-[10px] transition-all duration-300 active:scale-95 shadow-sm"
                   onClick={() => {
                     releaseBed(patientBed.id);
                     toast.success("Leito liberado");
@@ -3349,10 +3357,16 @@ export default function PatientEvolution() {
               </div>
             ) : (
               <div className="space-y-4">
-                <p className="text-xs font-black uppercase tracking-widest text-muted-foreground px-1">Selecionar Leito Disponível</p>
-                <div className="max-h-[300px] overflow-y-auto space-y-2 pr-2">
+                <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 px-1 flex items-center gap-2">
+                  <span className="h-1.5 w-1.5 rounded-full bg-blue-500" />
+                  Alocar Leito Disponível
+                </p>
+                <div className="max-h-[250px] overflow-y-auto space-y-2.5 pr-1 scrollbar-thin">
                   {availableBeds.length === 0 ? (
-                    <p className="text-sm text-center py-8 text-muted-foreground italic">Nenhum leito disponível no momento.</p>
+                    <div className="py-12 border border-dashed border-slate-200 dark:border-slate-800 rounded-2xl flex flex-col items-center justify-center gap-2 opacity-50 bg-slate-50/10 dark:bg-slate-900/10">
+                      <BedIcon className="h-8 w-8 text-slate-400 dark:text-slate-600" />
+                      <p className="text-[10px] font-black uppercase tracking-widest text-[#006699] dark:text-sky-400">Nenhum leito disponível</p>
+                    </div>
                   ) : (
                     availableBeds.map(bed => (
                       <button
@@ -3362,13 +3376,18 @@ export default function PatientEvolution() {
                           toast.success(`Paciente alocado no ${bed.name}`);
                           setIsBedDialogOpen(false);
                         }}
-                        className="w-full p-4 rounded-xl border border-border/50 hover:border-primary hover:bg-primary/5 transition-all text-left flex items-center justify-between group"
+                        className="w-full p-4 rounded-2xl border border-slate-200/40 dark:border-slate-800/40 bg-white/40 dark:bg-slate-900/30 text-left flex items-center justify-between hover:border-primary/50 dark:hover:border-sky-500/50 hover:bg-[#006699]/5 dark:hover:bg-sky-500/10 transition-all duration-300 active:scale-[0.98] group"
                       >
-                        <div>
-                          <p className="font-bold text-sm group-hover:text-primary transition-colors">{bed.name}</p>
-                          <p className="text-[10px] text-muted-foreground">{bed.ward} · {bed.room}</p>
+                        <div className="flex items-center gap-3 min-w-0">
+                          <div className="h-10 w-10 rounded-xl bg-slate-100/50 dark:bg-slate-900/40 flex items-center justify-center shrink-0 border border-slate-200/30 dark:border-slate-800 group-hover:bg-primary/10 dark:group-hover:bg-sky-500/15 group-hover:border-primary/20 dark:group-hover:border-sky-500/25 transition-all">
+                            <BedIcon className="h-5 w-5 text-muted-foreground/80 group-hover:text-primary dark:group-hover:text-sky-400 transition-colors" />
+                          </div>
+                          <div className="min-w-0">
+                            <p className="font-bold text-sm text-foreground transition-colors group-hover:text-primary dark:group-hover:text-sky-450 truncate">{bed.name}</p>
+                            <p className="text-[10px] font-semibold text-muted-foreground/80 mt-0.5 truncate">{bed.ward} · {bed.room}</p>
+                          </div>
                         </div>
-                        <CheckCircle2 className="h-4 w-4 text-emerald-500 opacity-0 group-hover:opacity-100 transition-opacity" />
+                        <CheckCircle2 className="h-4 w-4 text-emerald-500 opacity-0 group-hover:opacity-100 transition-all scale-75 group-hover:scale-100 shrink-0" />
                       </button>
                     ))
                   )}
