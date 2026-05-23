@@ -1,4 +1,4 @@
-import { LayoutDashboard, Users, UserPlus, Activity, ClipboardList, Building2, BedDouble, Stethoscope, HeartPulse, FileText, Pill, UserCog, Globe, Megaphone, LogIn, Archive, Baby, FlaskConical, PackageOpen, Syringe, DollarSign, Sparkles } from "lucide-react";
+import { LayoutDashboard, Users, UserPlus, Activity, ClipboardList, Building2, BedDouble, Stethoscope, HeartPulse, FileText, Pill, UserCog, Globe, Megaphone, LogIn, Archive, Baby, FlaskConical, PackageOpen, Syringe, DollarSign, Sparkles, UserSquare2 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -46,6 +46,7 @@ const menuGroups = [
       { title: "Setores", url: "/setores", icon: Building2 },
       { title: "SAME", url: "/same", icon: Archive },
       { title: "Recursos Humanos", url: "/rh", icon: UserCog },
+      { title: "Meu RH", url: "/meu-rh", icon: UserSquare2 },
       { title: "Faturamento", url: "/faturamento", icon: DollarSign },
       { title: "Relatórios", url: "/relatorios", icon: FileText },
     ]

@@ -261,7 +261,7 @@ export default function Pharmacy() {
         <Card 
           className={cn(
             "glass-card-premium shadow-[0_8px_30px_rgba(0,0,0,0.12)] cursor-pointer transition-all hover:scale-[1.02] active:scale-95 border-2",
-            specialFilter === "controlled" ? "bg-slate-900/10 border-slate-900 shadow-lg shadow-slate-900/5" : "hover:bg-slate-900/5 border-transparent opacity-80 hover:opacity-100"
+            specialFilter === "controlled" ? "bg-slate-900/10 dark:bg-slate-100/10 border-slate-900 dark:border-slate-300 shadow-lg shadow-slate-900/5 dark:shadow-slate-100/5" : "hover:bg-slate-900/5 dark:hover:bg-white/5 border-transparent opacity-80 hover:opacity-100"
           )}
           onClick={() => {
             setActiveTab("controlled");
@@ -271,15 +271,15 @@ export default function Pharmacy() {
         >
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-4">
             <CardTitle className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Psicotrópicos</CardTitle>
-            <ShieldAlert className="h-4 w-4 text-slate-800" />
+            <ShieldAlert className="h-4 w-4 text-slate-800 dark:text-slate-200" />
           </CardHeader>
-          <CardContent className="p-4 pt-0"><div className="text-2xl font-black text-slate-900">{medications.filter(m => m.category === 'psychotropic').length}</div></CardContent>
+          <CardContent className="p-4 pt-0"><div className="text-2xl font-black text-slate-900 dark:text-slate-100">{medications.filter(m => m.category === 'psychotropic').length}</div></CardContent>
         </Card>
 
         <Card 
           className={cn(
-            "glass-card-premium shadow-[0_8px_30px_rgba(0,0,0,0.12)] cursor-pointer transition-all hover:scale-[1.02] active:scale-95 border-2 border-slate-950/20",
-            specialFilter === "narcotics" ? "bg-slate-950/20 border-slate-950" : "hover:bg-slate-950/5 opacity-80 hover:opacity-100"
+            "glass-card-premium shadow-[0_8px_30px_rgba(0,0,0,0.12)] cursor-pointer transition-all hover:scale-[1.02] active:scale-95 border-2 border-slate-950/20 dark:border-slate-200/20",
+            specialFilter === "narcotics" ? "bg-slate-950/20 dark:bg-slate-50/15 border-slate-950 dark:border-slate-200" : "hover:bg-slate-950/5 dark:hover:bg-slate-50/5 opacity-80 hover:opacity-100"
           )}
           onClick={() => {
             setActiveTab("stock");
@@ -290,10 +290,10 @@ export default function Pharmacy() {
           }}
         >
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-4">
-            <CardTitle className="text-[10px] font-black uppercase tracking-widest text-slate-950">Narcóticos</CardTitle>
+            <CardTitle className="text-[10px] font-black uppercase tracking-widest text-slate-950 dark:text-slate-100">Narcóticos</CardTitle>
             <ShieldAlert className="h-4 w-4 text-red-600 animate-pulse" />
           </CardHeader>
-          <CardContent className="p-4 pt-0"><div className="text-2xl font-black text-slate-950">{medications.filter(m => m.category === 'narcotic').length}</div></CardContent>
+          <CardContent className="p-4 pt-0"><div className="text-2xl font-black text-slate-950 dark:text-slate-100">{medications.filter(m => m.category === 'narcotic').length}</div></CardContent>
         </Card>
       </div>
 
@@ -339,7 +339,7 @@ export default function Pharmacy() {
         {/* CONTROLLED TAB */}
         <TabsContent value="controlled" className="space-y-4">
           <div className="flex flex-col gap-1">
-            <h3 className="text-xl font-black uppercase tracking-tight text-slate-950 flex items-center gap-2">
+            <h3 className="text-xl font-black uppercase tracking-tight text-slate-950 dark:text-slate-100 flex items-center gap-2">
               <ShieldAlert className="h-5 w-5" />
               Psicotrópicos e Narcóticos (Portaria 344)
             </h3>
@@ -678,7 +678,7 @@ export default function Pharmacy() {
 
       {/* QUICK CONTROLLED DISPATCH DIALOG */}
       <Dialog open={!!medForControlledDispatch} onOpenChange={(open) => !open && setMedForControlledDispatch(null)}>
-        <DialogContent className="max-w-md p-0 overflow-hidden rounded-[2rem] glass-card-premium shadow-[0_30px_60px_-15px_rgba(0,0,0,0.3)] border-4 border-slate-950">
+        <DialogContent className="max-w-md p-0 overflow-hidden rounded-[2rem] glass-card-premium shadow-[0_30px_60px_-15px_rgba(0,0,0,0.3)] border-4 border-slate-950 dark:border-slate-800">
           <DialogHeader className="p-8 bg-slate-950 text-white relative">
             <div className="absolute top-4 right-4 bg-white/10 p-2 rounded-full backdrop-blur-sm">
               <ShieldAlert className="h-6 w-6 text-white" />
@@ -728,13 +728,13 @@ export default function Pharmacy() {
               </div>
               <div className="space-y-2">
                 <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Disponível</Label>
-                <div className="h-12 flex items-center justify-center bg-slate-100 rounded-md font-black text-slate-950 border border-slate-950/10">
+                <div className="h-12 flex items-center justify-center bg-slate-100 dark:bg-slate-900 rounded-md font-black text-slate-950 dark:text-slate-100 border border-slate-950/10 dark:border-white/10">
                   {medForControlledDispatch?.currentStock} {medForControlledDispatch?.unit}
                 </div>
               </div>
             </div>
 
-            <div className="space-y-4 pt-2 border-t border-slate-100">
+            <div className="space-y-4 pt-2 border-t border-slate-100 dark:border-slate-800">
                <div className="space-y-2">
                   <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Identificação do Profissional (CRM/COREN)</Label>
                   <div className="grid grid-cols-2 gap-2">
@@ -742,13 +742,13 @@ export default function Pharmacy() {
                       value={controlledDispatchData.professional} 
                       onChange={e => setControlledDispatchData(prev => ({ ...prev, professional: e.target.value }))} 
                       placeholder="Nome Completo"
-                      className="h-11 border-slate-950/20 text-xs"
+                      className="h-11 border-slate-950/20 dark:border-white/20 text-xs"
                     />
                     <Input 
                       value={controlledDispatchData.professionalId} 
                       onChange={e => setControlledDispatchData(prev => ({ ...prev, professionalId: e.target.value }))} 
                       placeholder="Nº Registro"
-                      className="h-11 border-slate-950/20 text-xs"
+                      className="h-11 border-slate-950/20 dark:border-white/20 text-xs"
                     />
                   </div>
                </div>
@@ -759,7 +759,7 @@ export default function Pharmacy() {
                     value={controlledDispatchData.obs} 
                     onChange={e => setControlledDispatchData(prev => ({ ...prev, obs: e.target.value }))} 
                     placeholder="Ex: Urgência em leito / Reforço dose"
-                    className="h-11 border-slate-950/20 text-xs"
+                    className="h-11 border-slate-950/20 dark:border-white/20 text-xs"
                   />
                </div>
             </div>
@@ -855,7 +855,7 @@ function MedicationTable({
                 key={m.id} 
                 className={cn(
                   "cursor-pointer hover:bg-primary/5 transition-colors group",
-                  m.controlled && "bg-slate-950/5 hover:bg-slate-900/10"
+                  m.controlled && "bg-slate-950/5 dark:bg-white/5 hover:bg-slate-900/10 dark:hover:bg-white/10"
                 )}
                 onClick={() => onSelect(m)}
               >
@@ -908,7 +908,7 @@ function MedicationTable({
                       <Button 
                         variant="ghost" 
                         size="icon" 
-                        className="h-8 w-8 text-slate-900 animate-pulse bg-slate-100 hover:bg-slate-200"
+                        className="h-8 w-8 text-slate-900 dark:text-slate-100 animate-pulse bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700"
                         onClick={() => onControlledDispatch(m)}
                         title="Despacho Controlado (Urgente)"
                       >
@@ -1336,8 +1336,8 @@ function RegisterMedicationForm({ onSave }: { onSave: (m: Omit<Medication, 'id'>
           <div className="space-y-2"><Label className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Estoque Mínimo (Alerta)</Label><Input type="number" value={form.minStock} onChange={e => set('minStock', e.target.value)} className="h-10 border-primary/20" /></div>
           <div className="space-y-2"><Label className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Endereçamento (Local)</Label><Input value={form.location} onChange={e => set('location', e.target.value.toUpperCase())} placeholder="Ex: A1-P4-G2" className="h-10 border-primary/20" /></div>
           <div className="space-y-2"><Label className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Data de Validade *</Label><Input type="date" value={form.expirationDate} onChange={e => set('expirationDate', e.target.value)} className="h-10 border-primary/20" /></div>
-          <div className="md:col-span-2 flex items-center gap-4 p-5 bg-slate-950/5 rounded-2xl border-2 border-dashed border-slate-950/20 self-end transition-all hover:bg-slate-950/10 group">
-            <div className="flex items-center justify-center h-10 w-10 rounded-full bg-slate-950 text-white shadow-lg group-hover:scale-110 transition-transform">
+          <div className="md:col-span-2 flex items-center gap-4 p-5 bg-slate-950/5 dark:bg-white/5 rounded-2xl border-2 border-dashed border-slate-950/20 dark:border-white/20 self-end transition-all hover:bg-slate-950/10 dark:hover:bg-white/10 group">
+            <div className="flex items-center justify-center h-10 w-10 rounded-full bg-slate-950 dark:bg-slate-800 text-white shadow-lg group-hover:scale-110 transition-transform">
               <ShieldAlert className="h-6 w-6" />
             </div>
             <div className="flex-1">
@@ -1347,9 +1347,9 @@ function RegisterMedicationForm({ onSave }: { onSave: (m: Omit<Medication, 'id'>
                   checked={form.controlled} 
                   onChange={e => set('controlled', e.target.checked)} 
                   id="controlled" 
-                  className="h-5 w-5 accent-slate-950 transition-all cursor-pointer" 
+                  className="h-5 w-5 accent-slate-950 dark:accent-slate-50 transition-all cursor-pointer" 
                 />
-                <Label htmlFor="controlled" className="cursor-pointer font-black text-slate-950 uppercase tracking-tight text-sm">Medicamento Controlado / Psicotrópico</Label>
+                <Label htmlFor="controlled" className="cursor-pointer font-black text-slate-950 dark:text-slate-100 uppercase tracking-tight text-sm">Medicamento Controlado / Psicotrópico</Label>
               </div>
               <p className="text-[10px] text-muted-foreground mt-1 font-medium italic">Exige retenção de receita (Portaria 344/98) e guarda em armário/cofre sob chave.</p>
             </div>

@@ -137,9 +137,9 @@ export default function PatientEvolution() {
     function handleClickOutside(event: MouseEvent | TouchEvent) {
       const target = event.target as HTMLElement;
       
-      if (cidContainerRef.current && !cidContainerRef.current.contains(target)) {
-        setIsCidDropdownOpen(false);
-      }
+      // if (cidContainerRef.current && !cidContainerRef.current.contains(target)) {
+      //   setIsCidDropdownOpen(false);
+      // }
 
       // Fechar todos os dropdowns clínicos/multidisciplinares ao clicar fora
       const clickedDropdown = target.closest('.clinical-dropdown-container');

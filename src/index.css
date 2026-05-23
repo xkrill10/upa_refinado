@@ -69,23 +69,23 @@
     --popover: 222 47% 9%;
     --popover-foreground: 213 31% 95%;
 
-    --primary: 217.2 91.2% 59.8%;
+    --primary: 217.2 91.2% 65%;
     --primary-foreground: 222.2 47.4% 11.2%;
 
     --secondary: 222 47% 15%;
     --secondary-foreground: 210 40% 98%;
 
     --muted: 222 47% 12%;
-    --muted-foreground: 215 20% 70%;
+    --muted-foreground: 215 20% 85%; /* Brighter for better readability in cards */
 
     --accent: 222 47% 18%;
     --accent-foreground: 210 40% 98%;
 
-    --destructive: 0 62.8% 30.6%;
+    --destructive: 0 62.8% 45%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 222 47% 18%;
-    --input: 222 47% 18%;
+    --border: 222 47% 30%; /* Brighter border */
+    --input: 222 47% 25%; /* Lighter input background hint */
     --ring: 224.3 76.3% 48%;
 
     /* Sidebar Dark - Higher Contrast */
@@ -159,15 +159,15 @@
       inset 0 -1px 2px rgba(148, 163, 184, 0.03);
   }
   .dark .glass-card-premium {
-    background: linear-gradient(135deg, rgba(15, 23, 42, 0.6) 0%, rgba(15, 23, 42, 0.38) 50%, rgba(30, 41, 59, 0.45) 100%);
-    backdrop-filter: blur(32px) saturate(180%);
-    -webkit-backdrop-filter: blur(32px) saturate(180%);
-    border: 1px solid rgba(255, 255, 255, 0.09);
+    background: linear-gradient(135deg, rgba(30, 41, 59, 0.6) 0%, rgba(15, 23, 42, 0.4) 50%, rgba(30, 41, 59, 0.5) 100%);
+    backdrop-filter: blur(32px) saturate(200%);
+    -webkit-backdrop-filter: blur(32px) saturate(200%);
+    border: 1px solid rgba(255, 255, 255, 0.15);
     box-shadow: 
-      0 12px 40px -10px rgba(0, 0, 0, 0.45),
-      0 4px 12px rgba(0, 0, 0, 0.1),
-      inset 0 1px 1px rgba(255, 255, 255, 0.08),
-      inset 0 -1px 2px rgba(15, 23, 42, 0.2);
+      0 12px 40px -10px rgba(0, 0, 0, 0.5),
+      0 4px 12px rgba(0, 0, 0, 0.15),
+      inset 0 1px 1px rgba(255, 255, 255, 0.15),
+      inset 0 -1px 2px rgba(30, 41, 59, 0.3);
   }
 
   /* StatCard Active States Glow Shadows & Borders */

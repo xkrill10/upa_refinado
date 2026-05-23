@@ -25,6 +25,7 @@ const Same = React.lazy(() => import("./pages/Same"));
 const NotFound = React.lazy(() => import("./pages/NotFound"));
 const Pediatria = React.lazy(() => import("./pages/Pediatria"));
 const AtendimentosPediatrico = React.lazy(() => import("./pages/AtendimentosPediatrico"));
+const MyHR = React.lazy(() => import("./pages/MyHR"));
 
 // Novas Telas
 const Laboratory = React.lazy(() => import("./pages/Laboratory"));
@@ -100,6 +101,7 @@ const AppContent = () => {
                 <Route path="/setores" element={<Sectors />} />
                 <Route path="/farmacia" element={<Pharmacy />} />
                 <Route path="/rh" element={<HR />} />
+                <Route path="/meu-rh" element={<MyHR />} />
                 <Route path="/sus" element={<SUSIntegration />} />
                 <Route path="/relatorios" element={<Reports />} />
                 <Route path="/same" element={<Same />} />
