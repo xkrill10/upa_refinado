@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 
-export type BedStatus = 'available' | 'occupied' | 'maintenance';
+export type BedStatus = 'available' | 'occupied' | 'maintenance' | 'cleaning';
 
 export interface Bed {
   id: string;
@@ -18,7 +18,7 @@ interface BedsContextType {
   assignPatient: (bedId: string, patientId: string) => void;
   releaseBed: (bedId: string) => void;
   transferPatient: (sourceBedId: string, targetBedId: string) => void;
-  getStats: () => { available: number, occupied: number, maintenance: number };
+  getStats: () => { available: number, occupied: number, maintenance: number, cleaning: number };
 }
 
 const generateBeds = () => {
@@ -69,7 +69,7 @@ export function BedsProvider({ children }: { children: ReactNode }) {
 
   const releaseBed = (bedId: string) => {
     setBeds(prev => prev.map(bed => 
-      bed.id === bedId ? { ...bed, status: 'available', patientId: undefined, lastUpdated: 'Agora' } : bed
+      bed.id === bedId ? { ...bed, status: 'cleaning', patientId: undefined, lastUpdated: 'Agora' } : bed
     ));
   };
   
@@ -82,7 +82,7 @@ export function BedsProvider({ children }: { children: ReactNode }) {
       
       return prev.map(bed => {
         if (bed.id === sourceBedId) {
-          return { ...bed, status: 'available', patientId: undefined, lastUpdated: 'Agora' };
+          return { ...bed, status: 'cleaning', patientId: undefined, lastUpdated: 'Agora' };
         }
         if (bed.id === targetBedId) {
           return { ...bed, status: 'occupied', patientId, lastUpdated: 'Agora' };
@@ -96,7 +96,7 @@ export function BedsProvider({ children }: { children: ReactNode }) {
     return beds.reduce((acc, bed) => {
       acc[bed.status]++;
       return acc;
-    }, { available: 0, occupied: 0, maintenance: 0 });
+    }, { available: 0, occupied: 0, maintenance: 0, cleaning: 0 });
   };
 
   return (

@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # Logs
 logs
 *.log
@@ -39,45 +38,6 @@ DRAFT_firestore.rules
 # Production/Build
 /dist
 /build
-=======
-# Logs
-logs
-*.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
-lerna-debug.log*
 
-node_modules
-dist
-dist-ssr
-*.local
-
-# Environment variables
-.env
-.env.production
-.env.development
-.env.local
-.env.*.local
-
-# Editor directories and files
-.vscode/*
-!.vscode/extensions.json
-.idea
-.DS_Store
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
-
-# Firebase
-.firebase
-firestore.rules.test.ts
-DRAFT_firestore.rules
-
-# Production/Build
-/dist
-/build
->>>>>>> 90a546e1d0071dc1c5623b89d4598bd5075cea58
+# Secrets and Keys
+*-firebase-adminsdk-*.json

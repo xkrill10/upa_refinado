@@ -1,4 +1,4 @@
-import { LayoutDashboard, Users, UserPlus, Activity, ClipboardList, Building2, BedDouble, Stethoscope, HeartPulse, FileText, Pill, UserCog, Globe, Megaphone, LogIn, Archive, Baby, FlaskConical, PackageOpen, Syringe, DollarSign, Sparkles, UserSquare2 } from "lucide-react";
+import { LayoutDashboard, Users, UserPlus, Activity, ClipboardList, Building2, BedDouble, Stethoscope, HeartPulse, FileText, Pill, UserCog, Globe, Megaphone, LogIn, Archive, Baby, FlaskConical, PackageOpen, Syringe, DollarSign, Sparkles, UserSquare2, MessageSquare } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -55,6 +55,7 @@ const menuGroups = [
     label: "Serviços e Apoio",
     items: [
       { title: "Painel de Chamadas", url: "/painel-chamadas", icon: Megaphone },
+      { title: "Central de Comunicações", url: "/central-comunicacoes", icon: MessageSquare },
       { title: "Farmácia", url: "/farmacia", icon: Pill },
       { title: "Almoxarifado", url: "/almoxarifado", icon: PackageOpen },
       { title: "Governança", url: "/governanca", icon: Sparkles },

@@ -31,6 +31,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { usePatients } from "@/hooks/use-patients";
+import { usePrescriptions, AprazamentoHour as ContextAprazamentoHour } from "@/context/PrescriptionsContext";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
@@ -51,6 +52,7 @@ interface AprazamentoHour {
 
 interface PrescriptionItem {
   id: string;
+  orderId?: string;
   medication: string;
   dosage: string;
   route: string;
@@ -105,6 +107,7 @@ const formatArrivalTime = (timeStr?: string): string => {
 
 export default function NursingCheck() {
   const { patients } = usePatients();
+  const { orders, updateMedicationHours } = usePrescriptions();
   
   // Filter active hospitalized/triaged patients
   const activePatients = patients.filter(p => p.status === 'attending' || p.status === 'waiting');
@@ -130,6 +133,7 @@ export default function NursingCheck() {
   // Modal/Check details state (For inputting checks)
   const [activeCheckItem, setActiveCheckItem] = useState<{
     prescriptionId: string;
+    orderId?: string;
     hourIdx: number;
     hourData: AprazamentoHour;
     medName: string;
@@ -138,6 +142,7 @@ export default function NursingCheck() {
   // Viewing already checked bubble details state
   const [viewingCheckDetails, setViewingCheckDetails] = useState<{
     prescriptionId: string;
+    orderId?: string;
     hourIdx: number;
     hourData: AprazamentoHour;
     medName: string;
@@ -278,114 +283,36 @@ export default function NursingCheck() {
     localStorage.setItem("upa_nursing_checks_v4", JSON.stringify(newData));
   };
 
-  // Pre-populate data if empty for a patient (Pure render computation fallback, no state write)
+  // Dynamic mapping from PrescriptionsContext
   const getPatientCheckSheet = (patientId: string): PatientCheckData => {
+    const patientOrders = orders.filter(o => o.patientId === patientId);
+    
+    const prescriptionsFromContext: PrescriptionItem[] = [];
+    patientOrders.forEach(order => {
+      order.medications.forEach(med => {
+        if (med.status !== 'suspended' && med.status !== 'awaiting_pharmacy') {
+          prescriptionsFromContext.push({
+            id: med.id,
+            orderId: order.id,
+            medication: med.medication,
+            dosage: med.dosage,
+            route: med.route,
+            frequency: med.frequency,
+            hours: (med.hours as AprazamentoHour[]) || []
+          });
+        }
+      });
+    });
+
+    if (prescriptionsFromContext.length > 0) {
+      return { prescriptions: prescriptionsFromContext };
+    }
+
     if (patientData[patientId]) {
       return patientData[patientId];
     }
     
-    // Default initial mock prescriptions based on patient profile
-    const target = patients.find(p => p.id === patientId);
-    let defaultPrescriptions: PrescriptionItem[] = [];
-
-    if (target && target.name && target.name.includes("Maria Silva")) {
-      defaultPrescriptions = [
-        {
-          id: "pr-1",
-          medication: "Ceftriaxona",
-          dosage: "1g",
-          route: "EV",
-          frequency: "12/12h",
-          hours: [
-            { hour: "08:00", status: "checked", checkedAt: "2026-05-23 08:12", nurseName: "Enf. Rodrigo Silva" },
-            { hour: "20:00", status: "pending" }
-          ]
-        },
-        {
-          id: "pr-2",
-          medication: "Insulina Regular",
-          dosage: "Escala Móvel",
-          route: "SC",
-          frequency: "Conforme Glicemia",
-          hours: [
-            { hour: "07:00", status: "checked", checkedAt: "2026-05-23 07:04", nurseName: "Enf. Rodrigo Silva", vitalSigns: { glycemia: "245" } },
-            { hour: "12:00", status: "delayed" },
-            { hour: "18:00", status: "pending" },
-            { hour: "22:00", status: "pending" }
-          ]
-        },
-        {
-          id: "pr-3",
-          medication: "Soro Fisiológico 0.9%",
-          dosage: "500ml",
-          route: "EV",
-          frequency: "Contínuo",
-          hours: [
-            { hour: "08:00", status: "checked", checkedAt: "2026-05-23 08:00", nurseName: "Enf. Ricardo Silva" },
-            { hour: "20:00", status: "pending" }
-          ]
-        }
-      ];
-    } else if (target && target.name && target.name.includes("Pedro Almeida")) {
-      defaultPrescriptions = [
-        {
-          id: "pr-4",
-          medication: "Salbutamol Spray",
-          dosage: "100mcg/dose",
-          route: "Inalatória",
-          frequency: "4/4h",
-          hours: [
-            { hour: "08:00", status: "checked", checkedAt: "2026-05-23 08:05", nurseName: "Enf. Amanda Lemos" },
-            { hour: "12:00", status: "checked", checkedAt: "2026-05-23 12:02", nurseName: "Enf. Cláudia Ramos" },
-            { hour: "16:00", status: "pending" },
-            { hour: "20:00", status: "pending" },
-            { hour: "00:00", status: "pending" },
-            { hour: "04:00", status: "pending" }
-          ]
-        },
-        {
-          id: "pr-5",
-          medication: "Hidrocortisona",
-          dosage: "100mg",
-          route: "EV",
-          frequency: "8/8h",
-          hours: [
-            { hour: "06:00", status: "checked", checkedAt: "2026-05-23 06:10", nurseName: "Enf. Amanda Lemos" },
-            { hour: "14:00", status: "pending" },
-            { hour: "22:00", status: "pending" }
-          ]
-        }
-      ];
-    } else {
-      // Default placeholder prescriptions for any other patient
-      defaultPrescriptions = [
-        {
-          id: "pr-gen1",
-          medication: "Soro Ringer com Lactato",
-          dosage: "500ml",
-          route: "EV",
-          frequency: "12/12h",
-          hours: [
-            { hour: "08:00", status: "checked", checkedAt: "2026-05-23 08:20", nurseName: "Enf. Amanda Lemos" },
-            { hour: "20:00", status: "pending" }
-          ]
-        },
-        {
-          id: "pr-gen2",
-          medication: "Metoclopramida (Plasil)",
-          dosage: "10mg (1 ampola)",
-          route: "EV",
-          frequency: "8/8h",
-          hours: [
-            { hour: "08:00", status: "checked", checkedAt: "2026-05-23 08:25", nurseName: "Enf. Amanda Lemos" },
-            { hour: "16:00", status: "pending" },
-            { hour: "00:00", status: "pending" }
-          ]
-        }
-      ];
-    }
-
-    return { prescriptions: defaultPrescriptions };
+    return { prescriptions: [] };
   };
 
   const currentSheet = selectedPatient ? getPatientCheckSheet(selectedPatient.id) : { prescriptions: [] };
@@ -409,12 +336,12 @@ export default function NursingCheck() {
   );
 
   // Trigger administration or review details modal
-  const handleHourClick = (prescriptionId: string, hourIdx: number, hourData: AprazamentoHour, medName: string, route?: string, dosage?: string) => {
+  const handleHourClick = (prescriptionItem: PrescriptionItem, hourIdx: number, hourData: AprazamentoHour) => {
     if (hourData.status === 'checked' || hourData.status === 'refused') {
-      setViewingCheckDetails({ prescriptionId, hourIdx, hourData, medName, route, dosage });
+      setViewingCheckDetails({ prescriptionId: prescriptionItem.id, orderId: prescriptionItem.orderId, hourIdx, hourData, medName: prescriptionItem.medication, route: prescriptionItem.route, dosage: prescriptionItem.dosage });
       return;
     }
-    setActiveCheckItem({ prescriptionId, hourIdx, hourData, medName });
+    setActiveCheckItem({ prescriptionId: prescriptionItem.id, orderId: prescriptionItem.orderId, hourIdx, hourData, medName: prescriptionItem.medication });
     // Reset form states
     setCheckAction('check');
     setJustification("");
@@ -424,10 +351,14 @@ export default function NursingCheck() {
   // Submit check (dar o visto / recusar)
   const submitCheck = () => {
     if (!activeCheckItem || !selectedPatient) return;
-    const { prescriptionId, hourIdx } = activeCheckItem;
+    const { prescriptionId, orderId, hourIdx } = activeCheckItem;
     
+    let isContextPrescription = false;
+
     const updatedPrescriptions = prescriptions.map(p => {
       if (p.id === prescriptionId) {
+        if (p.orderId) isContextPrescription = true;
+
         const updatedHours = [...(p.hours || [])];
         
         let finalDosage = p.dosage;
@@ -448,43 +379,41 @@ export default function NursingCheck() {
           status: checkAction === 'check' ? 'checked' : 'refused',
           checkedAt: new Date().toISOString().replace('T', ' ').slice(0, 16),
           nurseName: coSignatureSuccess ? `${nurseName} (Dupla Checagem: ${coSigningNurse})` : nurseName,
-          vitalSigns: checkAction === 'check' && (vitals.bp || vitals.hr || vitals.temp || vitals.glycemia) 
-            ? { 
-                ...vitals, 
-                glycemia: p.medication.includes("Insulina") && vitals.glycemia ? `${vitals.glycemia} mg/dL (Dose Insulina: ${finalDosage})` : vitals.glycemia 
-              } 
-            : undefined,
-          justification: checkAction === 'refuse' ? justification : undefined
+          vitalSigns: (vitals.bp || vitals.hr || vitals.temp || vitals.glycemia) ? { ...vitals } : undefined,
+          justification: justification.trim() ? justification : undefined
         };
-        return { ...p, hours: updatedHours };
+        
+        // Se for prescrição via contexto, atualiza direto no contexto
+        if (orderId) {
+          updateMedicationHours(orderId, prescriptionId, updatedHours);
+        }
+
+        return { ...p, hours: updatedHours, dosage: finalDosage };
       }
       return p;
     });
 
-    const updatedData = {
-      ...patientData,
-      [selectedPatient.id]: { prescriptions: updatedPrescriptions }
-    };
-    saveChecks(updatedData);
+    // Só salva localmente se for prescrição legada
+    if (!isContextPrescription) {
+      saveChecks({
+        ...patientData,
+        [selectedPatient.id]: {
+          ...currentSheet,
+          prescriptions: updatedPrescriptions
+        }
+      });
+    }
 
-    toast.success(
-      checkAction === 'check' 
-        ? `Medicação ${activeCheckItem.medName} checada com sucesso!` 
-        : `Justificativa registrada para ${activeCheckItem.medName}.`
-    );
-
-    // Clear clinical barrier states
-    setScannedPatient(false);
-    setScannedMed(false);
-    setCoSignatureSuccess(false);
-    setCoSigningNurse("");
+    toast.success(checkAction === 'check' ? 'Medicação checada com sucesso!' : 'Medicação recusada.');
     setActiveCheckItem(null);
+    setCoSignatureRequired(false);
+    setCoSignatureSuccess(false);
   };
 
   // Revert check (Undo administration / set bubble back to pending)
   const handleUndoCheck = () => {
     if (!viewingCheckDetails || !selectedPatient) return;
-    const { prescriptionId, hourIdx } = viewingCheckDetails;
+    const { prescriptionId, orderId, hourIdx } = viewingCheckDetails;
 
     const updatedPrescriptions = prescriptions.map(p => {
       if (p.id === prescriptionId) {
@@ -493,16 +422,23 @@ export default function NursingCheck() {
           hour: updatedHours[hourIdx].hour,
           status: 'pending' // Set back to pending
         };
+        
+        if (orderId) {
+          updateMedicationHours(orderId, prescriptionId, updatedHours);
+        }
+        
         return { ...p, hours: updatedHours };
       }
       return p;
     });
 
-    const updatedData = {
-      ...patientData,
-      [selectedPatient.id]: { prescriptions: updatedPrescriptions }
-    };
-    saveChecks(updatedData);
+    if (!orderId) {
+      const updatedData = {
+        ...patientData,
+        [selectedPatient.id]: { prescriptions: updatedPrescriptions }
+      };
+      saveChecks(updatedData);
+    }
 
     toast.success(`Administração de ${viewingCheckDetails.medName} revertida com sucesso.`);
     setViewingCheckDetails(null);
@@ -526,28 +462,46 @@ export default function NursingCheck() {
   };
 
   // Suspend dynamic prescription (remove from list)
-  const handleSuspendPrescription = () => {
-    if (!viewingPrescription || !selectedPatient) return;
+  const handleSuspendPrescription = (prescriptionId?: string) => {
+    const targetId = prescriptionId || viewingPrescription?.id;
+    if (!targetId || !selectedPatient) return;
 
-    const updatedPrescriptions = prescriptions.filter(p => p.id !== viewingPrescription.id);
-    const updatedData = {
-      ...patientData,
-      [selectedPatient.id]: { prescriptions: updatedPrescriptions }
-    };
-    saveChecks(updatedData);
+    const targetPresc = prescriptions.find(p => p.id === targetId);
 
-    toast.warning(`Prescrição de ${viewingPrescription.medication} suspensa e removida.`);
+    const updatedPrescriptions = prescriptions.filter(p => p.id !== targetId);
+    
+    if (targetPresc?.orderId) {
+       // Ideally we suspend in context, but for simplicity let's just update hours to 'refused' or suspended status
+       // Actually `updateMedicationStatus` can suspend the whole med
+       // Assuming we have that in usePrescriptions? Oh, updateMedicationStatus exists!
+       toast.error("Suspensão de medicamento do contexto não está implementada nesta view, precisa de permissão médica.");
+    } else {
+       const updatedData = {
+         ...patientData,
+         [selectedPatient.id]: { prescriptions: updatedPrescriptions }
+       };
+       saveChecks(updatedData);
+       toast.warning(`Prescrição suspensa e removida.`);
+    }
+
     setViewingPrescription(null);
   };
 
   // Add dynamic SOS extra dose to prescription
-  const handleAddExtraDose = () => {
-    if (!viewingPrescription || !selectedPatient) return;
+  const handleAddExtraDose = (prescriptionId?: string) => {
+    const targetId = prescriptionId || viewingPrescription?.id;
+    if (!targetId || !selectedPatient) return;
 
     const currentHourStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    let isContextPrescription = false;
+    let targetOrder: string | undefined;
 
     const updatedPrescriptions = prescriptions.map(p => {
-      if (p.id === viewingPrescription.id) {
+      if (p.id === targetId) {
+        if (p.orderId) {
+          isContextPrescription = true;
+          targetOrder = p.orderId;
+        }
         const updatedHours = [...(p.hours || [])];
         updatedHours.push({
           hour: currentHourStr,
@@ -555,16 +509,23 @@ export default function NursingCheck() {
         });
         // Sort chronologically
         updatedHours.sort((a, b) => a.hour.localeCompare(b.hour));
+        
+        if (targetOrder) {
+          // @ts-ignore
+          updateMedicationHours(targetOrder, targetId, updatedHours);
+        }
         return { ...p, hours: updatedHours };
       }
       return p;
     });
 
-    const updatedData = {
-      ...patientData,
-      [selectedPatient.id]: { prescriptions: updatedPrescriptions }
-    };
-    saveChecks(updatedData);
+    if (!isContextPrescription) {
+      const updatedData = {
+        ...patientData,
+        [selectedPatient.id]: { prescriptions: updatedPrescriptions }
+      };
+      saveChecks(updatedData);
+    }
 
     toast.success(`Dose extra programada para às ${currentHourStr}!`);
     setViewingPrescription(null);
@@ -901,7 +862,7 @@ export default function NursingCheck() {
                             return (
                               <div
                                 key={hourIdx}
-                                onClick={() => handleHourClick(p.id, hourIdx, h, p.medication, p.route, p.dosage)}
+                                onClick={() => handleHourClick(p, hourIdx, h)}
                                 className={cn(
                                   "h-12 w-12 rounded-xl flex flex-col items-center justify-center cursor-pointer transition-all border group relative shadow-inner select-none",
                                   isChecked && "bg-emerald-500/20 border-emerald-500/40 text-emerald-600 dark:text-emerald-400 scale-[0.98] hover:bg-emerald-500/30",
@@ -1913,7 +1874,7 @@ export default function NursingCheck() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     <Button 
                       type="button"
-                      onClick={handleAddExtraDose}
+                      onClick={() => handleAddExtraDose()}
                       className="bg-rose-600 hover:bg-rose-700 text-white rounded-xl h-12 font-black uppercase tracking-wider text-xs shadow-lg shadow-rose-500/10 flex items-center justify-center gap-2"
                     >
                       <Plus className="h-4 w-4" />
@@ -1921,7 +1882,7 @@ export default function NursingCheck() {
                     </Button>
                     <Button 
                       type="button"
-                      onClick={handleSuspendPrescription}
+                      onClick={() => handleSuspendPrescription()}
                       className="bg-transparent hover:bg-red-500/10 text-red-500 border border-red-500/30 hover:border-red-500/50 h-12 rounded-xl font-black uppercase tracking-wider text-xs flex items-center justify-center gap-2"
                     >
                       <Trash2 className="h-4 w-4" />

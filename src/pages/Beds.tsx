@@ -7,7 +7,8 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { motion } from "motion/react";
-import { useBeds, BedStatus } from "@/context/BedsContext";
+import { useBeds } from "@/context/BedsContext";
+import { usePatientsContext } from "@/context/PatientsContext";
 import { usePatients, Patient } from "@/hooks/use-patients";
 import {
   Dialog,
@@ -43,10 +44,11 @@ const RISK_ORDER: Record<string, number> = {
 
 export default function Beds() {
   const [selectedBedId, setSelectedBedId] = useState<string | null>(null);
-  const [filter, setFilter] = useState<BedStatus | 'all'>('all');
+  const [filter, setFilter] = useState<'all' | 'occupied' | 'available' | 'maintenance' | 'cleaning'>('all');
   const [selectedRisk, setSelectedRisk] = useState<Patient['risk'] | null>(null);
   const [activeTab, setActiveTab] = useState("census");
   const [editingVitalsPatient, setEditingVitalsPatient] = useState<Patient | null>(null);
+  const [allocatingPatientId, setAllocatingPatientId] = useState<string | null>(null);
   const [summaryPatient, setSummaryPatient] = useState<Patient | null>(null);
   const [timelinePatient, setTimelinePatient] = useState<Patient | null>(null);
   const [transferringBedId, setTransferringBedId] = useState<string | null>(null);
@@ -132,13 +134,10 @@ export default function Beds() {
     setLocalRisk(calculatedRisk);
   }, [vitalsForm, editingVitalsPatient]);
 
-  const { beds, updateBedStatus, transferPatient, getStats } = useBeds();
-  const { patients, updatePatient } = usePatients();
-  const stats = getStats();
-  const navigate = useNavigate();
-
+  const { beds, updateBedStatus, getStats, releaseBed, transferPatient, assignPatient } = useBeds();
+  const { patients, updatePatient } = usePatientsContext();
+  
   const getBedPatient = (bed: typeof beds[number]) => {
-    if (bed.status !== 'occupied') return undefined;
     const linkedPatient = patients.find(patient => patient.id === bed.patientId);
     if (linkedPatient) return linkedPatient;
 
@@ -154,6 +153,32 @@ export default function Beds() {
 
     return undefined;
   };
+
+  const getPatientAssignedBed = (patientId: string) => {
+    return beds.find(b => b.patientId === patientId);
+  };
+
+  const admissionQueue = patients.filter(p => p.admissionRequest?.status === 'pending');
+  const stats = getStats();
+  const navigate = useNavigate();
+
+  // Automação: Popup para a Enfermagem / NIR quando entra um novo pedido
+  const [prevQueueLength, setPrevQueueLength] = useState(admissionQueue.length);
+  
+  useEffect(() => {
+    if (admissionQueue.length > prevQueueLength) {
+      // Identifica quem é o paciente mais recente na fila (podemos pegar o primeiro da fila)
+      const newPatient = admissionQueue[0];
+      const bedTypeStr = newPatient?.admissionRequest?.bedType === 'emergency' ? 'EMERGÊNCIA' : 'OBSERVAÇÃO';
+      
+      toast.error('🚨 URGENTE: NOVO PEDIDO DE LEITO!', {
+        description: `O médico solicitou vaga de ${bedTypeStr} para o paciente ${newPatient?.name || 'na fila'}. Por favor, aloque um leito imediatamente.`,
+        duration: 10000, // Fica 10 segundos na tela
+        className: 'bg-red-600 text-white font-black border-2 border-red-800 shadow-[0_0_40px_rgba(220,38,38,0.6)] text-lg',
+      });
+    }
+    setPrevQueueLength(admissionQueue.length);
+  }, [admissionQueue.length, prevQueueLength]);
 
   const handleTabChange = (value: string) => {
     setActiveTab(value);
@@ -202,7 +227,13 @@ export default function Beds() {
       label: 'Manutenção', 
       color: 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20', 
       icon: Settings2,
-      description: 'Leito em limpeza ou reparo técnico.'
+      description: 'Leito em reparo técnico.'
+    },
+    cleaning: {
+      label: 'Limpeza',
+      color: 'bg-orange-500/10 text-orange-500 border-orange-500/20',
+      icon: Sparkles,
+      description: 'Aguardando higienização.'
     },
   };
 
@@ -278,7 +309,10 @@ export default function Beds() {
               )}
               
               {bed.status === 'maintenance' && (
-                <div className="absolute top-0 left-0 right-0 h-1 z-10 bg-yellow-500 animate-pulse" />
+                <div className="absolute top-0 left-0 right-0 h-1 z-10 bg-yellow-500" />
+              )}
+              {bed.status === 'cleaning' && (
+                <div className="absolute top-0 left-0 right-0 h-1 z-10 bg-orange-500 animate-pulse" />
               )}
               <CardHeader className="pb-3 p-4">
                 <div className="flex items-center justify-between mb-2">
@@ -286,7 +320,8 @@ export default function Beds() {
                     <div className={cn(
                       "h-8 w-8 rounded-lg flex items-center justify-center transition-colors",
                       bed.status === 'occupied' ? "bg-red-500/10 text-red-500" : 
-                      bed.status === 'maintenance' ? "bg-yellow-500/10 text-yellow-500" : "bg-emerald-500/10 text-emerald-500"
+                      bed.status === 'maintenance' ? "bg-yellow-500/10 text-yellow-500" : 
+                      bed.status === 'cleaning' ? "bg-orange-500/10 text-orange-500" : "bg-emerald-500/10 text-emerald-500"
                     )}>
                       <BedDouble className="h-4 w-4" />
                     </div>
@@ -394,8 +429,13 @@ export default function Beds() {
                   </div>
                 ) : bed.status === 'maintenance' ? (
                   <div className="py-6 flex flex-col items-center justify-center gap-2 opacity-60">
-                    <Sparkles className="h-8 w-8 text-yellow-500 animate-pulse" />
-                    <p className="text-[10px] font-black uppercase tracking-widest text-center text-foreground animate-pulse">Aguardando Higienização</p>
+                    <Settings2 className="h-8 w-8 text-yellow-500 animate-spin-slow" />
+                    <p className="text-[10px] font-black uppercase tracking-widest text-center text-foreground">Em Manutenção</p>
+                  </div>
+                ) : bed.status === 'cleaning' ? (
+                  <div className="py-6 flex flex-col items-center justify-center gap-2 opacity-80">
+                    <Sparkles className="h-8 w-8 text-orange-500 animate-pulse" />
+                    <p className="text-[10px] font-black uppercase tracking-widest text-center text-orange-500 animate-pulse">Aguardando Higienização</p>
                   </div>
                 ) : (
                   <div className="py-6 flex flex-col items-center justify-center gap-2 opacity-40">
@@ -419,6 +459,15 @@ export default function Beds() {
                       onClick={() => updateBedStatus(bed.id, 'maintenance')}
                     >
                       <Sparkles className="h-3.5 w-3.5 mr-1.5" /> Limpar
+                    </Button>
+                  )}
+                  {bed.status === 'cleaning' && (
+                    <Button
+                      variant="secondary"
+                      className="flex-1 text-[10px] font-black uppercase tracking-[0.15em] h-10 rounded-xl bg-orange-500/20 text-orange-500 hover:bg-orange-500 hover:text-white transition-all border border-orange-500/30 backdrop-blur-md shadow-sm"
+                      onClick={(e) => { e.stopPropagation(); updateBedStatus(bed.id, 'available'); }}
+                    >
+                      <Sparkles className="h-3.5 w-3.5 mr-1.5" /> Limpeza Concluída
                     </Button>
                   )}
                 </div>
@@ -491,6 +540,20 @@ export default function Beds() {
             <span className="font-bold text-xs">{stats.maintenance} Manutenção</span>
           </button>
 
+          <button 
+            type="button"
+            onClick={() => toggleFilter('cleaning')}
+            className={cn(
+              "px-4 py-1.5 rounded-full border flex items-center gap-2 transition-all duration-300",
+              filter === 'cleaning' 
+                ? "bg-orange-500 text-white border-orange-600 shadow-lg scale-105" 
+                : "border-orange-500/30 bg-orange-500/5 text-orange-600 hover:bg-orange-500/10"
+            )}
+          >
+            <div className={cn("h-2 w-2 rounded-full", filter === 'cleaning' ? "bg-white animate-pulse" : "bg-orange-500")} />
+            <span className="font-bold text-xs">{stats.cleaning || 0} Limpeza</span>
+          </button>
+
           {filter !== 'all' && (
             <Button variant="ghost" size="sm" onClick={() => setFilter('all')} className="text-[10px] font-black uppercase tracking-widest h-8 px-2 hover:bg-muted">
               Limpar Filtro
@@ -522,6 +585,14 @@ export default function Beds() {
           <TabsTrigger value="observation" className="rounded-lg h-12 px-8 font-bold text-sm data-[state=active]:bg-amber-400 dark:data-[state=active]:bg-amber-500 data-[state=active]:text-black dark:data-[state=active]:text-slate-950 data-[state=active]:shadow-md transition-all">
             Observação ({observationBeds.length})
           </TabsTrigger>
+          <TabsTrigger value="queue" className="rounded-lg h-12 px-8 font-bold text-sm data-[state=active]:bg-red-500 dark:data-[state=active]:bg-red-600 data-[state=active]:text-white data-[state=active]:shadow-md transition-all relative">
+            Fila de Internação
+            {admissionQueue.length > 0 && (
+              <span className="absolute -top-1 -right-1 bg-red-600 text-white text-[9px] font-black w-5 h-5 rounded-full flex items-center justify-center animate-pulse">
+                {admissionQueue.length}
+              </span>
+            )}
+          </TabsTrigger>
         </TabsList>
         <TabsContent value="all" className="mt-0 outline-none">
           {renderBedCards(filteredBeds)}
@@ -531,6 +602,58 @@ export default function Beds() {
         </TabsContent>
         <TabsContent value="observation" className="mt-0 outline-none">
           {renderBedCards(observationBeds)}
+        </TabsContent>
+        <TabsContent value="queue" className="mt-0 outline-none">
+          {admissionQueue.length === 0 ? (
+            <div className="py-20 text-center flex flex-col items-center gap-4">
+              <div className="h-20 w-20 rounded-3xl bg-emerald-500/10 flex items-center justify-center text-emerald-500">
+                <CheckCircle2 className="h-10 w-10" />
+              </div>
+              <div>
+                <h3 className="text-xl font-black uppercase tracking-tight text-foreground">Fila Vazia</h3>
+                <p className="text-[12px] font-bold text-muted-foreground uppercase tracking-widest mt-1">Nenhum paciente aguardando leito no momento.</p>
+              </div>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {admissionQueue.map(patient => (
+                <Card key={patient.id} className="glass-card-premium border-2 border-red-500/30 dark:border-red-500/40 bg-red-500/5 dark:bg-red-500/10 shadow-[0_10px_30px_rgba(239,68,68,0.1)] relative overflow-hidden group">
+                  <div className="absolute top-0 right-0 p-3 flex gap-2">
+                    <span className="px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest bg-red-500 text-white shadow-sm flex items-center gap-1 animate-pulse">
+                      <Clock3 className="h-3 w-3" /> Aguardando {patient.admissionRequest?.bedType === 'emergency' ? 'Emergência' : 'Observação'}
+                    </span>
+                  </div>
+                  
+                  <CardHeader className="pb-3 p-5">
+                    <div className="flex items-center gap-4 mt-2">
+                      <div className="h-12 w-12 rounded-xl bg-white/50 dark:bg-slate-900/50 flex items-center justify-center text-red-500 border border-red-500/20 shadow-sm backdrop-blur-sm">
+                        <UserRound className="h-6 w-6" />
+                      </div>
+                      <div>
+                        <h3 className="text-sm font-black uppercase tracking-tight text-foreground">{patient.name}</h3>
+                        <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mt-0.5 flex items-center gap-1">
+                          <Activity className="h-3 w-3" /> {patient.mainComplaint || 'Não informado'}
+                        </p>
+                      </div>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="p-5 pt-0">
+                    <div className="bg-white/40 dark:bg-slate-900/40 p-3 rounded-xl border border-white/50 dark:border-white/5 mb-4 shadow-[inset_0_1px_1px_rgba(255,255,255,0.4)] backdrop-blur-md">
+                      <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">Solicitado por</p>
+                      <p className="text-xs font-black uppercase tracking-tight text-foreground">{patient.admissionRequest?.doctor}</p>
+                    </div>
+                    <Button 
+                      className="w-full h-12 rounded-xl font-black uppercase tracking-[0.15em] text-[11px] bg-red-600 hover:bg-red-700 text-white shadow-lg transition-all border border-red-500"
+                      onClick={() => setAllocatingPatientId(patient.id)}
+                    >
+                      <BedDouble className="h-4 w-4 mr-2" />
+                      Alocar Leito
+                    </Button>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
         </TabsContent>
         <TabsContent value="census" className="mt-0 outline-none">
           <div className="space-y-6">
@@ -1258,6 +1381,61 @@ export default function Beds() {
               Confirmar Troca
             </Button>
           </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={!!allocatingPatientId} onOpenChange={(open) => !open && setAllocatingPatientId(null)}>
+        <DialogContent className="sm:max-w-[600px] rounded-2xl p-0 overflow-hidden glass-card-premium shadow-2xl border-white/40 dark:border-white/10">
+          <div className="p-6 border-b border-white/20 dark:border-white/5 flex items-center gap-4 bg-white/40 dark:bg-slate-900/40">
+            <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-[#006699] to-[#004d73] flex items-center justify-center text-white shadow-lg">
+              <BedDouble className="h-6 w-6" />
+            </div>
+            <div>
+              <DialogTitle className="text-xl font-black uppercase tracking-tight text-foreground">Selecionar Leito Livre</DialogTitle>
+              <DialogDescription className="text-[10px] font-bold uppercase tracking-widest mt-1 opacity-80">
+                Escolha onde alocar o paciente
+              </DialogDescription>
+            </div>
+          </div>
+          <div className="p-6 max-h-[60vh] overflow-y-auto space-y-3">
+            {beds.filter(b => b.status === 'available').length === 0 ? (
+              <div className="text-center py-8 text-muted-foreground font-bold text-sm">
+                Nenhum leito disponível no momento.
+              </div>
+            ) : (
+              beds.filter(b => b.status === 'available').map(bed => (
+                <div 
+                  key={bed.id}
+                  onClick={() => {
+                    if (allocatingPatientId) {
+                      assignPatient(bed.id, allocatingPatientId);
+                      const patient = patients.find(p => p.id === allocatingPatientId);
+                      if (patient && patient.admissionRequest) {
+                        updatePatient(allocatingPatientId, {
+                          admissionRequest: { ...patient.admissionRequest, status: 'allocated' },
+                          status: 'attending', // Garante que saiu de waiting se estava
+                          sector: bed.name
+                        });
+                      }
+                      setAllocatingPatientId(null);
+                      toast.success(`Paciente alocado no ${bed.name}`);
+                    }
+                  }}
+                  className="p-4 rounded-xl border-2 border-slate-200 dark:border-slate-800 hover:border-emerald-500/50 hover:bg-emerald-500/5 cursor-pointer flex justify-between items-center transition-all"
+                >
+                  <div className="flex items-center gap-4">
+                    <div className="h-10 w-10 rounded-lg bg-emerald-500/20 text-emerald-600 flex items-center justify-center">
+                      <CheckCircle2 className="h-5 w-5" />
+                    </div>
+                    <div>
+                      <h4 className="font-black uppercase tracking-tight text-foreground">{bed.name}</h4>
+                      <p className="text-[10px] font-bold text-muted-foreground tracking-widest">{bed.ward} • {bed.room}</p>
+                    </div>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
         </DialogContent>
       </Dialog>
     </motion.div>

@@ -10,6 +10,8 @@ import { toast } from "sonner";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { cn, formatWords, formatPatientNameLGPD } from "@/lib/utils";
 import { PatientDetailsModal } from "@/components/PatientDetailsModal";
+import { useEffect, useRef } from "react";
+import { AlertTriangle } from "lucide-react";
 
 export default function Attendances() {
   const navigate = useNavigate();
@@ -82,6 +84,20 @@ export default function Attendances() {
     });
   };
 
+  const gravePatients = classifiedPatients.filter(p => p.risk === 'emergency' || p.risk === 'very-urgent');
+  const prevGraveCount = useRef(gravePatients.length);
+
+  useEffect(() => {
+    if (gravePatients.length > prevGraveCount.current) {
+      toast.error('NOVO PACIENTE GRAVE AGUARDANDO!', {
+        description: 'Um novo paciente foi classificado com risco Emergência ou Muito Urgente.',
+        icon: <AlertTriangle className="h-5 w-5 text-red-500 animate-pulse" />,
+        duration: 8000,
+      });
+    }
+    prevGraveCount.current = gravePatients.length;
+  }, [gravePatients.length]);
+
   return (
     <motion.div 
       initial={{ opacity: 0, y: 10 }}
@@ -105,6 +121,33 @@ export default function Attendances() {
           </div>
         </div>
       </div>
+
+      {gravePatients.length > 0 && (
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.95, y: -20 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          className="bg-red-600 border-2 border-red-500 rounded-2xl p-6 shadow-[0_0_40px_rgba(220,38,38,0.4)] flex flex-col sm:flex-row items-center justify-between gap-4"
+        >
+          <div className="flex items-center gap-4 text-white">
+            <div className="h-12 w-12 rounded-full bg-white/20 flex items-center justify-center animate-pulse shrink-0">
+              <AlertTriangle className="h-7 w-7 text-white" />
+            </div>
+            <div>
+              <h2 className="text-xl font-black uppercase tracking-tight">🚨 Alerta de Risco Grave!</h2>
+              <p className="text-xs font-bold tracking-widest uppercase opacity-90 mt-1">
+                {gravePatients.length} paciente(s) com classificação Vermelha/Laranja aguardando na fila.
+              </p>
+            </div>
+          </div>
+          <Button 
+            className="w-full sm:w-auto h-12 bg-white hover:bg-slate-100 text-red-600 font-black uppercase tracking-[0.15em] text-xs shadow-xl rounded-xl transition-all hover:scale-105"
+            onClick={() => handleAttend(gravePatients[0])}
+          >
+            <Stethoscope className="h-4 w-4 mr-2" />
+            Atender Imediatamente
+          </Button>
+        </motion.div>
+      )}
 
       {/* Stats rápidas */}
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">

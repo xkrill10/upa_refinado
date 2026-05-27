@@ -3,10 +3,11 @@ import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { usePatients } from "@/hooks/use-patients";
 import { EvolutionRecord } from "@/context/PatientsContext";
 import { useBeds } from "@/context/BedsContext";
+import { usePrescriptions, PrescriptionMedication } from "@/context/PrescriptionsContext";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Plus, MessageSquare, Bed as BedIcon, History, X, CheckCircle2, ChevronLeft, ChevronRight, Activity, Search, Clock, ShieldAlert, Heart, Baby, Brain } from "lucide-react";
+import { ArrowLeft, Plus, MessageSquare, Bed as BedIcon, History, X, CheckCircle2, ChevronLeft, ChevronRight, Activity, Search, Clock, ShieldAlert, Heart, Baby, Brain, Flame, Droplet, Wind } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -93,6 +94,17 @@ import { FugulinModal } from "@/components/PatientEvolution/Modals/FugulinModal"
 import { NandaModal } from "@/components/PatientEvolution/Modals/NandaModal";
 import { ClinicalProfileModal } from "@/components/PatientEvolution/Modals/ClinicalProfileModal";
 import { VitalsHistoryModal } from "@/components/PatientEvolution/Modals/VitalsHistoryModal";
+import { HeartScoreModal } from "@/components/PatientEvolution/Modals/HeartScoreModal";
+import { Curb65Modal } from "@/components/PatientEvolution/Modals/Curb65Modal";
+import { WellsScoreModal } from "@/components/PatientEvolution/Modals/WellsScoreModal";
+import { NihssModal } from "@/components/PatientEvolution/Modals/NihssModal";
+import { DehydrationScoreModal } from "@/components/PatientEvolution/Modals/DehydrationScoreModal";
+import { WoodDownesModal } from "@/components/PatientEvolution/Modals/WoodDownesModal";
+import { ParklandModal } from "@/components/PatientEvolution/Modals/ParklandModal";
+import { BedTransferModal } from "@/components/PatientEvolution/Modals/BedTransferModal";
+import { BedStatusModal } from "@/components/PatientEvolution/Modals/BedStatusModal";
+import { PatientTimelineModal } from "@/components/PatientEvolution/Modals/PatientTimelineModal";
+import { BedRequestModal } from "@/components/PatientEvolution/Modals/BedRequestModal";
 
 export default function PatientEvolution() {
   const { id } = useParams();
@@ -120,6 +132,7 @@ export default function PatientEvolution() {
   const [isBedDialogOpen, setIsBedDialogOpen] = useState(false);
   const [isClinicalProfileOpen, setIsClinicalProfileOpen] = useState(false);
   const [isVitalsHistoryOpen, setIsVitalsHistoryOpen] = useState(false);
+  const [isBedRequestOpen, setIsBedRequestOpen] = useState(false);
   const patientBed = beds.find(b => b.patientId === id);
   const availableBeds = beds.filter(b => b.status === 'available');
 
@@ -231,6 +244,35 @@ export default function PatientEvolution() {
   const [isSaeAdmissionDropdownOpen, setIsSaeAdmissionDropdownOpen] = useState(false);
   const [isSaeCareDropdownOpen, setIsSaeCareDropdownOpen] = useState(false);
 
+  // Estados para o Super Painel de Prescrição Médica
+  const [prescWizard, setPrescWizard] = useState({ medication: "", dosage: "", route: "", frequency: "" });
+  const [prescribedMedications, setPrescribedMedications] = useState<PrescriptionMedication[]>([]);
+  const { addPrescriptionOrder } = usePrescriptions();
+
+  const handleAddPrescriptionItem = () => {
+    if (!prescWizard.medication || !prescWizard.dosage || !prescWizard.route || !prescWizard.frequency) {
+      toast.error("Preencha todos os campos do medicamento!");
+      return;
+    }
+    const newItem: PrescriptionMedication = {
+      id: `med-${Date.now()}`,
+      medication: prescWizard.medication,
+      dosage: prescWizard.dosage,
+      route: prescWizard.route,
+      frequency: prescWizard.frequency,
+      status: 'awaiting_pharmacy',
+      hours: []
+    };
+    setPrescribedMedications([...prescribedMedications, newItem]);
+    setPrescWizard({ medication: "", dosage: "", route: "", frequency: "" });
+  };
+
+  const handleRemovePrescriptionItem = (idx: number) => {
+    const arr = [...prescribedMedications];
+    arr.splice(idx, 1);
+    setPrescribedMedications(arr);
+  };
+
   // Estados para os Dropdowns do Super Painel de Prescrição Médica
   const [isPrescMedicationDropdownOpen, setIsPrescMedicationDropdownOpen] = useState(false);
   const [isPrescDietDropdownOpen, setIsPrescDietDropdownOpen] = useState(false);
@@ -247,6 +289,22 @@ export default function PatientEvolution() {
   const [isPediatricNeuroDropdownOpen, setIsPediatricNeuroDropdownOpen] = useState(false);
   const [isPediatricSyndromeDropdownOpen, setIsPediatricSyndromeDropdownOpen] = useState(false);
   const [isPediatricConductDropdownOpen, setIsPediatricConductDropdownOpen] = useState(false);
+
+  // Estados Calculadoras Médicas Extras
+  const [openHeartCalc, setOpenHeartCalc] = useState(false);
+  const [openCurb65Calc, setOpenCurb65Calc] = useState(false);
+  const [openWellsCalc, setOpenWellsCalc] = useState(false);
+  const [openNihssCalc, setOpenNihssCalc] = useState(false);
+  const [openDehydrationCalc, setOpenDehydrationCalc] = useState(false);
+  const [openWoodDownesCalc, setOpenWoodDownesCalc] = useState(false);
+  const [openParklandCalc, setOpenParklandCalc] = useState(false);
+
+  // Estados Gestão de Leitos
+  const [openBedTransfer, setOpenBedTransfer] = useState(false);
+  const [openBedStatus, setOpenBedStatus] = useState(false);
+
+  // Estado Linha do Tempo
+  const [isTimelineOpen, setIsTimelineOpen] = useState(false);
 
   // Estados para os Dropdowns da Equipe Multidisciplinar
   const [isFisioEvalDropdownOpen, setIsFisioEvalDropdownOpen] = useState(false);
@@ -296,6 +354,24 @@ export default function PatientEvolution() {
         return trimmedPrev + "\n\n" + itemText;
       });
       toast.success(`${toastMsg} adicionado(a)`);
+      
+      // Smart CID Logic
+      const isSyndrome = MEDICAL_SYNDROME_ITEMS.some(i => i.toastMsg === toastMsg) || PEDIATRIC_SYNDROME_ITEMS.some(i => i.toastMsg === toastMsg);
+      if (isSyndrome) {
+        if (normItem.includes("infecção") && normItem.includes("urinário") || normItem.includes("itu")) {
+          const cid = CID10_DATABASE.find(c => c.code === "N390");
+          if (cid) setSelectedCid(cid);
+        } else if (normItem.includes("dor torácica") || normItem.includes("iam") || normItem.includes("coronariana")) {
+          const cid = CID10_DATABASE.find(c => c.code === "I219");
+          if (cid) setSelectedCid(cid);
+        } else if (normItem.includes("dengue")) {
+          const cid = CID10_DATABASE.find(c => c.code === "A90");
+          if (cid) setSelectedCid(cid);
+        } else if (normItem.includes("hipertensiva") || normItem.includes("hipertensão")) {
+          const cid = CID10_DATABASE.find(c => c.code === "I10");
+          if (cid) setSelectedCid(cid);
+        }
+      }
     }
   };
 
@@ -561,6 +637,17 @@ export default function PatientEvolution() {
       if (description.trim()) {
         finalDescription += `\n\nObservações clínicas adicionais:\n${description}`;
       }
+    } else if (evolutionType === "Prescrição" && prescribedMedications.length > 0) {
+      finalDescription = "PRESCRIÇÃO MÉDICA ESTRUTURADA:\n\n";
+      prescribedMedications.forEach((med, idx) => {
+        finalDescription += `${idx + 1}. ${med.medication} - ${med.dosage} (${med.route}) - ${med.frequency}\n`;
+        if (med.observation) {
+          finalDescription += `   Observação: ${med.observation}\n`;
+        }
+      });
+      if (description.trim()) {
+        finalDescription += `\nObservações Adicionais:\n${description}`;
+      }
     }
 
     // Anexar carimbo digital se configurado
@@ -586,11 +673,53 @@ export default function PatientEvolution() {
       });
     }
 
+    // AUTOMAÇÃO: Disparo automático de vaga via texto da evolução
+    if (finalDescription.includes("SOLICITAÇÃO DE INTERNAÇÃO / LEITO:") || finalDescription.includes("SOLICITAÇÃO DE INTERNAÇÃO PEDIÁTRICA:")) {
+      updatePatient(id!, {
+        admissionRequest: {
+          status: 'pending',
+          bedType: 'emergency',
+          requestedAt: new Date().toISOString(),
+          doctor: professional,
+        }
+      });
+      toast.success("O NIR foi notificado automaticamente do pedido de leito.");
+      new BroadcastChannel('upa_sync_channel').postMessage('sync_all');
+    } else if (finalDescription.includes("SOLICITAÇÃO DE OBSERVAÇÃO CLÍNICA:") || finalDescription.includes("SOLICITAÇÃO DE OBSERVAÇÃO PEDIÁTRICA:")) {
+      updatePatient(id!, {
+        admissionRequest: {
+          status: 'pending',
+          bedType: 'observation',
+          requestedAt: new Date().toISOString(),
+          doctor: professional,
+        }
+      });
+      toast.success("A Enfermagem foi notificada para providenciar o leito de observação.");
+      new BroadcastChannel('upa_sync_channel').postMessage('sync_all');
+    }
+
+    if ((evolutionType === "Evolução Médica" || evolutionType === "Evolução Médica (Pediátrica)") && prescribedMedications.length > 0) {
+      addPrescriptionOrder({
+        patientId: patient.id,
+        patientName: patient.name,
+        doctorId: professional,
+        doctorName: `Dr(a). ${professional}`,
+        medications: prescribedMedications.map((m, i) => ({
+          ...m,
+          id: `med-${Date.now()}-${i}`,
+          status: 'awaiting_pharmacy',
+          hours: []
+        }))
+      });
+    }
+
     setIsFormOpen(false);
     setEvolutionType("");
     setProfessional(localStorage.getItem("upa_stamp_name") || "");
     setDescription("");
     setSelectedCid(null);
+    setPrescribedMedications([]);
+    setPrescWizard({ medication: "", dosage: "", route: "", frequency: "" });
     
     // Limpar campos de sinais vitais
     setVsBloodPressure("");
@@ -677,18 +806,19 @@ export default function PatientEvolution() {
       animate={{ opacity: 1, y: 0 }}
       className="space-y-8"
     >
-      <div className="flex items-center gap-6">
-        <Button 
-          asChild
-          variant="ghost" 
-          size="icon" 
-          className="h-10 w-10 rounded-full hover:bg-muted"
-        >
-          <Link to={fromPath}>
-            <ArrowLeft className="h-5 w-5" />
-          </Link>
-        </Button>
-        <div className="flex flex-col gap-1">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="flex items-center gap-6">
+          <Button 
+            asChild
+            variant="ghost" 
+            size="icon" 
+            className="h-10 w-10 rounded-full hover:bg-muted"
+          >
+            <Link to={fromPath}>
+              <ArrowLeft className="h-5 w-5" />
+            </Link>
+          </Button>
+          <div className="flex flex-col gap-1">
           <div className="flex items-center gap-3">
             <h1 className="text-2xl font-black text-[#006699] dark:text-sky-400 uppercase tracking-tight">
               {patient.name.toUpperCase().includes('NÃO IDENTIFICADO') || patient.name.toUpperCase().includes('DESCONHECIDO') 
@@ -717,6 +847,41 @@ export default function PatientEvolution() {
               </div>
             )}
           </div>
+        </div>
+      </div>
+        
+        <div className="flex flex-col md:flex-row gap-2 mt-2 md:mt-0 shrink-0">
+          {patient.admissionRequest && patient.admissionRequest.status === 'pending' ? (
+            <Button 
+              disabled
+              className="rounded-xl gap-2 font-black bg-amber-500/20 text-amber-600 dark:text-amber-400 border border-amber-500/50 uppercase tracking-widest text-[10px] h-10 px-4"
+            >
+              ⏳ Vaga Solicitada
+            </Button>
+          ) : patientBed ? (
+            <Button 
+              disabled
+              className="rounded-xl gap-2 font-black bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/50 uppercase tracking-widest text-[10px] h-10 px-4"
+            >
+              <CheckCircle2 className="h-4 w-4" /> Leito Alocado
+            </Button>
+          ) : (
+            <Button 
+              onClick={() => setIsBedRequestOpen(true)}
+              className="rounded-xl gap-2 font-black bg-amber-500 hover:bg-amber-600 text-white shadow-lg shadow-amber-500/20 uppercase tracking-widest text-[10px] h-10 px-4"
+            >
+              <BedIcon className="h-4 w-4" />
+              Solicitar Vaga
+            </Button>
+          )}
+
+          <Button 
+            onClick={() => setIsTimelineOpen(true)}
+            className="rounded-xl gap-2 font-black bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-500/20 uppercase tracking-widest text-[10px] h-10 px-4"
+          >
+            <Clock className="h-4 w-4" />
+            ⏱️ Jornada
+          </Button>
         </div>
       </div>
 
@@ -855,7 +1020,7 @@ export default function PatientEvolution() {
                   setActiveTab(tab.id as any);
                   if (isFormOpen) {
                     if (tab.id === "prescriptions") {
-                      handleEvolutionTypeChange("Prescrição");
+                      handleEvolutionTypeChange(isChild ? "Evolução Médica (Pediátrica)" : "Evolução Médica");
                     } else if (tab.id === "vitals") {
                       handleEvolutionTypeChange("Sinais Vitais");
                     } else if (tab.id === "discharge") {
@@ -895,7 +1060,7 @@ export default function PatientEvolution() {
             onClick={() => {
               setIsFormOpen(true);
               if (activeTab === "prescriptions") {
-                handleEvolutionTypeChange("Prescrição");
+                handleEvolutionTypeChange(isChild ? "Evolução Médica (Pediátrica)" : "Evolução Médica");
               } else if (activeTab === "vitals") {
                 handleEvolutionTypeChange("Sinais Vitais");
               } else if (activeTab === "discharge") {
@@ -975,7 +1140,6 @@ export default function PatientEvolution() {
                             Condutas e Registros
                           </SelectLabel>
                           <SelectItem value="Sinais Vitais">Sinais Vitais</SelectItem>
-                          <SelectItem value="Prescrição">Prescrição</SelectItem>
                           <SelectItem value="Procedimento">Procedimento</SelectItem>
                           <SelectItem value="Alta">Alta</SelectItem>
                         </SelectGroup>
@@ -1223,8 +1387,8 @@ export default function PatientEvolution() {
                   </motion.div>
                 )}
 
-                {/* Super Painel de Prescrição Médica */}
-                {evolutionType === "Prescrição" && (
+                {/* Super Painel de Prescrição Médica (Kanban / Estruturada) */}
+                {(evolutionType === "Evolução Médica" || evolutionType === "Evolução Médica (Pediátrica)") && (
                   <motion.div 
                     initial={{ opacity: 0, y: -5 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -1240,161 +1404,109 @@ export default function PatientEvolution() {
                     </div>
                     
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {/* 1. Combos de Medicamentos */}
-                      <div className={cn("space-y-2 relative", isPrescMedicationDropdownOpen ? "z-30" : "z-10")}>
+                      {/* 1. Formulário de Inserção */}
+                      <div className="space-y-3">
                         <span className="text-[9px] font-black uppercase text-muted-foreground block">
-                          1. Combos de Medicamentos (Inserir no texto)
+                          1. Adicionar Item (Fila da Farmácia & Enfermagem)
                         </span>
                         
-                        <div className="relative clinical-dropdown-container">
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setIsPrescMedicationDropdownOpen(!isPrescMedicationDropdownOpen);
-                              setIsPrescDietDropdownOpen(false);
-                            }}
-                            className={cn(
-                              "flex items-center justify-between w-full px-4 py-2.5 rounded-xl border bg-white/45 dark:bg-slate-900/45 hover:bg-white/60 dark:hover:bg-slate-900/60 backdrop-blur-sm text-xs font-semibold shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-[#006699]/20",
-                              isPrescMedicationDropdownOpen ? "border-[#006699] text-foreground" : "border-white/60 dark:border-white/10 text-muted-foreground"
-                            )}
-                          >
-                            <div className="flex items-center gap-2">
-                              <span className="p-1 rounded-lg bg-blue-500/10 text-blue-600">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-pill"><path d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z"/><path d="m8.5 8.5 7 7"/></svg>
-                              </span>
-                              <span>Selecionar Combos...</span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                              {(() => {
-                                const count = PRESCRIPTION_MEDICATION_ITEMS.filter(item => normalizeText(description).includes(normalizeText(item.text).trim())).length;
-                                return count > 0 ? (
-                                  <Badge className="bg-blue-600 text-white font-black text-[9px] px-1.5 py-0.5 rounded-full border-none shadow-sm animate-in zoom-in-50 duration-200">
-                                    {count}
-                                  </Badge>
-                                ) : null;
-                              })()}
-                              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={cn("lucide lucide-chevron-down text-muted-foreground/60 transition-transform duration-200", isPrescMedicationDropdownOpen && "transform rotate-180")}><path d="m6 9 6 6 6-6"/></svg>
-                            </div>
-                          </button>
-
-                          <AnimatePresence>
-                            {isPrescMedicationDropdownOpen && (
-                              <motion.div
-                                initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                                animate={{ opacity: 1, y: 0, scale: 1 }}
-                                exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                                transition={{ duration: 0.15, ease: "easeOut" }}
-                                className="absolute left-0 right-0 mt-2 p-1.5 rounded-xl border border-blue-500/20 border-white/20 dark:border-white/10 bg-white/95 dark:bg-slate-950/95 text-slate-900 dark:text-slate-100 shadow-2xl backdrop-blur-md z-50 max-h-[280px] overflow-y-auto overflow-x-hidden space-y-1 scrollbar-thin scrollbar-thumb-muted"
-                              >
-                                {PRESCRIPTION_MEDICATION_ITEMS.map((item) => {
-                                  const isActive = normalizeText(description).includes(normalizeText(item.text).trim());
-                                  return (
-                                    <button
-                                      key={item.id}
-                                      type="button"
-                                      onClick={() => toggleCareItem(item.text, item.toastMsg)}
-                                      className={cn(
-                                        "group flex items-center justify-between w-full px-3 py-2 rounded-lg text-left text-xs transition-all",
-                                        isActive 
-                                          ? "bg-blue-500/5 text-blue-700 dark:text-blue-400 font-bold border border-blue-500/20" 
-                                          : "hover:bg-muted/70 text-slate-700 dark:text-slate-200 border border-transparent"
-                                      )}
-                                    >
-                                      <span className="truncate">{item.label}</span>
-                                      {isActive ? (
-                                        <span className="text-[10px] font-black text-blue-600 dark:text-blue-400 flex items-center gap-1">
-                                          Adicionado ✓
-                                        </span>
-                                      ) : (
-                                        <span className="text-[10px] text-slate-400 dark:text-slate-500 group-hover:text-[#006699] dark:group-hover:text-sky-400 font-bold transition-all">
-                                          + Inserir
-                                        </span>
-                                      )}
-                                    </button>
-                                  );
-                                })}
-                              </motion.div>
-                            )}
-                          </AnimatePresence>
+                        <div className="grid grid-cols-2 gap-2">
+                          <div className="space-y-1">
+                            <Label className="text-[10px] font-bold">Medicamento</Label>
+                            <Input 
+                              placeholder="Ex: Dipirona" 
+                              className="h-8 text-xs bg-white/50 dark:bg-black/20"
+                              value={prescWizard.medication}
+                              onChange={(e) => setPrescWizard({...prescWizard, medication: e.target.value})}
+                            />
+                          </div>
+                          <div className="space-y-1">
+                            <Label className="text-[10px] font-bold">Dose</Label>
+                            <Input 
+                              placeholder="Ex: 1g" 
+                              className="h-8 text-xs bg-white/50 dark:bg-black/20"
+                              value={prescWizard.dosage}
+                              onChange={(e) => setPrescWizard({...prescWizard, dosage: e.target.value})}
+                            />
+                          </div>
+                          <div className="space-y-1">
+                            <Label className="text-[10px] font-bold">Via</Label>
+                            <Select 
+                              value={prescWizard.route} 
+                              onValueChange={(v) => setPrescWizard({...prescWizard, route: v})}
+                            >
+                              <SelectTrigger className="h-8 text-xs bg-white/50 dark:bg-black/20">
+                                <SelectValue placeholder="Selecione" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="EV">EV (Endovenosa)</SelectItem>
+                                <SelectItem value="IM">IM (Intramuscular)</SelectItem>
+                                <SelectItem value="VO">VO (Oral)</SelectItem>
+                                <SelectItem value="SC">SC (Subcutânea)</SelectItem>
+                                <SelectItem value="Inalatória">Inalatória</SelectItem>
+                                <SelectItem value="Tópica">Tópica</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <div className="space-y-1">
+                            <Label className="text-[10px] font-bold">Frequência</Label>
+                            <Select 
+                              value={prescWizard.frequency} 
+                              onValueChange={(v) => setPrescWizard({...prescWizard, frequency: v})}
+                            >
+                              <SelectTrigger className="h-8 text-xs bg-white/50 dark:bg-black/20">
+                                <SelectValue placeholder="Selecione" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="Dose única">Dose única</SelectItem>
+                                <SelectItem value="Contínuo">Contínuo</SelectItem>
+                                <SelectItem value="4/4h">4/4h</SelectItem>
+                                <SelectItem value="6/6h">6/6h</SelectItem>
+                                <SelectItem value="8/8h">8/8h</SelectItem>
+                                <SelectItem value="12/12h">12/12h</SelectItem>
+                                <SelectItem value="24/24h">24/24h</SelectItem>
+                                <SelectItem value="ACM">ACM (A critério médico)</SelectItem>
+                                <SelectItem value="SOS">SOS (Se necessário)</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
                         </div>
+
+                        <Button 
+                          type="button" 
+                          variant="outline" 
+                          onClick={handleAddPrescriptionItem}
+                          className="w-full h-8 text-[10px] font-black uppercase tracking-wider bg-blue-500/10 hover:bg-blue-500/20 text-blue-600 border-blue-500/30"
+                        >
+                          <Plus className="h-3 w-3 mr-1" /> Adicionar à Prescrição
+                        </Button>
                       </div>
 
-                      {/* 2. Dietas e Cuidados Clínicos */}
-                      <div className={cn("space-y-2 relative", isPrescDietDropdownOpen ? "z-30" : "z-10")}>
+                      {/* 2. Lista de Itens Prescritos */}
+                      <div className="space-y-2">
                         <span className="text-[9px] font-black uppercase text-muted-foreground block">
-                          2. Dietas e Cuidados Clínicos (Inserir no texto)
+                          2. Lista Estruturada
                         </span>
-                        
-                        <div className="relative clinical-dropdown-container">
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setIsPrescDietDropdownOpen(!isPrescDietDropdownOpen);
-                              setIsPrescMedicationDropdownOpen(false);
-                            }}
-                            className={cn(
-                              "flex items-center justify-between w-full px-4 py-2.5 rounded-xl border bg-white/45 dark:bg-slate-900/45 hover:bg-white/60 dark:hover:bg-slate-900/60 backdrop-blur-sm text-xs font-semibold shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-[#006699]/20",
-                              isPrescDietDropdownOpen ? "border-[#006699] text-foreground" : "border-white/60 dark:border-white/10 text-muted-foreground"
-                            )}
-                          >
-                            <div className="flex items-center gap-2">
-                              <span className="p-1 rounded-lg bg-emerald-500/10 text-emerald-600">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-apple"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="M12 2v4"/></svg>
-                              </span>
-                              <span>Selecionar Dietas/Cuidados...</span>
+                        <div className="bg-white/40 dark:bg-black/20 rounded-lg border border-white/40 dark:border-white/10 p-2 min-h-[120px] max-h-[160px] overflow-y-auto space-y-1.5">
+                          {prescribedMedications.length === 0 ? (
+                            <div className="h-full flex flex-col items-center justify-center text-muted-foreground/50 py-4">
+                              <CheckCircle2 className="h-6 w-6 mb-1 opacity-20" />
+                              <span className="text-[10px] font-bold uppercase tracking-wider">Nenhum item adicionado</span>
                             </div>
-                            <div className="flex items-center gap-2">
-                              {(() => {
-                                const count = PRESCRIPTION_DIET_ITEMS.filter(item => normalizeText(description).includes(normalizeText(item.text).trim())).length;
-                                return count > 0 ? (
-                                  <Badge className="bg-emerald-600 text-white font-black text-[9px] px-1.5 py-0.5 rounded-full border-none shadow-sm animate-in zoom-in-50 duration-200">
-                                    {count}
-                                  </Badge>
-                                ) : null;
-                              })()}
-                              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={cn("lucide lucide-chevron-down text-muted-foreground/60 transition-transform duration-200", isPrescDietDropdownOpen && "transform rotate-180")}><path d="m6 9 6 6 6-6"/></svg>
-                            </div>
-                          </button>
-
-                          <AnimatePresence>
-                            {isPrescDietDropdownOpen && (
-                              <motion.div
-                                initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                                animate={{ opacity: 1, y: 0, scale: 1 }}
-                                exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                                transition={{ duration: 0.15, ease: "easeOut" }}
-                                className="absolute left-0 right-0 mt-2 p-1.5 rounded-xl border border-emerald-500/20 border-white/20 dark:border-white/10 bg-white/95 dark:bg-slate-950/95 text-slate-900 dark:text-slate-100 shadow-2xl backdrop-blur-md z-50 max-h-[280px] overflow-y-auto overflow-x-hidden space-y-1 scrollbar-thin scrollbar-thumb-muted"
-                              >
-                                {PRESCRIPTION_DIET_ITEMS.map((item) => {
-                                  const isActive = normalizeText(description).includes(normalizeText(item.text).trim());
-                                  return (
-                                    <button
-                                      key={item.id}
-                                      type="button"
-                                      onClick={() => toggleCareItem(item.text, item.toastMsg)}
-                                      className={cn(
-                                        "group flex items-center justify-between w-full px-3 py-2 rounded-lg text-left text-xs transition-all",
-                                        isActive 
-                                          ? "bg-emerald-500/5 text-emerald-700 dark:text-emerald-400 font-bold border border-emerald-500/20" 
-                                          : "hover:bg-muted/70 text-slate-700 dark:text-slate-200 border border-transparent"
-                                      )}
-                                    >
-                                      <span className="truncate">{item.label}</span>
-                                      {isActive ? (
-                                        <span className="text-[10px] font-black text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
-                                          Adicionado ✓
-                                        </span>
-                                      ) : (
-                                        <span className="text-[10px] text-slate-400 dark:text-slate-500 group-hover:text-[#006699] dark:group-hover:text-sky-400 font-bold transition-all">
-                                          + Inserir
-                                        </span>
-                                      )}
-                                    </button>
-                                  );
-                                })}
-                              </motion.div>
-                            )}
-                          </AnimatePresence>
+                          ) : (
+                            prescribedMedications.map((med, idx) => (
+                              <div key={idx} className="flex flex-col bg-white/60 dark:bg-slate-800/60 p-2 rounded-md border border-slate-500/20 text-xs relative group">
+                                <button 
+                                  onClick={() => handleRemovePrescriptionItem(idx)}
+                                  className="absolute top-1 right-1 h-5 w-5 bg-red-500/10 hover:bg-red-500/20 text-red-500 rounded flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                                >
+                                  <X className="h-3 w-3" />
+                                </button>
+                                <span className="font-bold pr-6">{med.medication} <span className="text-muted-foreground font-normal">({med.dosage})</span></span>
+                                <span className="text-[10px] text-muted-foreground">Via: {med.route} • Freq: {med.frequency}</span>
+                              </div>
+                            ))
+                          )}
                         </div>
                       </div>
                     </div>
@@ -2076,6 +2188,35 @@ export default function PatientEvolution() {
                         </div>
                       </div>
                     </div>
+
+                    {/* Escores e Calculadoras Rápidas */}
+                    <div className="space-y-3 pt-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[9px] font-black uppercase text-muted-foreground">4. Escores e Calculadoras Rápidas</span>
+                        <Badge variant="outline" className="text-[8px] uppercase tracking-wider bg-primary/5 text-primary border-primary/20">Fast-Track</Badge>
+                      </div>
+
+                      <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
+                        <button type="button" onClick={() => setOpenQsofaCalc(true)} className="flex items-center justify-center gap-1.5 p-2 rounded-xl border border-purple-500/30 bg-purple-500/10 hover:bg-purple-500/20 text-purple-700 dark:text-purple-400 text-[10px] font-black uppercase transition-all">
+                          <Activity className="h-3 w-3" /> qSOFA
+                        </button>
+                        <button type="button" onClick={() => setOpenHeartCalc(true)} className="flex items-center justify-center gap-1.5 p-2 rounded-xl border border-red-500/30 bg-red-500/10 hover:bg-red-500/20 text-red-700 dark:text-red-400 text-[10px] font-black uppercase transition-all">
+                          <Heart className="h-3 w-3" /> HEART Score
+                        </button>
+                        <button type="button" onClick={() => setOpenCurb65Calc(true)} className="flex items-center justify-center gap-1.5 p-2 rounded-xl border border-sky-500/30 bg-sky-500/10 hover:bg-sky-500/20 text-sky-700 dark:text-sky-400 text-[10px] font-black uppercase transition-all">
+                          <Activity className="h-3 w-3" /> CURB-65
+                        </button>
+                        <button type="button" onClick={() => setOpenWellsCalc(true)} className="flex items-center justify-center gap-1.5 p-2 rounded-xl border border-orange-500/30 bg-orange-500/10 hover:bg-orange-500/20 text-orange-700 dark:text-orange-400 text-[10px] font-black uppercase transition-all">
+                          <Activity className="h-3 w-3" /> Wells (TEP)
+                        </button>
+                        <button type="button" onClick={() => setOpenNihssCalc(true)} className="flex items-center justify-center gap-1.5 p-2 rounded-xl border border-indigo-500/30 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-700 dark:text-indigo-400 text-[10px] font-black uppercase transition-all">
+                          <Brain className="h-3 w-3" /> NIHSS (AVC)
+                        </button>
+                        <button type="button" onClick={() => setOpenParklandCalc(true)} className="flex items-center justify-center gap-1.5 p-2 rounded-xl border border-orange-500/30 bg-orange-500/10 hover:bg-orange-500/20 text-orange-700 dark:text-orange-400 text-[10px] font-black uppercase transition-all">
+                          <Flame className="h-3 w-3" /> Parkland (SCQ)
+                        </button>
+                      </div>
+                    </div>
                   </motion.div>
                 )}
 
@@ -2337,6 +2478,32 @@ export default function PatientEvolution() {
                             )}
                           </AnimatePresence>
                         </div>
+                      </div>
+                    </div>
+
+                    {/* Escores e Calculadoras Rápidas (Pediatria) */}
+                    <div className="space-y-3 pt-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[9px] font-black uppercase text-muted-foreground">4. Escores Pediátricos (Fast-Track)</span>
+                        <Badge variant="outline" className="text-[8px] uppercase tracking-wider bg-primary/5 text-primary border-primary/20">Pediatria</Badge>
+                      </div>
+
+                      <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
+                        <button type="button" onClick={() => setOpenPewsCalc(true)} className="flex items-center justify-center gap-1.5 p-2 rounded-xl border border-sky-500/30 bg-sky-500/10 hover:bg-sky-500/20 text-sky-700 dark:text-sky-400 text-[10px] font-black uppercase transition-all">
+                          <Activity className="h-3 w-3" /> Escore PEWS
+                        </button>
+                        <button type="button" onClick={() => setOpenGlasgowCalc(true)} className="flex items-center justify-center gap-1.5 p-2 rounded-xl border border-indigo-500/30 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-700 dark:text-indigo-400 text-[10px] font-black uppercase transition-all">
+                          <Brain className="h-3 w-3" /> Glasgow
+                        </button>
+                        <button type="button" onClick={() => setOpenDehydrationCalc(true)} className="flex items-center justify-center gap-1.5 p-2 rounded-xl border border-sky-500/30 bg-sky-500/10 hover:bg-sky-500/20 text-sky-700 dark:text-sky-400 text-[10px] font-black uppercase transition-all">
+                          <Droplet className="h-3 w-3" /> Desidratação OMS
+                        </button>
+                        <button type="button" onClick={() => setOpenWoodDownesCalc(true)} className="flex items-center justify-center gap-1.5 p-2 rounded-xl border border-teal-500/30 bg-teal-500/10 hover:bg-teal-500/20 text-teal-700 dark:text-teal-400 text-[10px] font-black uppercase transition-all">
+                          <Wind className="h-3 w-3" /> Wood-Downes
+                        </button>
+                        <button type="button" onClick={() => setOpenParklandCalc(true)} className="flex items-center justify-center gap-1.5 p-2 rounded-xl border border-orange-500/30 bg-orange-500/10 hover:bg-orange-500/20 text-orange-700 dark:text-orange-400 text-[10px] font-black uppercase transition-all">
+                          <Flame className="h-3 w-3" /> Parkland (SCQ)
+                        </button>
                       </div>
                     </div>
                   </motion.div>
@@ -2786,6 +2953,92 @@ export default function PatientEvolution() {
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       {renderPanelDropdown("1. Avaliação Farmacêutica", <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-clipboard-plus"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M9 14h6"/><path d="M12 11v6"/></svg>, "amber", isChild ? FARMA_PED_ITEMS : FARMA_ADULT_ITEMS, isFarmaEvalDropdownOpen, () => { setIsFarmaEvalDropdownOpen(!isFarmaEvalDropdownOpen); setIsFarmaProcDropdownOpen(false); })}
                       {renderPanelDropdown("2. Condutas e Reconciliação", <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-pill"><path d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z"/><path d="m8.5 8.5 7 7"/></svg>, "pink", isChild ? FARMA_PED_PROCEDURES : FARMA_ADULT_PROCEDURES, isFarmaProcDropdownOpen, () => { setIsFarmaProcDropdownOpen(!isFarmaProcDropdownOpen); setIsFarmaEvalDropdownOpen(false); })}
+                    </div>
+                  </motion.div>
+                )}
+
+                {/* Super Painel Gestão de Leitos (Enfermagem) */}
+                {evolutionType === "Evolução Enfermagem" && (
+                  <motion.div 
+                    initial={{ opacity: 0, y: -5 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="p-5 rounded-xl border border-sky-500/20 dark:border-sky-500/10 bg-gradient-to-r from-sky-500/5 to-transparent dark:from-sky-500/10 backdrop-blur-md shadow-sm space-y-4 relative z-20 mb-4"
+                  >
+                    <div className="flex items-center justify-between border-b border-sky-500/20 pb-2">
+                      <span className="font-extrabold text-[#006699] dark:text-sky-400 uppercase tracking-wider text-[11px] flex items-center gap-1.5">
+                        <BedIcon className="h-4 w-4" />
+                        Gestão de Leitos e Fluxo (Bed Management)
+                      </span>
+                      <Badge variant="outline" className="text-[8px] uppercase tracking-wider bg-sky-500/10 text-sky-600 border-sky-500/20">
+                        Privativo Enfermagem
+                      </Badge>
+                    </div>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {/* Resumo de Vagas */}
+                      <div className="space-y-2">
+                        <span className="text-[9px] font-black uppercase text-muted-foreground block">
+                          Disponibilidade de Vagas (Giro de Leito)
+                        </span>
+                        {(() => {
+                          const stats = beds.reduce((acc, bed) => {
+                            if (!acc[bed.ward]) acc[bed.ward] = { available: 0, total: 0 };
+                            acc[bed.ward].total++;
+                            if (bed.status === 'available') acc[bed.ward].available++;
+                            return acc;
+                          }, {} as Record<string, {available: number, total: number}>);
+                          
+                          return (
+                            <div className="grid grid-cols-2 gap-2">
+                              {Object.entries(stats).map(([ward, wardStats]) => (
+                                <div key={ward} className="p-2.5 rounded-xl border bg-white/45 dark:bg-slate-900/45 shadow-sm">
+                                  <div className="flex justify-between items-center mb-1">
+                                    <span className="text-[10px] font-bold truncate max-w-[70%]">{ward}</span>
+                                    <span className={cn(
+                                      "text-[9px] font-black",
+                                      wardStats.available > 0 ? "text-green-600" : "text-red-500"
+                                    )}>
+                                      {wardStats.available} Livres
+                                    </span>
+                                  </div>
+                                  <div className="w-full bg-slate-200 dark:bg-slate-700 h-1.5 rounded-full overflow-hidden">
+                                    <div 
+                                      className={cn("h-full rounded-full transition-all", wardStats.available > 0 ? "bg-green-500" : "bg-red-500")}
+                                      style={{ width: `${((wardStats.total - wardStats.available) / wardStats.total) * 100}%` }}
+                                    />
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          );
+                        })()}
+                      </div>
+
+                      {/* Ações Rápidas */}
+                      <div className="space-y-2">
+                        <span className="text-[9px] font-black uppercase text-muted-foreground block">
+                          Ações de Movimentação (Lançar na Evolução)
+                        </span>
+                        <div className="grid grid-cols-2 gap-2 h-[58px]">
+                          <button
+                            type="button"
+                            onClick={() => setOpenBedTransfer(true)}
+                            className="flex flex-col items-center justify-center gap-1 p-2 rounded-xl border border-blue-500/30 bg-blue-500/10 hover:bg-blue-500/20 text-blue-700 dark:text-blue-400 transition-all h-full"
+                          >
+                            <ArrowLeft className="h-4 w-4 rotate-180" />
+                            <span className="text-[9px] font-black uppercase">Alocar / Transferir</span>
+                          </button>
+                          
+                          <button
+                            type="button"
+                            onClick={() => setOpenBedStatus(true)}
+                            className="flex flex-col items-center justify-center gap-1 p-2 rounded-xl border border-amber-500/30 bg-amber-500/10 hover:bg-amber-500/20 text-amber-700 dark:text-amber-400 transition-all h-full"
+                          >
+                            <ShieldAlert className="h-4 w-4" />
+                            <span className="text-[9px] font-black uppercase">Status / Higienização</span>
+                          </button>
+                        </div>
+                      </div>
                     </div>
                   </motion.div>
                 )}
@@ -3679,6 +3932,36 @@ export default function PatientEvolution() {
           setSelectedMentalSummary(sum);
         }}
       />
+      {/* Modais de Gestão de Leitos */}
+      <BedTransferModal
+        isOpen={openBedTransfer}
+        onClose={setOpenBedTransfer}
+        patientId={patient?.id}
+        fugulinSummary={selectedNursingSummary}
+        onApply={(text) => {
+          setDescription(prev => prev ? prev + '\n\n' + text : text);
+        }}
+      />
+      <BedStatusModal
+        isOpen={openBedStatus}
+        onClose={setOpenBedStatus}
+        onApply={(text) => {
+          setDescription(prev => prev ? prev + '\n\n' + text : text);
+        }}
+      />
+
+      <PatientTimelineModal 
+        isOpen={isTimelineOpen} 
+        onClose={setIsTimelineOpen} 
+        patient={patient} 
+      />
+      <BedRequestModal
+        patient={patient}
+        isOpen={isBedRequestOpen}
+        onClose={() => setIsBedRequestOpen(false)}
+      />
+
+      {/* Modais Médicos / Pediátricos */}
       <UrgencyModal
         isOpen={openUrgencyCalc}
         onClose={setOpenUrgencyCalc}
@@ -3701,6 +3984,56 @@ export default function PatientEvolution() {
         onApply={(desc, sum) => {
           setDescription(p => p ? `${p}\n${desc}` : desc);
           setActiveNandaPlan(sum);
+        }}
+      />
+      
+      <HeartScoreModal
+        isOpen={openHeartCalc}
+        onClose={setOpenHeartCalc}
+        onApply={(desc, sum) => {
+          setDescription(p => p ? `${p}\n${desc}` : desc);
+        }}
+      />
+      <Curb65Modal
+        isOpen={openCurb65Calc}
+        onClose={setOpenCurb65Calc}
+        onApply={(desc, sum) => {
+          setDescription(p => p ? `${p}\n${desc}` : desc);
+        }}
+      />
+      <WellsScoreModal
+        isOpen={openWellsCalc}
+        onClose={setOpenWellsCalc}
+        onApply={(desc, sum) => {
+          setDescription(p => p ? `${p}\n${desc}` : desc);
+        }}
+      />
+      <NihssModal
+        isOpen={openNihssCalc}
+        onClose={setOpenNihssCalc}
+        onApply={(desc, sum) => {
+          setDescription(p => p ? `${p}\n${desc}` : desc);
+        }}
+      />
+      <DehydrationScoreModal
+        isOpen={openDehydrationCalc}
+        onClose={setOpenDehydrationCalc}
+        onApply={(desc, sum) => {
+          setDescription(p => p ? `${p}\n${desc}` : desc);
+        }}
+      />
+      <WoodDownesModal
+        isOpen={openWoodDownesCalc}
+        onClose={setOpenWoodDownesCalc}
+        onApply={(desc, sum) => {
+          setDescription(p => p ? `${p}\n${desc}` : desc);
+        }}
+      />
+      <ParklandModal
+        isOpen={openParklandCalc}
+        onClose={setOpenParklandCalc}
+        onApply={(desc, sum) => {
+          setDescription(p => p ? `${p}\n${desc}` : desc);
         }}
       />
 

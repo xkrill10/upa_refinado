@@ -9,8 +9,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogClose } from "@/components/ui/dialog";
 import { usePharmacy } from "@/hooks/use-pharmacy";
-import { usePatients } from "@/hooks/use-patients";
 import { categoryLabels, movementLabels, MedicationCategory, Medication, MovementType, Movement } from "@/lib/pharmacy-store";
+import { usePrescriptions } from "@/context/PrescriptionsContext";
 import { RENAME_2024, MedicationLibEntry } from "@/constants/medications";
 import { Patient } from "@/hooks/use-patients";
 import { toast } from "sonner";
@@ -30,7 +30,8 @@ import {
   FileText,
   MoreVertical,
   ChevronDown,
-  X
+  X,
+  CheckCircle2
 } from "lucide-react";
 import { 
   DropdownMenu, 
@@ -89,6 +90,7 @@ const getCategoryColor = (category: string) => {
 export default function Pharmacy() {
   const { medications, movements, addMedication, addMovement, lowStock, expiringSoon } = usePharmacy();
   const { patients } = usePatients();
+  const { orders, updateMedicationStatus } = usePrescriptions();
   const [search, setSearch] = useState("");
   const [catFilter, setCatFilter] = useState<string>("all");
   const [specialFilter, setSpecialFilter] = useState<"all" | "lowStock" | "expiring" | "narcotics" | "controlled">("all");
@@ -300,6 +302,7 @@ export default function Pharmacy() {
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
         <TabsList className="glass-card-premium p-1 h-14 rounded-2xl border border-white/40 dark:border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.12)] overflow-x-auto flex-nowrap shrink-0">
           <TabsTrigger value="stock" className="gap-2"><Package className="h-4 w-4" />Estoque</TabsTrigger>
+          <TabsTrigger value="prescriptions" className="gap-2"><Activity className="h-4 w-4" />Fila Médica</TabsTrigger>
           <TabsTrigger value="controlled" className="gap-2"><ShieldAlert className="h-4 w-4" />Psicotrópicos / Narcóticos</TabsTrigger>
           <TabsTrigger value="dispensing" className="gap-2"><Pill className="h-4 w-4" />Dispensação</TabsTrigger>
           <TabsTrigger value="movements" className="gap-2"><ArrowDownUp className="h-4 w-4" />Movimentações</TabsTrigger>
@@ -334,6 +337,67 @@ export default function Pharmacy() {
           </div>
           
           <MedicationTable medications={filtered} onSelect={setSelectedMedDetails} onQuickDispense={setMedForQuickDispense} onControlledDispatch={setMedForControlledDispatch} onStockEntry={setMedForStockEntry} />
+        </TabsContent>
+
+        {/* PRESCRIPTIONS KANBAN TAB */}
+        <TabsContent value="prescriptions" className="space-y-4">
+          <div className="flex flex-col gap-1">
+            <h3 className="text-xl font-black uppercase tracking-tight text-slate-950 dark:text-slate-100 flex items-center gap-2">
+              <Activity className="h-5 w-5" />
+              Fila de Prescrições Médicas
+            </h3>
+            <p className="text-xs text-muted-foreground font-medium">Libere as medicações prescritas para a equipe de enfermagem.</p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {orders.flatMap(order => 
+              order.medications
+                .filter(m => m.status === 'awaiting_pharmacy')
+                .map(med => (
+                  <Card key={`${order.id}-${med.id}`} className="glass-card-premium border border-white/40 dark:border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.12)]">
+                    <CardHeader className="p-4 pb-2">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <Badge variant="outline" className="bg-blue-500/10 text-blue-600 border-blue-500/20 text-[9px] font-black uppercase mb-1">
+                            Aguardando Dispensação
+                          </Badge>
+                          <CardTitle className="text-sm font-black uppercase">{med.medication}</CardTitle>
+                          <p className="text-xs font-semibold text-muted-foreground">{med.dosage} - {med.route}</p>
+                        </div>
+                      </div>
+                    </CardHeader>
+                    <CardContent className="p-4 pt-2 space-y-3">
+                      <div className="text-xs bg-muted/50 p-2 rounded-lg">
+                        <span className="font-bold">Paciente:</span> {order.patientName}<br/>
+                        <span className="font-bold">Médico:</span> {order.doctorName}<br/>
+                        <span className="font-bold">Freq:</span> {med.frequency}
+                        {med.observation && <><br/><span className="font-bold text-orange-500">Obs:</span> {med.observation}</>}
+                      </div>
+                      <Button 
+                        className="w-full gap-2 bg-[#006699] hover:bg-[#005580] text-white font-black uppercase tracking-widest text-[10px] h-10"
+                        onClick={() => {
+                          // TODO: Integrar com a redução real do estoque, se desejar.
+                          // Por ora, move para a enfermagem.
+                          updateMedicationStatus(order.id, med.id, 'awaiting_nursing');
+                          toast.success(`Medicamento ${med.medication} liberado para a enfermagem.`);
+                        }}
+                      >
+                        <CheckCircle2 className="h-4 w-4" />
+                        Dispensar e Enviar
+                      </Button>
+                    </CardContent>
+                  </Card>
+                ))
+            )}
+            
+            {orders.flatMap(o => o.medications.filter(m => m.status === 'awaiting_pharmacy')).length === 0 && (
+              <div className="col-span-full py-12 flex flex-col items-center justify-center text-muted-foreground bg-white/5 rounded-2xl border border-dashed border-white/20">
+                <CheckCircle2 className="h-12 w-12 opacity-20 mb-2" />
+                <p className="font-black uppercase tracking-widest text-xs">Fila Vazia</p>
+                <p className="text-[10px] font-semibold mt-1">Nenhuma prescrição aguardando liberação no momento.</p>
+              </div>
+            )}
+          </div>
         </TabsContent>
 
         {/* CONTROLLED TAB */}

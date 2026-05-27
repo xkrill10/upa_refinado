@@ -33,11 +33,15 @@ const Inventory = React.lazy(() => import("./pages/Inventory"));
 const NursingCheck = React.lazy(() => import("./pages/NursingCheck"));
 const Billing = React.lazy(() => import("./pages/Billing"));
 const Governance = React.lazy(() => import("./pages/Governance"));
+const CommunicationsCenter = React.lazy(() => import("./pages/CommunicationsCenter"));
+const Login = React.lazy(() => import("./pages/Login"));
 
 import { ThemeProvider } from "./components/ThemeProvider";
 import { ThemeToggle } from "./components/ThemeToggle";
 import { PatientsProvider } from "@/context/PatientsContext";
 import { BedsProvider } from "@/context/BedsContext";
+import { AuthProvider } from "@/context/AuthContext";
+import { PrescriptionsProvider } from "@/context/PrescriptionsContext";
 import { CallAnnouncer } from "./components/CallAnnouncer";
 import { useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -48,6 +52,7 @@ const AppContent = () => {
   const location = useLocation();
   const [isFullscreen, setIsFullscreen] = React.useState(false);
   const isCallPanel = location.pathname === "/painel-chamadas";
+  const isLogin = location.pathname === "/login";
 
   React.useEffect(() => {
     const handleFullscreenChange = () => {
@@ -57,15 +62,15 @@ const AppContent = () => {
     return () => document.removeEventListener("fullscreenchange", handleFullscreenChange);
   }, []);
 
-  const showSidebar = !isFullscreen || !isCallPanel;
+  const showSidebar = !isFullscreen && !isCallPanel && !isLogin;
 
   return (
     <SidebarProvider defaultOpen={true}>
       <CallAnnouncer />
       <div className="min-h-screen flex w-full">
         {showSidebar && <AppSidebar />}
-        <div className="flex-1 flex flex-col main-content-bg">
-          {!isCallPanel && (
+        <div className={cn("flex-1 flex flex-col", !isLogin && "main-content-bg")}>
+          {!isCallPanel && !isLogin && (
             <header className="h-24 flex items-center justify-between px-8 sticky top-0 z-20 header-premium-glass">
               <div className="flex items-center gap-6">
                 <SidebarTrigger className="h-12 w-12 hover:bg-primary/10 hover:text-primary transition-all duration-300 rounded-xl" />
@@ -86,9 +91,11 @@ const AppContent = () => {
               </div>
             </header>
           )}
-          <main className={cn("flex-1", !isCallPanel && "p-6")}>
+          <main className={cn("flex-1", (!isCallPanel && !isLogin) && "p-6")}>
             <Suspense fallback={<div className="flex items-center justify-center min-h-[50vh]"><div className="animate-pulse text-muted-foreground font-bold tracking-widest uppercase text-xs">Carregando...</div></div>}>
               <Routes>
+                <Route path="/login" element={<Login />} />
+                
                 <Route path="/" element={<Dashboard />} />
                 <Route path="/fila" element={<Queue />} />
                 <Route path="/novo-paciente" element={<NewPatient />} />
@@ -116,6 +123,8 @@ const AppContent = () => {
                 <Route path="/checagem-enfermagem" element={<NursingCheck />} />
                 <Route path="/faturamento" element={<Billing />} />
                 <Route path="/governanca" element={<Governance />} />
+                <Route path="/central-comunicacoes" element={<CommunicationsCenter />} />
+                
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </Suspense>
@@ -129,16 +138,20 @@ const AppContent = () => {
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
-      <PatientsProvider>
-        <BedsProvider>
-        <TooltipProvider>
-        <Sonner />
-        <BrowserRouter>
-          <AppContent />
-        </BrowserRouter>
-        </TooltipProvider>
-        </BedsProvider>
-      </PatientsProvider>
+      <BrowserRouter>
+        <AuthProvider>
+          <PatientsProvider>
+            <BedsProvider>
+              <PrescriptionsProvider>
+                <TooltipProvider>
+                  <Sonner />
+                  <AppContent />
+                </TooltipProvider>
+              </PrescriptionsProvider>
+            </BedsProvider>
+          </PatientsProvider>
+        </AuthProvider>
+      </BrowserRouter>
     </ThemeProvider>
   </QueryClientProvider>
 );

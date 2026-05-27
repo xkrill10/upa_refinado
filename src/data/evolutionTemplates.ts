@@ -50,7 +50,7 @@ export const EVOLUTION_TEMPLATES: Record<string, string> = {
     "4. Intercorrências observadas ou procedimentos executados: [ ]\n" +
     "5. Assinatura do Profissional (Coren Técnico/Enfermeiro): ",
     
-  "Sinais Vitais": 
+    "Sinais Vitais": 
     "REGISTRO DE SINAIS VITAIS:\n" +
     "- Pressão Arterial (PA): [   ] mmHg\n" +
     "- Frequência Cardíaca (FC): [   ] bpm\n" +
@@ -58,15 +58,6 @@ export const EVOLUTION_TEMPLATES: Record<string, string> = {
     "- Temperatura Corporal: [   ] °C\n" +
     "- Frequência Respiratória (FR): [   ] irpm\n" +
     "- Escala de Dor: [   ]/10",
-    
-  "Prescrição": 
-    "PRESCRIÇÃO CLÍNICA:\n" +
-    "1. Dieta: [   ]\n" +
-    "2. Hidratação Venosa: Soro Fisiológico 0.9% 500ml EV a correr in [   ] horas\n" +
-    "3. Sintomáticos:\n" +
-    "   - Dipirona 1g EV (se febre > 37.8°C ou dor)\n" +
-    "   - Ondansetrona 8mg EV (se náuseas ou vômitos)\n" +
-    "4. Monitorização de Sinais Vitais de [   ] em [   ] horas.",
     
   "Procedimento": 
     "Procedimento realizado: [   ]\n" +
@@ -623,6 +614,114 @@ export const MEDICAL_CONDUCT_ITEMS: CareItem[] = [
     label: "📈 Solicitar ECG",
     text: "CONDUTA / ECG:\n- Realizado ECG de 12 derivações. Aguardo avaliação do traçado.",
     toastMsg: "ECG"
+  },
+  {
+    id: "kit_iam",
+    label: "⚡ Kit IAM (Fast-Track)",
+    text: "CONDUTA PROTOCOLO IAM:\n- Inserido no protocolo de dor torácica/SCA.\n- Prescrito AAS 300mg VO mastigado, Clopidogrel 300mg VO, Isordil 5mg SL, Morfina (se dor refratária) e Enoxaparina.\n- Solicitado curva de Troponina e ECG seriado.",
+    toastMsg: "Kit IAM inserido"
+  },
+  {
+    id: "kit_sepse",
+    label: "⚡ Kit Sepse (Protocolo)",
+    text: "CONDUTA PROTOCOLO SEPSE:\n- Inserido no protocolo de Sepse.\n- Prescrito expansão volêmica imediata (30ml/kg com SF 0,9% ou Ringer).\n- Solicitado Lactato, Gasometria e Hemoculturas (2 amostras).\n- Antibioticoterapia empírica de amplo espectro a ser iniciada na primeira hora.",
+    toastMsg: "Kit Sepse inserido"
+  },
+  {
+    id: "kit_asma",
+    label: "⚡ Kit Crise Asmática",
+    text: "CONDUTA CRISE RESPIRATÓRIA:\n- Prescrito Hidrocortisona EV ou Prednisona VO.\n- NBZ de resgate com Fenoterol + Ipratrópio (3 ciclos).\n- Reavaliação clínica programada após 1 hora.",
+    toastMsg: "Kit Asma inserido"
+  },
+  {
+    id: "kit_colica",
+    label: "⚡ Kit Cólica Nefrética",
+    text: "CONDUTA CÓLICA NEFRÉTICA:\n- Prescrito Analgesia Otimizada (Dipirona 1g + Cetoprofeno 100mg EV).\n- Prescrito Antiemético/Antiespasmódico (Ondansetrona/Buscopan).\n- Hidratação venosa criteriosa.",
+    toastMsg: "Kit Cólica inserido"
+  },
+  {
+    id: "check_iot",
+    label: "🩺 Checklist IOT (Vias Aéreas)",
+    text: "CHECKLIST DE PROCEDIMENTO (IOT):\n- Procedimento: Intubação Orotraqueal via Laringoscopia Direta.\n- Indicação: [Insuficiência Respiratória / Rebaixamento de Nível de Consciência].\n- Medicações (SRI): Fentanil [ ] mcg, Etomidato [ ] mg, Succinilcolina [ ] mg.\n- Tamanho do Tubo: [ ] (Cuff insuflado).\n- Ausculta: Simétrica e bilateral. Tubo fixado e acoplado ao ventilador.",
+    toastMsg: "Checklist IOT"
+  },
+  {
+    id: "check_acesso_central",
+    label: "🩺 Checklist Acesso Venoso Central",
+    text: "CHECKLIST DE PROCEDIMENTO (CVC):\n- Procedimento: Acesso Venoso Central em [Veia Jugular Interna / Subclávia / Femoral] à [Direita / Esquerda].\n- Indicação: [Drogas Vasoativas / Falta de acesso periférico / Hemodiálise].\n- Técnica: Asséptica, guiada por USG [Sim / Não].\n- Número de punções: [ ]. Sem intercorrências agudas evidentes. Solicitado RX de controle.",
+    toastMsg: "Checklist Acesso Central"
+  },
+  {
+    id: "check_pcr",
+    label: "🩺 Checklist Reanimação (PCR)",
+    text: "CHECKLIST DE REANIMAÇÃO (PCR):\n- Início das manobras: [Hora].\n- Ritmo inicial: [Assistolia / AESP / FV / TVSP].\n- Medicações: Adrenalina [ ] ampolas, Amiodarona [ ] ampolas.\n- Desfibrilação: [ ] choques realizados.\n- Tempo total de RCP: [ ] minutos. Retorno da Circulação Espontânea (RCE): [Sim / Não].",
+    toastMsg: "Checklist PCR"
+  },
+  {
+    id: "doc_cross",
+    label: "📄 Solicitação Vaga CROSS",
+    text: "SOLICITAÇÃO DE VAGA / TRANSFERÊNCIA (CROSS):\n- Paciente necessita de transferência emergencial para unidade de maior complexidade para [Avaliação Especializada / Vaga UTI].\n- Caso cadastrado na central de regulação do estado.\n- Relatório de transferência preenchido e assinado.",
+    toastMsg: "Doc CROSS"
+  },
+  {
+    id: "doc_recusa",
+    label: "📄 Termo de Recusa / Alta a Pedido",
+    text: "TERMO DE RECUSA DE TRATAMENTO / ALTA A PEDIDO:\n- O(A) paciente e/ou responsável manifestou desejo de recusar as condutas propostas ou solicitou alta à revelia.\n- Foram amplamente explicados os riscos inerentes a essa decisão, incluindo o risco de complicações e óbito.\n- Paciente/Responsável ciente, assume os riscos e assina o respectivo Termo de Responsabilidade.",
+    toastMsg: "Doc Recusa"
+  },
+  {
+    id: "doc_atestado",
+    label: "📄 Atestado Médico Padrão",
+    text: "ATESTADO MÉDICO:\n- Atesto para os devidos fins que o paciente foi atendido nesta unidade no dia de hoje, necessitando de [ ] dias de afastamento de suas atividades laborais por motivo de doença. (CID em anexo ou impresso na via do paciente).",
+    toastMsg: "Doc Atestado"
+  },
+  {
+    id: "solicitar_leito",
+    label: "🛌 Solicitar Leito / Internação",
+    text: "SOLICITAÇÃO DE INTERNAÇÃO / LEITO:\n- Paciente com indicação de internação hospitalar devido ao quadro clínico.\n- Solicitado leito via NIR (Núcleo Interno de Regulação).\n- Conduta: Manter estabilização clínica na UPA até transferência.",
+    toastMsg: "Solicitação de Leito"
+  },
+  {
+    id: "solicitar_sala_obs",
+    label: "🛏️ Solicitar Sala de Observação",
+    text: "SOLICITAÇÃO DE OBSERVAÇÃO CLÍNICA:\n- Paciente necessita de reavaliação seriada e administração de medicações parenterais.\n- Solicitado alocação em Sala de Observação por até 24h.\n- Conduta: Reavaliar após término da medicação ou exames.",
+    toastMsg: "Sala de Observação"
+  },
+  {
+    id: "parecer_especialista",
+    label: "👨‍⚕️ Parecer Especializado",
+    text: "SOLICITAÇÃO DE PARECER ESPECIALIZADO:\n- Solicitado parecer da equipe de [CIRURGIA / ORTOPEDIA / NEUROLOGIA / PSIQUIATRIA] para avaliação conjunta.\n- Justificativa: [Escrever justificativa do parecer].\n- Aguardando especialista no local.",
+    toastMsg: "Parecer Solicitado"
+  },
+  {
+    id: "vaga_zero",
+    label: "🚨 Solicitar Vaga ZERO (SAMU)",
+    text: "SOLICITAÇÃO DE VAGA ZERO (RISCO DE MORTE):\n- Paciente em estado grave, instável, com risco iminente de morte.\n- Acionado SAMU / Central de Regulação (CROSS) com solicitação de VAGA ZERO para hospital de referência (Alta Complexidade).\n- Mantido suporte avançado de vida na Sala Vermelha.",
+    toastMsg: "Vaga ZERO Solicitada"
+  },
+  {
+    id: "uti_movel",
+    label: "🚑 Solicitar UTI Móvel",
+    text: "SOLICITAÇÃO DE TRANSPORTE UTI MÓVEL:\n- Paciente com indicação de transferência, necessitando de suporte avançado de vida durante o trajeto.\n- Solicitada ambulância tipo UTI Móvel (USA) com equipe médica.\n- Conduta: Mantido monitorizado e estável até a chegada do transporte.",
+    toastMsg: "UTI Móvel Solicitada"
+  },
+  {
+    id: "isolamento",
+    label: "☣️ Prescrição de Isolamento",
+    text: "PRESCRIÇÃO DE ISOLAMENTO:\n- Indicado isolamento de [Contato / Respiratório (Gotículas/Aerossóis)].\n- Justificativa: Suspeita/Confirmação de doença infectocontagiosa [especificar doença].\n- Orientada a equipe quanto ao uso de EPIs adequados (Avental, Luvas, Máscara N95/Cirúrgica).",
+    toastMsg: "Isolamento Prescrito"
+  },
+  {
+    id: "encaminhamento_ubs",
+    label: "🏥 Encaminhamento UBS",
+    text: "ENCAMINHAMENTO ATENÇÃO BÁSICA (DESOSPITALIZAÇÃO):\n- Paciente com quadro clínico resolvido/estabilizado no pronto atendimento.\n- Encaminhado para acompanhamento ambulatorial na UBS de referência (Atenção Básica).\n- Orientações de sinais de alarme e receitas de uso contínuo entregues.",
+    toastMsg: "Encaminhado p/ UBS"
+  },
+  {
+    id: "assistente_social",
+    label: "🤝 Acionar Serviço Social",
+    text: "ACIONAMENTO DO SERVIÇO SOCIAL:\n- Solicitado parecer e intervenção do Serviço Social.\n- Motivo: [Vulnerabilidade Social / Paciente desacompanhado / Situação de abandono / Suspeita de violência].\n- Aguardando avaliação do profissional assistente social plantonista.",
+    toastMsg: "Serviço Social Acionado"
   }
 ];
 
@@ -686,6 +785,48 @@ export const PEDIATRIC_CONDUCT_ITEMS: CareItem[] = [
     label: "🩻 Solicitar Raio-X",
     text: "CONDUTA / IMAGEM:\n- Solicitado Raio-X de [TÓRAX / CRÂNIO / MEMBRO]. Aguardo filme.",
     toastMsg: "RX"
+  },
+  {
+    id: "ped_solicitar_leito",
+    label: "🛌 Solicitar Leito / Internação",
+    text: "SOLICITAÇÃO DE INTERNAÇÃO PEDIÁTRICA:\n- Criança com indicação de internação hospitalar devido ao quadro clínico.\n- Solicitado leito via NIR (Núcleo Interno de Regulação).\n- Conduta: Manter estabilização clínica e monitorização na UPA até transferência.",
+    toastMsg: "Leito Pediátrico"
+  },
+  {
+    id: "ped_solicitar_sala_obs",
+    label: "🛏️ Solicitar Observação",
+    text: "SOLICITAÇÃO DE OBSERVAÇÃO PEDIÁTRICA:\n- Criança necessita de hidratação venosa / medicações e reavaliação em algumas horas.\n- Solicitado alocação em Sala de Observação Pediátrica.\n- Conduta: Reavaliar após término da terapia proposta.",
+    toastMsg: "Obs. Pediátrica"
+  },
+  {
+    id: "ped_parecer_especialista",
+    label: "👨‍⚕️ Parecer Pediátrico Especializado",
+    text: "SOLICITAÇÃO DE PARECER ESPECIALIZADO:\n- Solicitado parecer da equipe de [CIRURGIA PEDIÁTRICA / ORTOPEDIA / NEUROPEDIATRIA].\n- Justificativa: [Escrever justificativa do parecer].\n- Aguardando especialista.",
+    toastMsg: "Parecer Solicitado"
+  },
+  {
+    id: "ped_uti_movel",
+    label: "🚑 Solicitar UTI Móvel Neonatal/Ped",
+    text: "SOLICITAÇÃO DE TRANSPORTE UTI MÓVEL PEDIÁTRICA:\n- Criança com indicação de transferência, necessitando de suporte avançado de vida (UTI Pediátrica/Neonatal) no transporte.\n- Acionado SAMU/Regulação. Mantido suporte avançado e monitorização rigorosa.",
+    toastMsg: "UTI Móvel Ped Solicitada"
+  },
+  {
+    id: "ped_isolamento",
+    label: "☣️ Isolamento Pediátrico",
+    text: "PRESCRIÇÃO DE ISOLAMENTO PEDIÁTRICO:\n- Indicado isolamento de [Contato / Respiratório].\n- Justificativa: [Doença Exantemática / Infecção Respiratória].\n- Orientada a equipe e os familiares quanto ao uso restrito e EPIs apropriados.",
+    toastMsg: "Isolamento Ped Prescrito"
+  },
+  {
+    id: "ped_encaminhamento_ubs",
+    label: "🏥 Encaminhamento Puericultura/UBS",
+    text: "DESOSPITALIZAÇÃO / ATENÇÃO BÁSICA:\n- Quadro agudo estabilizado. Encaminhado para seguimento em puericultura / pediatria ambulatorial na UBS de referência.\n- Receitas e orientações de sinais de alarme entregues aos pais/responsáveis.",
+    toastMsg: "Encaminhado p/ UBS"
+  },
+  {
+    id: "ped_assistente_social",
+    label: "🤝 Acionar Serviço Social / Conselho",
+    text: "ACIONAMENTO DO SERVIÇO SOCIAL / CONSELHO TUTELAR:\n- Solicitada intervenção do Serviço Social e/ou Conselho Tutelar.\n- Motivo: [Suspeita de maus-tratos / Negligência / Vulnerabilidade extrema familiar].\n- Criança mantida em proteção na unidade até resolução do caso.",
+    toastMsg: "Assistência Social Acionada"
   }
 ];
 

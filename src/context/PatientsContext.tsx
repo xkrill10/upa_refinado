@@ -51,6 +51,12 @@ export interface Patient {
   hydration?: string;
   painPattern?: string;
   evolutions?: EvolutionRecord[];
+  admissionRequest?: {
+    status: 'pending' | 'allocated';
+    bedType: 'emergency' | 'observation';
+    requestedAt: string;
+    doctor: string;
+  };
 }
 
 export interface EvolutionRecord {
@@ -167,6 +173,7 @@ interface PatientsContextType {
   isAnnouncing: boolean;
   setIsAnnouncing: (is: boolean) => void;
   resetSystem: () => void;
+  requestAdmission: (patientId: string, bedType: 'emergency' | 'observation', doctor: string) => void;
 }
 
 const PatientsContext = createContext<PatientsContextType | undefined>(undefined);
@@ -561,6 +568,21 @@ export function PatientsProvider({ children }: { children: ReactNode }) {
     }));
   };
 
+  const requestAdmission = (patientId: string, bedType: 'emergency' | 'observation', doctor: string) => {
+    updatePatient(patientId, {
+      admissionRequest: {
+        status: 'pending',
+        bedType,
+        requestedAt: new Date().toISOString(),
+        doctor,
+      }
+    });
+    toast.success("Vaga solicitada com sucesso!", {
+      description: `O NIR foi notificado para providenciar um leito de ${bedType === 'emergency' ? 'Emergência' : 'Observação'}.`
+    });
+    new BroadcastChannel('upa_sync_channel').postMessage('sync_all');
+  };
+
   return (
     <PatientsContext.Provider value={{ 
       patients, 
@@ -578,6 +600,7 @@ export function PatientsProvider({ children }: { children: ReactNode }) {
       isAnnouncing,
       setIsAnnouncing,
       resetSystem,
+      requestAdmission,
     }}>
       {children}
     </PatientsContext.Provider>

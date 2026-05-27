@@ -4,15 +4,18 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { FileText, ClipboardList, History, FlaskConical, Pill, User, Droplet, AlertTriangle, Activity, Calendar, Stethoscope, Printer, ChevronLeft } from "lucide-react";
+import { FileText, ClipboardList, History, FlaskConical, Pill, User, Droplet, AlertTriangle, Activity, Calendar, Stethoscope, Printer, ChevronLeft, Clock, Syringe } from "lucide-react";
 import { motion } from "motion/react";
 import { Link } from "react-router-dom";
+import { useState } from "react";
+import { PatientTimelineModal } from "@/components/PatientEvolution/Modals/PatientTimelineModal";
 
 export default function PatientRecord() {
   const { id } = useParams();
   const location = useLocation();
   const { patients } = usePatients();
   const patient = patients.find(p => String(p.id) === String(id));
+  const [isTimelineOpen, setIsTimelineOpen] = useState(false);
 
   const fromPath = location.state?.from || "/leitos";
   const fromLabel = location.state?.label || "Leitos";
@@ -115,10 +118,17 @@ export default function PatientRecord() {
           <Button 
             variant="outline" 
             onClick={() => window.print()}
-            className="rounded-xl gap-2 font-bold border-primary/20 hover:bg-primary/5"
+            className="rounded-xl gap-2 font-bold border-primary/20 hover:bg-primary/5 hidden sm:flex"
           >
             <Printer className="h-4 w-4" />
-            Imprimir Ficha
+            Imprimir
+          </Button>
+          <Button 
+            onClick={() => setIsTimelineOpen(true)}
+            className="rounded-xl gap-2 font-black bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-500/20 uppercase tracking-widest text-[10px]"
+          >
+            <Clock className="h-4 w-4" />
+            ⏱️ Jornada
           </Button>
         </div>
       </div>
@@ -429,6 +439,15 @@ export default function PatientRecord() {
           </Card>
         </TabsContent>
       </Tabs>
+
+      {/* Patient Timeline Modal */}
+      {patient && (
+        <PatientTimelineModal 
+          isOpen={isTimelineOpen} 
+          onClose={setIsTimelineOpen} 
+          patient={patient} 
+        />
+      )}
     </motion.div>
   );
 }

@@ -153,12 +153,14 @@ export default function Dashboard() {
       animate="show"
       className="min-h-[calc(100vh-3.5rem)] space-y-6 pb-12"
     >
-      <motion.div variants={item}>
-        <h1 className="text-3xl mission-control-title bg-gradient-to-r from-foreground to-foreground/60 bg-clip-text text-transparent">Sistema de Monitoramento</h1>
-        <p className="text-muted-foreground text-xs font-bold uppercase tracking-[0.2em] flex items-center gap-2 mt-1">
-          <Activity className="h-3.5 w-3.5 text-primary animate-pulse" />
-          Unidade de Pronto Atendimento - Status Real-Time
-        </p>
+      <motion.div variants={item} className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-white/5 dark:border-slate-800/10 pb-4">
+        <div>
+          <h1 className="text-3xl mission-control-title bg-gradient-to-r from-foreground to-foreground/60 bg-clip-text text-transparent">Sistema de Monitoramento</h1>
+          <p className="text-muted-foreground text-xs font-bold uppercase tracking-[0.2em] flex items-center gap-2 mt-1">
+            <Activity className="h-3.5 w-3.5 text-primary animate-pulse" />
+            Unidade de Pronto Atendimento - Status Real-Time
+          </p>
+        </div>
       </motion.div>
 
       <motion.div variants={item} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
