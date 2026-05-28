@@ -456,9 +456,9 @@ export default function Beds() {
                     <Button
                       variant="secondary"
                       className="flex-1 text-[10px] font-black uppercase tracking-[0.15em] h-10 rounded-xl bg-white/40 dark:bg-slate-800/40 hover:bg-emerald-500 hover:text-white dark:hover:bg-emerald-500 transition-all border border-white/50 dark:border-white/10 backdrop-blur-md shadow-sm"
-                      onClick={() => updateBedStatus(bed.id, 'maintenance')}
+                      onClick={() => releaseBed(bed.id, 'normal', false)}
                     >
-                      <Sparkles className="h-3.5 w-3.5 mr-1.5" /> Limpar
+                      <Sparkles className="h-3.5 w-3.5 mr-1.5" /> Solicitar Limpeza
                     </Button>
                   )}
                   {bed.status === 'cleaning' && (
