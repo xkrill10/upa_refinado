@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -16,6 +16,13 @@ interface NandaModalProps {
 export function NandaModal({ isOpen, onClose, onApply }: NandaModalProps) {
   const [viewedNanda, setViewedNanda] = useState<string | null>(null);
   const [activePlans, setActivePlans] = useState<Record<string, { nocs: string[], nics: string[] }>>({});
+
+  useEffect(() => {
+    if (isOpen) {
+      setViewedNanda(null);
+      setActivePlans({});
+    }
+  }, [isOpen]);
 
   const handleClear = () => {
     if (viewedNanda) {
@@ -128,7 +135,7 @@ export function NandaModal({ isOpen, onClose, onApply }: NandaModalProps) {
                       if (!activePlans[diag.id]) {
                         setActivePlans(prev => ({
                           ...prev,
-                          [diag.id]: { nocs: diag.nocs, nics: diag.nics }
+                          [diag.id]: { nocs: [], nics: [] }
                         }));
                       }
                     }}

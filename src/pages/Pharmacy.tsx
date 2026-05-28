@@ -12,7 +12,7 @@ import { usePharmacy } from "@/hooks/use-pharmacy";
 import { categoryLabels, movementLabels, MedicationCategory, Medication, MovementType, Movement } from "@/lib/pharmacy-store";
 import { usePrescriptions } from "@/context/PrescriptionsContext";
 import { RENAME_2024, MedicationLibEntry } from "@/constants/medications";
-import { Patient } from "@/hooks/use-patients";
+import { Patient, usePatients } from "@/hooks/use-patients";
 import { toast } from "sonner";
 import { 
   Package, 

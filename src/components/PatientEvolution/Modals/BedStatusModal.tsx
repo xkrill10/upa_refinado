@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { ShieldAlert, PaintBucket, Bed, ActivitySquare } from "lucide-react";
+import { ShieldAlert, PaintBucket, Bed, ActivitySquare, CheckCircle2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { useBeds, BedStatus } from "@/context/BedsContext";

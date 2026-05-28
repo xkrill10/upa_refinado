@@ -41,6 +41,7 @@ export interface Patient {
   temperature?: string;
   glasgow?: string;
   glicemia?: string;
+  weight?: string | number;
   // Anamnese
   evolutionTime?: string;
   comorbidities?: string;
