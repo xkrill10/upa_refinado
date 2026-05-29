@@ -925,8 +925,8 @@ export default function Beds() {
                               <div className="space-y-0.5">
                                 <p className="text-[13px] font-black text-foreground tracking-tight group-hover:text-[#006699] dark:group-hover:text-sky-400 transition-colors flex items-center gap-1.5">
                                   {formatWords(patient.name)}
-                                  {patient.isolation?.includes('contact') && <ShieldAlert className="h-3 w-3 text-orange-500" title="Precaução de Contato" />}
-                                  {patient.isolation?.includes('droplet') && <Droplets className="h-3 w-3 text-blue-500" title="Gotículas" />}
+                                  {patient.isolation?.includes('contact') && <span title="Precaução de Contato" className="flex items-center"><ShieldAlert className="h-3 w-3 text-orange-500" /></span>}
+                                  {patient.isolation?.includes('droplet') && <span title="Gotículas" className="flex items-center"><Droplets className="h-3 w-3 text-blue-500" /></span>}
                                 </p>
                                 <p className="text-[9px] font-bold uppercase tracking-[0.1em] text-muted-foreground">CPF: {patient.cpf || '***'}</p>
                               </div>
