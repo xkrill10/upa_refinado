@@ -513,7 +513,6 @@ export default function NursingCheck() {
         updatedHours.sort((a, b) => a.hour.localeCompare(b.hour));
         
         if (targetOrder) {
-          // @ts-expect-error updateMedicationHours types are compatible at runtime
           updateMedicationHours(targetOrder, targetId, updatedHours);
         }
         return { ...p, hours: updatedHours };

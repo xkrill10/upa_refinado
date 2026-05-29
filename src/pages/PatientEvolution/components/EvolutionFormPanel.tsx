@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
 import { 
   Stethoscope, Activity, FileText, Pill, Plus, Trash2, Shield, Calendar, Scale,
-  User, Printer, CheckCircle2, AlertCircle, RefreshCw, Save, Clock, Copy, Brain, History, Heart, UserPlus, Lungs, Flame, Droplets, Bone, Eye
+  User, Printer, CheckCircle2, AlertCircle, RefreshCw, Save, Clock, Copy, Brain, History, Heart, UserPlus, Flame, Droplets, Bone, Eye, X, ShieldAlert, Droplet, Wind, ArrowLeft, Baby, Bed as BedIcon
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,20 +13,26 @@ import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { Card, CardContent } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, SelectGroup, SelectLabel, SelectSeparator } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 import { 
-  CID10_DATABASE, EVOLUTION_TEMPLATES, 
-  MEDICAL_PHYSICAL_NEURO_ITEMS, MEDICAL_PHYSICAL_SYNDROME_ITEMS, MEDICAL_CONDUCT_ITEMS,
-  PEDIATRIC_NEURO_ITEMS, PEDIATRIC_SYNDROME_ITEMS, PEDIATRIC_CONDUCT_ITEMS,
-  FISIO_EVAL_ITEMS, FISIO_PROC_ITEMS, NUTRI_EVAL_ITEMS, NUTRI_PROC_ITEMS,
-  PSICO_EVAL_ITEMS, PSICO_PROC_ITEMS, SOCIAL_EVAL_ITEMS, SOCIAL_PROC_ITEMS,
-  TO_EVAL_ITEMS, TO_PROC_ITEMS, FONO_EVAL_ITEMS, FONO_PROC_ITEMS,
-  FARMA_EVAL_ITEMS, FARMA_PROC_ITEMS,
-  NURSING_SAE_ADMISSION_ITEMS, NURSING_SAE_CARE_ITEMS,
-  MEDICATION_ITEMS, CARE_ITEMS, COMFORT_ITEMS, MOVEMENT_ITEMS,
-  PRESC_DIET_ITEMS, DISCHARGE_TYPE_ITEMS, DISCHARGE_CONDUCT_ITEMS
+  EVOLUTION_TEMPLATES, 
+  MEDICAL_PHYSICAL_NEURO_ITEMS, MEDICAL_SYNDROME_ITEMS, MEDICAL_CONDUCT_ITEMS,
+  PEDIATRIC_PHYSICAL_NEURO_ITEMS, PEDIATRIC_SYNDROME_ITEMS, PEDIATRIC_CONDUCT_ITEMS,
+  FISIO_ADULT_ITEMS, FISIO_ADULT_PROCEDURES, NUTRI_ADULT_ITEMS, NUTRI_ADULT_PROCEDURES,
+  PSICO_ADULT_ITEMS, PSICO_ADULT_PROCEDURES, SOCIAL_ADULT_ITEMS, SOCIAL_ADULT_PROCEDURES,
+  TO_ADULT_ITEMS, TO_ADULT_PROCEDURES, FONO_ADULT_ITEMS, FONO_ADULT_PROCEDURES,
+  FARMA_ADULT_ITEMS, FARMA_ADULT_PROCEDURES,
+  ADMISSION_ROUTINE_ITEMS, NURSING_CARE_ITEMS,
+  MEDICATION_CARE_ITEMS, COMFORT_CARE_ITEMS, MOVEMENT_CARE_ITEMS,
+  PRESCRIPTION_DIET_ITEMS, DISCHARGE_TYPE_ITEMS, DISCHARGE_CONDUCT_ITEMS,
+  FISIO_PED_ITEMS, FISIO_PED_PROCEDURES, NUTRI_PED_ITEMS, NUTRI_PED_PROCEDURES,
+  PSICO_PED_ITEMS, PSICO_PED_PROCEDURES, SOCIAL_PED_ITEMS, SOCIAL_PED_PROCEDURES,
+  TO_PED_ITEMS, TO_PED_PROCEDURES, FONO_PED_ITEMS, FONO_PED_PROCEDURES,
+  FARMA_PED_ITEMS, FARMA_PED_PROCEDURES
 } from "@/data/evolutionTemplates";
+import { CID10_DATABASE } from "@/data/cid10";
+import { SmartCidSelector } from "@/components/SmartCidSelector";
 
 export function EvolutionFormPanel({ 
   form, vitals, modalsState, patient, isChild, 
@@ -79,7 +85,10 @@ export function EvolutionFormPanel({
     isFonoProcDropdownOpen, setIsFonoProcDropdownOpen,
     isFarmaEvalDropdownOpen, setIsFarmaEvalDropdownOpen,
     isFarmaProcDropdownOpen, setIsFarmaProcDropdownOpen,
-    resetForm
+    resetForm,
+    handleAddPrescriptionItem, handleRemovePrescriptionItem,
+    medicationItems, careItems, comfortItems, movementItems,
+    renderPanelDropdown, beds, admissionItems, handleSaveEvolution
   } = form;
 
   const {
@@ -2036,7 +2045,7 @@ export function EvolutionFormPanel({
 
                           return (
                             <div className="grid grid-cols-2 gap-2">
-                              {Object.entries(stats).map(([ward, wardStats]) => (
+                              {Object.entries(stats as Record<string, { available: number, total: number }>).map(([ward, wardStats]) => (
                                 <div key={ward} className="p-2.5 rounded-xl border bg-white/45 dark:bg-slate-900/45 shadow-sm">
                                   <div className="flex justify-between items-center mb-1">
                                     <span className="text-[10px] font-bold truncate max-w-[70%]">{ward}</span>
