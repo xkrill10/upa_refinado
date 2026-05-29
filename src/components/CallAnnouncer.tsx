@@ -54,7 +54,7 @@ export function CallAnnouncer() {
     } catch (e) {
       console.error("Erro ao reproduzir chime:", e);
     }
-  }, [isAudioEnabled]);
+  }, [isAudioEnabled, isCallPanelRoute]);
 
   const announceCall = useCallback((callName: string, roomName: string, ticket?: string) => {
     if (!isAudioEnabled || isCallPanelRoute || !window.speechSynthesis) return;
@@ -95,7 +95,7 @@ export function CallAnnouncer() {
 
       window.speechSynthesis.speak(utterance);
     }, 1500);
-  }, [isAudioEnabled, setIsAnnouncing]);
+  }, [isAudioEnabled, isCallPanelRoute, setIsAnnouncing]);
 
   useEffect(() => {
     if (currentCall && currentCall.id !== lastCallId.current) {

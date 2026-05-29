@@ -171,7 +171,7 @@ export default function Governance() {
                 variant={filterSector === sec ? "secondary" : "ghost"} 
                 size="sm" 
                 className={cn("text-xs font-bold", filterSector === sec ? "shadow-sm" : "opacity-50")}
-                onClick={() => setFilterSector(sec as any)}
+                onClick={() => setFilterSector(sec as 'ALL' | 'Emergência' | 'Observação')}
               >
                 {sec === "ALL" ? "Todos os Setores" : sec}
               </Button>

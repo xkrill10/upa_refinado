@@ -7,7 +7,7 @@ import { usePrescriptions, PrescriptionMedication } from "@/context/Prescription
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Plus, MessageSquare, Bed as BedIcon, History, X, CheckCircle2, ChevronLeft, ChevronRight, Activity, Search, Clock, ShieldAlert, Heart, Baby, Brain, Flame, Droplet, Wind } from "lucide-react";
+import { ArrowLeft, Plus, MessageSquare, Bed as BedIcon, History, X, CheckCircle2, ChevronLeft, ChevronRight, Activity, Search, Clock, ShieldAlert, Heart, Baby, Brain, Flame, Droplet, Wind, FlaskConical } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -105,6 +105,7 @@ import { BedTransferModal } from "@/components/PatientEvolution/Modals/BedTransf
 import { BedStatusModal } from "@/components/PatientEvolution/Modals/BedStatusModal";
 import { PatientTimelineModal } from "@/components/PatientEvolution/Modals/PatientTimelineModal";
 import { BedRequestModal } from "@/components/PatientEvolution/Modals/BedRequestModal";
+import { ExamsModal } from "@/components/PatientEvolution/Modals/ExamsModal";
 
 export default function PatientEvolution() {
   const { id } = useParams();
@@ -133,6 +134,7 @@ export default function PatientEvolution() {
   const [isClinicalProfileOpen, setIsClinicalProfileOpen] = useState(false);
   const [isVitalsHistoryOpen, setIsVitalsHistoryOpen] = useState(false);
   const [isBedRequestOpen, setIsBedRequestOpen] = useState(false);
+  const [isExamsModalOpen, setIsExamsModalOpen] = useState(false);
   const patientBed = beds.find(b => b.patientId === id);
   const availableBeds = beds.filter(b => b.status === 'available');
 
@@ -882,6 +884,14 @@ export default function PatientEvolution() {
             <Clock className="h-4 w-4" />
             ⏱️ Jornada
           </Button>
+
+          <Button
+            onClick={() => setIsExamsModalOpen(true)}
+            className="rounded-xl gap-2 font-black bg-purple-600 hover:bg-purple-700 text-white shadow-lg shadow-purple-500/20 uppercase tracking-widest text-[10px] h-10 px-4"
+          >
+            <FlaskConical className="h-4 w-4" />
+            Apoio Diagnóstico
+          </Button>
         </div>
       </div>
 
@@ -1017,7 +1027,7 @@ export default function PatientEvolution() {
               <button
                 key={tab.id}
                 onClick={() => {
-                  setActiveTab(tab.id as any);
+                  setActiveTab(tab.id as 'all' | 'vitals' | 'evolutions' | 'prescriptions' | 'exams' | 'discharge');
                   if (isFormOpen) {
                     if (tab.id === "prescriptions") {
                       handleEvolutionTypeChange(isChild ? "Evolução Médica (Pediátrica)" : "Evolução Médica");
@@ -3713,7 +3723,7 @@ export default function PatientEvolution() {
       <div className="space-y-6">
         <h2 className="text-sm font-black tracking-widest text-[#006699] dark:text-sky-400 uppercase">Linha do Tempo de Atendimento</h2>
 
-        {filteredEvolutions.length === 0 ? (
+        {filteredEvolutions.length === 0 && !(patient?.exams && patient.exams.length > 0) ? (
           <Card className="glass-card-premium border border-white/40 dark:border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.06)] rounded-xl overflow-hidden transition-all duration-500">
             <CardContent className="h-36 flex items-center justify-center bg-muted/5">
               <p className="text-sm font-bold uppercase tracking-widest text-muted-foreground/30 px-8 text-center leading-relaxed">
@@ -3729,6 +3739,46 @@ export default function PatientEvolution() {
           </Card>
         ) : (
           <div className="relative pl-6 border-l-2 border-slate-200 dark:border-slate-800 ml-3 space-y-6">
+            {(activeTab === "all" || activeTab === "exams") && patient?.exams && patient.exams.map((exam) => (
+              <motion.div
+                key={exam.id}
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                className="relative"
+              >
+                <div className="absolute -left-[31px] top-1.5 h-3.5 w-3.5 rounded-full border-2 border-purple-600 dark:border-purple-400 bg-background flex items-center justify-center shadow-sm z-10">
+                  <div className="h-1.5 w-1.5 rounded-full bg-purple-600 dark:bg-purple-400" />
+                </div>
+                <Card className="glass-card-premium border border-purple-500/20 shadow-[0_8px_30px_rgba(0,0,0,0.06)] rounded-xl overflow-hidden hover:scale-[1.01] transition-all duration-300">
+                  <CardContent className="p-4 space-y-3">
+                    <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border/50 pb-2">
+                      <div className="flex items-center gap-2.5">
+                        <Badge className="bg-purple-600/10 text-purple-600 border-none text-[10px] font-black uppercase px-2 py-0.5 rounded">
+                          {exam.type === 'lab' ? 'Laboratório' : 'Imagem'}
+                        </Badge>
+                        <span className="text-xs font-black text-foreground/90 uppercase tracking-wide">
+                          {exam.name}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Badge className={cn("border-none font-bold text-[10px] uppercase py-0.5 px-2 rounded-full shadow-sm", exam.status === 'completed' ? 'bg-emerald-500/10 text-emerald-600' : exam.status === 'in_analysis' ? 'bg-blue-500/10 text-blue-600' : 'bg-orange-500/10 text-orange-600')}>
+                          {exam.status === 'completed' ? 'Concluído' : exam.status === 'in_analysis' ? 'Em Análise' : 'Aguardando Coleta'}
+                        </Badge>
+                        <span className="text-xs font-bold text-muted-foreground/80">
+                          {new Date(exam.requestedAt).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="text-sm">
+                        <p className="text-muted-foreground font-semibold text-[10px] uppercase">Médico Solicitante: {exam.doctor}</p>
+                        {exam.priority === 'urgent' && <p className="text-red-500 font-bold text-[10px] uppercase mt-1">SLA URGENTE (1h)</p>}
+                        {exam.result && <p className="mt-2 text-foreground font-medium"><strong>Laudo:</strong> {exam.result}</p>}
+                    </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            ))}
+            
             {filteredEvolutions.map((record) => (
               <motion.div
                 key={record.id}
@@ -3853,6 +3903,18 @@ export default function PatientEvolution() {
               </div>
             )}
           </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={isExamsModalOpen} onOpenChange={setIsExamsModalOpen}>
+        <DialogContent className="sm:max-w-[600px] rounded-[2rem] p-6 overflow-hidden glass-card-premium bg-white/70 dark:bg-slate-900/80 backdrop-blur-xl border border-white/40 dark:border-white/10 shadow-[0_25px_50px_-12px_rgba(0,0,0,0.25)]">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-black uppercase tracking-tight text-purple-600 dark:text-purple-400">Apoio Diagnóstico</DialogTitle>
+            <DialogDescription className="font-bold uppercase text-[10px] tracking-widest text-slate-500 dark:text-slate-400 mt-1">
+              Solicitação de Exames Laboratoriais e de Imagem
+            </DialogDescription>
+          </DialogHeader>
+          <ExamsModal patient={patient} onClose={() => setIsExamsModalOpen(false)} />
         </DialogContent>
       </Dialog>
 

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { usePatients } from "@/hooks/use-patients";
+import { usePatients, Patient } from "@/hooks/use-patients";
 import { Building2, Users, AlertCircle, Clock, Stethoscope, Pill, ShieldCheck, HeartPulse, Baby, Globe, UserCheck } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";

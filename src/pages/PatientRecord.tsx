@@ -19,6 +19,7 @@ export default function PatientRecord() {
 
   const fromPath = location.state?.from || "/leitos";
   const fromLabel = location.state?.label || "Leitos";
+  const activeTab = location.state?.activeTab || "clinical";
 
   if (!patient) {
     return (
@@ -133,7 +134,7 @@ export default function PatientRecord() {
         </div>
       </div>
 
-      <Tabs defaultValue="clinical" className="w-full">
+      <Tabs defaultValue={activeTab} className="w-full">
         <TabsList className="bg-muted/50 p-1 rounded-xl mb-8">
           <TabsTrigger value="clinical" className="rounded-lg gap-2"><FileText className="h-4 w-4" /> Clínica</TabsTrigger>
           <TabsTrigger value="history" className="rounded-lg gap-2"><History className="h-4 w-4" /> Histórico</TabsTrigger>

@@ -93,7 +93,7 @@ export default function Pharmacy() {
   const { orders, updateMedicationStatus } = usePrescriptions();
   const [search, setSearch] = useState("");
   const [catFilter, setCatFilter] = useState<string>("all");
-  const [specialFilter, setSpecialFilter] = useState<"all" | "lowStock" | "expiring" | "narcotics" | "controlled">("all");
+  const [specialFilter, setSpecialFilter] = useState<"all" | "lowStock" | "expiring" | "narcotics" | "controlled" | "thermolabile" | "highAlert">("all");
   const [movSearch, setMovSearch] = useState("");
   const [selectedMedDetails, setSelectedMedDetails] = useState<Medication | null>(null);
   const [activeTab, setActiveTab] = useState("stock");

@@ -41,8 +41,8 @@ export const sendPushNotification = async (payload: SendMessagePayload): Promise
       messageId: data?.[0]?.id,
       timestamp: new Date().toISOString(),
     };
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error('Erro detalhado do Supabase:', err);
-    throw new Error(err.message || 'Falha ao registrar notificação no banco de dados. Verifique a conexão.');
+    throw new Error(err instanceof Error ? err.message : 'Falha ao registrar notificação no banco de dados. Verifique a conexão.');
   }
 };

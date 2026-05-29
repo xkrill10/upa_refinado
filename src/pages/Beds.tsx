@@ -1,13 +1,14 @@
 import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { BedDouble, AlertCircle, CheckCircle2, Settings2, Info, UserRound, HeartPulse, Thermometer, Droplets, Activity, Sparkles, Clock3, Timer, Pill, ArrowRightLeft, Stethoscope, ArrowRight, Globe } from "lucide-react";
+import { BedDouble, AlertCircle, CheckCircle2, Settings2, Info, UserRound, HeartPulse, Thermometer, Droplets, Activity, Sparkles, Clock3, Timer, Pill, ArrowRightLeft, Stethoscope, ArrowRight, Globe, FlaskConical } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { cn, formatWords } from "@/lib/utils";
+import { ExamsModal } from "@/components/PatientEvolution/Modals/ExamsModal";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { motion } from "motion/react";
-import { useBeds } from "@/context/BedsContext";
+import { useBeds, BedStatus } from "@/context/BedsContext";
 import { usePatientsContext } from "@/context/PatientsContext";
 import { usePatients, Patient } from "@/hooks/use-patients";
 import {
@@ -54,6 +55,8 @@ export default function Beds() {
   const [transferringBedId, setTransferringBedId] = useState<string | null>(null);
   const [targetBedId, setTargetBedId] = useState<string>("");
   const [localRisk, setLocalRisk] = useState<string | null>(null);
+  const [isExamsModalOpen, setIsExamsModalOpen] = useState(false);
+  const [patientForExams, setPatientForExams] = useState<Patient | null>(null);
   const [vitalsForm, setVitalsForm] = useState({
     heartRate: "",
     bloodPressure: "",
@@ -78,7 +81,7 @@ export default function Beds() {
     let dia = 80;
     const bp = vitalsForm.bloodPressure;
     if (bp && bp.includes('/')) {
-      let parts = bp.split('/');
+      const parts = bp.split('/');
       let parsedSys = parseInt(parts[0]);
       let parsedDia = parseInt(parts[1]);
       if (parsedSys < 30) parsedSys = parsedSys * 10;
@@ -178,7 +181,7 @@ export default function Beds() {
       });
     }
     setPrevQueueLength(admissionQueue.length);
-  }, [admissionQueue.length, prevQueueLength]);
+  }, [admissionQueue, admissionQueue.length, prevQueueLength]);
 
   const handleTabChange = (value: string) => {
     setActiveTab(value);
@@ -350,7 +353,7 @@ export default function Beds() {
                          <UserRound className="h-3.5 w-3.5 text-[#006699] dark:text-sky-400 group-hover/pname:scale-110 transition-transform drop-shadow-sm" />
                          <span className="text-[12px] font-black truncate group-hover/pname:text-[#006699] dark:group-hover/pname:text-sky-300 text-foreground">{formatWords(patient?.name || "")}</span>
                        </div>
-                       <div className="grid grid-cols-2 gap-2">
+                       <div className="grid grid-cols-3 gap-2">
                           <div 
                             className="flex items-center justify-center gap-1.5 bg-white/40 dark:bg-slate-950/40 py-2 rounded-xl text-[9px] font-black text-slate-600 dark:text-slate-400 uppercase cursor-help hover:text-[#006699] dark:hover:text-sky-300 transition-colors border border-white/40 dark:border-white/5 shadow-[inset_0_1px_1px_rgba(255,255,255,0.4)]"
                             onClick={(e) => {
@@ -379,6 +382,16 @@ export default function Beds() {
                               patient.risk === 'emergency' ? "text-red-500 animate-pulse-slow" : "text-emerald-500"
                             )} /> Risco: {patient.risk === 'emergency' ? 'Crítico' : 'Estável'}
                           </div>
+                          <div 
+                            className="flex items-center justify-center gap-1.5 bg-white/40 dark:bg-slate-950/40 py-2 rounded-xl text-[9px] font-black text-slate-600 dark:text-slate-400 uppercase cursor-pointer hover:text-purple-600 dark:hover:text-purple-400 transition-colors border border-white/40 dark:border-white/5 shadow-[inset_0_1px_1px_rgba(255,255,255,0.4)]"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setPatientForExams(patient);
+                              setIsExamsModalOpen(true);
+                            }}
+                          >
+                            <FlaskConical className="h-3 w-3 text-purple-500 drop-shadow-[0_0_5px_rgba(168,85,247,0.5)]" /> Exames
+                          </div>
                        </div>
                     </div>
 
@@ -388,41 +401,32 @@ export default function Beds() {
                         e.stopPropagation();
                         setEditingVitalsPatient(patient);
                         setLocalRisk(null); 
-                        if (patient.vitals) {
-                          setVitalsForm({
-                            heartRate: patient.vitals.heartRate || "",
-                            bloodPressure: patient.vitals.bloodPressure || "",
-                            saturation: patient.vitals.saturation || "",
-                            temperature: patient.vitals.temperature || ""
+                        setVitalsForm({
+                            heartRate: patient.fc || "",
+                            bloodPressure: patient.pa || "",
+                            saturation: patient.spo2 || "",
+                            temperature: patient.temperature || ""
                           });
-                        } else {
-                          setVitalsForm({
-                            heartRate: "",
-                            bloodPressure: "",
-                            saturation: "",
-                            temperature: ""
-                          });
-                        }
                       }}
                     >
                        <div className="flex flex-col items-center justify-center p-2 rounded-xl bg-white/40 dark:bg-slate-900/40 border border-white/50 dark:border-white/5 shadow-sm group-hover/vitals:bg-white/60 dark:group-hover/vitals:bg-slate-800/50 transition-colors">
                          <HeartPulse className="h-3.5 w-3.5 text-red-500 mb-1 drop-shadow-[0_0_5px_rgba(239,68,68,0.5)]" />
-                         <span className="text-[11px] font-black text-foreground leading-none">{patient.vitals?.heartRate || "88"}</span>
+                         <span className="text-[11px] font-black text-foreground leading-none">{patient.fc || "88"}</span>
                          <span className="text-[7px] font-black uppercase text-slate-500 dark:text-slate-400 mt-0.5">FC</span>
                        </div>
                        <div className="flex flex-col items-center justify-center p-2 rounded-xl bg-white/40 dark:bg-slate-900/40 border border-white/50 dark:border-white/5 shadow-sm group-hover/vitals:bg-white/60 dark:group-hover/vitals:bg-slate-800/50 transition-colors">
                          <Activity className="h-3.5 w-3.5 text-blue-500 mb-1 drop-shadow-[0_0_5px_rgba(59,130,246,0.5)]" />
-                         <span className="text-[11px] font-black text-foreground leading-none">{patient.vitals?.bloodPressure || "12/8"}</span>
+                         <span className="text-[11px] font-black text-foreground leading-none">{patient.pa || "12/8"}</span>
                          <span className="text-[7px] font-black uppercase text-slate-500 dark:text-slate-400 mt-0.5">PA</span>
                        </div>
                        <div className="flex flex-col items-center justify-center p-2 rounded-xl bg-white/40 dark:bg-slate-900/40 border border-white/50 dark:border-white/5 shadow-sm group-hover/vitals:bg-white/60 dark:group-hover/vitals:bg-slate-800/50 transition-colors">
                          <Droplets className="h-3.5 w-3.5 text-emerald-500 mb-1 drop-shadow-[0_0_5px_rgba(16,185,129,0.5)]" />
-                         <span className="text-[11px] font-black text-foreground leading-none">{patient.vitals?.saturation ? patient.vitals.saturation + "%" : "98%"}</span>
+                         <span className="text-[11px] font-black text-foreground leading-none">{patient.spo2 ? patient.spo2 + "%" : "98%"}</span>
                          <span className="text-[7px] font-black uppercase text-slate-500 dark:text-slate-400 mt-0.5">SAT</span>
                        </div>
                        <div className="flex flex-col items-center justify-center p-2 rounded-xl bg-white/40 dark:bg-slate-900/40 border border-white/50 dark:border-white/5 shadow-sm group-hover/vitals:bg-white/60 dark:group-hover/vitals:bg-slate-800/50 transition-colors">
                          <Thermometer className="h-3.5 w-3.5 text-orange-500 mb-1 drop-shadow-[0_0_5px_rgba(249,115,22,0.5)]" />
-                         <span className="text-[11px] font-black text-foreground leading-none">{patient.vitals?.temperature || "36.5"}</span>
+                         <span className="text-[11px] font-black text-foreground leading-none">{patient.temperature || "36.5"}</span>
                          <span className="text-[7px] font-black uppercase text-slate-500 dark:text-slate-400 mt-0.5">TEMP</span>
                        </div>
                     </div>
@@ -767,21 +771,21 @@ export default function Beds() {
                           <div className="flex items-center justify-center gap-2.5 bg-white/30 dark:bg-slate-900/50 py-1.5 rounded-xl border border-white/40 dark:border-white/5 shadow-sm group/vital hover:bg-white/60 dark:hover:bg-slate-800/50 transition-colors">
                             <HeartPulse className="h-4 w-4 text-red-500 drop-shadow-[0_0_8px_rgba(239,68,68,0.5)] group-hover/vital:scale-110 transition-transform" />
                             <div className="flex flex-col">
-                              <span className="text-[13px] font-black leading-none text-foreground">{patient.vitals?.heartRate || "--"}</span>
+                              <span className="text-[13px] font-black leading-none text-foreground">{patient.fc || "--"}</span>
                               <span className="text-[8px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest mt-0.5">BPM</span>
                             </div>
                           </div>
                           <div className="flex items-center justify-center gap-2.5 bg-white/30 dark:bg-slate-900/50 py-1.5 rounded-xl border border-white/40 dark:border-white/5 shadow-sm group/vital hover:bg-white/60 dark:hover:bg-slate-800/50 transition-colors">
                             <Activity className="h-4 w-4 text-sky-500 drop-shadow-[0_0_8px_rgba(14,165,233,0.5)] group-hover/vital:scale-110 transition-transform" />
                             <div className="flex flex-col">
-                              <span className="text-[13px] font-black leading-none text-foreground">{patient.vitals?.bloodPressure || "--"}</span>
+                              <span className="text-[13px] font-black leading-none text-foreground">{patient.pa || "--"}</span>
                               <span className="text-[8px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest mt-0.5">PA</span>
                             </div>
                           </div>
                           <div className="flex items-center justify-center gap-2.5 bg-white/30 dark:bg-slate-900/50 py-1.5 rounded-xl border border-white/40 dark:border-white/5 shadow-sm group/vital hover:bg-white/60 dark:hover:bg-slate-800/50 transition-colors">
                             <Droplets className="h-4 w-4 text-emerald-500 drop-shadow-[0_0_8px_rgba(16,185,129,0.5)] group-hover/vital:scale-110 transition-transform" />
                             <div className="flex flex-col">
-                              <span className="text-[13px] font-black leading-none text-foreground">{patient.vitals?.saturation ? patient.vitals.saturation + "%" : "--"}</span>
+                              <span className="text-[13px] font-black leading-none text-foreground">{patient.spo2 ? patient.spo2 + "%" : "--"}</span>
                               <span className="text-[8px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest mt-0.5">O2</span>
                             </div>
                           </div>
@@ -1006,7 +1010,7 @@ export default function Beds() {
                         className="w-full h-12 bg-slate-50/50 dark:bg-slate-900/40 border border-slate-200/60 dark:border-slate-800/60 rounded-xl pl-10 pr-4 text-sm font-black text-foreground placeholder:text-muted-foreground/50 focus:ring-2 focus:ring-[#006699]/20 dark:focus:ring-sky-55/20 transition-all outline-none"
                         value={vitalsForm.bloodPressure}
                         onChange={(e) => {
-                          let val = e.target.value;
+                          const val = e.target.value;
                           
                           // Permite apagar livremente
                           if (val.length < vitalsForm.bloodPressure.length) {
@@ -1120,13 +1124,11 @@ export default function Beds() {
                       if (!editingVitalsPatient) return;
                       updatePatient(editingVitalsPatient.id, { 
                         risk: localRisk as Patient['risk'],
-                        vitals: {
-                          heartRate: vitalsForm.heartRate,
-                          bloodPressure: vitalsForm.bloodPressure,
-                          saturation: vitalsForm.saturation,
-                          temperature: vitalsForm.temperature
-                        }
-                      } as Partial<Patient>);
+                        fc: vitalsForm.heartRate,
+                        pa: vitalsForm.bloodPressure,
+                        spo2: vitalsForm.saturation,
+                        temperature: vitalsForm.temperature
+                      });
                       toast.success("Dados Sincronizados!", {
                         description: `Risco e sinais de ${editingVitalsPatient.name} atualizados com sucesso.`
                       });
@@ -1436,6 +1438,18 @@ export default function Beds() {
               ))
             )}
           </div>
+        </DialogContent>
+      </Dialog>
+      <Dialog open={isExamsModalOpen} onOpenChange={setIsExamsModalOpen}>
+        <DialogContent className="max-w-2xl bg-white dark:bg-slate-900 rounded-2xl border-0 shadow-2xl p-6">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-black uppercase tracking-tight flex items-center gap-2">
+              <FlaskConical className="w-5 h-5 text-blue-600" /> Solicitar Exames
+            </DialogTitle>
+          </DialogHeader>
+          {patientForExams && (
+            <ExamsModal patient={patientForExams} onClose={() => setIsExamsModalOpen(false)} />
+          )}
         </DialogContent>
       </Dialog>
     </motion.div>

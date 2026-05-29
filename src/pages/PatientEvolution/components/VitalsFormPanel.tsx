@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 
 // Tipagem para as props baseadas no retorno de useVitals
 interface VitalsFormPanelProps {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   vitals: any; // Em produção idealmente tiparíamos com o retorno exato do useVitals
 }
 

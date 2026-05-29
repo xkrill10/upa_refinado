@@ -215,7 +215,7 @@ export default function NursingCheck() {
 
   const playBeep = () => {
     try {
-      const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
+      const audioCtx = new (window.AudioContext || (window as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext!)();
       const oscillator = audioCtx.createOscillator();
       const gainNode = audioCtx.createGain();
 
@@ -250,7 +250,9 @@ export default function NursingCheck() {
       try {
         const parsed = JSON.parse(saved);
         if (parsed && typeof parsed === 'object') return parsed;
-      } catch (e) {}
+      } catch (_e) {
+        // silent fail - use fallback
+      }
     }
     return {
       "pr-3": { velocity: 80, vtbi: 500, infused: 120, status: "running" }
@@ -511,7 +513,7 @@ export default function NursingCheck() {
         updatedHours.sort((a, b) => a.hour.localeCompare(b.hour));
         
         if (targetOrder) {
-          // @ts-ignore
+          // @ts-expect-error updateMedicationHours types are compatible at runtime
           updateMedicationHours(targetOrder, targetId, updatedHours);
         }
         return { ...p, hours: updatedHours };

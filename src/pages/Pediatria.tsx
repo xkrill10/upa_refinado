@@ -9,7 +9,7 @@ import {
   Zap, Check, Bone, ArrowLeft, ArrowRight, UserPlus, Save, MapPin,
   ClipboardList, Info, Palette, Droplets, Pill, SearchCode, Syringe,
   FileText, Plus, MessageSquare, Ban, ChevronRight, Eye, Sparkles,
-  Scale, HeartPulse, Wrench, LayoutGrid, XCircle, Thermometer
+  Scale, HeartPulse, Wrench, LayoutGrid, XCircle, Thermometer, FlaskConical
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -25,6 +25,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { AnimatePresence } from "motion/react";
 import { PatientDetailsModal } from "@/components/PatientDetailsModal";
+import { ExamsModal } from "@/components/PatientEvolution/Modals/ExamsModal";
 
 const getVitalSeverity = (key: string, value: string): 'normal' | 'caution' | 'emergency' => {
   if (!value) return 'normal';
@@ -217,6 +218,35 @@ const getRiskDetails = (risk: string) => {
   }
 };
 
+
+const maskSUS = (value: string) =>
+  value.replace(/\D/g, "").substring(0, 15);
+
+const validateSUS = (cns: string) => {
+  if (cns.length !== 15) return false;
+  const firstDigit = cns[0];
+  if (!['1', '2', '7', '8', '9'].includes(firstDigit)) return false;
+  if (['1', '2'].includes(firstDigit)) {
+    const pis = cns.substring(0, 11);
+    let sum = 0;
+    for (let i = 0; i < 11; i++) { sum += parseInt(pis[i]) * (15 - i); }
+    const rest = sum % 11;
+    let dv = 11 - rest;
+    if (dv === 11) dv = 0;
+    if (dv === 10) {
+      const rest2 = (sum + 2) % 11;
+      return cns === pis + "001" + (11 - rest2).toString();
+    }
+    return cns === pis + "000" + dv.toString();
+  }
+  if (['7', '8', '9'].includes(firstDigit)) {
+    let sum = 0;
+    for (let i = 0; i < 15; i++) { sum += parseInt(cns[i]) * (15 - i); }
+    return (sum % 11 === 0);
+  }
+  return false;
+};
+
 export default function Pediatria() {
   const { patients, updatePatient, callTicket, isAudioEnabled, setIsAudioEnabled } = usePatients();
   const navigate = useNavigate();
@@ -243,6 +273,7 @@ export default function Pediatria() {
   const [openGlasgowCalc, setOpenGlasgowCalc] = useState(false);
   const [openMedicationSelector, setOpenMedicationSelector] = useState(false);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
+  const [isExamsModalOpen, setIsExamsModalOpen] = useState(false);
   const [patientForModal, setPatientForModal] = useState<Patient | null>(null);
   const [medSearch, setMedSearch] = useState("");
   const [glasgowValues, setGlasgowValues] = useState({ eye: 4, verbal: 5, motor: 6 });
@@ -1883,14 +1914,24 @@ export default function Pediatria() {
 
                             {/* Footer Actions Premium */}
                             <div className="flex flex-col sm:flex-row items-center justify-between gap-6 pt-10 border-t border-border/40">
-                              <Button
-                                variant="ghost"
-                                onClick={() => { setIsIdentifying(true); setIsFillingClinical(false); }}
-                                className="h-16 px-8 rounded-2xl font-black text-xs uppercase tracking-widest bg-muted/30 hover:bg-muted text-muted-foreground transition-all group"
-                              >
-                                <ArrowLeft className="h-4 w-4 mr-3 group-hover:-translate-x-1 transition-transform" />
-                                Dados do Paciente
-                              </Button>
+                              <div className="flex gap-4">
+                                <Button
+                                  variant="ghost"
+                                  onClick={() => { setIsIdentifying(true); setIsFillingClinical(false); }}
+                                  className="h-16 px-8 rounded-2xl font-black text-xs uppercase tracking-widest bg-muted/30 hover:bg-muted text-muted-foreground transition-all group"
+                                >
+                                  <ArrowLeft className="h-4 w-4 mr-3 group-hover:-translate-x-1 transition-transform" />
+                                  Dados do Paciente
+                                </Button>
+                                <Button
+                                  variant="outline"
+                                  onClick={() => setIsExamsModalOpen(true)}
+                                  className="h-16 px-8 rounded-2xl font-black text-xs uppercase tracking-widest text-purple-600 border-purple-200 hover:bg-purple-50 transition-all dark:text-purple-400 dark:border-purple-900/50 dark:hover:bg-purple-900/20"
+                                >
+                                  <FlaskConical className="h-5 w-5 mr-3" />
+                                  Solicitar Exames
+                                </Button>
+                              </div>
 
                               <div className="flex items-center gap-4 w-full sm:w-auto">
                                 <Button
@@ -2215,6 +2256,19 @@ export default function Pediatria() {
         isOpen={isDetailsModalOpen}
         onClose={() => setIsDetailsModalOpen(false)}
       />
+      {/* Exams Modal Dialog */}
+      <Dialog open={isExamsModalOpen} onOpenChange={setIsExamsModalOpen}>
+        <DialogContent className="max-w-2xl bg-white dark:bg-slate-900 rounded-2xl border-0 shadow-2xl p-6">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-black uppercase tracking-tight flex items-center gap-2">
+              <FlaskConical className="w-5 h-5 text-purple-600" /> Solicitar Exames
+            </DialogTitle>
+          </DialogHeader>
+          {selectedPatient && (
+            <ExamsModal patient={selectedPatient} onClose={() => setIsExamsModalOpen(false)} />
+          )}
+        </DialogContent>
+      </Dialog>
     </motion.div>
   );
 }

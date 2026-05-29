@@ -174,7 +174,7 @@ export default function Same() {
                 <div className={cn("p-2 rounded-xl", stat.bg)}>
                   <stat.icon className={cn("h-5 w-5", stat.color)} />
                 </div>
-                <Badge variant="ghost" className="text-[10px] font-black opacity-0 group-hover:opacity-100 transition-opacity uppercase">Ver Detalhes</Badge>
+                <Badge variant="outline" className="text-[10px] font-black opacity-0 group-hover:opacity-100 transition-opacity uppercase">Ver Detalhes</Badge>
               </div>
               <div>
                 <p className="text-[10px] font-black uppercase text-muted-foreground tracking-widest mb-1">{stat.label}</p>
@@ -355,7 +355,7 @@ export default function Same() {
                                   variant="ghost" 
                                   size="sm" 
                                   className="h-8 w-8 rounded-lg p-0 hover:bg-blue-600/10 hover:text-blue-600 transition-colors"
-                                  onClick={() => handleAction('print', p.name)}
+                                  onClick={() => handleAction('print', p.id, p.name)}
                                 >
                                   <Printer className="h-4 w-4" />
                                 </Button>
@@ -363,7 +363,7 @@ export default function Same() {
                                   variant="ghost" 
                                   size="sm" 
                                   className="h-8 w-8 rounded-lg p-0 hover:bg-muted transition-colors"
-                                  onClick={() => handleAction('export', p.name)}
+                                  onClick={() => handleAction('export', p.id, p.name)}
                                 >
                                   <ExternalLink className="h-4 w-4" />
                                 </Button>

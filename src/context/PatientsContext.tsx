@@ -58,6 +58,25 @@ export interface Patient {
     requestedAt: string;
     doctor: string;
   };
+  exams?: ExamRequest[];
+}
+
+export type ExamStatus = 'pending_collection' | 'in_analysis' | 'completed';
+
+export interface ExamRequest {
+  id: string;
+  type: 'lab' | 'image';
+  name: string;
+  priority: 'normal' | 'urgent';
+  status: ExamStatus;
+  requestedAt: string;
+  doctor: string;
+  result?: string;
+  releasedAt?: string;
+  deadline?: string; // ISO timestamp for SLA countdown
+  isCritical?: boolean;
+  attachmentUrl?: string;
+  observations?: string;
 }
 
 export interface EvolutionRecord {
@@ -175,6 +194,10 @@ interface PatientsContextType {
   setIsAnnouncing: (is: boolean) => void;
   resetSystem: () => void;
   requestAdmission: (patientId: string, bedType: 'emergency' | 'observation', doctor: string) => void;
+  requestExam: (patientId: string, exam: Omit<ExamRequest, "id" | "status" | "requestedAt">) => void;
+  updateExamStatus: (patientId: string, examId: string, status: ExamStatus, result?: string, isCritical?: boolean, attachmentUrl?: string) => void;
+  cancelExam: (patientId: string, examId: string) => void;
+  recollectExam: (patientId: string, examId: string, reason: string) => void;
 }
 
 const PatientsContext = createContext<PatientsContextType | undefined>(undefined);
@@ -584,6 +607,88 @@ export function PatientsProvider({ children }: { children: ReactNode }) {
     new BroadcastChannel('upa_sync_channel').postMessage('sync_all');
   };
 
+  const requestExam = (patientId: string, exam: Omit<ExamRequest, "id" | "status" | "requestedAt">) => {
+    const collectionSlaMinutes = 15; // collection deadline
+    const newExam: ExamRequest = {
+      ...exam,
+      id: Math.random().toString(36).substring(2, 11),
+      status: 'pending_collection',
+      requestedAt: new Date().toISOString(),
+      deadline: new Date(Date.now() + collectionSlaMinutes * 60 * 1000).toISOString(),
+    };
+    setPatients(prev => prev.map(p => {
+      if (p.id === patientId) {
+        return {
+          ...p,
+          exams: [newExam, ...(p.exams || [])]
+        };
+      }
+      return p;
+    }));
+    toast.success(`Exame ${exam.name} solicitado com sucesso!`);
+    new BroadcastChannel('upa_sync_channel').postMessage('sync_all');
+  };
+
+  const analysisSlaMinutes = 30; // analysis deadline
+  const updateExamStatus = (patientId: string, examId: string, status: ExamStatus, result?: string, isCritical?: boolean, attachmentUrl?: string) => {
+    setPatients(prev => prev.map(p => {
+      if (p.id === patientId) {
+        const updatedExams = (p.exams || []).map(e => {
+          if (e.id === examId) {
+            const updated: ExamRequest = {
+              ...e,
+              status,
+              result: result !== undefined ? result : e.result,
+              releasedAt: status === 'completed' ? new Date().toISOString() : e.releasedAt,
+              isCritical: isCritical !== undefined ? isCritical : e.isCritical,
+              attachmentUrl: attachmentUrl !== undefined ? attachmentUrl : e.attachmentUrl,
+            };
+            // Set new deadline when moving to analysis
+            if (status === 'in_analysis') {
+              updated.deadline = new Date(Date.now() + analysisSlaMinutes * 60 * 1000).toISOString();
+            }
+            // Remove deadline when completed
+            if (status === 'completed') {
+              delete updated.deadline;
+            }
+            return updated;
+          }
+          return e;
+        });
+        return { ...p, exams: updatedExams };
+      }
+      return p;
+    }));
+    new BroadcastChannel('upa_sync_channel').postMessage('sync_all');
+  };
+
+  const cancelExam = (patientId: string, examId: string) => {
+    setPatients(prev => prev.map(p => {
+      if (p.id === patientId) {
+        return { ...p, exams: (p.exams || []).filter(e => e.id !== examId) };
+      }
+      return p;
+    }));
+    toast.info('Exame cancelado.');
+    new BroadcastChannel('upa_sync_channel').postMessage('sync_all');
+  };
+
+  const recollectExam = (patientId: string, examId: string, reason: string) => {
+    setPatients(prev => prev.map(p => {
+      if (p.id === patientId) {
+        const updatedExams = (p.exams || []).map(e =>
+          e.id === examId
+            ? { ...e, status: 'pending_collection' as ExamStatus, result: undefined, releasedAt: undefined, requestedAt: new Date().toISOString() }
+            : e
+        );
+        return { ...p, exams: updatedExams };
+      }
+      return p;
+    }));
+    toast.error(`Amostra rejeitada. Motivo: ${reason}. Nova coleta solicitada.`);
+    new BroadcastChannel('upa_sync_channel').postMessage('sync_all');
+  };
+
   return (
     <PatientsContext.Provider value={{ 
       patients, 
@@ -602,6 +707,10 @@ export function PatientsProvider({ children }: { children: ReactNode }) {
       setIsAnnouncing,
       resetSystem,
       requestAdmission,
+      requestExam,
+      updateExamStatus,
+      cancelExam,
+      recollectExam,
     }}>
       {children}
     </PatientsContext.Provider>

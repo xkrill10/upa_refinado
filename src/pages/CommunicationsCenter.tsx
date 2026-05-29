@@ -66,8 +66,8 @@ export default function CommunicationsCenter() {
         if (error) throw error;
         toast.success("Notificações ativadas para este aparelho!");
       }
-    } catch (err: any) {
-      toast.error(err.message || "Erro ao ativar notificações.");
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : "Erro ao ativar notificações.");
     } finally {
       setIsActivatingPush(false);
     }
@@ -97,9 +97,9 @@ export default function CommunicationsCenter() {
         });
         setMessageContent(""); // clear after sending
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast.error("Erro ao enviar mensagem", {
-        description: error.message || "Ocorreu um erro desconhecido."
+        description: error instanceof Error ? error.message : "Ocorreu um erro desconhecido."
       });
     } finally {
       setIsSending(false);
@@ -173,7 +173,7 @@ export default function CommunicationsCenter() {
 
                 <div className="space-y-3">
                   <label className="text-xs font-black uppercase tracking-wider text-muted-foreground">Prioridade</label>
-                  <Select value={priority} onValueChange={(val: any) => setPriority(val)}>
+                  <Select value={priority} onValueChange={(val: 'normal' | 'high' | 'critical') => setPriority(val)}>
                     <SelectTrigger className={cn("h-12 border-white/20 dark:border-slate-800/50 backdrop-blur-md rounded-xl text-sm font-bold transition-colors", 
                       priority === 'critical' ? 'bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/30' : 
                       priority === 'high' ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/30' : 
@@ -192,7 +192,7 @@ export default function CommunicationsCenter() {
 
               <div className="space-y-3">
                 <label className="text-xs font-black uppercase tracking-wider text-muted-foreground">Canal de Envio</label>
-                <Tabs value={messageType} onValueChange={(v: any) => {
+                <Tabs value={messageType} onValueChange={(v: 'push' | 'sms' | 'whatsapp') => {
                   setMessageType(v);
                   if (v === 'push') setPhoneNumber(''); // Clear phone if switching back to push
                 }} className="w-full">

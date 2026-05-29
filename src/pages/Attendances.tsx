@@ -10,8 +10,9 @@ import { toast } from "sonner";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { cn, formatWords, formatPatientNameLGPD } from "@/lib/utils";
 import { PatientDetailsModal } from "@/components/PatientDetailsModal";
+import { ExamsModal } from "@/components/PatientEvolution/Modals/ExamsModal";
 import { useEffect, useRef } from "react";
-import { AlertTriangle } from "lucide-react";
+import { AlertTriangle, FlaskConical } from "lucide-react";
 
 export default function Attendances() {
   const navigate = useNavigate();
@@ -27,6 +28,8 @@ export default function Attendances() {
   const [showCallControl, setShowCallControl] = useState(false);
   const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
+  const [isExamsModalOpen, setIsExamsModalOpen] = useState(false);
+  const [patientForExams, setPatientForExams] = useState<Patient | null>(null);
   const [activeFilter, setActiveFilter] = useState<'all' | 'attending' | 'waiting'>('all');
   const [callingTicket, setCallingTicket] = useState<{ 
     ticket: string; 
@@ -274,6 +277,15 @@ export default function Attendances() {
                         Prontuário
                       </Button>
                       <Button 
+                        variant="outline"
+                        size="sm" 
+                        className="h-9 rounded-xl gap-2 font-black uppercase text-[10px] tracking-wider text-blue-600 border-blue-200 hover:bg-blue-50 dark:text-blue-400 dark:border-blue-900 dark:hover:bg-blue-900/20 cursor-pointer" 
+                        onClick={() => navigate(`/paciente/${patient.id}`, { state: { from: '/atendimentos', label: 'Atendimentos', activeTab: 'exams' } })}
+                      >
+                        <FlaskConical className="h-3.5 w-3.5" />
+                        Exames
+                      </Button>
+                      <Button 
                         size="sm" 
                         className="h-9 rounded-xl gap-2 font-black uppercase text-[10px] tracking-wider bg-[#006699] hover:bg-[#005580] dark:bg-sky-600 dark:hover:bg-sky-500 text-white shadow-lg shadow-[#006699]/10 dark:shadow-none border-0 cursor-pointer" 
                         onClick={() => navigate(`/paciente/${patient.id}/evolucao`, { state: { from: '/atendimentos', label: 'Atendimentos' } })}
@@ -484,6 +496,19 @@ export default function Attendances() {
         isOpen={isDetailsModalOpen}
         onClose={() => setIsDetailsModalOpen(false)}
       />
+
+      <Dialog open={isExamsModalOpen} onOpenChange={setIsExamsModalOpen}>
+        <DialogContent className="max-w-2xl bg-white dark:bg-slate-900 rounded-2xl border-0 shadow-2xl p-6">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-black uppercase tracking-tight flex items-center gap-2">
+              <FlaskConical className="w-5 h-5 text-blue-600" /> Solicitar Exames
+            </DialogTitle>
+          </DialogHeader>
+          {patientForExams && (
+            <ExamsModal patient={patientForExams} onClose={() => setIsExamsModalOpen(false)} />
+          )}
+        </DialogContent>
+      </Dialog>
     </motion.div>
   );
 }

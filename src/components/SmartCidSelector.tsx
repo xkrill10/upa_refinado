@@ -26,7 +26,7 @@ interface SmartCidSelectorProps {
 }
 
 interface CategoryMeta {
-  icon: React.ComponentType<any>;
+  icon: React.ComponentType<{ className?: string }>;
   description: string;
   color: string;
   bgGradient: string;

@@ -3,13 +3,14 @@ import { usePatients, Patient } from "@/hooks/use-patients";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Baby, Stethoscope, User, Calendar, ExternalLink, Activity, Megaphone, X, Volume2, VolumeX, Building2, Info } from "lucide-react";
+import { Baby, Stethoscope, User, Calendar, ExternalLink, Activity, Megaphone, X, Volume2, VolumeX, Building2, Info, FlaskConical } from "lucide-react";
 import { motion } from "motion/react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { cn, formatWords, formatPatientNameLGPD } from "@/lib/utils";
 import { PatientDetailsModal } from "@/components/PatientDetailsModal";
+import { ExamsModal } from "@/components/PatientEvolution/Modals/ExamsModal";
 
 export default function AtendimentosPediatrico() {
   const navigate = useNavigate();
@@ -24,6 +25,8 @@ export default function AtendimentosPediatrico() {
   const [showCallControl, setShowCallControl] = useState(false);
   const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
+  const [isExamsModalOpen, setIsExamsModalOpen] = useState(false);
+  const [patientForExams, setPatientForExams] = useState<Patient | null>(null);
   const [activeFilter, setActiveFilter] = useState<'all' | 'attending' | 'waiting'>('all');
   const [callingTicket, setCallingTicket] = useState<{
     ticket: string;
@@ -214,6 +217,10 @@ export default function AtendimentosPediatrico() {
                        onClick={() => navigate(`/paciente/${patient.id}`, { state: { from: "/atendimentos-pediatrico", label: "Pediátrico" } })}>
                       <User className="h-3.5 w-3.5" /> Prontuário
                     </Button>
+                    <Button variant="outline" size="sm" className="h-9 rounded-xl gap-2 font-black uppercase text-[10px] tracking-wider text-purple-600 border-purple-200 hover:bg-purple-50 dark:text-purple-400 dark:border-purple-900/50 dark:hover:bg-purple-900/20 cursor-pointer" 
+                       onClick={() => navigate(`/paciente/${patient.id}`, { state: { from: "/atendimentos-pediatrico", label: "Pediátrico", activeTab: 'exams' } })}>
+                      <FlaskConical className="h-3.5 w-3.5" /> Exames
+                    </Button>
                     <Button size="sm" className="h-9 rounded-xl gap-2 font-bold bg-orange-500 hover:bg-orange-600 text-white shadow-lg shadow-orange-500/20"
                        onClick={() => navigate(`/paciente/${patient.id}/evolucao`, { state: { from: "/atendimentos-pediatrico", label: "Pediátrico" } })}>
                       <Stethoscope className="h-3.5 w-3.5" /> Evoluir
@@ -341,6 +348,20 @@ export default function AtendimentosPediatrico() {
       </Dialog>
 
       <PatientDetailsModal patient={selectedPatient} isOpen={isDetailsModalOpen} onClose={() => setIsDetailsModalOpen(false)} />
+      
+      {/* Exams Modal Dialog */}
+      <Dialog open={isExamsModalOpen} onOpenChange={setIsExamsModalOpen}>
+        <DialogContent className="max-w-2xl bg-white dark:bg-slate-900 rounded-2xl border-0 shadow-2xl p-6">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-black uppercase tracking-tight flex items-center gap-2">
+              <FlaskConical className="w-5 h-5 text-blue-600" /> Solicitar Exames
+            </DialogTitle>
+          </DialogHeader>
+          {patientForExams && (
+            <ExamsModal patient={patientForExams} onClose={() => setIsExamsModalOpen(false)} />
+          )}
+        </DialogContent>
+      </Dialog>
     </motion.div>
   );
 }

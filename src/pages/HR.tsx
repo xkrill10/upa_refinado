@@ -68,7 +68,10 @@ export default function HR() {
 
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
   const [detailsModalTab, setDetailsModalTab] = useState<'details' | 'history'>('details');
-  const [selectedStaffForDetails, setSelectedStaffForDetails] = useState<any>(null);
+  const [selectedStaffForDetails, setSelectedStaffForDetails] = useState<{
+    id: number; name: string; role: string; status: string; shift: string;
+    specialty: string; category: string; docStatus: string; training: number;
+  } | null>(null);
 
   const [swapRequests, setSwapRequests] = useState<SwapRequest[]>([
     { id: 1, from: "Dr. João Mendes", to: "Dra. Maria Clara", date: "15/05/2030", shift: "Diurno", status: "pending", reason: "Participação em congresso médico internacional" },
@@ -149,7 +152,10 @@ export default function HR() {
       role,
       specialty,
       status: 'On-Call',
-      shift
+      shift,
+      category: 'geral',
+      docStatus: 'active',
+      training: 0
     }]);
 
     toast.success(`${name} adicionado à escala.`);

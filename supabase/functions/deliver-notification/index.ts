@@ -35,10 +35,19 @@ serve(async (req) => {
   }
 })
 
+interface NotificationRecord {
+  message_type?: string;
+  target_sector?: string;
+  content?: string;
+  priority?: string;
+  id?: string;
+  [key: string]: unknown;
+}
+
 /**
  * FCM API V1 - Utiliza JWT Token OAuth2
  */
-async function sendPushNotificationV1(record: any) {
+async function sendPushNotificationV1(record: NotificationRecord) {
   if (!FIREBASE_SERVICE_ACCOUNT) {
     console.warn("ATENÇÃO: Conta de serviço não configurada. Simulando Push V1.");
     console.log(`[PUSH V1 MOCK] Setor: ${record.target_sector} | Msg: ${record.content}`);
@@ -94,7 +103,7 @@ async function sendPushNotificationV1(record: any) {
   console.log("Notificação FCM V1 entregue com sucesso!");
 }
 
-async function sendWhatsAppMessage(record: any) {
+async function sendWhatsAppMessage(record: NotificationRecord) {
   if (!META_WHATSAPP_TOKEN) return; // Mock simplificado
   
   // (Código Meta mantido igual, consulte a versão anterior para detalhes)

@@ -43,7 +43,7 @@ const consolidatedMetrics = [
 ];
 
 export default function Reports() {
-  const [selectedKpi, setSelectedKpi] = useState<any>(null);
+  const [selectedKpi, setSelectedKpi] = useState<{ label: string; value: string; sub: string; subColor: string; highlight?: boolean } | null>(null);
 
   const currentDate = new Date().toLocaleDateString('pt-BR', {
     day: '2-digit',

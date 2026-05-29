@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { Search, Heart, Wind, AlertCircle, Thermometer, Activity, Brain, ShieldAlert, Zap, X, Check, CheckCircle2, Bone, Stethoscope, RotateCcw, ArrowLeft, ArrowRight, UserPlus, Save, MapPin, ClipboardList, Info, Palette, Droplets, Pill, SearchCode, History, Syringe, FileText, Plus, Volume2, Megaphone, VolumeX, MessageSquare, Ban, ChevronRight, Eye, Sparkles, Scale, Clock, HeartPulse, Wrench, Settings2, Users, LayoutGrid, XCircle } from "lucide-react";
+import { Search, Heart, Wind, AlertCircle, Thermometer, Activity, Brain, ShieldAlert, Zap, X, Check, CheckCircle2, Bone, Stethoscope, RotateCcw, ArrowLeft, ArrowRight, UserPlus, Save, MapPin, ClipboardList, Info, Palette, Droplets, Pill, SearchCode, History, Syringe, FileText, Plus, Volume2, Megaphone, VolumeX, MessageSquare, Ban, ChevronRight, Eye, Sparkles, Scale, Clock, HeartPulse, Wrench, Settings2, Users, LayoutGrid, XCircle, FlaskConical } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { motion, AnimatePresence } from "motion/react";
 import { toast } from "sonner";
@@ -124,6 +124,7 @@ const getVitalSeverity = (key: string, value: string): 'normal' | 'caution' | 'e
 };
 
 import { PatientDetailsModal } from "@/components/PatientDetailsModal";
+import { ExamsModal } from "@/components/PatientEvolution/Modals/ExamsModal";
 
 export default function Triage() {
   const { patients, updatePatient, addPatient, callTicket, isAudioEnabled, setIsAudioEnabled } = usePatients();
@@ -145,6 +146,7 @@ export default function Triage() {
   const [autoCallNext, setAutoCallNext] = useState<boolean>(() => {
     return localStorage.getItem('autoCallNext') === 'true';
   });
+  const [isExamsModalOpen, setIsExamsModalOpen] = useState(false);
 
   useEffect(() => {
     localStorage.setItem('selectedTriageRoom', selectedTriageRoom);
@@ -2026,14 +2028,24 @@ export default function Triage() {
 
                               {/* Footer Actions Premium */}
                               <div className="flex flex-col sm:flex-row items-center justify-between gap-6 pt-10 border-t border-border/40">
-                                <Button
-                                  variant="ghost"
-                                  onClick={() => { setIsIdentifying(true); setIsFillingClinical(false); }}
-                                  className="h-16 px-8 rounded-2xl font-black text-xs uppercase tracking-widest bg-muted/30 hover:bg-muted text-muted-foreground transition-all group"
-                                >
-                                  <ArrowLeft className="h-4 w-4 mr-3 group-hover:-translate-x-1 transition-transform" />
-                                  Dados do Paciente
-                                </Button>
+                                <div className="flex gap-4">
+                                  <Button
+                                    variant="ghost"
+                                    onClick={() => { setIsIdentifying(true); setIsFillingClinical(false); }}
+                                    className="h-16 px-8 rounded-2xl font-black text-xs uppercase tracking-widest bg-muted/30 hover:bg-muted text-muted-foreground transition-all group"
+                                  >
+                                    <ArrowLeft className="h-4 w-4 mr-3 group-hover:-translate-x-1 transition-transform" />
+                                    Dados do Paciente
+                                  </Button>
+                                  <Button
+                                    variant="outline"
+                                    onClick={() => setIsExamsModalOpen(true)}
+                                    className="h-16 px-8 rounded-2xl font-black text-xs uppercase tracking-widest text-purple-600 border-purple-200 hover:bg-purple-50 transition-all dark:text-purple-400 dark:border-purple-900/50 dark:hover:bg-purple-900/20"
+                                  >
+                                    <FlaskConical className="h-5 w-5 mr-3" />
+                                    Solicitar Exames
+                                  </Button>
+                                </div>
 
                                 <div className="flex items-center gap-4 w-full sm:w-auto">
                                   <Button
@@ -2721,6 +2733,19 @@ export default function Triage() {
         isOpen={isDetailsModalOpen}
         onClose={() => setIsDetailsModalOpen(false)}
       />
+      {/* Exams Modal Dialog */}
+      <Dialog open={isExamsModalOpen} onOpenChange={setIsExamsModalOpen}>
+        <DialogContent className="max-w-2xl bg-white dark:bg-slate-900 rounded-2xl border-0 shadow-2xl p-6">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-black uppercase tracking-tight flex items-center gap-2">
+              <FlaskConical className="w-5 h-5 text-blue-600" /> Solicitar Exames
+            </DialogTitle>
+          </DialogHeader>
+          {selectedPatient && (
+            <ExamsModal patient={selectedPatient} onClose={() => setIsExamsModalOpen(false)} />
+          )}
+        </DialogContent>
+      </Dialog>
     </motion.div>
   );
 }

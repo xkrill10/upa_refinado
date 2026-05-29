@@ -38,7 +38,7 @@ export default function Dashboard() {
   // Simulated Live Feed generation based on real context data
   useEffect(() => {
     // Generate initial feed
-    const initialFeed = cleaningHistory.slice(0, 3).map((log, i) => ({
+    const initialFeed: {id: number, text: string, time: string, type: 'gov' | 'med' | 'alert'}[] = cleaningHistory.slice(0, 3).map((log, i) => ({
       id: Date.now() - i * 1000,
       text: `${log.cleanerName} finalizou a higienização do ${log.bedName}`,
       time: log.finishedAt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
@@ -51,7 +51,7 @@ export default function Dashboard() {
     // Add new items every few seconds to simulate real-time
     const interval = setInterval(() => {
       const types = ['gov', 'med', 'alert'];
-      const randType = types[Math.floor(Math.random() * types.length)] as any;
+      const randType = types[Math.floor(Math.random() * types.length)] as 'gov' | 'med' | 'alert';
       const now = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
       
       let text = "";

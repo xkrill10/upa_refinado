@@ -35,6 +35,7 @@ export function EvolutionFormPanel({
   stampName, setStampName, stampCouncil, setStampCouncil, 
   stampNumber, setStampNumber, stampState, setStampState,
   handleEvolutionSubmit, saveEvolutionAsPdf, isSubmitting
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 }: any) {
   const evolutionTextRef = useRef<HTMLTextAreaElement>(null);
   

@@ -55,7 +55,7 @@ export function NandaModal({ isOpen, onClose, onApply }: NandaModalProps) {
   const handleConfirm = () => {
     let finalDesc = "- PROCESSO DE ENFERMAGEM INTEGRADO (NANDA NOC NIC):";
     let hasAny = false;
-    let summaryTitles = [];
+    const summaryTitles = [];
 
     for (const [diagId, plan] of Object.entries(activePlans)) {
       if (plan.nocs.length === 0 && plan.nics.length === 0) continue;
