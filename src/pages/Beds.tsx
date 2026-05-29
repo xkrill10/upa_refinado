@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { BedDouble, AlertCircle, CheckCircle2, Settings2, Info, UserRound, HeartPulse, Thermometer, Droplets, Activity, Sparkles, Clock3, Timer, Pill, ArrowRightLeft, Stethoscope, ArrowRight, Globe, FlaskConical } from "lucide-react";
+import { BedDouble, AlertCircle, CheckCircle2, Settings2, Info, UserRound, HeartPulse, Thermometer, Droplets, Activity, Sparkles, Clock3, Timer, Pill, ArrowRightLeft, Stethoscope, ArrowRight, Globe, FlaskConical, PackagePlus, X, FileText, ShieldAlert, Biohazard, Clock, CalendarClock, History, Ambulance } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { cn, formatWords } from "@/lib/utils";
 import { ExamsModal } from "@/components/PatientEvolution/Modals/ExamsModal";
+import PatientRecord from "@/pages/PatientRecord";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -29,6 +30,15 @@ import {
 import { toast } from "sonner";
 
 import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+
+import {
   Tabs,
   TabsContent,
   TabsList,
@@ -43,10 +53,24 @@ const RISK_ORDER: Record<string, number> = {
   'not-urgent': 4 
 };
 
+const getTimeInBed = (arrivalTime?: string) => {
+  if (!arrivalTime) return { text: '--', hours: 0, color: 'text-slate-500' };
+  const diff = Date.now() - new Date(arrivalTime).getTime();
+  const hours = diff / (1000 * 60 * 60);
+  let color = 'text-emerald-500';
+  if (hours >= 12) color = 'text-red-500 animate-pulse';
+  else if (hours >= 6) color = 'text-amber-500';
+  
+  const h = Math.floor(hours);
+  const m = Math.floor((hours - h) * 60);
+  return { text: `${h}h ${m}m`, hours, color };
+};
+
 export default function Beds() {
   const [selectedBedId, setSelectedBedId] = useState<string | null>(null);
   const [filter, setFilter] = useState<'all' | 'occupied' | 'available' | 'maintenance' | 'cleaning'>('all');
   const [selectedRisk, setSelectedRisk] = useState<Patient['risk'] | null>(null);
+  const [advancedFilter, setAdvancedFilter] = useState<'sla' | 'isolation' | 'discharge' | null>(null);
   const [activeTab, setActiveTab] = useState("census");
   const [editingVitalsPatient, setEditingVitalsPatient] = useState<Patient | null>(null);
   const [allocatingPatientId, setAllocatingPatientId] = useState<string | null>(null);
@@ -63,6 +87,14 @@ export default function Beds() {
     saturation: "",
     temperature: ""
   });
+
+  /* ─── Satellite Pharmacy Flow State ─── */
+  const [showPharmacyModal, setShowPharmacyModal] = useState(false);
+  const [patientForPharmacy, setPatientForPharmacy] = useState<Patient | null>(null);
+  const [pharmacyRequest, setPharmacyRequest] = useState({ item: "", amount: "1", priority: "normal" });
+
+  /* ─── Quick Record Modal Flow State ─── */
+  const [recordPatientId, setRecordPatientId] = useState<number | null>(null);
 
   useEffect(() => {
     if (!editingVitalsPatient) return;
@@ -138,7 +170,7 @@ export default function Beds() {
   }, [vitalsForm, editingVitalsPatient]);
 
   const { beds, updateBedStatus, getStats, releaseBed, transferPatient, assignPatient } = useBeds();
-  const { patients, updatePatient } = usePatientsContext();
+  const { patients, updatePatient, requestTransfer } = usePatientsContext();
   
   const getBedPatient = (bed: typeof beds[number]) => {
     const linkedPatient = patients.find(patient => patient.id === bed.patientId);
@@ -199,7 +231,7 @@ export default function Beds() {
   const occupiedBedsWithPatients = beds
     .filter(b => b.status === 'occupied')
     .map(b => ({ bed: b, patient: getBedPatient(b) }))
-    .filter(item => item.patient !== undefined) as { bed: typeof beds[number], patient: Patient }[];
+    .filter(item => item.patient) as { bed: typeof beds[number], patient: Patient }[];
 
   const handleTransfer = () => {
     if (transferringBedId && targetBedId) {
@@ -353,7 +385,7 @@ export default function Beds() {
                          <UserRound className="h-3.5 w-3.5 text-[#006699] dark:text-sky-400 group-hover/pname:scale-110 transition-transform drop-shadow-sm" />
                          <span className="text-[12px] font-black truncate group-hover/pname:text-[#006699] dark:group-hover/pname:text-sky-300 text-foreground">{formatWords(patient?.name || "")}</span>
                        </div>
-                       <div className="grid grid-cols-3 gap-2">
+                       <div className="grid grid-cols-2 gap-2 mt-2">
                           <div 
                             className="flex items-center justify-center gap-1.5 bg-white/40 dark:bg-slate-950/40 py-2 rounded-xl text-[9px] font-black text-slate-600 dark:text-slate-400 uppercase cursor-help hover:text-[#006699] dark:hover:text-sky-300 transition-colors border border-white/40 dark:border-white/5 shadow-[inset_0_1px_1px_rgba(255,255,255,0.4)]"
                             onClick={(e) => {
@@ -380,7 +412,7 @@ export default function Beds() {
                             <AlertCircle className={cn(
                               "h-3 w-3 drop-shadow-[0_0_5px_currentColor]",
                               patient.risk === 'emergency' ? "text-red-500 animate-pulse-slow" : "text-emerald-500"
-                            )} /> Risco: {patient.risk === 'emergency' ? 'Crítico' : 'Estável'}
+                            )} /> {patient.risk === 'emergency' ? 'Crítico' : 'Estável'}
                           </div>
                           <div 
                             className="flex items-center justify-center gap-1.5 bg-white/40 dark:bg-slate-950/40 py-2 rounded-xl text-[9px] font-black text-slate-600 dark:text-slate-400 uppercase cursor-pointer hover:text-purple-600 dark:hover:text-purple-400 transition-colors border border-white/40 dark:border-white/5 shadow-[inset_0_1px_1px_rgba(255,255,255,0.4)]"
@@ -391,6 +423,16 @@ export default function Beds() {
                             }}
                           >
                             <FlaskConical className="h-3 w-3 text-purple-500 drop-shadow-[0_0_5px_rgba(168,85,247,0.5)]" /> Exames
+                          </div>
+                          <div 
+                            className="flex items-center justify-center gap-1.5 bg-white/40 dark:bg-slate-950/40 py-2 rounded-xl text-[9px] font-black text-sky-600 dark:text-sky-400 uppercase cursor-pointer hover:text-sky-700 dark:hover:text-sky-300 transition-colors border border-sky-400/30 dark:border-sky-400/20 shadow-[inset_0_1px_1px_rgba(14,165,233,0.1)]"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setPatientForPharmacy(patient);
+                              setShowPharmacyModal(true);
+                            }}
+                          >
+                            <PackagePlus className="h-3 w-3 text-sky-500 drop-shadow-[0_0_5px_rgba(14,165,233,0.5)]" /> Insumos
                           </div>
                        </div>
                     </div>
@@ -580,6 +622,12 @@ export default function Beds() {
               Censo Global ({occupiedBedsWithPatients.length})
             </div>
           </TabsTrigger>
+          <TabsTrigger value="map" className="rounded-lg h-12 px-8 font-bold text-sm data-[state=active]:bg-[#006699] dark:data-[state=active]:bg-sky-500 data-[state=active]:text-white data-[state=active]:shadow-md transition-all">
+            <div className="flex items-center gap-2">
+              <Activity className="h-4 w-4" />
+              Mapa da Unidade
+            </div>
+          </TabsTrigger>
           <TabsTrigger value="all" className="rounded-lg h-12 px-8 font-bold text-sm data-[state=active]:bg-slate-700 dark:data-[state=active]:bg-slate-800 data-[state=active]:text-white data-[state=active]:shadow-md transition-all">
             Todas as Alas ({filteredBeds.length})
           </TabsTrigger>
@@ -598,6 +646,86 @@ export default function Beds() {
             )}
           </TabsTrigger>
         </TabsList>
+        <TabsContent value="map" className="mt-0 outline-none">
+          <Card className="glass-card-premium border-none shadow-2xl overflow-hidden rounded-xl">
+            <CardHeader className="p-6 border-b border-white/20 dark:border-white/5">
+              <CardTitle className="text-sm font-black tracking-widest text-[#006699] dark:text-sky-400 uppercase">Planta Baixa</CardTitle>
+            </CardHeader>
+            <CardContent className="p-6 bg-transparent">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                {/* Emergência Zone */}
+                <div className="p-6 rounded-2xl border-2 border-red-500/20 bg-red-500/5 relative">
+                  <div className="absolute -top-3 left-6 px-2 bg-background font-black text-xs text-red-500 uppercase tracking-widest">Ala de Emergência</div>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mt-2">
+                    {emergencyBeds.map(bed => {
+                      const p = getBedPatient(bed);
+                      return (
+                        <div 
+                          key={bed.id} 
+                          className={cn("p-4 rounded-xl border flex flex-col items-center justify-center text-center gap-2 transition-all cursor-pointer hover:scale-105", bed.status === 'occupied' ? "bg-red-500/10 border-red-500/30" : bed.status === 'available' ? "bg-emerald-500/10 border-emerald-500/30" : bed.status === 'cleaning' ? "bg-orange-500/10 border-orange-500/30 animate-pulse" : "bg-yellow-500/10 border-yellow-500/30")} 
+                          onClick={() => setSelectedBedId(bed.id)}
+                          draggable={bed.status === 'occupied'}
+                          onDragStart={(e) => {
+                            e.dataTransfer.setData('sourceBedId', bed.id);
+                          }}
+                          onDragOver={(e) => {
+                            if (bed.status === 'available') e.preventDefault();
+                          }}
+                          onDrop={(e) => {
+                            e.preventDefault();
+                            const sourceBedId = e.dataTransfer.getData('sourceBedId');
+                            if (sourceBedId && sourceBedId !== bed.id) {
+                              transferPatient(sourceBedId, bed.id);
+                            }
+                          }}
+                        >
+                          <BedDouble className={cn("h-6 w-6", bed.status === 'occupied' ? "text-red-500" : bed.status === 'available' ? "text-emerald-500" : bed.status === 'cleaning' ? "text-orange-500" : "text-yellow-500")} />
+                          <span className="text-[10px] font-black uppercase tracking-widest text-foreground">{bed.room}</span>
+                          {p && <span className="text-[9px] font-bold text-muted-foreground truncate w-full pointer-events-none">{formatWords(p.name)}</span>}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Observação Zone */}
+                <div className="p-6 rounded-2xl border-2 border-amber-500/20 bg-amber-500/5 relative">
+                  <div className="absolute -top-3 left-6 px-2 bg-background font-black text-xs text-amber-500 uppercase tracking-widest">Ala de Observação</div>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-2">
+                    {observationBeds.map(bed => {
+                      const p = getBedPatient(bed);
+                      return (
+                        <div 
+                          key={bed.id} 
+                          className={cn("p-4 rounded-xl border flex flex-col items-center justify-center text-center gap-2 transition-all cursor-pointer hover:scale-105", bed.status === 'occupied' ? "bg-[#006699]/10 border-[#006699]/30" : bed.status === 'available' ? "bg-emerald-500/10 border-emerald-500/30" : bed.status === 'cleaning' ? "bg-orange-500/10 border-orange-500/30 animate-pulse" : "bg-yellow-500/10 border-yellow-500/30")} 
+                          onClick={() => setSelectedBedId(bed.id)}
+                          draggable={bed.status === 'occupied'}
+                          onDragStart={(e) => {
+                            e.dataTransfer.setData('sourceBedId', bed.id);
+                          }}
+                          onDragOver={(e) => {
+                            if (bed.status === 'available') e.preventDefault();
+                          }}
+                          onDrop={(e) => {
+                            e.preventDefault();
+                            const sourceBedId = e.dataTransfer.getData('sourceBedId');
+                            if (sourceBedId && sourceBedId !== bed.id) {
+                              transferPatient(sourceBedId, bed.id);
+                            }
+                          }}
+                        >
+                          <BedDouble className={cn("h-6 w-6", bed.status === 'occupied' ? "text-[#006699]" : bed.status === 'available' ? "text-emerald-500" : bed.status === 'cleaning' ? "text-orange-500" : "text-yellow-500")} />
+                          <span className="text-[10px] font-black uppercase tracking-widest text-foreground">{bed.room}</span>
+                          {p && <span className="text-[9px] font-bold text-muted-foreground truncate w-full pointer-events-none">{formatWords(p.name)}</span>}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
         <TabsContent value="all" className="mt-0 outline-none">
           {renderBedCards(filteredBeds)}
         </TabsContent>
@@ -709,18 +837,36 @@ export default function Beds() {
                       )}
                     </div>
                     <p className="text-xs text-muted-foreground font-medium mt-1">Todos os pacientes atualmente em leitos</p>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    {selectedRisk && (
-                      <Button 
-                        variant="ghost" 
-                        size="sm" 
-                        className="h-8 text-[9px] font-black uppercase underline decoration-dotted underline-offset-4"
-                        onClick={() => setSelectedRisk(null)}
-                      >
-                        Limpar Filtro
+                    <div className="flex gap-2 mt-3">
+                      <Button variant="outline" size="sm" className={cn("h-7 text-[10px] font-black uppercase tracking-widest", advancedFilter === 'sla' ? "bg-red-500 text-white border-red-500 hover:bg-red-600 hover:text-white" : "border-red-500/30 text-red-500")} onClick={() => setAdvancedFilter(advancedFilter === 'sla' ? null : 'sla')}>
+                        🚨 SLA Estourado ({occupiedBedsWithPatients.filter(i => getTimeInBed(i.patient.arrivalTime).hours >= 12).length})
                       </Button>
-                    )}
+                      <Button variant="outline" size="sm" className={cn("h-7 text-[10px] font-black uppercase tracking-widest", advancedFilter === 'isolation' ? "bg-orange-500 text-white border-orange-500 hover:bg-orange-600 hover:text-white" : "border-orange-500/30 text-orange-500")} onClick={() => setAdvancedFilter(advancedFilter === 'isolation' ? null : 'isolation')}>
+                        ⚠️ Isolamento ({occupiedBedsWithPatients.filter(i => i.patient.isolation && i.patient.isolation.length > 0).length})
+                      </Button>
+                      <Button variant="outline" size="sm" className={cn("h-7 text-[10px] font-black uppercase tracking-widest", advancedFilter === 'discharge' ? "bg-emerald-500 text-white border-emerald-500 hover:bg-emerald-600 hover:text-white" : "border-emerald-500/30 text-emerald-500")} onClick={() => setAdvancedFilter(advancedFilter === 'discharge' ? null : 'discharge')}>
+                        ✅ Altas Hoje ({occupiedBedsWithPatients.filter(i => {
+                          if (!i.patient.dischargePrediction) return false;
+                          return new Date(i.patient.dischargePrediction).toDateString() === new Date().toDateString();
+                        }).length})
+                      </Button>
+                      {(selectedRisk || advancedFilter) && (
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          className="h-7 px-3 text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:bg-slate-200 dark:hover:bg-slate-800"
+                          onClick={() => {
+                            setSelectedRisk(null);
+                            setAdvancedFilter(null);
+                          }}
+                        >
+                          <X className="h-3 w-3 mr-1" />
+                          Limpar Filtros
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                  <div className="flex flex-col items-end gap-3">
                     <Badge variant="outline" className="font-black border-slate-200/60 dark:border-slate-800">
                       {selectedRisk ? 'RESULTADOS' : 'TOTAL OCUPADO'}: {
                         occupiedBedsWithPatients.filter(item => !selectedRisk || item.patient.risk === selectedRisk).length
@@ -729,89 +875,182 @@ export default function Beds() {
                   </div>
                 </div>
               </CardHeader>
-              <CardContent className="p-4 sm:p-6 bg-transparent rounded-b-xl">
-                <div className="grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-4">
-                  {occupiedBedsWithPatients
-                    .filter(item => !selectedRisk || item.patient.risk === selectedRisk)
-                    .sort((a, b) => {
-                      const orderA = RISK_ORDER[a.patient.risk] ?? 99;
-                      const orderB = RISK_ORDER[b.patient.risk] ?? 99;
-                      
-                      if (orderA !== orderB) return orderA - orderB;
-                      
-                      // Secondary sort by arrival time (oldest first)
-                      return new Date(a.patient.arrivalTime).getTime() - new Date(b.patient.arrivalTime).getTime();
-                    })
-                    .map(({ bed, patient }) => (
-                      <div key={bed.id} className="glass-card-premium rounded-2xl p-5 flex flex-col gap-5 hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.1)] hover:-translate-y-1.5 transition-all duration-500 group relative overflow-hidden">
-                        <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-transparent dark:from-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
-                        
-                        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 relative z-10">
-                          <div className="flex items-center gap-4">
-                            <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-white/80 to-white/30 dark:from-slate-800/80 dark:to-slate-900/40 border border-white/60 dark:border-white/10 shadow-[inset_0_1px_1px_rgba(255,255,255,0.8),0_4px_10px_rgba(0,0,0,0.05)] flex items-center justify-center font-black text-[11px] text-slate-700 dark:text-slate-300 group-hover:scale-105 group-hover:shadow-[inset_0_1px_1px_rgba(255,255,255,0.8),0_8px_20px_rgba(14,165,233,0.15)] group-hover:text-[#006699] dark:group-hover:text-sky-400 transition-all duration-300 backdrop-blur-md">
-                              {patient.ticket}
+              <CardContent className="p-0 sm:p-0 bg-transparent rounded-b-xl overflow-x-auto">
+                <Table className="w-full">
+                  <TableHeader className="bg-white/50 dark:bg-slate-900/50 backdrop-blur-md">
+                    <TableRow className="border-b border-white/20 dark:border-white/5 hover:bg-transparent">
+                      <TableHead className="font-black text-[10px] uppercase tracking-widest text-slate-500 w-[150px]">Leito</TableHead>
+                      <TableHead className="font-black text-[10px] uppercase tracking-widest text-slate-500">Paciente</TableHead>
+                      <TableHead className="font-black text-[10px] uppercase tracking-widest text-slate-500 w-[120px]">Idade / SLA</TableHead>
+                      <TableHead className="font-black text-[10px] uppercase tracking-widest text-slate-500 w-[160px]">Risco & Alta</TableHead>
+                      <TableHead className="font-black text-[10px] uppercase tracking-widest text-slate-500 w-[200px]">Sinais Vitais</TableHead>
+                      <TableHead className="font-black text-[10px] uppercase tracking-widest text-slate-500 text-right w-[150px]">Ações</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {occupiedBedsWithPatients
+                      .filter(item => !selectedRisk || item.patient.risk === selectedRisk)
+                      .filter(item => {
+                        if (advancedFilter === 'sla') return getTimeInBed(item.patient.arrivalTime).hours >= 12;
+                        if (advancedFilter === 'isolation') return item.patient.isolation && item.patient.isolation.length > 0;
+                        if (advancedFilter === 'discharge') return item.patient.dischargePrediction && new Date(item.patient.dischargePrediction).toDateString() === new Date().toDateString();
+                        return true;
+                      })
+                      .sort((a, b) => {
+                        const orderA = RISK_ORDER[a.patient.risk] ?? 99;
+                        const orderB = RISK_ORDER[b.patient.risk] ?? 99;
+                        if (orderA !== orderB) return orderA - orderB;
+                        return new Date(a.patient.arrivalTime).getTime() - new Date(b.patient.arrivalTime).getTime();
+                      })
+                      .map(({ bed, patient }) => (
+                        <TableRow key={bed.id} className="border-b border-white/10 dark:border-slate-800/50 hover:bg-white/40 dark:hover:bg-slate-800/40 transition-colors group">
+                          <TableCell className="font-medium">
+                            <div className="flex items-center gap-2">
+                              <span className="text-[10px] font-bold text-slate-600 dark:text-slate-400 flex items-center gap-1.5 bg-white/40 dark:bg-slate-900/40 px-2.5 py-1 rounded-full border border-white/40 dark:border-slate-700/50 backdrop-blur-sm">
+                                <div className={cn("h-1.5 w-1.5 rounded-full shadow-[0_0_5px_currentColor]", patient.risk === 'emergency' ? "bg-red-500 text-red-500 animate-pulse-slow" : patient.risk === 'very-urgent' ? "bg-orange-500 text-orange-500 animate-pulse-slow" : patient.risk === 'urgent' ? "bg-[#FFDE21] text-[#FFDE21] animate-pulse-slow" : patient.risk === 'less-urgent' ? "bg-emerald-500 text-emerald-500" : "bg-blue-600 text-blue-600")} />
+                                {bed.name} ({bed.ward})
+                              </span>
                             </div>
-                            <div className="space-y-0.5">
-                              <p className="text-[15px] font-black text-foreground tracking-tight group-hover:text-[#006699] dark:group-hover:text-sky-300 transition-colors">{formatWords(patient.name)}</p>
-                              <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted-foreground opacity-80">{patient.age} Anos • CPF: {patient.cpf || '***'}</p>
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex items-center gap-3">
+                              <div className="h-8 w-8 rounded-xl bg-gradient-to-br from-white/80 to-white/30 dark:from-slate-800/80 dark:to-slate-900/40 border border-white/60 dark:border-white/10 shadow-sm flex items-center justify-center font-black text-[9px] text-slate-700 dark:text-slate-300 relative">
+                                {patient.ticket}
+                                {patient.isolation && patient.isolation.length > 0 && (
+                                  <div className="absolute -top-1 -right-1 h-3 w-3 bg-red-500 rounded-full flex items-center justify-center shadow-sm">
+                                    <Biohazard className="h-2 w-2 text-white" />
+                                  </div>
+                                )}
+                              </div>
+                              <div className="space-y-0.5">
+                                <p className="text-[13px] font-black text-foreground tracking-tight group-hover:text-[#006699] dark:group-hover:text-sky-400 transition-colors flex items-center gap-1.5">
+                                  {formatWords(patient.name)}
+                                  {patient.isolation?.includes('contact') && <ShieldAlert className="h-3 w-3 text-orange-500" title="Precaução de Contato" />}
+                                  {patient.isolation?.includes('droplet') && <Droplets className="h-3 w-3 text-blue-500" title="Gotículas" />}
+                                </p>
+                                <p className="text-[9px] font-bold uppercase tracking-[0.1em] text-muted-foreground">CPF: {patient.cpf || '***'}</p>
+                              </div>
                             </div>
-                          </div>
-                          <div className="flex flex-col items-end gap-2 shrink-0">
-                            <Badge className={cn("text-[10px] font-black px-2.5 py-0.5 shadow-md border border-white/20", patient.risk === 'emergency' ? "bg-red-500 hover:bg-red-600" : patient.risk === 'very-urgent' ? "bg-orange-500 hover:bg-orange-600" : patient.risk === 'urgent' ? "bg-[#FFDE21] text-black hover:bg-[#FFDE21]/90" : patient.risk === 'less-urgent' ? "bg-emerald-500 hover:bg-emerald-600" : "bg-blue-600 hover:bg-blue-700")}>
-                              {patient.risk === 'emergency' ? 'Emergência' : patient.risk === 'very-urgent' ? 'Muito Urgente' : patient.risk === 'urgent' ? 'Urgente' : patient.risk === 'less-urgent' ? 'Pouco Urgente' : 'Não Urgente'}
-                            </Badge>
-                            <span className="text-[10px] font-bold text-slate-600 dark:text-slate-400 flex items-center gap-1.5 bg-white/40 dark:bg-slate-900/40 px-2 py-0.5 rounded-full border border-white/40 dark:border-slate-700/50 backdrop-blur-sm">
-                              <div className={cn("h-1.5 w-1.5 rounded-full shadow-[0_0_5px_currentColor]", patient.risk === 'emergency' ? "bg-red-500 text-red-500 animate-pulse-slow" : patient.risk === 'very-urgent' ? "bg-orange-500 text-orange-500 animate-pulse-slow" : patient.risk === 'urgent' ? "bg-[#FFDE21] text-[#FFDE21] animate-pulse-slow" : patient.risk === 'less-urgent' ? "bg-emerald-500 text-emerald-500" : "bg-blue-600 text-blue-600")} />
-                              {bed.name} ({bed.ward})
-                            </span>
-                          </div>
-                        </div>
-                        
-                        <div className="grid grid-cols-3 gap-3 bg-gradient-to-r from-white/40 via-white/20 to-white/40 dark:from-slate-900/40 dark:via-slate-800/20 dark:to-slate-900/40 p-2.5 rounded-2xl border border-white/50 dark:border-white/10 shadow-[inset_0_1px_2px_rgba(255,255,255,0.4),0_2px_10px_rgba(0,0,0,0.02)] backdrop-blur-md relative z-10">
-                          <div className="flex items-center justify-center gap-2.5 bg-white/30 dark:bg-slate-900/50 py-1.5 rounded-xl border border-white/40 dark:border-white/5 shadow-sm group/vital hover:bg-white/60 dark:hover:bg-slate-800/50 transition-colors">
-                            <HeartPulse className="h-4 w-4 text-red-500 drop-shadow-[0_0_8px_rgba(239,68,68,0.5)] group-hover/vital:scale-110 transition-transform" />
-                            <div className="flex flex-col">
-                              <span className="text-[13px] font-black leading-none text-foreground">{patient.fc || "--"}</span>
-                              <span className="text-[8px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest mt-0.5">BPM</span>
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex flex-col gap-1">
+                              <span className="text-[12px] font-bold text-slate-600 dark:text-slate-400 leading-none">{patient.age} Anos</span>
+                              <div className={cn("flex items-center gap-1 text-[9px] font-black uppercase tracking-widest", getTimeInBed(patient.arrivalTime).color)}>
+                                <Clock className="h-2.5 w-2.5" />
+                                {getTimeInBed(patient.arrivalTime).text}
+                              </div>
                             </div>
-                          </div>
-                          <div className="flex items-center justify-center gap-2.5 bg-white/30 dark:bg-slate-900/50 py-1.5 rounded-xl border border-white/40 dark:border-white/5 shadow-sm group/vital hover:bg-white/60 dark:hover:bg-slate-800/50 transition-colors">
-                            <Activity className="h-4 w-4 text-sky-500 drop-shadow-[0_0_8px_rgba(14,165,233,0.5)] group-hover/vital:scale-110 transition-transform" />
-                            <div className="flex flex-col">
-                              <span className="text-[13px] font-black leading-none text-foreground">{patient.pa || "--"}</span>
-                              <span className="text-[8px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest mt-0.5">PA</span>
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex flex-col items-start gap-1">
+                              <Badge className={cn("text-[9px] font-black px-2 py-0.5 shadow-sm border border-white/20", patient.risk === 'emergency' ? "bg-red-500 hover:bg-red-600" : patient.risk === 'very-urgent' ? "bg-orange-500 hover:bg-orange-600" : patient.risk === 'urgent' ? "bg-[#FFDE21] text-black hover:bg-[#FFDE21]/90" : patient.risk === 'less-urgent' ? "bg-emerald-500 hover:bg-emerald-600" : "bg-blue-600 hover:bg-blue-700")}>
+                                {patient.risk === 'emergency' ? 'Emergência' : patient.risk === 'very-urgent' ? 'Muito Urgente' : patient.risk === 'urgent' ? 'Urgente' : patient.risk === 'less-urgent' ? 'Pouco Urgente' : 'Não Urgente'}
+                              </Badge>
+                              {patient.dischargePrediction ? (
+                                <Badge variant="outline" className="text-[8px] font-black border-blue-500 text-blue-500 bg-blue-500/10 px-1.5 py-0 flex items-center gap-1 cursor-pointer hover:bg-blue-500 hover:text-white transition-colors" onClick={(e) => { e.stopPropagation(); updatePatient(patient.id, { dischargePrediction: undefined }); }}>
+                                  <CalendarClock className="h-2 w-2" /> ALTA: {new Date(patient.dischargePrediction).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                                </Badge>
+                              ) : (
+                                <button className="text-[8px] font-black uppercase tracking-widest text-slate-400 hover:text-blue-500 transition-colors flex items-center gap-1 mt-0.5" onClick={(e) => { e.stopPropagation(); updatePatient(patient.id, { dischargePrediction: new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString() }); }}>
+                                  + Previsão de Alta
+                                </button>
+                              )}
                             </div>
-                          </div>
-                          <div className="flex items-center justify-center gap-2.5 bg-white/30 dark:bg-slate-900/50 py-1.5 rounded-xl border border-white/40 dark:border-white/5 shadow-sm group/vital hover:bg-white/60 dark:hover:bg-slate-800/50 transition-colors">
-                            <Droplets className="h-4 w-4 text-emerald-500 drop-shadow-[0_0_8px_rgba(16,185,129,0.5)] group-hover/vital:scale-110 transition-transform" />
-                            <div className="flex flex-col">
-                              <span className="text-[13px] font-black leading-none text-foreground">{patient.spo2 ? patient.spo2 + "%" : "--"}</span>
-                              <span className="text-[8px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest mt-0.5">O2</span>
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex items-center gap-2">
+                              <div className="flex items-center gap-1 bg-white/30 dark:bg-slate-900/50 px-2 py-1 rounded-lg border border-white/40 dark:border-white/5">
+                                <HeartPulse className="h-3 w-3 text-red-500" />
+                                <span className="text-[10px] font-black">{patient.fc || "--"}</span>
+                              </div>
+                              <div className="flex items-center gap-1 bg-white/30 dark:bg-slate-900/50 px-2 py-1 rounded-lg border border-white/40 dark:border-white/5">
+                                <Activity className="h-3 w-3 text-sky-500" />
+                                <span className="text-[10px] font-black">{patient.pa || "--"}</span>
+                              </div>
+                              <div className="flex items-center gap-1 bg-white/30 dark:bg-slate-900/50 px-2 py-1 rounded-lg border border-white/40 dark:border-white/5">
+                                <Droplets className="h-3 w-3 text-emerald-500" />
+                                <span className="text-[10px] font-black">{patient.spo2 ? patient.spo2 + "%" : "--"}</span>
+                              </div>
                             </div>
-                          </div>
-                        </div>
-                        
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          className="relative z-10 w-full text-[11px] font-black uppercase tracking-[0.2em] rounded-xl h-11 bg-gradient-to-b from-white/60 to-white/30 dark:from-slate-800/60 dark:to-slate-900/60 border border-white/60 dark:border-white/10 hover:from-[#006699] hover:to-[#004d73] hover:text-white dark:hover:from-sky-500 dark:hover:to-sky-600 dark:hover:text-slate-950 hover:border-transparent hover:shadow-[0_8px_20px_rgba(0,102,153,0.25)] transition-all duration-300 text-foreground group/btn overflow-hidden" 
-                          onClick={() => navigate(`/paciente/${patient.id}`, { state: { from: '/leitos', label: 'Leitos' } })}
-                        >
-                          <div className="absolute inset-0 bg-white/20 translate-y-[-100%] group-hover/btn:translate-y-[100%] transition-transform duration-700 pointer-events-none" />
-                          Visualizar Prontuário <ArrowRight className="h-4 w-4 ml-2 group-hover/btn:translate-x-1 transition-transform" />
-                        </Button>
-                      </div>
-                    ))}
-                    
-                    {occupiedBedsWithPatients.filter(item => !selectedRisk || item.patient.risk === selectedRisk).length === 0 && (
-                      <div className="col-span-full py-16 text-center flex flex-col items-center gap-3">
-                        <div className="h-16 w-16 rounded-2xl bg-muted/50 flex items-center justify-center">
-                          <BedDouble className="h-8 w-8 text-muted-foreground/30" />
-                        </div>
-                        <p className="text-[11px] font-black uppercase tracking-[0.2em] text-muted-foreground">Nenhum paciente encontrado com este filtro</p>
-                      </div>
-                    )}
-                </div>
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <div className="flex justify-end gap-1.5">
+                              <Button 
+                                variant="outline" 
+                                size="sm" 
+                                className="h-8 px-2.5 text-[9px] font-black uppercase tracking-widest rounded-lg bg-white/50 dark:bg-slate-800/50 hover:bg-[#006699] hover:text-white border-white/60 dark:border-white/10" 
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setRecordPatientId(patient.id as any);
+                                }}
+                              >
+                                <FileText className="h-3 w-3 mr-1.5" />
+                                Prontuário
+                              </Button>
+                              {!patient.transferRequest && (
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  className="h-8 px-2 text-[9px] font-black uppercase tracking-widest rounded-lg bg-white/50 dark:bg-slate-800/50 hover:bg-orange-500 hover:text-white border-orange-500/30 text-orange-600"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    requestTransfer(patient.id, 'normal', 'Solicitação via Censo Global');
+                                  }}
+                                >
+                                  <Ambulance className="h-3 w-3" />
+                                </Button>
+                              )}
+                              <Button
+                                variant="default"
+                                size="sm"
+                                className="h-8 w-8 p-0 rounded-lg bg-sky-500 hover:bg-sky-600 text-white"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setPatientForPharmacy(patient);
+                                  setShowPharmacyModal(true);
+                                }}
+                                title="Solicitar Insumos"
+                              >
+                                <PackagePlus className="h-3.5 w-3.5" />
+                              </Button>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="h-8 w-8 p-0 rounded-lg border-slate-200 dark:border-slate-800 text-slate-500 hover:text-slate-900 dark:hover:text-white"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setSelectedBedId(bed.id);
+                                }}
+                                title="Timeline / Auditoria"
+                              >
+                                <History className="h-3.5 w-3.5" />
+                              </Button>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+
+                      {occupiedBedsWithPatients
+                        .filter(item => !selectedRisk || item.patient.risk === selectedRisk)
+                        .filter(item => {
+                          if (advancedFilter === 'sla') return getTimeInBed(item.patient.arrivalTime).hours >= 12;
+                          if (advancedFilter === 'isolation') return item.patient.isolation && item.patient.isolation.length > 0;
+                          if (advancedFilter === 'discharge') return item.patient.dischargePrediction && new Date(item.patient.dischargePrediction).toDateString() === new Date().toDateString();
+                          return true;
+                        }).length === 0 && (
+                        <TableRow>
+                          <TableCell colSpan={6} className="h-32 text-center">
+                            <div className="flex flex-col items-center justify-center gap-3">
+                              <div className="h-12 w-12 rounded-2xl bg-muted/50 flex items-center justify-center">
+                                <BedDouble className="h-6 w-6 text-muted-foreground/30" />
+                              </div>
+                              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Nenhum paciente encontrado</p>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      )}
+                  </TableBody>
+                </Table>
               </CardContent>
             </Card>
           </div>
@@ -839,10 +1078,11 @@ export default function Beds() {
               
               <div className="grid gap-6 p-8 py-6">
                 <Tabs defaultValue="status" className="w-full">
-                  <TabsList className="grid w-full grid-cols-3 mb-6 bg-white/30 dark:bg-slate-900/40 p-1.5 rounded-xl h-14 border border-white/50 dark:border-white/5 shadow-[inset_0_1px_2px_rgba(0,0,0,0.05)] backdrop-blur-md">
+                  <TabsList className="grid w-full grid-cols-4 mb-6 bg-white/30 dark:bg-slate-900/40 p-1.5 rounded-xl h-14 border border-white/50 dark:border-white/5 shadow-[inset_0_1px_2px_rgba(0,0,0,0.05)] backdrop-blur-md">
                     <TabsTrigger value="status" className="rounded-lg text-[10px] font-black uppercase tracking-[0.15em] data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#006699] data-[state=active]:to-[#004d73] dark:data-[state=active]:from-sky-500 dark:data-[state=active]:to-sky-600 data-[state=active]:text-white data-[state=active]:shadow-lg transition-all">Status</TabsTrigger>
                     <TabsTrigger value="care" className="rounded-lg text-[10px] font-black uppercase tracking-[0.15em] data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#006699] data-[state=active]:to-[#004d73] dark:data-[state=active]:from-sky-500 dark:data-[state=active]:to-sky-600 data-[state=active]:text-white data-[state=active]:shadow-lg transition-all">Cuidados</TabsTrigger>
                     <TabsTrigger value="meds" className="rounded-lg text-[10px] font-black uppercase tracking-[0.15em] data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#006699] data-[state=active]:to-[#004d73] dark:data-[state=active]:from-sky-500 dark:data-[state=active]:to-sky-600 data-[state=active]:text-white data-[state=active]:shadow-lg transition-all">Prescrição</TabsTrigger>
+                    <TabsTrigger value="audit" className="rounded-lg text-[10px] font-black uppercase tracking-[0.15em] data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#006699] data-[state=active]:to-[#004d73] dark:data-[state=active]:from-sky-500 dark:data-[state=active]:to-sky-600 data-[state=active]:text-white data-[state=active]:shadow-lg transition-all">Auditoria</TabsTrigger>
                   </TabsList>
 
                 <TabsContent value="status" className="space-y-4 outline-none">
@@ -912,6 +1152,38 @@ export default function Beds() {
                     <Button variant="outline" className="w-full h-10 rounded-xl border-dashed border-2 border-slate-200 dark:border-slate-800 text-[10px] font-black uppercase tracking-widest hover:border-[#006699] dark:hover:border-sky-400 hover:text-[#006699] dark:hover:text-sky-400 transition-all text-muted-foreground bg-transparent">
                       + Adicionar Medicação
                     </Button>
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="audit" className="space-y-4 outline-none overflow-y-auto max-h-[300px] pr-2">
+                  <div className="space-y-3 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-slate-200 dark:before:via-slate-800 before:to-transparent">
+                    {(!selectedBed.bedHistory || selectedBed.bedHistory.length === 0) ? (
+                      <div className="text-center py-6 text-sm font-bold text-muted-foreground uppercase tracking-widest">Nenhum histórico disponível</div>
+                    ) : (
+                      selectedBed.bedHistory.map((record, i) => {
+                        const patient = patients.find(p => p.id === record.patientId);
+                        return (
+                          <div key={i} className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
+                            <div className="flex items-center justify-center w-10 h-10 rounded-full border-4 border-white dark:border-slate-900 bg-sky-500 dark:bg-sky-400 text-white shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10">
+                              <History className="h-4 w-4" />
+                            </div>
+                            <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] p-4 rounded-xl border border-slate-200/50 dark:border-slate-800/50 bg-white/50 dark:bg-slate-900/50 backdrop-blur-md shadow-sm hover:scale-[1.02] transition-transform">
+                              <div className="flex items-center justify-between mb-1">
+                                <span className="text-[10px] font-black uppercase tracking-widest text-sky-500">{new Date(record.admittedAt).toLocaleDateString()}</span>
+                                <span className="text-[9px] font-bold text-slate-500 bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded">{new Date(record.admittedAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+                              </div>
+                              <p className="text-xs font-black text-slate-700 dark:text-slate-300 uppercase">{patient ? patient.name : 'Paciente Desconhecido'}</p>
+                              {record.dischargedAt && (
+                                <div className="mt-2 flex items-center justify-between border-t border-slate-200 dark:border-slate-800 pt-2">
+                                  <span className="text-[9px] font-black uppercase tracking-widest text-slate-400">Saída/Alta</span>
+                                  <span className="text-[10px] font-bold text-emerald-500">{new Date(record.dischargedAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        );
+                      })
+                    )}
                   </div>
                 </TabsContent>
               </Tabs>
@@ -1450,6 +1722,116 @@ export default function Beds() {
           {patientForExams && (
             <ExamsModal patient={patientForExams} onClose={() => setIsExamsModalOpen(false)} />
           )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Pharmacy Satellite Modal */}
+      {showPharmacyModal && patientForPharmacy && (
+        <Dialog open={showPharmacyModal} onOpenChange={setShowPharmacyModal}>
+          <DialogContent className="max-w-lg glass-card-premium border-border/50 rounded-[2rem] shadow-2xl p-0 overflow-hidden">
+            <div className="p-6 border-b border-border/50 flex items-center justify-between bg-sky-500/10">
+              <div className="flex items-center gap-3">
+                <div className="h-10 w-10 rounded-xl bg-sky-500/20 flex items-center justify-center border border-sky-500/30">
+                  <PackagePlus className="h-5 w-5 text-sky-500" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-black tracking-wide text-foreground">Farmácia Satélite</h3>
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Solicitação Expressa • {patientForPharmacy.sector || 'Leito'}</p>
+                </div>
+              </div>
+            </div>
+            
+            <div className="p-6 space-y-5">
+              <div className="p-4 rounded-xl bg-muted/30 border border-border/50 flex items-center gap-3">
+                <div className="h-10 w-10 rounded-xl bg-white/50 dark:bg-slate-900/50 flex items-center justify-center text-sky-500 border border-sky-500/20 shrink-0">
+                  <UserRound className="h-6 w-6" />
+                </div>
+                <div>
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Para o Leito de</p>
+                  <p className="text-sm font-black text-foreground uppercase">{patientForPharmacy.name}</p>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <div>
+                  <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-1.5 block">Item Necessário</label>
+                  <input 
+                    type="text" 
+                    value={pharmacyRequest.item}
+                    onChange={(e) => setPharmacyRequest({...pharmacyRequest, item: e.target.value})}
+                    placeholder="Ex: Soro Fisiológico, Seringa 10ml..." 
+                    className="w-full h-12 bg-background/50 border border-border/50 rounded-xl px-4 text-sm focus:outline-none focus:border-sky-500/50 text-foreground" 
+                  />
+                </div>
+                
+                <div className="flex gap-4">
+                  <div className="w-1/3">
+                    <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-1.5 block">Qtd</label>
+                    <input 
+                      type="number" 
+                      value={pharmacyRequest.amount}
+                      onChange={(e) => setPharmacyRequest({...pharmacyRequest, amount: e.target.value})}
+                      className="w-full h-12 bg-background/50 border border-border/50 rounded-xl px-4 text-sm focus:outline-none focus:border-sky-500/50 text-foreground text-center" 
+                    />
+                  </div>
+                  <div className="flex-1">
+                    <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-1.5 block">Prioridade</label>
+                    <div className="flex bg-background/50 border border-border/50 rounded-xl p-1 h-12">
+                       <button 
+                         onClick={() => setPharmacyRequest({...pharmacyRequest, priority: 'normal'})}
+                         className={cn("flex-1 text-[11px] font-black uppercase tracking-wider rounded-lg transition-all", pharmacyRequest.priority === 'normal' ? "bg-muted text-foreground shadow" : "text-muted-foreground hover:text-foreground")}
+                       >
+                         Normal
+                       </button>
+                       <button 
+                         onClick={() => setPharmacyRequest({...pharmacyRequest, priority: 'urgency'})}
+                         className={cn("flex-1 text-[11px] font-black uppercase tracking-wider rounded-lg transition-all", pharmacyRequest.priority === 'urgency' ? "bg-rose-500 text-white shadow-lg shadow-rose-500/20" : "text-rose-500/50 hover:text-rose-500")}
+                       >
+                         Urgência
+                       </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="p-6 border-t border-border/50 bg-muted/10 flex justify-end gap-3">
+              <Button variant="ghost" onClick={() => setShowPharmacyModal(false)} className="px-5 h-12 rounded-xl font-bold text-sm">Cancelar</Button>
+              <Button 
+                onClick={() => {
+                  if (!pharmacyRequest.item) {
+                    toast.error("Por favor, informe o item necessário.");
+                    return;
+                  }
+                  setShowPharmacyModal(false);
+                  toast.success("Solicitação enviada para a Farmácia Satélite!");
+                  setPharmacyRequest({ item: "", amount: "1", priority: "normal" });
+                }} 
+                className="px-6 h-12 rounded-xl font-black text-[11px] uppercase tracking-wider bg-sky-500 text-white hover:bg-sky-600 transition-colors shadow-lg shadow-sky-500/25 flex items-center gap-2"
+              >
+                Enviar Pedido <ArrowRight className="h-4 w-4" />
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
+
+      {/* Patient Record Modal (Quick View) */}
+      <Dialog open={!!recordPatientId} onOpenChange={(open) => !open && setRecordPatientId(null)}>
+        <DialogContent className="max-w-5xl w-[95vw] h-[85vh] p-0 overflow-y-auto glass-card-premium border-white/40 dark:border-white/10 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.3)] rounded-[2rem] flex flex-col">
+          <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-white/10 dark:from-slate-900/80 dark:to-slate-950/90 pointer-events-none -z-10" />
+          <div className="p-4 sm:p-6 sticky top-0 z-50 bg-white/40 dark:bg-slate-900/60 backdrop-blur-xl border-b border-white/20 dark:border-white/10 flex justify-between items-center shrink-0 shadow-sm rounded-t-[2rem]">
+            <h2 className="text-xl font-black uppercase tracking-widest text-foreground flex items-center gap-3 drop-shadow-sm">
+              <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-[#006699]/20 to-[#006699]/5 dark:from-sky-400/20 dark:to-sky-400/5 flex items-center justify-center border border-[#006699]/20 dark:border-sky-400/20 shadow-[inset_0_1px_1px_rgba(255,255,255,0.4)]">
+                <FileText className="h-5 w-5 text-[#006699] dark:text-sky-400 drop-shadow-[0_0_8px_rgba(0,102,153,0.5)] dark:drop-shadow-[0_0_8px_rgba(56,189,248,0.5)]" />
+              </div>
+              Prontuário Rápido
+            </h2>
+            {/* Ocultamos o botão X manual pois o DialogContent já traz o dele por padrão */}
+          </div>
+          <div className="flex-1 overflow-y-auto p-4 sm:p-8 relative z-10">
+            {recordPatientId && <PatientRecord patientId={String(recordPatientId)} />}
+          </div>
         </DialogContent>
       </Dialog>
     </motion.div>

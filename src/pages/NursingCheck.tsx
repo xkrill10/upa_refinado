@@ -22,7 +22,9 @@ import {
   QrCode,
   UserCheck,
   PenTool,
-  Droplet
+  Droplet,
+  PackagePlus,
+  ArrowRight
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -212,6 +214,10 @@ export default function NursingCheck() {
   const [scannedPatient, setScannedPatient] = useState(false);
   const [scannedMed, setScannedMed] = useState(false);
   const [scanTarget, setScanTarget] = useState<{ medName: string; patientName: string } | null>(null);
+
+  /* ─── Satellite Pharmacy Flow State ─── */
+  const [showPharmacyModal, setShowPharmacyModal] = useState(false);
+  const [pharmacyRequest, setPharmacyRequest] = useState({ item: "", amount: "1", priority: "normal" });
 
   const playBeep = () => {
     try {
@@ -786,12 +792,20 @@ export default function NursingCheck() {
                     </div>
                   )}
 
-                  {/* Occurrence button */}
+                  {/* Occurrence & Pharmacy buttons */}
                   <div className="flex flex-col gap-2 shrink-0 relative z-20">
                     <Button
                       type="button"
+                      onClick={() => setShowPharmacyModal(true)}
+                      className="bg-sky-500/20 hover:bg-sky-500/30 text-sky-100 rounded-2xl h-10 px-4 font-black uppercase tracking-wider text-[10px] border border-sky-400/30 backdrop-blur-sm transition-all flex items-center gap-1.5 shadow-[0_0_15px_rgba(14,165,233,0.3)] hover:shadow-[0_0_25px_rgba(14,165,233,0.5)]"
+                    >
+                      <PackagePlus className="h-4 w-4" />
+                      Solicitar Insumo (Farm. Satélite)
+                    </Button>
+                    <Button
+                      type="button"
                       onClick={() => setShowOccurrenceLogger(true)}
-                      className="bg-white/10 hover:bg-white/20 text-white rounded-2xl h-11 px-4 font-black uppercase tracking-wider text-[10px] border border-white/20 backdrop-blur-sm transition-all flex items-center gap-1.5"
+                      className="bg-white/10 hover:bg-white/20 text-white rounded-2xl h-10 px-4 font-black uppercase tracking-wider text-[10px] border border-white/20 backdrop-blur-sm transition-all flex items-center gap-1.5"
                     >
                       <AlertOctagon className="h-4 w-4" />
                       Reportar Ocorrência

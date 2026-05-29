@@ -7,6 +7,7 @@ import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 const Dashboard = React.lazy(() => import("./pages/Dashboard"));
 const Pharmacy = React.lazy(() => import("./pages/Pharmacy"));
+const SatellitePharmacy = React.lazy(() => import("./pages/SatellitePharmacy"));
 const Sectors = React.lazy(() => import("./pages/Sectors"));
 const Queue = React.lazy(() => import("./pages/Queue"));
 const NewPatient = React.lazy(() => import("./pages/NewPatient"));
@@ -33,8 +34,9 @@ const Inventory = React.lazy(() => import("./pages/Inventory"));
 const NursingCheck = React.lazy(() => import("./pages/NursingCheck"));
 const Billing = React.lazy(() => import("./pages/Billing"));
 const Governance = React.lazy(() => import("./pages/Governance"));
-const CommunicationsCenter = React.lazy(() => import("./pages/CommunicationsCenter"));
 const Login = React.lazy(() => import("./pages/Login"));
+const NirDashboard = React.lazy(() => import("./pages/NirDashboard"));
+const CleaningDashboard = React.lazy(() => import("./pages/CleaningDashboard"));
 
 import { ThemeProvider } from "./components/ThemeProvider";
 import { ThemeToggle } from "./components/ThemeToggle";
@@ -52,6 +54,7 @@ const AppContent = () => {
   const location = useLocation();
   const [isFullscreen, setIsFullscreen] = React.useState(false);
   const isCallPanel = location.pathname === "/painel-chamadas";
+  const isCleaning = location.pathname === "/higiene";
   const isLogin = location.pathname === "/login";
 
   React.useEffect(() => {
@@ -62,15 +65,15 @@ const AppContent = () => {
     return () => document.removeEventListener("fullscreenchange", handleFullscreenChange);
   }, []);
 
-  const showSidebar = !isFullscreen && !isCallPanel && !isLogin;
+  const showSidebar = !isFullscreen && !isCallPanel && !isLogin && !isCleaning;
 
   return (
     <SidebarProvider defaultOpen={true}>
       <CallAnnouncer />
       <div className="min-h-screen flex w-full">
         {showSidebar && <AppSidebar />}
-        <div className={cn("flex-1 flex flex-col", !isLogin && "main-content-bg")}>
-          {!isCallPanel && !isLogin && (
+        <div className={cn("flex-1 flex flex-col", !isLogin && !isCleaning && "main-content-bg")}>
+          {!isCallPanel && !isLogin && !isCleaning && (
             <header className="h-24 flex items-center justify-between px-8 sticky top-0 z-20 header-premium-glass">
               <div className="flex items-center gap-6">
                 <SidebarTrigger className="h-12 w-12 hover:bg-primary/10 hover:text-primary transition-all duration-300 rounded-xl" />
@@ -91,7 +94,7 @@ const AppContent = () => {
               </div>
             </header>
           )}
-          <main className={cn("flex-1", (!isCallPanel && !isLogin) && "p-6")}>
+          <main className={cn("flex-1", (!isCallPanel && !isLogin && !isCleaning) && "p-6")}>
             <Suspense fallback={<div className="flex items-center justify-center min-h-[50vh]"><div className="animate-pulse text-muted-foreground font-bold tracking-widest uppercase text-xs">Carregando...</div></div>}>
               <Routes>
                 <Route path="/login" element={<Login />} />
@@ -107,6 +110,7 @@ const AppContent = () => {
                 <Route path="/leitos" element={<Beds />} />
                 <Route path="/setores" element={<Sectors />} />
                 <Route path="/farmacia" element={<Pharmacy />} />
+                <Route path="/farmacia-satelite" element={<SatellitePharmacy />} />
                 <Route path="/rh" element={<HR />} />
                 <Route path="/meu-rh" element={<MyHR />} />
                 <Route path="/sus" element={<SUSIntegration />} />
@@ -123,8 +127,10 @@ const AppContent = () => {
                 <Route path="/checagem-enfermagem" element={<NursingCheck />} />
                 <Route path="/faturamento" element={<Billing />} />
                 <Route path="/governanca" element={<Governance />} />
-                <Route path="/central-comunicacoes" element={<CommunicationsCenter />} />
                 
+                <Route path="/nir" element={<NirDashboard />} />
+                <Route path="/higiene" element={<CleaningDashboard />} />
+
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </Suspense>

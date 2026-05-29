@@ -1,4 +1,4 @@
-import { LayoutDashboard, Users, UserPlus, Activity, ClipboardList, Building2, BedDouble, Stethoscope, HeartPulse, FileText, Pill, UserCog, Globe, Megaphone, LogIn, Archive, Baby, FlaskConical, PackageOpen, Syringe, DollarSign, Sparkles, UserSquare2, MessageSquare } from "lucide-react";
+import { LayoutDashboard, Users, UserPlus, Activity, ClipboardList, Building2, BedDouble, Stethoscope, HeartPulse, FileText, Pill, UserCog, Globe, Megaphone, LogIn, Archive, Baby, FlaskConical, PackageOpen, Syringe, DollarSign, Sparkles, UserSquare2, MessageSquare, ArchiveRestore, Ambulance, Droplets } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -37,6 +37,7 @@ const menuGroups = [
       { title: "Laboratório", url: "/laboratorio", icon: FlaskConical },
       { title: "Leitos", url: "/leitos", icon: BedDouble },
       { title: "Checagem Leito", url: "/checagem-enfermagem", icon: Syringe },
+      { title: "Regulação (NIR)", url: "/nir", icon: Ambulance },
     ]
   },
   {
@@ -55,10 +56,11 @@ const menuGroups = [
     label: "Serviços e Apoio",
     items: [
       { title: "Painel de Chamadas", url: "/painel-chamadas", icon: Megaphone },
-      { title: "Central de Comunicações", url: "/central-comunicacoes", icon: MessageSquare },
-      { title: "Farmácia", url: "/farmacia", icon: Pill },
+      { title: "Farmácia Central", url: "/farmacia", icon: Pill },
+      { title: "Farm. Satélite", url: "/farmacia-satelite", icon: ArchiveRestore },
       { title: "Almoxarifado", url: "/almoxarifado", icon: PackageOpen },
       { title: "Governança", url: "/governanca", icon: Sparkles },
+      { title: "Higienização", url: "/higiene", icon: Droplets },
       { title: "SUS Cross Vagas", url: "/sus", icon: Globe },
     ]
   }

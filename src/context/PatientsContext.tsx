@@ -59,6 +59,15 @@ export interface Patient {
     doctor: string;
   };
   exams?: ExamRequest[];
+  dischargePrediction?: string;
+  isolation?: ('contact' | 'droplet' | 'airborne')[];
+  transferRequest?: {
+    status: 'requested' | 'accepted' | 'denied';
+    hospitalName?: string;
+    requestedAt: string;
+    reason: string;
+    priority: 'normal' | 'urgent' | 'emergency';
+  };
 }
 
 export type ExamStatus = 'pending_collection' | 'in_analysis' | 'completed';
@@ -198,6 +207,8 @@ interface PatientsContextType {
   updateExamStatus: (patientId: string, examId: string, status: ExamStatus, result?: string, isCritical?: boolean, attachmentUrl?: string) => void;
   cancelExam: (patientId: string, examId: string) => void;
   recollectExam: (patientId: string, examId: string, reason: string) => void;
+  requestTransfer: (patientId: string, priority: 'normal' | 'urgent' | 'emergency', reason: string) => void;
+  updateTransferStatus: (patientId: string, status: 'accepted' | 'denied', hospitalName?: string) => void;
 }
 
 const PatientsContext = createContext<PatientsContextType | undefined>(undefined);
@@ -689,6 +700,38 @@ export function PatientsProvider({ children }: { children: ReactNode }) {
     new BroadcastChannel('upa_sync_channel').postMessage('sync_all');
   };
 
+  const requestTransfer = (patientId: string, priority: 'normal' | 'urgent' | 'emergency', reason: string) => {
+    updatePatient(patientId, {
+      transferRequest: {
+        status: 'requested',
+        requestedAt: new Date().toISOString(),
+        priority,
+        reason
+      }
+    });
+    toast.success("Solicitação enviada ao NIR/CROSS.");
+    new BroadcastChannel('upa_sync_channel').postMessage('sync_all');
+  };
+
+  const updateTransferStatus = (patientId: string, status: 'accepted' | 'denied', hospitalName?: string) => {
+    setPatients(prev => prev.map(p => {
+      if (p.id === patientId && p.transferRequest) {
+        return {
+          ...p,
+          transferRequest: {
+            ...p.transferRequest,
+            status,
+            hospitalName: hospitalName || p.transferRequest.hospitalName
+          }
+        };
+      }
+      return p;
+    }));
+    if (status === 'accepted') toast.success(`Transferência aceita para: ${hospitalName}`);
+    else toast.error("Transferência negada pela regulação.");
+    new BroadcastChannel('upa_sync_channel').postMessage('sync_all');
+  };
+
   return (
     <PatientsContext.Provider value={{ 
       patients, 
@@ -711,6 +754,8 @@ export function PatientsProvider({ children }: { children: ReactNode }) {
       updateExamStatus,
       cancelExam,
       recollectExam,
+      requestTransfer,
+      updateTransferStatus,
     }}>
       {children}
     </PatientsContext.Provider>

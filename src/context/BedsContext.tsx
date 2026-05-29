@@ -11,6 +11,12 @@ export interface Cleaner {
   color: string; 
 }
 
+export interface BedHistoryRecord {
+  patientId: string;
+  admittedAt: string;
+  dischargedAt?: string;
+}
+
 export interface Bed {
   id: string;
   name: string;
@@ -28,6 +34,7 @@ export interface Bed {
   priority?: PriorityLevel;
   isIsolation?: boolean;
   maintenanceReason?: string;
+  bedHistory?: BedHistoryRecord[];
 }
 
 export interface CleaningLog {
@@ -167,24 +174,40 @@ export function BedsProvider({ children }: { children: ReactNode }) {
   };
 
   const assignPatient = (bedId: string, patientId: string) => {
-    setBeds(prev => prev.map(bed => 
-      bed.id === bedId ? { ...bed, status: 'occupied', patientId, lastUpdated: 'Agora' } : bed
-    ));
+    setBeds(prev => prev.map(bed => {
+      if (bed.id === bedId) {
+        const newHistoryRecord: BedHistoryRecord = {
+          patientId,
+          admittedAt: new Date().toISOString(),
+        };
+        const updatedHistory = [newHistoryRecord, ...(bed.bedHistory || [])];
+        return { ...bed, status: 'occupied', patientId, lastUpdated: 'Agora', bedHistory: updatedHistory };
+      }
+      return bed;
+    }));
   };
 
   const releaseBed = (bedId: string, priority: PriorityLevel = 'normal', isIsolation = false) => {
-    setBeds(prev => prev.map(bed => 
-      bed.id === bedId ? { 
-        ...bed, 
-        status: 'cleaning', 
-        patientId: undefined, 
-        lastUpdated: 'Agora',
-        cleaningStatus: 'waiting',
-        requestedAt: new Date(),
-        priority,
-        isIsolation
-      } : bed
-    ));
+    setBeds(prev => prev.map(bed => {
+      if (bed.id === bedId) {
+        let updatedHistory = bed.bedHistory || [];
+        if (updatedHistory.length > 0 && !updatedHistory[0].dischargedAt) {
+          updatedHistory = [{ ...updatedHistory[0], dischargedAt: new Date().toISOString() }, ...updatedHistory.slice(1)];
+        }
+        return { 
+          ...bed, 
+          status: 'cleaning', 
+          patientId: undefined, 
+          lastUpdated: 'Agora',
+          cleaningStatus: 'waiting',
+          requestedAt: new Date(),
+          priority,
+          isIsolation,
+          bedHistory: updatedHistory
+        };
+      }
+      return bed;
+    }));
   };
   
   const transferPatient = (sourceBedId: string, targetBedId: string) => {
@@ -196,6 +219,10 @@ export function BedsProvider({ children }: { children: ReactNode }) {
       
       return prev.map(bed => {
         if (bed.id === sourceBedId) {
+          let updatedHistory = bed.bedHistory || [];
+          if (updatedHistory.length > 0 && !updatedHistory[0].dischargedAt) {
+            updatedHistory = [{ ...updatedHistory[0], dischargedAt: new Date().toISOString() }, ...updatedHistory.slice(1)];
+          }
           return { 
             ...bed, 
             status: 'cleaning', 
@@ -204,11 +231,17 @@ export function BedsProvider({ children }: { children: ReactNode }) {
             cleaningStatus: 'waiting',
             requestedAt: new Date(),
             priority: 'normal',
-            isIsolation: false 
+            isIsolation: false,
+            bedHistory: updatedHistory
           };
         }
         if (bed.id === targetBedId) {
-          return { ...bed, status: 'occupied', patientId, lastUpdated: 'Agora' };
+          const newHistoryRecord: BedHistoryRecord = {
+            patientId,
+            admittedAt: new Date().toISOString(),
+          };
+          const updatedHistory = [newHistoryRecord, ...(bed.bedHistory || [])];
+          return { ...bed, status: 'occupied', patientId, lastUpdated: 'Agora', bedHistory: updatedHistory };
         }
         return bed;
       });

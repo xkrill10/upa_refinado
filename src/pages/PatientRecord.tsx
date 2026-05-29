@@ -10,8 +10,9 @@ import { Link } from "react-router-dom";
 import { useState } from "react";
 import { PatientTimelineModal } from "@/components/PatientEvolution/Modals/PatientTimelineModal";
 
-export default function PatientRecord() {
-  const { id } = useParams();
+export default function PatientRecord({ patientId }: { patientId?: string }) {
+  const { id: paramId } = useParams();
+  const id = patientId || paramId;
   const location = useLocation();
   const { patients } = usePatients();
   const patient = patients.find(p => String(p.id) === String(id));
@@ -26,12 +27,14 @@ export default function PatientRecord() {
       <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-4">
         <h2 className="text-2xl font-bold">Paciente não encontrado</h2>
         <p className="text-muted-foreground text-center">O prontuário que você está tentando acessar não existe ou foi removido.</p>
-        <Button asChild variant="outline">
-          <Link to={fromPath} className="flex items-center gap-2">
-            <ChevronLeft className="h-4 w-4" />
-            Voltar
-          </Link>
-        </Button>
+        {!patientId && (
+          <Button asChild variant="outline">
+            <Link to={fromPath} className="flex items-center gap-2">
+              <ChevronLeft className="h-4 w-4" />
+              Voltar
+            </Link>
+          </Button>
+        )}
       </div>
     );
   }
@@ -106,16 +109,18 @@ export default function PatientRecord() {
           </div>
         </div>
         <div className="flex items-center gap-2 print:hidden">
-          <Button 
-            asChild 
-            variant="ghost" 
-            className="rounded-xl gap-2 font-bold text-muted-foreground hover:text-foreground"
-          >
-            <Link to={fromPath}>
-              <ChevronLeft className="h-4 w-4" />
-              Voltar
-            </Link>
-          </Button>
+          {!patientId && (
+            <Button 
+              asChild 
+              variant="ghost" 
+              className="rounded-xl gap-2 font-bold text-muted-foreground hover:text-foreground"
+            >
+              <Link to={fromPath}>
+                <ChevronLeft className="h-4 w-4" />
+                Voltar
+              </Link>
+            </Button>
+          )}
           <Button 
             variant="outline" 
             onClick={() => window.print()}
