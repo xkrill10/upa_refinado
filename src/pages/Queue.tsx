@@ -11,9 +11,26 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import { cn, formatWords } from "@/lib/utils";
+import { cn, formatWords, formatPatientAge } from "@/lib/utils";
 
 import { PatientDetailsModal } from "@/components/PatientDetailsModal";
+
+const formatArrivalDate = (dateString: string) => {
+  const date = new Date(dateString);
+  const now = new Date();
+  
+  const isToday = date.getDate() === now.getDate() && date.getMonth() === now.getMonth() && date.getFullYear() === now.getFullYear();
+  
+  const yesterday = new Date(now);
+  yesterday.setDate(yesterday.getDate() - 1);
+  const isYesterday = date.getDate() === yesterday.getDate() && date.getMonth() === yesterday.getMonth() && date.getFullYear() === yesterday.getFullYear();
+
+  const timeString = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+  if (isToday) return `Hoje, ${timeString}`;
+  if (isYesterday) return `Ontem, ${timeString}`;
+  return `${date.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' })} às ${timeString}`;
+};
 
 export default function Queue() {
   const { patients, callPatient, updatePatient, callTicket, isAudioEnabled, setIsAudioEnabled } = usePatients();
@@ -388,7 +405,7 @@ export default function Queue() {
                         )}
                       </TableCell>
                       <TableCell className="text-center text-xs font-bold text-slate-600 dark:text-slate-400">
-                        {patient.age} anos
+                        {formatPatientAge(patient.age, patient.birthDate)}
                       </TableCell>
                       <TableCell>
                         <div className="flex justify-center">
@@ -408,7 +425,9 @@ export default function Queue() {
                       </TableCell>
                       <TableCell>
                         <div className="flex flex-col">
-                          <span className="text-foreground dark:text-slate-200 font-bold text-sm">{new Date(patient.arrivalTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                          <span className="text-foreground dark:text-slate-200 font-bold text-sm">
+                            {formatArrivalDate(patient.arrivalTime)}
+                          </span>
                           <div className="flex items-center gap-1">
                             <span className={cn(
                               "text-[10px] font-bold uppercase tracking-wider",
@@ -595,7 +614,7 @@ export default function Queue() {
                  callingTicket?.priority === 'pediatric' ? 'text-orange-600 dark:text-orange-400' : 'text-[#006699] dark:text-sky-400')
               )}>{callingTicket?.ticket}</h2>
               <p className="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase">{formatWords(callingTicket?.patientName || "")}</p>
-              <p className="text-[10px] text-muted-foreground font-medium uppercase">{callingTicket?.age} ANOS • CPF: {callingTicket?.cpf}</p>
+              <p className="text-[10px] text-muted-foreground font-medium uppercase">{formatPatientAge(callingTicket?.age)} • CPF: {callingTicket?.cpf}</p>
             </div>
 
             <div className="grid grid-cols-1 gap-4">

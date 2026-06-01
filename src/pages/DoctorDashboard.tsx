@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Stethoscope, Baby, DoorOpen, User } from "lucide-react";
+import { Stethoscope, Baby, DoorOpen, User, AlertTriangle } from "lucide-react";
 import { motion } from "motion/react";
 import { cn, formatWords } from "@/lib/utils";
 import {
@@ -28,6 +28,8 @@ const ROOMS = [
   { id: "CONSULTÓRIO PEDIÁTRICO 1", name: "Consultório Pediátrico 1", type: "pediatric", icon: Baby, color: "orange" },
   { id: "CONSULTÓRIO PEDIÁTRICO 2", name: "Consultório Pediátrico 2", type: "pediatric", icon: Baby, color: "orange" },
   { id: "CONSULTÓRIO PEDIÁTRICO 3", name: "Consultório Pediátrico 3", type: "pediatric", icon: Baby, color: "orange" },
+  { id: "SALA VERMELHA", name: "Sala Vermelha", type: "emergency", icon: AlertTriangle, color: "red" },
+  { id: "SALA DE EMERGÊNCIA 1", name: "Sala de Emergência 1", type: "emergency", icon: AlertTriangle, color: "red" },
 ];
 
 export default function DoctorDashboard() {
@@ -83,20 +85,27 @@ export default function DoctorDashboard() {
 
         <Tabs defaultValue="adult" className="w-full max-w-4xl mx-auto">
           <div className="flex justify-center mb-8">
-            <TabsList className="grid w-full max-w-md grid-cols-2 p-1.5 bg-white/40 dark:bg-slate-900/40 backdrop-blur-2xl border border-white/50 dark:border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.1)] rounded-2xl h-14">
+            <TabsList className="grid w-full max-w-2xl grid-cols-3 p-1.5 bg-white/40 dark:bg-slate-900/40 backdrop-blur-2xl border border-white/50 dark:border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.1)] rounded-2xl h-14">
               <TabsTrigger 
                 value="adult" 
-                className="rounded-xl text-xs font-black uppercase tracking-widest data-[state=active]:bg-[#006699] data-[state=active]:text-white data-[state=active]:shadow-md transition-all duration-300"
+                className="rounded-xl text-[10px] sm:text-xs font-black uppercase tracking-widest data-[state=active]:bg-[#006699] data-[state=active]:text-white data-[state=active]:shadow-md transition-all duration-300"
               >
-                <Stethoscope className="h-4 w-4 mr-2" />
-                Atendimento Adulto
+                <Stethoscope className="h-4 w-4 mr-1 sm:mr-2" />
+                Adulto
               </TabsTrigger>
               <TabsTrigger 
                 value="pediatric" 
-                className="rounded-xl text-xs font-black uppercase tracking-widest data-[state=active]:bg-orange-500 data-[state=active]:text-white data-[state=active]:shadow-md transition-all duration-300"
+                className="rounded-xl text-[10px] sm:text-xs font-black uppercase tracking-widest data-[state=active]:bg-orange-500 data-[state=active]:text-white data-[state=active]:shadow-md transition-all duration-300"
               >
-                <Baby className="h-4 w-4 mr-2" />
+                <Baby className="h-4 w-4 mr-1 sm:mr-2" />
                 Pediatria
+              </TabsTrigger>
+              <TabsTrigger 
+                value="emergency" 
+                className="rounded-xl text-[10px] sm:text-xs font-black uppercase tracking-widest data-[state=active]:bg-red-600 data-[state=active]:text-white data-[state=active]:shadow-md transition-all duration-300"
+              >
+                <AlertTriangle className="h-4 w-4 mr-1 sm:mr-2" />
+                Emergência
               </TabsTrigger>
             </TabsList>
           </div>
@@ -214,6 +223,69 @@ export default function DoctorDashboard() {
                             ) : (
                               <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[9px] sm:text-[10px] font-bold uppercase tracking-widest bg-orange-500/15 text-orange-600 dark:bg-orange-400/20 dark:text-orange-400">
                                 <span className="w-1.5 h-1.5 rounded-full bg-orange-500 dark:bg-orange-400 animate-pulse" />
+                                Livre para Entrada
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </motion.div>
+                );
+              })}
+            </div>
+          </TabsContent>
+
+          <TabsContent value="emergency" className="mt-0 focus-visible:outline-none focus-visible:ring-0">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {ROOMS.filter(r => r.type === 'emergency').map((room) => {
+                const isOccupied = !!occupiedRooms[room.id];
+                const occupant = occupiedRooms[room.id];
+                const Icon = room.icon;
+
+                return (
+                  <motion.div
+                    key={room.id}
+                    whileHover={!isOccupied ? { scale: 1.02, y: -2 } : {}}
+                    whileTap={!isOccupied ? { scale: 0.98 } : {}}
+                  >
+                    <Card 
+                      className={cn(
+                        "relative overflow-hidden cursor-pointer transition-all duration-300 h-full border-2",
+                        isOccupied 
+                          ? "opacity-60 cursor-not-allowed border-slate-200/50 dark:border-slate-800/50 grayscale-[0.5] bg-white/40 dark:bg-slate-900/20 backdrop-blur-md" 
+                          : "border-red-600/20 dark:border-red-500/20 hover:border-red-600/40 dark:hover:border-red-500/40 hover:shadow-[0_8px_32px_0_rgba(220,38,38,0.15)] dark:hover:shadow-[0_8px_32px_0_rgba(239,68,68,0.15)] bg-gradient-to-br from-red-600/10 to-red-600/5 dark:from-red-500/20 dark:to-red-500/10 backdrop-blur-xl shadow-[0_4px_16px_0_rgba(0,0,0,0.05)]"
+                      )}
+                      onClick={() => {
+                        if (!isOccupied) {
+                          setSelectedRoom(room);
+                          setDoctorName("Dr. ");
+                        }
+                      }}
+                    >
+                      <CardContent className="p-6 sm:p-8 flex flex-col items-center text-center space-y-4">
+                        <div className={cn(
+                          "p-4 rounded-2xl transition-colors",
+                          isOccupied 
+                            ? "bg-slate-500/10 text-slate-500 dark:text-slate-400"
+                            : "bg-red-600/15 text-red-600 dark:bg-red-500/20 dark:text-red-400"
+                        )}>
+                          <Icon className="h-8 w-8" />
+                        </div>
+                        
+                        <div className="space-y-2">
+                          <h3 className="font-black text-sm sm:text-base uppercase tracking-tight text-foreground">
+                            {room.name}
+                          </h3>
+                          <div className="flex justify-center">
+                            {isOccupied ? (
+                              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-500/10 text-[9px] sm:text-[10px] font-bold uppercase tracking-widest text-slate-600 dark:text-slate-400">
+                                <span className="w-1.5 h-1.5 rounded-full bg-slate-500" />
+                                <span>Ocupado: {occupant}</span>
+                              </div>
+                            ) : (
+                              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[9px] sm:text-[10px] font-bold uppercase tracking-widest bg-red-600/15 text-red-600 dark:bg-red-500/20 dark:text-red-500">
+                                <span className="w-1.5 h-1.5 rounded-full bg-red-600 dark:bg-red-500 animate-pulse" />
                                 Livre para Entrada
                               </div>
                             )}

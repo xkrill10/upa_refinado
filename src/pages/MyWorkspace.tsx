@@ -2,13 +2,14 @@ import React, { useState, useEffect } from "react";
 import { usePatients, Patient } from "@/hooks/use-patients";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Stethoscope, Clock, Users, ArrowRight, User, Baby, Activity, LogOut, CheckCircle2, PauseCircle, Megaphone, AlertTriangle, X, Volume2, VolumeX, FileText } from "lucide-react";
+import { Stethoscope, Clock, Users, ArrowRight, User, Baby, Activity, LogOut, CheckCircle2, PauseCircle, Megaphone, AlertTriangle, X, Volume2, VolumeX, FileText, Info, Coffee } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import { cn, formatWords, formatPatientNameLGPD } from "@/lib/utils";
+import { cn, formatWords, formatPatientNameLGPD, formatPatientAge } from "@/lib/utils";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import PatientRecord from "@/pages/PatientRecord";
+import { PatientDetailsModal } from "@/components/PatientDetailsModal";
 
 const RISK_ORDER: Record<string, number> = { 
   'emergency': 0, 
@@ -29,6 +30,7 @@ export default function MyWorkspace() {
   const [recordPatientId, setRecordPatientId] = useState<string | null>(null);
   const [isEndShiftModalOpen, setIsEndShiftModalOpen] = useState(false);
   const [finishingPatient, setFinishingPatient] = useState<Patient | null>(null);
+  const [detailsPatient, setDetailsPatient] = useState<Patient | null>(null);
   const [callingTicket, setCallingTicket] = useState<{
     ticket: string;
     patientName: string;
@@ -53,14 +55,33 @@ export default function MyWorkspace() {
     setActiveDoctor(doctor);
   }, [navigate]);
 
-  const isPediatric = activeRoom.toUpperCase().includes("PEDIÁTRICO");
+  const isEmergencyRoom = activeRoom.toUpperCase().includes("VERMELHA");
+  const isPediatric = activeRoom.toUpperCase().includes("PEDIÁTRICO") || activeRoom.toUpperCase().includes("PEDIATRIA");
 
   // Filter patients for this specific queue
   const relevantPatients = patients.filter(p => {
     if (p.status === 'completed' || p.status === 'evasion') return false;
     const isPatientPediatric = p.priority === "pediatric" || (p.age !== undefined && p.age <= 14);
-    if (isPediatric) return isPatientPediatric;
-    return !isPatientPediatric;
+    const isCritical = p.risk === 'emergency' || p.risk === 'very-urgent';
+
+    // Se o médico estiver na Sala Vermelha: Só atende os críticos (Vermelho/Laranja)
+    if (isEmergencyRoom) {
+      if (!isCritical) return false;
+      
+      // Se a sala especifica o tipo, filtramos. Senão, aceita todas as idades.
+      if (activeRoom.toUpperCase().includes("PEDIATRIA") || activeRoom.toUpperCase().includes("PEDIÁTRIC")) {
+          return isPatientPediatric;
+      }
+      if (activeRoom.toUpperCase().includes("ADULTO")) {
+          return !isPatientPediatric;
+      }
+      return true;
+    }
+
+    // Se o médico estiver no Consultório Clínico Normal: Só atende os estáveis (Amarelo, Verde, Azul)
+    if (isCritical) return false;
+
+    return isPediatric ? isPatientPediatric : !isPatientPediatric;
   });
 
   const myAttendingPatients = relevantPatients.filter(
@@ -156,25 +177,41 @@ export default function MyWorkspace() {
           ? "bg-white/60 dark:bg-slate-900/40 border-white/50 dark:border-white/10" 
           : "bg-white/60 dark:bg-slate-900/40 border-white/50 dark:border-white/10"
       )}>
-        <div className="flex items-center gap-4">
-          <div className={cn(
-            "h-12 w-12 rounded-2xl flex items-center justify-center shadow-inner",
-            isBlueTheme ? "bg-[#006699]/10 text-[#006699] dark:bg-sky-500/15 dark:text-sky-400" : "bg-orange-500/10 text-orange-600 dark:bg-orange-500/20 dark:text-orange-400"
-          )}>
-            {isPediatric ? <Baby className="h-6 w-6" /> : <Stethoscope className="h-6 w-6" />}
+        {isEmergencyRoom ? (
+          <div className="flex items-center gap-4">
+            <div className="h-12 w-12 rounded-2xl flex items-center justify-center shadow-inner bg-red-600/10 text-red-600 dark:bg-red-500/15 dark:text-red-400">
+              <AlertTriangle className="h-6 w-6 animate-pulse" />
+            </div>
+            <div>
+              <h1 className="text-2xl font-black uppercase tracking-tight leading-none text-red-600 dark:text-red-400">
+                {activeRoom}
+              </h1>
+              <p className="text-muted-foreground text-[11px] font-black uppercase tracking-[0.2em] mt-1 flex items-center gap-2">
+                <User className="h-3.5 w-3.5" /> Operando: {activeDoctor}
+              </p>
+            </div>
           </div>
-          <div>
-            <h1 className={cn(
-              "text-2xl font-black uppercase tracking-tight leading-none",
-              isBlueTheme ? "text-[#006699] dark:text-sky-400" : "text-orange-600 dark:text-orange-500"
+        ) : (
+          <div className="flex items-center gap-4">
+            <div className={cn(
+              "h-12 w-12 rounded-2xl flex items-center justify-center shadow-inner",
+              isBlueTheme ? "bg-[#006699]/10 text-[#006699] dark:bg-sky-500/15 dark:text-sky-400" : "bg-orange-500/10 text-orange-600 dark:bg-orange-500/20 dark:text-orange-400"
             )}>
-              {activeRoom}
-            </h1>
-            <p className="text-muted-foreground text-[11px] font-black uppercase tracking-[0.2em] mt-1 flex items-center gap-2">
-              <User className="h-3.5 w-3.5" /> Operando: {activeDoctor}
-            </p>
+              {isPediatric ? <Baby className="h-6 w-6" /> : <Stethoscope className="h-6 w-6" />}
+            </div>
+            <div>
+              <h1 className={cn(
+                "text-2xl font-black uppercase tracking-tight leading-none",
+                isBlueTheme ? "text-[#006699] dark:text-sky-400" : "text-orange-600 dark:text-orange-500"
+              )}>
+                {activeRoom}
+              </h1>
+              <p className="text-muted-foreground text-[11px] font-black uppercase tracking-[0.2em] mt-1 flex items-center gap-2">
+                <User className="h-3.5 w-3.5" /> Operando: {activeDoctor}
+              </p>
+            </div>
           </div>
-        </div>
+        )}
         <Button 
           variant="outline" 
           className="h-10 rounded-xl gap-2 text-red-500 border-red-200 hover:text-red-600 hover:bg-red-50 dark:border-red-900/40 dark:hover:bg-red-950/30 px-4 font-black uppercase text-xs tracking-wider shadow-sm"
@@ -213,7 +250,7 @@ export default function MyWorkspace() {
                     "h-16 w-16 rounded-full flex items-center justify-center shadow-inner",
                     isBlueTheme ? "bg-[#006699]/10 text-[#006699] dark:bg-sky-500/10 dark:text-sky-400" : "bg-orange-500/10 text-orange-600 dark:text-orange-400"
                   )}>
-                    {isPediatric ? <Baby className="h-8 w-8 animate-pulse" /> : <Stethoscope className="h-8 w-8 animate-pulse" />}
+                    {isPediatric ? <Baby className="h-8 w-8 animate-pulse" /> : isEmergencyRoom ? <AlertTriangle className="h-8 w-8 animate-pulse text-red-600" /> : <Stethoscope className="h-8 w-8 animate-pulse" />}
                   </div>
                   <div className="text-center space-y-1">
                     <p className={cn(
@@ -253,7 +290,7 @@ export default function MyWorkspace() {
                               {formatWords(patient.name)}
                             </h3>
                             <p className="text-[11px] font-bold text-muted-foreground uppercase tracking-widest mt-1">
-                              {patient.age} anos • Ticket: {patient.ticket}
+                              {formatPatientAge(patient.age, patient.birthDate)} • Ticket: {patient.ticket}
                             </p>
                           </div>
                         </div>
@@ -268,8 +305,16 @@ export default function MyWorkspace() {
                           </span>
                         </div>
 
-                        <div className="grid grid-cols-2 gap-2">
+                        <div className="flex flex-col gap-2">
                           <Button 
+                            variant="outline"
+                            className="h-10 text-[10px] font-black uppercase border-[#006699]/20 text-[#006699] hover:bg-[#006699]/5 dark:border-sky-400/20 dark:text-sky-400 dark:hover:bg-sky-400/5 w-full transition-all"
+                            onClick={() => setDetailsPatient(patient)}
+                          >
+                            <Info className="h-3.5 w-3.5 mr-1.5" /> Detalhes do Paciente
+                          </Button>
+                          <div className="grid grid-cols-2 gap-2">
+                            <Button 
                             variant="outline"
                             className="h-10 text-[10px] font-black uppercase border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-900"
                             onClick={() => setRecordPatientId(patient.id)}
@@ -297,7 +342,8 @@ export default function MyWorkspace() {
                             <CheckCircle2 className="h-3.5 w-3.5 mr-1.5" /> Dar Alta
                           </Button>
                         </div>
-                      </CardContent>
+                      </div>
+                    </CardContent>
                     </Card>
                   </motion.div>
                 ))
@@ -319,9 +365,19 @@ export default function MyWorkspace() {
 
           <div className="bg-white/60 dark:bg-slate-900/40 backdrop-blur-xl rounded-2xl border border-white/50 dark:border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.1)] overflow-hidden">
             {waitingPatients.length === 0 ? (
-              <div className="p-12 text-center">
-                <p className="text-xs font-black uppercase tracking-widest text-slate-400">Nenhum paciente aguardando</p>
-              </div>
+              <motion.div 
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="flex flex-col items-center justify-center p-16 text-center"
+              >
+                <div className="h-20 w-20 bg-emerald-500/10 dark:bg-emerald-500/5 text-emerald-500 rounded-full flex items-center justify-center mb-6 shadow-inner">
+                  <Coffee className="h-10 w-10" />
+                </div>
+                <h3 className="text-lg font-black uppercase tracking-tight text-foreground mb-2">Fila Zerada!</h3>
+                <p className="text-[11px] font-bold text-muted-foreground uppercase tracking-widest max-w-[300px]">
+                  Excelente trabalho. Nenhum paciente aguardando no momento.
+                </p>
+              </motion.div>
             ) : (
               <div className="divide-y divide-slate-100 dark:divide-slate-800">
                 {waitingPatients.map(patient => {
@@ -355,7 +411,7 @@ export default function MyWorkspace() {
                             )}
                           </div>
                           <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mt-0.5">
-                            {patient.age} anos • {patient.ticket || 'GERAL'} • Aguardando há {Math.floor((new Date().getTime() - new Date(patient.arrivalTime).getTime()) / 60000)}m
+                            {formatPatientAge(patient.age, patient.birthDate)} • {patient.ticket || 'GERAL'} • Aguardando há {Math.floor((new Date().getTime() - new Date(patient.arrivalTime).getTime()) / 60000)}m
                           </p>
                         </div>
                       </div>
@@ -425,7 +481,7 @@ export default function MyWorkspace() {
                  callingTicket?.priority === 'pediatric' ? 'text-orange-500 dark:text-orange-400' : 'text-[#006699] dark:text-sky-400')
               )}>{callingTicket?.ticket}</h2>
               <p className="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase">{formatPatientNameLGPD(callingTicket?.patientName || "")}</p>
-              <p className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase">{callingTicket?.age} ANOS • CPF: {callingTicket?.cpf || 'N/A'}</p>
+              <p className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase">{formatPatientAge(callingTicket?.age)} • CPF: {callingTicket?.cpf || 'N/A'}</p>
             </div>
 
             <div className="grid grid-cols-1 gap-4">
@@ -573,6 +629,12 @@ export default function MyWorkspace() {
           </div>
         </DialogContent>
       </Dialog>
+
+      <PatientDetailsModal 
+        patient={detailsPatient} 
+        isOpen={!!detailsPatient} 
+        onClose={() => setDetailsPatient(null)} 
+      />
     </div>
   );
 }

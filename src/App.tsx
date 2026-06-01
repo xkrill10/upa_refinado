@@ -5,6 +5,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
+import { GlobalClock } from "@/components/GlobalClock";
 const Dashboard = React.lazy(() => import("./pages/Dashboard"));
 const Pharmacy = React.lazy(() => import("./pages/Pharmacy"));
 const SatellitePharmacy = React.lazy(() => import("./pages/SatellitePharmacy"));
@@ -88,6 +89,7 @@ const AppContent = () => {
                 </div>
               </div>
               <div className="flex items-center gap-6">
+                <GlobalClock />
                 <div className="hidden md:flex flex-col items-end px-5 border-r border-border/30">
                   <span className="text-[11px] md:text-[12px] font-black text-muted-foreground uppercase tracking-widest leading-none mb-1 opacity-60">Operador do Sistema</span>
                   <span className="text-sm md:text-[15px] font-black text-foreground tracking-tight mission-control-title">DR. RICARDO BRAGA</span>

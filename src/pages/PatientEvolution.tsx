@@ -742,6 +742,11 @@ export default function PatientEvolution() {
     setVsConsciousness("A");
 
     toast.success("Evolução registrada com sucesso!");
+    
+    // Voltar automaticamente para a sala / consultório
+    setTimeout(() => {
+      navigate(location.state?.from || '/meu-consultorio');
+    }, 600);
   };
 
   // Helper para renderizar os Dropdowns padronizados dos painéis Multidisciplinares

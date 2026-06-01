@@ -68,5 +68,42 @@ export function formatPatientNameLGPD(name: string) {
     return `${firstName} ${nextInitial}.`;
   }
   
-  return firstName;
+}
+
+export function formatPatientAge(age?: number | string | null, birthDate?: string | null) {
+  if (birthDate) {
+    const bDate = new Date(birthDate);
+    const now = new Date();
+    
+    let years = now.getFullYear() - bDate.getFullYear();
+    let months = now.getMonth() - bDate.getMonth();
+    let days = now.getDate() - bDate.getDate();
+
+    if (days < 0) {
+      months -= 1;
+      const prevMonth = new Date(now.getFullYear(), now.getMonth(), 0);
+      days += prevMonth.getDate();
+    }
+    
+    if (months < 0) {
+      years -= 1;
+      months += 12;
+    }
+
+    if (years >= 2) {
+      return `${years} anos`;
+    } else {
+      let result = [];
+      if (years === 1) result.push("1 ano");
+      if (months > 0) result.push(`${months} ${months === 1 ? 'mês' : 'meses'}`);
+      if (days > 0 || (years === 0 && months === 0)) result.push(`${days} ${days === 1 ? 'dia' : 'dias'}`);
+      return result.join(" e ");
+    }
+  }
+
+  if (age !== undefined && age !== null) {
+    return `${age} ${Number(age) === 1 ? 'ano' : 'anos'}`;
+  }
+  
+  return "";
 }
