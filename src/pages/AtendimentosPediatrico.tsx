@@ -36,6 +36,7 @@ export default function AtendimentosPediatrico() {
   const [showCallControl, setShowCallControl] = useState(false);
   const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
   const [recordPatientId, setRecordPatientId] = useState<number | null>(null);
+  const [queueFilterMode, setQueueFilterMode] = useState<'all' | 'my-room'>('all');
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
   const [isExamsModalOpen, setIsExamsModalOpen] = useState(false);
   const [patientForExams, setPatientForExams] = useState<Patient | null>(null);
@@ -59,6 +60,9 @@ export default function AtendimentosPediatrico() {
   const waitingPatients = pediatricPatients.filter(
     (p) => p.status === "waiting" && p.risk && !attendingPatients.includes(p) && (p.registrationComplete !== false || p.risk === 'emergency')
   );
+  const displayedWaitingPatients = queueFilterMode === 'all'
+    ? waitingPatients
+    : waitingPatients.filter(p => p.sector === selectedRoom);
 
   const getRiskDetails = (risk: string) => {
     switch (risk) {
@@ -286,15 +290,40 @@ export default function AtendimentosPediatrico() {
 
         {/* Aguardando */}
         {(activeFilter === 'all' || activeFilter === 'waiting') && (
-        <div className="space-y-4">
-          <h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground flex items-center gap-2">
-            <Calendar className="h-4 w-4 text-muted-foreground" />
-            Aguardando Chamada
-          </h2>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-2 bg-transparent">
+              <h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground flex items-center gap-2">
+                <Calendar className="h-4 w-4 text-muted-foreground" />
+                Aguardando Chamada
+              </h2>
+              <div className="flex bg-slate-100 dark:bg-slate-900 border border-slate-200/50 dark:border-slate-800 p-0.5 rounded-xl self-start sm:self-auto shrink-0 shadow-sm">
+                <button
+                  onClick={() => setQueueFilterMode('all')}
+                  className={cn(
+                    "px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-wider transition-all cursor-pointer border-0",
+                    queueFilterMode === 'all' 
+                      ? "bg-orange-500 text-white shadow-sm font-black" 
+                      : "text-slate-500 hover:text-slate-705 dark:text-slate-400 dark:hover:text-slate-200 bg-transparent"
+                  )}
+                >
+                  Fila Geral
+                </button>
+                <button
+                  onClick={() => setQueueFilterMode('my-room')}
+                  className={cn(
+                    "px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-wider transition-all cursor-pointer border-0",
+                    queueFilterMode === 'my-room' 
+                      ? "bg-orange-500 text-white shadow-sm font-black" 
+                      : "text-slate-500 hover:text-slate-705 dark:text-slate-400 dark:hover:text-slate-200 bg-transparent"
+                  )}
+                >
+                  Minha Sala
+                </button>
+              </div>
+            </div>
           <Card className="glass-card border border-slate-200/40 dark:border-slate-800/40 shadow-xl rounded-xl overflow-hidden bg-white/70 dark:bg-slate-900/45 transition-colors duration-500">
             <CardContent className="p-0">
               <div className="divide-y divide-border/30">
-                {waitingPatients.map((patient) => {
+                {displayedWaitingPatients.map((patient) => {
                   const risk = getRiskDetails(patient.risk || "not-urgent");
                   return (
                     <div key={patient.id} className="p-4 flex items-center justify-between hover:bg-muted/5 transition-colors">
@@ -320,7 +349,7 @@ export default function AtendimentosPediatrico() {
                         <Button size="sm" variant="ghost" className="h-9 rounded-xl px-3 gap-2 text-emerald-600 hover:bg-emerald-50 font-black uppercase text-[10px] tracking-wider" onClick={() => handleAttend(patient)}>
                           <Stethoscope className="h-3.5 w-3.5" /> Atender
                         </Button>
-                         <Button size="sm" variant="ghost" className="h-9 w-9 rounded-xl p-0 text-muted-foreground hover:text-orange-500"
+                        <Button size="sm" variant="ghost" className="h-9 w-9 rounded-xl p-0 text-muted-foreground hover:text-orange-500"
                           onClick={() => setRecordPatientId(patient.id)}>
                           <ExternalLink className="h-4 w-4" />
                         </Button>
@@ -328,9 +357,11 @@ export default function AtendimentosPediatrico() {
                     </div>
                   );
                 })}
-                {waitingPatients.length === 0 && (
+                {displayedWaitingPatients.length === 0 && (
                   <div className="p-12 text-center">
-                    <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Fila pediátrica vazia</p>
+                    <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">
+                      {queueFilterMode === 'all' ? 'Fila pediátrica vazia' : 'Nenhum paciente direcionado para esta sala'}
+                    </p>
                   </div>
                 )}
               </div>

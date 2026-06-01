@@ -39,6 +39,7 @@ export default function Attendances() {
   const [showCallControl, setShowCallControl] = useState(false);
   const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
   const [recordPatientId, setRecordPatientId] = useState<number | null>(null);
+  const [queueFilterMode, setQueueFilterMode] = useState<'all' | 'my-room'>('all');
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
   const [isExamsModalOpen, setIsExamsModalOpen] = useState(false);
   const [patientForExams, setPatientForExams] = useState<Patient | null>(null);
@@ -84,6 +85,9 @@ export default function Attendances() {
       return riskA - riskB;
     });
   const classifiedPatients = patients.filter(p => !attendingPatients.includes(p) && p.status === 'waiting' && p.risk && (p.registrationComplete !== false || p.risk === 'emergency'));
+  const displayedWaitingPatients = queueFilterMode === 'all'
+    ? classifiedPatients
+    : classifiedPatients.filter(p => p.sector === selectedRoom);
 
   const handleCall = (patient: Patient) => {
     const ticketToUse = patient.ticket || "GERAL";
@@ -367,14 +371,40 @@ export default function Attendances() {
         {/* Aguardando */}
         {(activeFilter === 'all' || activeFilter === 'waiting') && (
           <div className="space-y-4">
-            <h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-[#006699] dark:text-sky-450 flex items-center gap-2">
-              <Calendar className="h-4 w-4 text-[#006699] dark:text-sky-400" />
-              Aguardando Chamada
-            </h2>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-2 bg-transparent">
+              <h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-[#006699] dark:text-sky-400 flex items-center gap-2">
+                <Calendar className="h-4 w-4 text-[#006699] dark:text-sky-400" />
+                Aguardando Chamada
+              </h2>
+              <div className="flex bg-slate-100 dark:bg-slate-900 border border-slate-200/50 dark:border-slate-800 p-0.5 rounded-xl self-start sm:self-auto shrink-0 shadow-sm">
+                <button
+                  onClick={() => setQueueFilterMode('all')}
+                  className={cn(
+                    "px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-wider transition-all cursor-pointer border-0",
+                    queueFilterMode === 'all' 
+                      ? "bg-[#006699] text-white shadow-sm font-black" 
+                      : "text-slate-500 hover:text-slate-705 dark:text-slate-400 dark:hover:text-slate-200 bg-transparent"
+                  )}
+                >
+                  Fila Geral
+                </button>
+                <button
+                  onClick={() => setQueueFilterMode('my-room')}
+                  className={cn(
+                    "px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-wider transition-all cursor-pointer border-0",
+                    queueFilterMode === 'my-room' 
+                      ? "bg-[#006699] text-white shadow-sm font-black" 
+                      : "text-slate-500 hover:text-slate-705 dark:text-slate-400 dark:hover:text-slate-200 bg-transparent"
+                  )}
+                >
+                  Minha Sala
+                </button>
+              </div>
+            </div>
             <Card className="glass-card border border-slate-200/40 dark:border-slate-800/40 shadow-xl rounded-xl overflow-hidden bg-white/70 dark:bg-slate-900/45 transition-colors duration-500">
               <CardContent className="p-0">
                 <div className="divide-y divide-slate-100 dark:divide-slate-800/25">
-                  {classifiedPatients.map((patient) => {
+                  {displayedWaitingPatients.map((patient) => {
                     const risk = getRiskDetails(patient.risk || 'not-urgent');
                     return (
                       <div key={patient.id} className="p-4 flex items-center justify-between hover:bg-slate-50/50 dark:hover:bg-slate-900/30 transition-colors">
@@ -396,7 +426,7 @@ export default function Attendances() {
                           >
                             <p className="font-bold text-sm text-slate-800 dark:text-slate-100 uppercase tracking-tight group-hover/row:text-[#006699] dark:group-hover/row:text-sky-400 transition-colors">{formatWords(patient.name)}</p>
                             <div className="flex items-center gap-2 mt-0.5">
-                              <span className="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase">{patient.age} anos</span>
+                              <span className="text-[10px] text-slate-550 dark:text-slate-400 font-bold uppercase">{patient.age} anos</span>
                               <span className="w-1 h-1 rounded-full bg-slate-200 dark:bg-slate-800"></span>
                               <span className="text-[9px] font-black uppercase tracking-widest text-[#006699] dark:text-sky-400">ID: {patient.id}</span>
                             </div>
@@ -443,9 +473,11 @@ export default function Attendances() {
                       </div>
                     );
                   })}
-                  {classifiedPatients.length === 0 && (
+                  {displayedWaitingPatients.length === 0 && (
                     <div className="p-12 text-center">
-                       <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-600">Fila de espera vazia</p>
+                       <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-600">
+                         {queueFilterMode === 'all' ? 'Fila de espera vazia' : 'Nenhum paciente direcionado para esta sala'}
+                       </p>
                     </div>
                   )}
                 </div>
