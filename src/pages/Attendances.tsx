@@ -28,13 +28,23 @@ export default function Attendances() {
     resetSystem
   } = usePatients();
   
+  const [activeDoctor, setActiveDoctor] = useState<string | null>(null);
+  
   const [selectedRoom, setSelectedRoom] = useState<string>(() => {
-    return localStorage.getItem('selectedClinicalRoom') || "CONSULTÓRIO MÉDICO 1";
+    return localStorage.getItem('upa_active_room') || localStorage.getItem('selectedClinicalRoom') || "CONSULTÓRIO MÉDICO 1";
   });
 
   useEffect(() => {
     localStorage.setItem('selectedClinicalRoom', selectedRoom);
+    const doc = localStorage.getItem('upa_active_doctor');
+    if (doc) setActiveDoctor(doc);
   }, [selectedRoom]);
+
+  const handleEndShift = () => {
+    localStorage.removeItem("upa_active_room");
+    localStorage.removeItem("upa_active_doctor");
+    navigate("/painel-medico");
+  };
 
   const [showCallControl, setShowCallControl] = useState(false);
   const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
@@ -161,21 +171,41 @@ export default function Attendances() {
           <div className="flex items-center justify-center h-10 w-10 rounded-xl bg-[#006699]/10 text-[#006699] dark:bg-sky-400/10 dark:text-sky-400 shrink-0">
             <Building2 className="h-5 w-5" />
           </div>
-          <div className="flex flex-col gap-1 pr-2">
-            <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground">Meu Consultório</span>
-            <Select value={selectedRoom} onValueChange={setSelectedRoom}>
-              <SelectTrigger className="h-7 w-[220px] border-none bg-transparent shadow-none p-0 focus:ring-0 text-sm font-black text-foreground">
-                <SelectValue placeholder="Selecione o consultório" />
-              </SelectTrigger>
-              <SelectContent className="glass-card-premium rounded-xl border-white/20">
-                {Array.from({ length: 8 }, (_, i) => (
-                  <SelectItem key={i} value={`CONSULTÓRIO MÉDICO ${i + 1}`} className="font-bold text-xs">
-                    CONSULTÓRIO MÉDICO {i + 1}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+          
+          {activeDoctor ? (
+            <div className="flex items-center gap-4 pr-2">
+              <div className="flex flex-col gap-0.5">
+                <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground leading-none">Operando</span>
+                <span className="text-sm font-black text-foreground uppercase tracking-tight leading-none">{selectedRoom}</span>
+                <span className="text-[10px] font-bold text-[#006699] dark:text-sky-400 uppercase tracking-widest mt-0.5">{activeDoctor}</span>
+              </div>
+              <div className="w-px h-8 bg-slate-200 dark:bg-slate-800 mx-1" />
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="h-8 rounded-lg gap-2 text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 px-3 font-black uppercase text-[10px] tracking-wider"
+                onClick={handleEndShift}
+              >
+                <LogOut className="h-3.5 w-3.5" /> Sair
+              </Button>
+            </div>
+          ) : (
+            <div className="flex flex-col gap-1 pr-2">
+              <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground">Modo Administrador</span>
+              <Select value={selectedRoom} onValueChange={setSelectedRoom}>
+                <SelectTrigger className="h-7 w-[220px] border-none bg-transparent shadow-none p-0 focus:ring-0 text-sm font-black text-foreground">
+                  <SelectValue placeholder="Selecione o consultório" />
+                </SelectTrigger>
+                <SelectContent className="glass-card-premium rounded-xl border-white/20">
+                  {Array.from({ length: 9 }, (_, i) => (
+                    <SelectItem key={i} value={`CONSULTÓRIO CLÍNICO ${i + 1}`} className="font-bold text-xs">
+                      CONSULTÓRIO CLÍNICO {i + 1}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
         </div>
       </div>
 

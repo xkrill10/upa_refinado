@@ -27,6 +27,8 @@ const NotFound = React.lazy(() => import("./pages/NotFound"));
 const Pediatria = React.lazy(() => import("./pages/Pediatria"));
 const AtendimentosPediatrico = React.lazy(() => import("./pages/AtendimentosPediatrico"));
 const MyHR = React.lazy(() => import("./pages/MyHR"));
+const DoctorDashboard = React.lazy(() => import("./pages/DoctorDashboard"));
+const MyWorkspace = React.lazy(() => import("./pages/MyWorkspace"));
 
 // Novas Telas
 const Laboratory = React.lazy(() => import("./pages/Laboratory"));
@@ -120,6 +122,8 @@ const AppContent = () => {
                 <Route path="/paciente/:id/evolucao" element={<PatientEvolution />} />
                 <Route path="/pediatria" element={<Pediatria />} />
                 <Route path="/atendimentos-pediatrico" element={<AtendimentosPediatrico />} />
+                <Route path="/painel-medico" element={<DoctorDashboard />} />
+                <Route path="/meu-consultorio" element={<MyWorkspace />} />
                 
                 {/* Novas Rotas (Esqueletos) */}
                 <Route path="/laboratorio" element={<Laboratory />} />

@@ -7,6 +7,7 @@ export interface Patient {
   age: number;
   cpf: string;
   status: 'waiting' | 'attending' | 'completed' | 'evasion';
+  subStatus?: 'reaval' | 'exam_pending' | 'medication_pending';
   risk: 'emergency' | 'very-urgent' | 'urgent' | 'less-urgent' | 'not-urgent' | 'evasion';
   arrivalTime: string;
   sector?: string;

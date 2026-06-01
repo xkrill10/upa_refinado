@@ -5,18 +5,27 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { UserPlus, Save, MapPin, AlertTriangle, Users, ClipboardList, Activity, Heart, Clock, CheckCircle2, User, Megaphone } from "lucide-react";
+import { UserPlus, Save, MapPin, AlertTriangle, Users, ClipboardList, Activity, Heart, Clock, CheckCircle2, User, Megaphone, Volume2, VolumeX, X } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { toast } from "sonner";
 import { cn, formatWords } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 
 export default function NewPatient() {
-  const { patients, updatePatient, callTicket } = usePatients();
+  const { patients, updatePatient, callTicket, isAudioEnabled, setIsAudioEnabled } = usePatients();
   
   const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [showCallControl, setShowCallControl] = useState(false);
+  const [callingTicket, setCallingTicket] = useState<{ 
+    ticket: string; 
+    patientName: string; 
+    risk: Patient['risk'];
+    priority: Patient['priority'];
+    age?: number;
+    cpf?: string;
+  } | null>(null);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -109,12 +118,17 @@ export default function NewPatient() {
   const handleCallPatient = (e: React.MouseEvent, patient: Patient) => {
     e.stopPropagation();
     const ticketToUse = patient.ticket || "GERAL";
-    callTicket(ticketToUse, "RECEPÇÃO", patient.risk || "not-urgent", patient.name);
-    toast.success(`Chamando: ${formatWords(patient.name)}`, {
-      description: "Paciente notificado no painel da recepção.",
-      duration: 5000,
-      icon: <Megaphone className="h-4 w-4 text-[#006699]" />,
+    
+    setCallingTicket({ 
+      ticket: ticketToUse, 
+      patientName: patient.name,
+      risk: patient.risk || 'not-urgent',
+      priority: patient.priority || 'normal',
+      age: patient.age,
+      cpf: patient.cpf
     });
+    setShowCallControl(true);
+    callTicket(ticketToUse, "RECEPÇÃO", patient.risk || "not-urgent", patient.name);
   };
 
   const maskCPF = (value: string) => {
@@ -589,6 +603,104 @@ export default function NewPatient() {
                 </Button>
               </div>
             </form>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* CALL CONTROL MODAL */}
+      <Dialog open={showCallControl} onOpenChange={setShowCallControl}>
+        <DialogContent className="sm:max-w-[400px] p-0 border border-white/20 dark:border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.3)] overflow-hidden rounded-3xl bg-white/70 dark:bg-slate-950/60 backdrop-blur-xl [&>button]:hidden">
+          <DialogHeader className="p-0 border-none m-0">
+            <div className="bg-gradient-to-br from-[#006699]/90 to-[#004466]/90 dark:from-sky-600/50 dark:to-sky-900/50 text-white p-6 pb-8 rounded-b-[2rem] flex items-center justify-between relative shadow-lg backdrop-blur-md">
+              <div className="flex items-center gap-3">
+                <div className="bg-white/20 p-2.5 rounded-xl backdrop-blur-sm">
+                  <Megaphone className="h-5 w-5 text-white animate-pulse" />
+                </div>
+                <div className="text-left">
+                  <DialogTitle className="text-sm font-black uppercase tracking-widest text-white">Controle de Chamada</DialogTitle>
+                  <DialogDescription className="text-white/80 text-[10px] font-bold uppercase tracking-wider mt-0.5">Sincronizado com o Painel</DialogDescription>
+                </div>
+              </div>
+              <Button 
+                variant="secondary" 
+                size="icon" 
+                className="bg-white text-black hover:bg-white/90 rounded-xl h-10 w-10 shadow-lg border-none"
+                onClick={() => setShowCallControl(false)}
+              >
+                <X className="h-5 w-5" />
+              </Button>
+            </div>
+          </DialogHeader>
+
+          <div className="p-8 space-y-8 text-center">
+            <div className="space-y-2">
+              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Chamando agora</p>
+              <h2 className={cn(
+                "text-7xl font-black tracking-tighter leading-none mb-4",
+                callingTicket?.risk === 'emergency' ? 'text-red-600' :
+                callingTicket?.risk === 'very-urgent' ? 'text-orange-600' :
+                callingTicket?.risk === 'urgent' ? 'text-black font-black' :
+                callingTicket?.risk === 'less-urgent' ? 'text-green-600' :
+                (callingTicket?.priority === 'preferential' ? 'text-purple-600' : 
+                 callingTicket?.priority === 'pediatric' ? 'text-orange-600' : 'text-[#006699]')
+              )}>{callingTicket?.ticket}</h2>
+              {callingTicket?.patientName.toUpperCase().includes('NÃO IDENTIFICADO') || callingTicket?.patientName.toUpperCase().includes('PRÉ-CADASTRO') ? (
+                <p className="text-sm font-bold text-slate-400 uppercase italic">SENHA {callingTicket?.ticket}</p>
+              ) : (
+                <>
+                  <p className="text-sm font-bold text-slate-500 uppercase">{callingTicket?.patientName}</p>
+                  <p className="text-[10px] text-muted-foreground font-medium">{callingTicket?.age ? callingTicket?.age + ' ANOS' : ''} {callingTicket?.cpf ? '• CPF: ' + callingTicket?.cpf : ''}</p>
+                </>
+              )}
+            </div>
+
+            <div className="space-y-4">
+              <Button 
+                onClick={() => {
+                  if (callingTicket) {
+                    callTicket(callingTicket.ticket, "RECEPÇÃO", callingTicket.risk, callingTicket.patientName);
+                    toast.success("Chamada enviada novamente ao painel.");
+                  }
+                }}
+                className={cn(
+                  "w-full h-16 rounded-2xl text-white font-black uppercase tracking-widest text-sm shadow-xl gap-3 transition-all duration-300",
+                  callingTicket?.risk === 'emergency' ? 'bg-red-600 hover:bg-red-700 shadow-red-600/20' :
+                  callingTicket?.risk === 'very-urgent' ? 'bg-orange-500 hover:bg-orange-600 shadow-orange-600/20' :
+                  callingTicket?.risk === 'urgent' ? 'bg-yellow-500 hover:bg-yellow-600 shadow-yellow-500/20' :
+                  callingTicket?.risk === 'less-urgent' ? 'bg-green-500 hover:bg-green-600 shadow-green-500/20' :
+                  'bg-[#006699] hover:bg-[#005580] shadow-[#006699]/20'
+                )}
+              >
+                <Volume2 className="h-6 w-6" />
+                Chamar Novamente
+              </Button>
+
+              <div 
+                className="flex items-center justify-between p-4 rounded-2xl bg-muted/50 border border-border cursor-pointer hover:bg-muted/70 transition-colors"
+                onClick={() => setIsAudioEnabled(!isAudioEnabled)}
+              >
+                <div className="flex items-center gap-3 text-left">
+                  <div className={`p-2 rounded-lg ${isAudioEnabled ? 'bg-green-500/10 text-green-600' : 'bg-red-500/10 text-red-600'}`}>
+                    {isAudioEnabled ? <Volume2 className="h-5 w-5" /> : <VolumeX className="h-5 w-5" />}
+                  </div>
+                  <div>
+                    <p className="text-xs font-black uppercase">Áudio do Painel</p>
+                    <p className="text-[10px] text-muted-foreground font-bold uppercase">{isAudioEnabled ? 'Ativado (Voz + Chime)' : 'Desativado (Mudo)'}</p>
+                  </div>
+                </div>
+                <div
+                  className={cn(
+                    "h-8 w-14 rounded-full transition-all relative flex items-center shrink-0",
+                    isAudioEnabled ? "bg-green-500" : "bg-slate-400"
+                  )}
+                >
+                  <div className={cn(
+                    "absolute h-6 w-6 rounded-full bg-white transition-all shadow-md",
+                    isAudioEnabled ? "right-1" : "left-1"
+                  )} />
+                </div>
+              </div>
+            </div>
           </div>
         </DialogContent>
       </Dialog>

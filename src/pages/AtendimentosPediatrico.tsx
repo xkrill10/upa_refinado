@@ -1,9 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { usePatients, Patient } from "@/hooks/use-patients";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Baby, Stethoscope, User, Calendar, ExternalLink, Activity, Megaphone, X, Volume2, VolumeX, Building2, Info, FlaskConical, FileText } from "lucide-react";
+import { Baby, Stethoscope, User, Calendar, ExternalLink, Activity, Megaphone, X, Volume2, VolumeX, Building2, Info, FlaskConical, FileText, LogOut, AlertTriangle } from "lucide-react";
 import { motion } from "motion/react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
@@ -25,13 +25,23 @@ export default function AtendimentosPediatrico() {
     updatePatient,
   } = usePatients();
   
+  const [activeDoctor, setActiveDoctor] = useState<string | null>(null);
+
   const [selectedRoom, setSelectedRoom] = useState<string>(() => {
-    return localStorage.getItem('selectedPediatricRoom') || "CONSULTÓRIO PEDIÁTRICO 1";
+    return localStorage.getItem('upa_active_room') || localStorage.getItem('selectedPediatricRoom') || "CONSULTÓRIO PEDIÁTRICO 1";
   });
 
   useEffect(() => {
     localStorage.setItem('selectedPediatricRoom', selectedRoom);
+    const doc = localStorage.getItem('upa_active_doctor');
+    if (doc) setActiveDoctor(doc);
   }, [selectedRoom]);
+
+  const handleEndShift = () => {
+    localStorage.removeItem("upa_active_room");
+    localStorage.removeItem("upa_active_doctor");
+    navigate("/painel-medico");
+  };
 
   const [showCallControl, setShowCallControl] = useState(false);
   const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
@@ -50,6 +60,8 @@ export default function AtendimentosPediatrico() {
     age?: number;
     cpf?: string;
   } | null>(null);
+  const [evasaoPatient, setEvasaoPatient] = useState<{id: string, name: string} | null>(null);
+  const [evasaoReason, setEvasaoReason] = useState<string>("");
 
   // Filtra apenas pacientes pediátricos (priority === 'pediatric' ou age <= 14)
   const pediatricPatients = patients.filter(
@@ -63,6 +75,20 @@ export default function AtendimentosPediatrico() {
   const displayedWaitingPatients = queueFilterMode === 'all'
     ? waitingPatients
     : waitingPatients.filter(p => p.sector === selectedRoom);
+
+  const gravePatients = waitingPatients.filter(p => p.risk === 'emergency' || p.risk === 'very-urgent');
+  const prevGraveCount = useRef(gravePatients.length);
+
+  useEffect(() => {
+    if (gravePatients.length > prevGraveCount.current) {
+      toast.error('NOVO PACIENTE GRAVE AGUARDANDO!', {
+        description: 'Uma nova criança foi classificada com risco Emergência ou Muito Urgente.',
+        icon: <AlertTriangle className="h-5 w-5 text-red-500 animate-pulse" />,
+        duration: 8000,
+      });
+    }
+    prevGraveCount.current = gravePatients.length;
+  }, [gravePatients.length]);
 
   const getRiskDetails = (risk: string) => {
     switch (risk) {
@@ -130,23 +156,69 @@ export default function AtendimentosPediatrico() {
           <div className="flex items-center justify-center h-10 w-10 rounded-xl bg-orange-500/10 text-orange-500 shrink-0">
             <Building2 className="h-5 w-5" />
           </div>
-          <div className="flex flex-col gap-1 pr-2">
-            <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground">Meu Consultório</span>
-            <Select value={selectedRoom} onValueChange={setSelectedRoom}>
-              <SelectTrigger className="h-7 w-[240px] border-none bg-transparent shadow-none p-0 focus:ring-0 text-sm font-black text-foreground">
-                <SelectValue placeholder="Selecione o consultório" />
-              </SelectTrigger>
-              <SelectContent className="glass-card-premium rounded-xl border-white/20">
-                {Array.from({ length: 3 }, (_, i) => (
-                  <SelectItem key={i} value={`CONSULTÓRIO PEDIÁTRICO ${i + 1}`} className="font-bold text-xs">
-                    CONSULTÓRIO PEDIÁTRICO {i + 1}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+          {activeDoctor ? (
+            <div className="flex items-center gap-4 pr-2">
+              <div className="flex flex-col gap-0.5">
+                <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground leading-none">Operando</span>
+                <span className="text-sm font-black text-foreground uppercase tracking-tight leading-none">{selectedRoom}</span>
+                <span className="text-[10px] font-bold text-[#006699] dark:text-sky-400 uppercase tracking-widest mt-0.5">{activeDoctor}</span>
+              </div>
+              <div className="w-px h-8 bg-slate-200 dark:bg-slate-800 mx-1" />
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="h-8 rounded-lg gap-2 text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 px-3 font-black uppercase text-[10px] tracking-wider"
+                onClick={handleEndShift}
+              >
+                <LogOut className="h-3.5 w-3.5" /> Sair
+              </Button>
+            </div>
+          ) : (
+            <div className="flex flex-col gap-1 pr-2">
+              <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground">Modo Administrador</span>
+              <Select value={selectedRoom} onValueChange={setSelectedRoom}>
+                <SelectTrigger className="h-7 w-[240px] border-none bg-transparent shadow-none p-0 focus:ring-0 text-sm font-black text-foreground">
+                  <SelectValue placeholder="Selecione o consultório" />
+                </SelectTrigger>
+                <SelectContent className="glass-card-premium rounded-xl border-white/20">
+                  {Array.from({ length: 3 }, (_, i) => (
+                    <SelectItem key={i} value={`CONSULTÓRIO PEDIÁTRICO ${i + 1}`} className="font-bold text-xs">
+                      CONSULTÓRIO PEDIÁTRICO {i + 1}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
         </div>
       </div>
+
+      {gravePatients.length > 0 && (
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.95, y: -20 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          className="bg-red-600 border-2 border-red-500 rounded-2xl p-6 shadow-[0_0_40px_rgba(220,38,38,0.4)] flex flex-col sm:flex-row items-center justify-between gap-4"
+        >
+          <div className="flex items-center gap-4 text-white">
+            <div className="h-12 w-12 rounded-full bg-white/20 flex items-center justify-center animate-pulse shrink-0">
+              <AlertTriangle className="h-7 w-7 text-white" />
+            </div>
+            <div>
+              <h2 className="text-xl font-black uppercase tracking-tight">🚨 Alerta de Risco Grave!</h2>
+              <p className="text-xs font-bold tracking-widest uppercase opacity-90 mt-1">
+                {gravePatients.length} criança(s) com classificação Vermelha/Laranja aguardando na fila.
+              </p>
+            </div>
+          </div>
+          <Button 
+            className="w-full sm:w-auto h-12 bg-white hover:bg-slate-100 text-red-600 font-black uppercase tracking-[0.15em] text-xs shadow-xl rounded-xl transition-all hover:scale-105 border-0 cursor-pointer"
+            onClick={() => handleAttend(gravePatients[0])}
+          >
+            <Baby className="h-4 w-4 mr-2" />
+            Atender Imediatamente
+          </Button>
+        </motion.div>
+      )}
 
       {/* Stats rápidas */}
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
@@ -290,6 +362,7 @@ export default function AtendimentosPediatrico() {
 
         {/* Aguardando */}
         {(activeFilter === 'all' || activeFilter === 'waiting') && (
+          <div className="space-y-4">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-2 bg-transparent">
               <h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground flex items-center gap-2">
                 <Calendar className="h-4 w-4 text-muted-foreground" />
@@ -343,6 +416,10 @@ export default function AtendimentosPediatrico() {
                         </div>
                       </div>
                       <div className="flex items-center gap-1">
+                        <Button size="sm" variant="ghost" className="h-9 w-9 rounded-xl p-0 text-muted-foreground hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 cursor-pointer border-0"
+                          onClick={() => setEvasaoPatient({ id: patient.id, name: patient.name })} title="Registrar Evasão">
+                          <LogOut className="h-4 w-4" />
+                        </Button>
                         <Button size="sm" variant="ghost" className="h-9 rounded-xl px-3 gap-2 text-orange-500 hover:bg-orange-500/5 font-black uppercase text-[10px] tracking-wider" onClick={() => handleCall(patient)}>
                           <Volume2 className="h-3.5 w-3.5" /> Chamar Senha
                         </Button>
@@ -416,6 +493,90 @@ export default function AtendimentosPediatrico() {
                   <div className={cn("absolute h-6 w-6 rounded-full bg-white transition-all shadow-md", isAudioEnabled ? "right-1" : "left-1")} />
                 </div>
               </div>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={!!evasaoPatient} onOpenChange={(open) => {
+        if (!open) {
+          setEvasaoPatient(null);
+          setEvasaoReason("");
+        }
+      }}>
+        <DialogContent className="sm:max-w-[450px] rounded-xl p-8 border-none shadow-2xl bg-white dark:bg-slate-950 text-foreground">
+          <div className="flex flex-col items-center text-center space-y-4">
+            <div className="h-16 w-16 rounded-full bg-red-500/10 dark:bg-red-500/20 flex items-center justify-center text-red-550 dark:text-red-400 animate-pulse">
+              <LogOut className="h-8 w-8" />
+            </div>
+            <div className="space-y-2">
+              <DialogTitle className="text-xl font-black uppercase tracking-tight text-slate-800 dark:text-white">Confirmar Evasão?</DialogTitle>
+              <DialogDescription className="text-sm font-medium leading-relaxed px-2 text-slate-500 dark:text-slate-400">
+                Você está registrando que o paciente <strong className="text-red-550 dark:text-red-400">{formatWords(evasaoPatient?.name || "")}</strong> se retirou da unidade sem concluir o atendimento pediátrico.
+              </DialogDescription>
+            </div>
+            
+            <div className="w-full text-left mt-2 mb-2">
+              <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 block mb-2">
+                Motivo da Evasão (Opcional)
+              </label>
+              <div className="grid grid-cols-1 gap-2">
+                {[
+                  "Demora no atendimento",
+                  "Melhora dos sintomas",
+                  "Procurou outro serviço",
+                  "Desistência voluntária",
+                  "Ausente após 3 chamadas"
+                ].map((reason) => (
+                  <button
+                    key={reason}
+                    onClick={() => setEvasaoReason(reason === evasaoReason ? "" : reason)}
+                    className={cn(
+                      "w-full text-left px-3 py-2.5 rounded-xl border-2 transition-all flex items-center justify-between group cursor-pointer",
+                      evasaoReason === reason 
+                        ? "border-red-500 bg-red-500/5 font-bold text-red-600 dark:text-red-400" 
+                        : "border-slate-100 dark:border-slate-800 hover:border-slate-200 dark:hover:border-slate-700 text-slate-600 dark:text-slate-400 bg-slate-50/50 dark:bg-slate-900/40"
+                    )}
+                  >
+                    <span className="text-[11px] font-bold uppercase tracking-tight truncate">{reason}</span>
+                    <div className={cn(
+                      "h-3.5 w-3.5 rounded-full border-2 flex items-center justify-center transition-all shrink-0",
+                      evasaoReason === reason ? "border-red-500 bg-red-500" : "border-slate-300 dark:border-slate-700"
+                    )}>
+                      {evasaoReason === reason && <div className="h-1.5 w-1.5 rounded-full bg-white dark:bg-slate-950" />}
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3 w-full pt-2">
+              <Button 
+                variant="outline" 
+                className="h-12 rounded-xl font-bold uppercase tracking-widest border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-900 transition-colors cursor-pointer"
+                onClick={() => {
+                  setEvasaoPatient(null);
+                  setEvasaoReason("");
+                }}
+              >
+                Cancelar
+              </Button>
+              <Button 
+                className="h-12 rounded-xl bg-red-500 hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-500 text-white font-black uppercase tracking-widest shadow-lg shadow-red-200 dark:shadow-none border-0 cursor-pointer"
+                onClick={() => {
+                  if (evasaoPatient) {
+                    updatePatient(evasaoPatient.id, { 
+                      status: 'evasao',
+                      justification: evasaoReason ? `Motivo da evasão: ${evasaoReason}` : undefined
+                    });
+                    toast.warning(evasaoReason ? `Evasão registrada: ${evasaoReason}` : `Evasão registrada: ${evasaoPatient.name}`);
+                    setEvasaoPatient(null);
+                    setEvasaoReason("");
+                  }
+                }}
+              >
+                Confirmar
+              </Button>
             </div>
           </div>
         </DialogContent>

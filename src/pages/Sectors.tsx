@@ -112,9 +112,9 @@ const sectorGroups = [
       { name: 'SALA DE COLETA', max: 6, description: 'EXAMES LABORATORIAIS', structure: 'Box de coleta individualizado e área de processamento rápido.' },
       { name: 'SALA DE SUTURA', max: 2, description: 'PROCEDIMENTOS RÁPIDOS', structure: 'Macas de procedimento e foco cirúrgico.' },
       { name: 'SALA DE CURATIVOS', max: 2, description: 'PROCEDIMENTOS RÁPIDOS', structure: 'Materiais esterilizados e pia cirúrgica.' },
-      ...Array.from({ length: 8 }, (_, i) => ({ 
-        name: `CONSULTÓRIO MÉDICO ${i + 1}`, 
-        max: 2, 
+      ...Array.from({ length: 9 }, (_, i) => ({ 
+        name: `CONSULTÓRIO CLÍNICO ${i + 1}`, 
+        max: 1, 
         description: 'ATENDIMENTO CLÍNICO',
         structure: 'Maca de exame, mesa administrativa e equipamentos básicos de diagnóstico.'
       }))
@@ -840,7 +840,6 @@ export default function Sectors() {
                                       duration: 5000,
                                       icon: <Megaphone className="h-4 w-4 text-primary" />,
                                     });
-                                    setShowSectorDialog(false);
                                   }}
                                 >
                                   Chamar Senha

@@ -31,6 +31,7 @@ const menuGroups = [
   {
     label: "Atendimento Clínico",
     items: [
+      { title: "Painel Médico", url: "/painel-medico", icon: UserSquare2 },
       { title: "Fila de Atendimento", url: "/fila", icon: ClipboardList },
       { title: "Clínico", url: "/atendimentos", icon: HeartPulse },
       { title: "Pediátrico", url: "/atendimentos-pediatrico", icon: Baby },

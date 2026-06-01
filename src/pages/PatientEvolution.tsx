@@ -129,6 +129,7 @@ export default function PatientEvolution() {
 
   const fromPath = location.state?.from || "/pacientes";
   const fromLabel = location.state?.label || "Pacientes";
+  const isExpressMode = location.state?.expressEvolution === true;
 
   const [isBedDialogOpen, setIsBedDialogOpen] = useState(false);
   const [isClinicalProfileOpen, setIsClinicalProfileOpen] = useState(false);
@@ -147,6 +148,14 @@ export default function PatientEvolution() {
   const [selectedCid, setSelectedCid] = useState<CID10Item | null>(null);
 
   const cidContainerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (isExpressMode && !isFormOpen) {
+      setIsFormOpen(true);
+      setActiveTab("prescriptions");
+      setEvolutionType(isChild ? "Evolução Médica (Pediátrica)" : "Evolução Médica");
+    }
+  }, [isExpressMode, isChild, isFormOpen]);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent | TouchEvent) {
@@ -895,7 +904,8 @@ export default function PatientEvolution() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      {!isExpressMode && (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Card 1: Queixa Principal & Alergias */}
         <Card
           className="group glass-card-premium border border-blue-500/15 dark:border-blue-500/20 bg-blue-500/[0.02] dark:bg-blue-500/[0.04] shadow-[0_8px_30px_rgba(0,0,0,0.02)] rounded-xl overflow-hidden transition-all duration-500 cursor-pointer hover:scale-[1.02] active:scale-[0.98] hover:bg-blue-500/[0.07] dark:hover:bg-blue-500/[0.10] hover:border-blue-500/40 hover:shadow-[0_12px_40px_rgba(59,130,246,0.12)]"
@@ -1010,6 +1020,7 @@ export default function PatientEvolution() {
           </CardContent>
         </Card>
       </div>
+      )}
 
       {/* Barra de Sub-Navegação Horizontal Glassmorphic Premium */}
       {isFormOpen && (
@@ -1065,7 +1076,7 @@ export default function PatientEvolution() {
       )}
 
       <div className="flex items-center justify-start pb-1">
-        {!isFormOpen && (
+        {!isFormOpen && !isExpressMode && (
           <Button
             onClick={() => {
               setIsFormOpen(true);
