@@ -2,18 +2,21 @@ import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { usePatients, Patient } from "@/hooks/use-patients";
-import { Building2, Users, AlertCircle, Clock, Stethoscope, Pill, ShieldCheck, HeartPulse, Baby, Globe, UserCheck } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { Building2, Users, AlertCircle, Clock, Stethoscope, Pill, ShieldCheck, HeartPulse, Baby, Globe, UserCheck, FileText } from "lucide-react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { motion, AnimatePresence } from "motion/react";
 import { cn, formatWords } from "@/lib/utils";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import PatientRecord from "@/pages/PatientRecord";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { ChevronRight, Search } from "lucide-react";
+import { ChevronRight, Search, Megaphone, X, Volume2, VolumeX } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { toast } from "sonner";
+import { formatPatientNameLGPD } from "@/lib/utils";
 
 const sectorGroups = [
   {
@@ -83,8 +86,15 @@ const sectorGroups = [
         description: 'SALA PEDIÁTRICA',
         structure: 'Leitos adequados, poltronas para acompanhantes e banheiro exclusivo para pediatria.'
       },
-      { name: 'ACOLHIMENTO INFANTIL', max: 4, description: 'AMBIENTE HUMANIZADO', structure: 'Área lúdica e acolhedora para triagem pediátrica.' },
-      { name: 'MEDICAÇÃO INFANTIL', max: 6, description: 'SALA DE PROCEDIMENTOS', structure: 'Equipamentos pediátricos para administração segura de medicamentos.' }
+      { name: 'ACOLHIMENTO INFANTIL 1', max: 4, description: 'AMBIENTE HUMANIZADO', structure: 'Área lúdica e acolhedora para triagem pediátrica.' },
+      { name: 'ACOLHIMENTO INFANTIL 2', max: 4, description: 'AMBIENTE HUMANIZADO', structure: 'Área lúdica e acolhedora para triagem pediátrica.' },
+      { name: 'MEDICAÇÃO INFANTIL', max: 6, description: 'SALA DE PROCEDIMENTOS', structure: 'Equipamentos pediátricos para administração segura de medicamentos.' },
+      ...Array.from({ length: 3 }, (_, i) => ({ 
+        name: `CONSULTÓRIO PEDIÁTRICO ${i + 1}`, 
+        max: 1, 
+        description: 'ATENDIMENTO CLÍNICO INFANTIL',
+        structure: 'Maca de exame, equipamentos infantis e decoração lúdica.'
+      }))
     ]
   },
   {
@@ -156,12 +166,40 @@ const DEFAULT_PROFESSIONALS: Record<string, string> = {
 };
 
 export default function Sectors() {
-  const { patients: allPatients, callPatient, updatePatient, isAudioEnabled, setIsAudioEnabled } = usePatients();
+  const { patients: allPatients, callPatient, updatePatient, isAudioEnabled, setIsAudioEnabled, callTicket } = usePatients();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    if (location.state?.reopenSector) {
+      const sectorName = location.state.reopenSector;
+      for (const group of sectorGroups) {
+        const sector = group.sectors.find(s => s.name === sectorName);
+        if (sector) {
+          setSelectedSector({ ...sector, group });
+          setShowSectorDialog(true);
+          break;
+        }
+      }
+      window.history.replaceState({}, '');
+    }
+  }, [location]);
+
   const [activeTab, setActiveTab] = useState("census");
   const [selectedSector, setSelectedSector] = useState<Sector | null>(null);
   const [showSectorDialog, setShowSectorDialog] = useState(false);
   const [transferringPatientId, setTransferringPatientId] = useState<string | null>(null);
+  const [recordPatientId, setRecordPatientId] = useState<number | null>(null);
+  const [showCallControl, setShowCallControl] = useState(false);
+  const [callingTicket, setCallingTicket] = useState<{ 
+    ticket: string; 
+    patientName: string; 
+    risk: Patient['risk'];
+    priority: Patient['priority'];
+    room: string;
+    age?: number;
+    cpf?: string;
+  } | null>(null);
   const [searchSector, setSearchSector] = useState("");
   const [selectedRisk, setSelectedRisk] = useState<Patient['risk'] | null>(null);
   const [now, setNow] = useState(new Date());
@@ -733,7 +771,7 @@ export default function Sectors() {
                                   </div>
                                 </div>
                                 <div className="flex gap-1.5 opacity-0 group-hover/row:opacity-100 transition-opacity">
-                                  {isTriage ? (
+                                  {isTriage && (
                                     <Button 
                                       variant="default" 
                                       size="sm" 
@@ -741,15 +779,6 @@ export default function Sectors() {
                                       onClick={() => navigate('/triagem')}
                                     >
                                       Ir para Triagem
-                                    </Button>
-                                  ) : (
-                                    <Button 
-                                      variant="ghost" 
-                                      size="sm" 
-                                      className="h-7 px-2 text-[8px] font-black uppercase text-muted-foreground hover:text-[#006699] dark:hover:text-sky-400 hover:bg-slate-50/50 dark:hover:bg-slate-800/40"
-                                      onClick={() => navigate(`/paciente/${patient.id}`, { state: { from: '/setores', label: 'Setores' } })}
-                                    >
-                                      Prontuário
                                     </Button>
                                   )}
                                   <Button 
@@ -773,11 +802,44 @@ export default function Sectors() {
                                 </div>
                               </div>
 
-                              <div className="flex gap-2 mt-4 pt-4 border-t border-slate-205 dark:border-slate-800">
+                              <div className="grid grid-cols-2 gap-2 mt-4 pt-4 border-t border-slate-205 dark:border-slate-800">
                                 <Button 
-                                  className="flex-1 h-9 text-[10px] font-black uppercase bg-[#006699] hover:bg-[#005580] dark:bg-sky-500 dark:hover:bg-sky-400 dark:text-slate-950 text-white border-none shadow-sm"
+                                  variant="outline"
+                                  className="w-full h-9 text-[10px] font-black uppercase border border-slate-200/50 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-900"
+                                  onClick={() => setRecordPatientId(patient.id)}
+                                >
+                                  Prontuário
+                                </Button>
+                                <Button 
+                                  variant="outline"
+                                  className="w-full h-9 text-[10px] font-black uppercase border border-emerald-200/50 dark:border-emerald-900/40 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20"
+                                  onClick={() => navigate(`/paciente/${patient.id}/evolucao`, { state: { from: '/setores', label: 'Setores', reopenSector: selectedSector?.name } })}
+                                >
+                                  Evoluir
+                                </Button>
+                                <Button 
+                                  className="w-full h-9 text-[10px] font-black uppercase bg-[#006699] hover:bg-[#005580] dark:bg-sky-500 dark:hover:bg-sky-400 dark:text-slate-950 text-white border-none shadow-sm"
                                   onClick={() => {
-                                    callPatient(patient);
+                                    const ticketToUse = patient.ticket || "GERAL";
+                                    const roomToUse = selectedSector?.name || "CONSULTÓRIO";
+                                    
+                                    setCallingTicket({ 
+                                      ticket: ticketToUse, 
+                                      patientName: patient.name,
+                                      risk: patient.risk || 'not-urgent',
+                                      priority: patient.priority || 'normal',
+                                      room: roomToUse,
+                                      age: patient.age,
+                                      cpf: patient.cpf
+                                    });
+                                    setShowCallControl(true);
+                                    callTicket(ticketToUse, roomToUse, patient.risk || 'not-urgent', patient.name);
+                                    
+                                    toast.success(`Chamando: ${formatWords(patient.name)}`, {
+                                      description: "Paciente notificado no painel da sala de espera.",
+                                      duration: 5000,
+                                      icon: <Megaphone className="h-4 w-4 text-primary" />,
+                                    });
                                     setShowSectorDialog(false);
                                   }}
                                 >
@@ -785,7 +847,7 @@ export default function Sectors() {
                                 </Button>
                                 <Button 
                                   variant="outline"
-                                  className="flex-1 h-9 text-[10px] font-black uppercase border border-red-200/70 dark:border-red-900/40 text-red-600 dark:text-red-400 hover:bg-red-500/10"
+                                  className="w-full h-9 text-[10px] font-black uppercase border border-red-200/70 dark:border-red-900/40 text-red-600 dark:text-red-400 hover:bg-red-500/10"
                                   onClick={() => {
                                     updatePatient(patient.id, { status: 'completed' });
                                     setShowSectorDialog(false);
@@ -875,6 +937,125 @@ export default function Sectors() {
               </div>
             </>
           )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Patient Record Modal (Quick View) */}
+      <Dialog open={!!recordPatientId} onOpenChange={(open) => !open && setRecordPatientId(null)}>
+        <DialogContent className="max-w-5xl w-[95vw] h-[85vh] p-0 overflow-y-auto glass-card-premium border-white/40 dark:border-white/10 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.3)] rounded-[2rem] flex flex-col bg-white dark:bg-slate-950">
+          <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-white/10 dark:from-slate-900/80 dark:to-slate-950/90 pointer-events-none -z-10" />
+          <div className="p-4 sm:p-6 sticky top-0 z-50 bg-white/40 dark:bg-slate-900/60 backdrop-blur-xl border-b border-white/20 dark:border-white/10 flex justify-between items-center shrink-0 shadow-sm rounded-t-[2rem]">
+            <h2 className="text-xl font-black uppercase tracking-widest text-foreground flex items-center gap-3 drop-shadow-sm">
+              <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-[#006699]/20 to-[#006699]/5 dark:from-sky-400/20 dark:to-sky-400/5 flex items-center justify-center border border-[#006699]/20 dark:border-sky-400/20 shadow-[inset_0_1px_1px_rgba(255,255,255,0.4)]">
+                <FileText className="h-5 w-5 text-[#006699] dark:text-sky-400 drop-shadow-[0_0_8px_rgba(0,102,153,0.5)] dark:drop-shadow-[0_0_8px_rgba(56,189,248,0.5)]" />
+              </div>
+              Prontuário Completo
+            </h2>
+          </div>
+          <div className="flex-1 overflow-y-auto p-4 sm:p-8 relative z-10">
+            {recordPatientId && <PatientRecord patientId={String(recordPatientId)} />}
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Call Control Dialog */}
+      <Dialog open={showCallControl} onOpenChange={setShowCallControl}>
+        <DialogContent className="max-w-md p-0 overflow-hidden rounded-xl border-none shadow-2xl bg-white dark:bg-slate-950 [&>button]:hidden">
+          <DialogHeader className={cn(
+            "p-6 text-white transition-colors duration-500",
+            callingTicket?.risk === 'emergency' ? 'bg-red-600' :
+            callingTicket?.risk === 'very-urgent' ? 'bg-orange-500' :
+            callingTicket?.risk === 'urgent' ? 'bg-[#FFDE21] text-black' :
+            callingTicket?.risk === 'less-urgent' ? 'bg-green-500' :
+            (callingTicket?.priority === 'preferential' ? 'bg-purple-600' : 
+             callingTicket?.priority === 'pediatric' ? 'bg-orange-500' : 'bg-[#006699] dark:bg-sky-950/60')
+          )}>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-white/20 rounded-xl">
+                  <Megaphone className="h-6 w-6" />
+                </div>
+                <div>
+                  <DialogTitle className="text-xl font-black uppercase tracking-tight text-white">Controle de Chamada</DialogTitle>
+                  <DialogDescription className="text-white/70 text-[10px] font-bold uppercase tracking-widest mt-0.5">Sincronizado com o Painel Central</DialogDescription>
+                </div>
+              </div>
+              <Button 
+                variant="secondary" 
+                size="icon" 
+                className="bg-white text-black hover:bg-white/90 dark:bg-white/10 dark:text-slate-100 rounded-xl h-10 w-10 shadow-lg border-none cursor-pointer"
+                onClick={() => setShowCallControl(false)}
+              >
+                <X className="h-5 w-5" />
+              </Button>
+            </div>
+          </DialogHeader>
+
+          <div className="p-8 space-y-8 bg-slate-50 dark:bg-slate-950 text-center">
+            <div className="space-y-2">
+              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#006699] dark:text-sky-400">Chamando agora</p>
+              <h2 className={cn(
+                "text-7xl font-black tracking-tighter leading-none mb-4",
+                callingTicket?.risk === 'emergency' ? 'text-red-655 dark:text-red-400' :
+                callingTicket?.risk === 'very-urgent' ? 'text-orange-500 dark:text-orange-400' :
+                callingTicket?.risk === 'urgent' ? 'text-black dark:text-slate-100' :
+                callingTicket?.risk === 'less-urgent' ? 'text-green-655 dark:text-green-400' :
+                (callingTicket?.priority === 'preferential' ? 'text-purple-600 dark:text-purple-400' : 
+                 callingTicket?.priority === 'pediatric' ? 'text-orange-500 dark:text-orange-400' : 'text-[#006699] dark:text-sky-400')
+              )}>{callingTicket?.ticket}</h2>
+              <p className="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase">{formatPatientNameLGPD(callingTicket?.patientName || "")}</p>
+              <p className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase">{callingTicket?.age} ANOS • CPF: {callingTicket?.cpf}</p>
+            </div>
+
+            <div className="grid grid-cols-1 gap-4">
+              <Button 
+                onClick={() => {
+                  if (callingTicket) {
+                    callTicket(callingTicket.ticket, callingTicket.room, callingTicket.risk, callingTicket.patientName);
+                    toast.success("Chamada enviada novamente ao painel.");
+                  }
+                }}
+                className={cn(
+                  "h-16 rounded-xl text-white font-black uppercase tracking-widest text-sm shadow-xl gap-3 transition-all duration-300 border-0 cursor-pointer",
+                  callingTicket?.risk === 'emergency' ? 'bg-red-600 hover:bg-red-700 shadow-red-600/20' :
+                  callingTicket?.risk === 'very-urgent' ? 'bg-orange-500 hover:bg-orange-600 shadow-orange-600/20' :
+                  callingTicket?.risk === 'urgent' ? 'bg-[#FFDE21] hover:bg-[#FFDE21]/90 shadow-[#FFDE21]/20 text-black' :
+                  callingTicket?.risk === 'less-urgent' ? 'bg-green-500 hover:bg-green-600 shadow-green-500/20' :
+                  (callingTicket?.priority === 'preferential' ? 'bg-purple-600 hover:bg-purple-700 shadow-purple-600/20' : 
+                   callingTicket?.priority === 'pediatric' ? 'bg-orange-500 hover:bg-orange-600 shadow-orange-600/20' : 'bg-[#006699] hover:bg-[#005580] shadow-[#006699]/20 dark:bg-sky-600 dark:hover:bg-sky-550')
+                )}
+              >
+                <Volume2 className="h-6 w-6" />
+                Chamar Novamente
+              </Button>
+
+              <div 
+                className="flex items-center justify-between p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200/40 dark:border-slate-800/40 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-900/85 transition-colors"
+                onClick={() => setIsAudioEnabled(!isAudioEnabled)}
+              >
+                <div className="flex items-center gap-3 text-left">
+                  <div className={cn("p-2 rounded-lg", isAudioEnabled ? 'bg-green-500/10 text-green-600 dark:text-green-400' : 'bg-red-500/10 text-red-600 dark:text-red-400')}>
+                    {isAudioEnabled ? <Volume2 className="h-5 w-5" /> : <VolumeX className="h-5 w-5" />}
+                  </div>
+                  <div>
+                    <p className="text-xs font-black uppercase text-slate-800 dark:text-slate-100">Áudio do Painel</p>
+                    <p className="text-[10px] text-slate-550 dark:text-slate-400 font-bold uppercase">{isAudioEnabled ? 'Ativado (Voz + Chime)' : 'Desativado (Mudo)'}</p>
+                  </div>
+                </div>
+                <div
+                  className={cn(
+                    "h-8 w-14 rounded-full transition-all relative flex items-center shrink-0",
+                    isAudioEnabled ? "bg-green-500" : "bg-slate-300 dark:bg-slate-800"
+                  )}
+                >
+                  <div className={cn(
+                    "absolute h-6 w-6 rounded-full bg-white transition-all shadow-md",
+                    isAudioEnabled ? "right-1" : "left-1"
+                  )} />
+                </div>
+              </div>
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
     </motion.div>

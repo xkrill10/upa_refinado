@@ -1,27 +1,45 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import { usePatients, Patient } from "@/hooks/use-patients";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { UserPlus, Save, MapPin, AlertTriangle } from "lucide-react";
-import { useNavigate, useSearchParams } from "react-router-dom";
-import { motion } from "motion/react";
+import { UserPlus, Save, MapPin, AlertTriangle, Users, ClipboardList, Activity, Heart, Clock, CheckCircle2, User, Megaphone } from "lucide-react";
+import { motion, AnimatePresence } from "motion/react";
 import { toast } from "sonner";
-import { usePatients } from "@/hooks/use-patients";
-import { cn } from "@/lib/utils";
+import { cn, formatWords } from "@/lib/utils";
+import { Badge } from "@/components/ui/badge";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 export default function NewPatient() {
-  const navigate = useNavigate();
-  const { addPatient, patients } = usePatients();
-  const [searchParams] = useSearchParams();
+  const { patients, updatePatient, callTicket } = usePatients();
+  
+  const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   const [formData, setFormData] = useState({
     name: "",
     socialName: "",
     cpf: "",
     susCard: "",
+    rg: "",
+    organIssuer: "",
     birthDate: "",
     gender: "",
+    motherName: "",
+    companionName: "",
+    companionRelation: "",
+    companionCpf: "",
+    companionPhone: "",
+    attendanceType: "clinico",
+    nationality: "Brasileira",
+    birthPlace: "",
+    race: "",
+    maritalStatus: "",
+    profession: "",
+    religion: "",
+    pcd: "nao",
     phone1: "",
     phone2: "",
     email: "",
@@ -34,31 +52,70 @@ export default function NewPatient() {
     state: "",
   });
 
-  useEffect(() => {
-    const cpfParam = searchParams.get("cpf");
-    if (cpfParam) {
-      const cleanCpf = cpfParam.replace(/\D/g, "");
-      const existing = patients.find(p => p.cpf.replace(/\D/g, "") === cleanCpf);
-      
-      if (existing) {
-        setFormData(prev => ({
-          ...prev,
-          name: existing.name || prev.name,
-          socialName: existing.socialName || prev.socialName,
-          cpf: maskCPF(existing.cpf),
-          susCard: existing.susCard || prev.susCard,
-          birthDate: existing.birthDate || prev.birthDate,
-          gender: existing.gender || prev.gender,
-          phone1: existing.phone1 || prev.phone1,
-          phone2: existing.phone2 || prev.phone2,
-          email: existing.email || prev.email,
-        }));
-        toast.info("Dados do pré-cadastro recuperados automaticamente.");
-      } else {
-        setFormData(prev => ({ ...prev, cpf: maskCPF(cpfParam) }));
-      }
+  // Filter patients who are triaged but registration is not complete
+  const waitingRegistration = patients.filter(
+    (p) => p.triaged && !p.registrationComplete && p.status !== "completed" && p.status !== "evasion"
+  ).sort((a, b) => new Date(a.arrivalTime).getTime() - new Date(b.arrivalTime).getTime());
+
+  const getRiskDetails = (risk: string) => {
+    switch (risk) {
+      case "emergency": return { label: "Emergência", color: "bg-red-600 text-white" };
+      case "very-urgent": return { label: "Muito Urgente", color: "bg-orange-500 text-white" };
+      case "urgent": return { label: "Urgente", color: "bg-[#FFDE21] text-black" };
+      case "less-urgent": return { label: "Pouco Urgente", color: "bg-green-500 text-white" };
+      case "not-urgent": return { label: "Não Urgente", color: "bg-blue-500 text-white" };
+      default: return { label: risk, color: "bg-slate-500 text-white" };
     }
-  }, [searchParams, patients]);
+  };
+
+  const handleOpenRegistration = (patient: Patient) => {
+    setSelectedPatient(patient);
+    setFormData({
+      name: patient.name.includes("Pré-cadastro") ? "" : patient.name || "",
+      socialName: patient.socialName || "",
+      cpf: patient.cpf || "",
+      susCard: patient.susCard || "",
+      rg: patient.rg || "",
+      organIssuer: patient.organIssuer || "",
+      birthDate: patient.birthDate || "",
+      gender: patient.gender || "",
+      motherName: patient.motherName || "",
+      companionName: patient.companionName || "",
+      companionRelation: patient.companionRelation || "",
+      companionCpf: patient.companionCpf || "",
+      companionPhone: patient.companionPhone || "",
+      attendanceType: patient.attendanceType || "clinico",
+      nationality: patient.nationality || "Brasileira",
+      birthPlace: patient.birthPlace || "",
+      race: patient.race || "",
+      maritalStatus: patient.maritalStatus || "",
+      profession: patient.profession || "",
+      religion: patient.religion || "",
+      pcd: patient.pcd || "nao",
+      phone1: patient.phone1 || "",
+      phone2: patient.phone2 || "",
+      email: patient.email || "",
+      cep: patient.cep || "",
+      street: patient.street || "",
+      number: patient.number || "",
+      complement: patient.complement || "",
+      neighborhood: patient.neighborhood || "",
+      city: patient.city || "",
+      state: patient.state || "",
+    });
+    setIsModalOpen(true);
+  };
+
+  const handleCallPatient = (e: React.MouseEvent, patient: Patient) => {
+    e.stopPropagation();
+    const ticketToUse = patient.ticket || "GERAL";
+    callTicket(ticketToUse, "RECEPÇÃO", patient.risk || "not-urgent", patient.name);
+    toast.success(`Chamando: ${formatWords(patient.name)}`, {
+      description: "Paciente notificado no painel da recepção.",
+      duration: 5000,
+      icon: <Megaphone className="h-4 w-4 text-[#006699]" />,
+    });
+  };
 
   const maskCPF = (value: string) => {
     return value
@@ -88,73 +145,19 @@ export default function NewPatient() {
     return value.replace(/\D/g, "").substring(0, 15);
   };
 
-  const validateSUS = (cns: string) => {
-    if (cns.length !== 15) return false;
-    
-    const firstDigit = cns[0];
-    if (!['1', '2', '7', '8', '9'].includes(firstDigit)) return false;
-
-    if (['1', '2'].includes(firstDigit)) {
-      const pis = cns.substring(0, 11);
-      let sum = 0;
-      for (let i = 0; i < 11; i++) {
-        sum += parseInt(pis[i]) * (15 - i);
-      }
-      
-      const rest = sum % 11;
-      let dv = 11 - rest;
-      
-      if (dv === 11) dv = 0;
-      
-      if (dv === 10) {
-        sum += 2;
-        const rest2 = sum % 11;
-        const dv2 = 11 - rest2;
-        return cns === pis + "001" + dv2.toString();
-      } else {
-        return cns === pis + "000" + dv.toString();
-      }
-    }
-
-    if (['7', '8', '9'].includes(firstDigit)) {
-      let sum = 0;
-      for (let i = 0; i < 15; i++) {
-        sum += parseInt(cns[i]) * (15 - i);
-      }
-      return (sum % 11 === 0);
-    }
-
-    return false;
-  };
-
-  const formatWords = (text: string) => {
-    const skipWords = ["de", "da", "do", "dos", "das", "e", "o", "a"];
-    return text
-      .split(" ")
-      .map((word, index) => {
-        const lowerWord = word.toLowerCase();
-        if (lowerWord.length === 0) return "";
-        if (index === 0 || !skipWords.includes(lowerWord)) {
-          return lowerWord.charAt(0).toUpperCase() + lowerWord.slice(1);
-        }
-        return lowerWord;
-      })
-      .join(" ");
-  };
-
   const handleChange = (field: string, value: string) => {
     let finalValue = value;
     
-    if (field === "name" || field === "socialName" || field === "street" || field === "neighborhood" || field === "city") {
+    if (["name", "socialName", "street", "neighborhood", "city", "motherName", "companionName", "companionRelation", "nationality", "birthPlace", "profession", "religion"].includes(field)) {
       finalValue = formatWords(value);
     }
     
-    if (field === "cpf") finalValue = maskCPF(value);
+    if (field === "cpf" || field === "companionCpf") finalValue = maskCPF(value);
     if (field === "susCard") finalValue = maskSUS(value);
-    if (field === "phone1" || field === "phone2") finalValue = maskPhone(value);
+    if (field === "phone1" || field === "phone2" || field === "companionPhone") finalValue = maskPhone(value);
     if (field === "cep") {
       finalValue = maskCEP(value);
-      handleCEPLookup(finalValue);
+      if (finalValue.length === 9) handleCEPLookup(finalValue);
     }
 
     setFormData(prev => ({ ...prev, [field]: finalValue }));
@@ -194,285 +197,401 @@ export default function NewPatient() {
       return;
     }
 
-    if (formData.susCard && !validateSUS(formData.susCard)) {
-      toast.error("Cartão do SUS inválido");
-      return;
-    }
-    
-    // Calculate age from birthDate for the mock state
+    if (!selectedPatient) return;
+
     const birthDate = new Date(formData.birthDate);
     const age = new Date().getFullYear() - birthDate.getFullYear();
 
-    addPatient({
-      name: formData.name,
-      age: isNaN(age) ? 0 : age,
-      cpf: formData.cpf,
-      susCard: formData.susCard,
-      status: 'waiting',
-      risk: 'not-urgent',
-      arrivalTime: new Date().toISOString(),
-      mainComplaint: "",
-      socialName: formData.socialName,
-      birthDate: formData.birthDate,
-      gender: formData.gender,
-      phone1: formData.phone1,
-      phone2: formData.phone2,
-      email: formData.email,
-      cep: formData.cep,
-      street: formData.street,
-      number: formData.number,
-      complement: formData.complement,
-      neighborhood: formData.neighborhood,
-      city: formData.city,
-      state: formData.state,
-      bloodType: "",
-      allergies: "",
-      currentMedications: "",
+    updatePatient(selectedPatient.id, {
+      ...formData,
+      age: isNaN(age) ? selectedPatient.age : age,
+      registrationComplete: true,
     });
     
-    toast.success("Paciente registrado com sucesso! Direcionando para triagem...");
-    setTimeout(() => {
-      navigate("/triagem");
-    }, 1500);
+    toast.success("Cadastro completo com sucesso! Paciente encaminhado para atendimento.");
+    setIsModalOpen(false);
+    setSelectedPatient(null);
   };
 
   return (
     <motion.div 
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="max-w-5xl mx-auto space-y-8 pb-10"
+      className="space-y-6 pb-10"
     >
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <div>
-            <h1 className="text-4xl font-black tracking-tight text-[#006699] dark:text-sky-400 uppercase">Admissão de Paciente</h1>
-            <p className="text-muted-foreground text-xs font-black uppercase tracking-[0.3em] flex items-center gap-2 mt-1">
-              <UserPlus className="h-4 w-4 text-primary animate-pulse" />
-              CADASTRO INTEGRAL DE PRONTUÁRIO
-            </p>
-          </div>
-        </div>
+      <div className="flex flex-col gap-1">
+        <h1 className="text-4xl font-black tracking-tight text-[#006699] dark:text-sky-400 uppercase">Fila da Recepção</h1>
+        <p className="text-muted-foreground text-xs font-black uppercase tracking-[0.3em] flex items-center gap-2 mt-1">
+          <ClipboardList className="h-4 w-4 text-primary animate-pulse" />
+          Pacientes Aguardando Cadastro Completo
+        </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
-        {/* DADOS PESSOAIS */}
-        <Card className="glass-card border border-slate-200/40 dark:border-slate-800/40 shadow-xl rounded-xl overflow-hidden bg-white/70 dark:bg-slate-900/45 transition-colors duration-500 relative">
-          <CardHeader className="bg-primary/5 dark:bg-primary/10 border-b border-primary/10 dark:border-primary/20 p-8">
-            <CardTitle className="text-xl mission-control-title flex items-center gap-3 text-foreground dark:text-white">
-              <div className="h-10 w-10 rounded-xl bg-[#006699]/10 dark:bg-sky-500/20 flex items-center justify-center border border-[#006699]/20 dark:border-sky-500/30 shadow-sm backdrop-blur-md transition-all">
-                <UserPlus className="h-5.5 w-5.5 text-[#006699] dark:text-sky-400" />
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        <AnimatePresence>
+          {waitingRegistration.map((patient) => {
+            const risk = getRiskDetails(patient.risk || "not-urgent");
+            const waitTime = Math.floor((new Date().getTime() - new Date(patient.arrivalTime).getTime()) / 60000);
+
+            return (
+              <motion.div
+                key={patient.id}
+                layout
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9 }}
+                whileHover={{ y: -4 }}
+                className="glass-card border border-slate-200/40 dark:border-slate-800/40 shadow-xl rounded-xl p-5 cursor-pointer bg-white/70 dark:bg-slate-900/45 hover:shadow-2xl transition-all"
+                onClick={() => handleOpenRegistration(patient)}
+              >
+                <div className="flex justify-between items-start mb-3">
+                  <Badge className={cn(risk.color, "font-bold text-[10px] px-2 py-1 rounded-md uppercase tracking-wider")}>
+                    {risk.label}
+                  </Badge>
+                  <div className="flex items-center gap-1 text-slate-500 text-[10px] font-bold">
+                    <Clock className="h-3 w-3" />
+                    {waitTime} min
+                  </div>
+                </div>
+                
+                <h3 className="font-black text-lg text-slate-800 dark:text-slate-100 uppercase truncate mb-1">
+                  {formatWords(patient.name)}
+                </h3>
+                
+                <div className="space-y-1 mt-3 border-t border-slate-100 dark:border-slate-800 pt-3">
+                  <p className="text-xs text-slate-500 dark:text-slate-400 font-medium line-clamp-1 flex items-center gap-1.5">
+                    <Activity className="h-3.5 w-3.5 text-[#006699]" />
+                    {patient.mainComplaint || "Queixa não informada"}
+                  </p>
+                  <div className="flex items-center justify-between mt-2">
+                    <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">
+                      Senha: {patient.ticket}
+                    </p>
+                    <Button 
+                      onClick={(e) => handleCallPatient(e, patient)}
+                      className="h-8 px-3 text-[10px] uppercase font-black bg-[#006699] hover:bg-[#005580] text-white gap-2 rounded-lg shadow-md shadow-sky-500/20 transition-all hover:scale-105"
+                    >
+                      <Megaphone className="h-3.5 w-3.5" />
+                      Chamar Painel
+                    </Button>
+                  </div>
+                </div>
+              </motion.div>
+            );
+          })}
+        </AnimatePresence>
+
+        {waitingRegistration.length === 0 && (
+          <div className="col-span-full py-20 flex flex-col items-center justify-center text-center">
+            <div className="h-20 w-20 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mb-4">
+              <CheckCircle2 className="h-10 w-10 text-emerald-500" />
+            </div>
+            <h3 className="text-xl font-black text-slate-700 dark:text-slate-300 uppercase tracking-tight">Fila Vazia</h3>
+            <p className="text-sm text-slate-500 font-medium mt-1">Todos os pacientes triados já foram cadastrados.</p>
+          </div>
+        )}
+      </div>
+
+      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+        <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto p-0 border-none bg-slate-50 dark:bg-slate-950">
+          <div className="sticky top-0 z-10 bg-[#006699] p-6 text-white shadow-md">
+            <DialogTitle className="text-2xl font-black uppercase tracking-tight flex items-center gap-2">
+              <UserPlus className="h-6 w-6" /> Completar Cadastro
+            </DialogTitle>
+            <p className="text-xs text-white/70 font-bold uppercase tracking-widest mt-1">
+              Paciente: {selectedPatient?.name} • Risco: {getRiskDetails(selectedPatient?.risk || 'not-urgent').label}
+            </p>
+          </div>
+          
+          <div className="p-6">
+            <form onSubmit={handleSubmit} className="space-y-6">
+              
+              {/* DADOS DO ATENDIMENTO */}
+              <Card className="glass-card shadow-sm border-slate-200/50">
+                <CardHeader className="bg-slate-100/50 dark:bg-slate-800/50 py-4 border-b border-slate-200/50">
+                  <CardTitle className="text-sm font-black uppercase text-[#006699] flex items-center gap-2">
+                    <Activity className="h-4 w-4" /> Dados do Atendimento
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-1.5">
+                    <Label className="text-[10px] font-bold uppercase text-slate-500">Tipo de Atendimento *</Label>
+                    <Select value={formData.attendanceType} onValueChange={(v) => handleChange("attendanceType", v)}>
+                      <SelectTrigger className="h-10">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="clinico">Atendimento Clínico Padrão</SelectItem>
+                        <SelectItem value="acidente_transito">Acidente de Trânsito</SelectItem>
+                        <SelectItem value="acidente_trabalho">Acidente de Trabalho</SelectItem>
+                        <SelectItem value="agressao">Vítima de Agressão / Violência</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label className="text-[10px] font-bold uppercase text-slate-500">Queixa (Triagem)</Label>
+                    <Input disabled value={selectedPatient?.mainComplaint || ""} className="h-10 bg-slate-100" />
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* DADOS PESSOAIS */}
+              <Card className="glass-card shadow-sm border-slate-200/50">
+                <CardHeader className="bg-slate-100/50 dark:bg-slate-800/50 py-4 border-b border-slate-200/50">
+                  <CardTitle className="text-sm font-black uppercase text-[#006699] flex items-center gap-2">
+                    <User className="h-4 w-4" /> Dados Pessoais e Filiação
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="p-4 grid grid-cols-1 md:grid-cols-4 gap-4">
+                  <div className="space-y-1.5 md:col-span-2">
+                    <Label className="text-[10px] font-bold uppercase text-slate-500">Nome Completo *</Label>
+                    <Input placeholder="Insira o nome completo sem abreviações" className="h-10" value={formData.name} onChange={(e) => handleChange("name", e.target.value)} />
+                  </div>
+                  <div className="space-y-1.5 md:col-span-2">
+                    <Label className="text-[10px] font-bold uppercase text-slate-500">Nome Social</Label>
+                    <Input placeholder="Nome social (se houver)" className="h-10" value={formData.socialName} onChange={(e) => handleChange("socialName", e.target.value)} />
+                  </div>
+                  
+                  <div className="space-y-1.5">
+                    <Label className="text-[10px] font-bold uppercase text-slate-500">CPF *</Label>
+                    <Input placeholder="000.000.000-00" className="h-10 font-mono" value={formData.cpf} onChange={(e) => handleChange("cpf", e.target.value)} />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label className="text-[10px] font-bold uppercase text-slate-500">RG</Label>
+                    <Input placeholder="0000000" className="h-10 font-mono" value={formData.rg} onChange={(e) => handleChange("rg", e.target.value)} />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label className="text-[10px] font-bold uppercase text-slate-500">Órgão Emissor / UF</Label>
+                    <Input placeholder="SSP/SP" className="h-10 uppercase" value={formData.organIssuer} onChange={(e) => handleChange("organIssuer", e.target.value.toUpperCase())} />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label className="text-[10px] font-bold uppercase text-slate-500">Cartão do SUS</Label>
+                    <Input placeholder="000 0000 0000 0000" className="h-10 font-mono" value={formData.susCard} onChange={(e) => handleChange("susCard", e.target.value)} />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <Label className="text-[10px] font-bold uppercase text-slate-500">Data de Nasc. *</Label>
+                    <Input type="date" className="h-10" value={formData.birthDate} onChange={(e) => handleChange("birthDate", e.target.value)} />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label className="text-[10px] font-bold uppercase text-slate-500">Sexo</Label>
+                    <Select value={formData.gender} onValueChange={(v) => handleChange("gender", v)}>
+                      <SelectTrigger className="h-10"><SelectValue placeholder="Selecione" /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="masculino">Masculino</SelectItem>
+                        <SelectItem value="feminino">Feminino</SelectItem>
+                        <SelectItem value="outro">Outro</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-1.5 md:col-span-2">
+                    <Label className="text-[10px] font-bold uppercase text-slate-500">Nome da Mãe *</Label>
+                    <Input placeholder="Nome completo da mãe" className="h-10" value={formData.motherName} onChange={(e) => handleChange("motherName", e.target.value)} />
+                  </div>
+
+                  <div className="col-span-full border-t border-slate-100 dark:border-slate-800 my-2 pt-4">
+                    <p className="text-xs font-black uppercase text-[#006699] mb-4">Informações Complementares</p>
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <Label className="text-[10px] font-bold uppercase text-slate-500">Nacionalidade</Label>
+                    <Input placeholder="Ex: Brasileira" className="h-10" value={formData.nationality} onChange={(e) => handleChange("nationality", e.target.value)} />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label className="text-[10px] font-bold uppercase text-slate-500">Naturalidade</Label>
+                    <Input placeholder="Ex: São Paulo" className="h-10" value={formData.birthPlace} onChange={(e) => handleChange("birthPlace", e.target.value)} />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label className="text-[10px] font-bold uppercase text-slate-500">Raça / Cor</Label>
+                    <Select value={formData.race} onValueChange={(v) => handleChange("race", v)}>
+                      <SelectTrigger className="h-10"><SelectValue placeholder="Selecione" /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="branca">Branca</SelectItem>
+                        <SelectItem value="preta">Preta</SelectItem>
+                        <SelectItem value="parda">Parda</SelectItem>
+                        <SelectItem value="amarela">Amarela</SelectItem>
+                        <SelectItem value="indigena">Indígena</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label className="text-[10px] font-bold uppercase text-slate-500">Estado Civil</Label>
+                    <Select value={formData.maritalStatus} onValueChange={(v) => handleChange("maritalStatus", v)}>
+                      <SelectTrigger className="h-10"><SelectValue placeholder="Selecione" /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="solteiro">Solteiro(a)</SelectItem>
+                        <SelectItem value="casado">Casado(a)</SelectItem>
+                        <SelectItem value="divorciado">Divorciado(a)</SelectItem>
+                        <SelectItem value="viuvo">Viúvo(a)</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <Label className="text-[10px] font-bold uppercase text-slate-500">Profissão</Label>
+                    <Input placeholder="Profissão ou Ocupação" className="h-10" value={formData.profession} onChange={(e) => handleChange("profession", e.target.value)} />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label className="text-[10px] font-bold uppercase text-slate-500">Religião</Label>
+                    <Input placeholder="Religião" className="h-10" value={formData.religion} onChange={(e) => handleChange("religion", e.target.value)} />
+                  </div>
+                  <div className="space-y-1.5 md:col-span-2">
+                    <Label className="text-[10px] font-bold uppercase text-slate-500">PCD (Necessidades Especiais)</Label>
+                    <Select value={formData.pcd} onValueChange={(v) => handleChange("pcd", v)}>
+                      <SelectTrigger className="h-10"><SelectValue placeholder="Não" /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="nao">Não possui</SelectItem>
+                        <SelectItem value="visual">Deficiência Visual</SelectItem>
+                        <SelectItem value="auditiva">Deficiência Auditiva</SelectItem>
+                        <SelectItem value="motora">Deficiência Motora</SelectItem>
+                        <SelectItem value="intelectual">Deficiência Intelectual / Cognitiva</SelectItem>
+                        <SelectItem value="multipla">Deficiência Múltipla</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* ACOMPANHANTE */}
+              <Card className="glass-card shadow-sm border-slate-200/50">
+                <CardHeader className="bg-slate-100/50 dark:bg-slate-800/50 py-4 border-b border-slate-200/50">
+                  <CardTitle className="text-sm font-black uppercase text-[#006699] flex items-center gap-2">
+                    <Users className="h-4 w-4" /> Dados do Acompanhante / Responsável
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-1.5 md:col-span-2">
+                    <Label className="text-[10px] font-bold uppercase text-slate-500">Nome do Acompanhante</Label>
+                    <Input placeholder="Opcional se maior de idade" className="h-10" value={formData.companionName} onChange={(e) => handleChange("companionName", e.target.value)} />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label className="text-[10px] font-bold uppercase text-slate-500">CPF do Acompanhante</Label>
+                    <Input placeholder="000.000.000-00" className="h-10 font-mono" value={formData.companionCpf} onChange={(e) => handleChange("companionCpf", e.target.value)} />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label className="text-[10px] font-bold uppercase text-slate-500">Telefone do Acompanhante</Label>
+                    <Input placeholder="(00) 00000-0000" className="h-10" value={formData.companionPhone} onChange={(e) => handleChange("companionPhone", e.target.value)} />
+                  </div>
+                  <div className="space-y-1.5 md:col-span-2">
+                    <Label className="text-[10px] font-bold uppercase text-slate-500">Grau de Parentesco</Label>
+                    <Select value={formData.companionRelation} onValueChange={(v) => handleChange("companionRelation", v)}>
+                      <SelectTrigger className="h-10"><SelectValue placeholder="Selecione" /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="mae">Mãe / Pai</SelectItem>
+                        <SelectItem value="filho">Filho(a)</SelectItem>
+                        <SelectItem value="conjuge">Cônjuge</SelectItem>
+                        <SelectItem value="irmao">Irmão(ã)</SelectItem>
+                        <SelectItem value="outro">Outro</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* ENDEREÇO E CONTATO */}
+              <Card className="glass-card shadow-sm border-slate-200/50">
+                <CardHeader className="bg-slate-100/50 dark:bg-slate-800/50 py-4 border-b border-slate-200/50">
+                  <CardTitle className="text-sm font-black uppercase text-[#006699] flex items-center gap-2">
+                    <MapPin className="h-4 w-4" /> Localização e Contato
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="p-4 grid grid-cols-1 md:grid-cols-4 gap-4">
+                  <div className="space-y-1.5">
+                    <Label className="text-[10px] font-bold uppercase text-slate-500">CEP</Label>
+                    <Input 
+                      placeholder="00000-000" 
+                      className="h-10"
+                      value={formData.cep}
+                      onChange={(e) => handleChange("cep", e.target.value)}
+                    />
+                  </div>
+                  
+                  <div className="space-y-1.5 md:col-span-3">
+                    <Label className="text-[10px] font-bold uppercase text-slate-500">Logradouro</Label>
+                    <Input 
+                      placeholder="Rua, Avenida..." 
+                      className="h-10"
+                      value={formData.street}
+                      onChange={(e) => handleChange("street", e.target.value)}
+                    />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <Label className="text-[10px] font-bold uppercase text-slate-500">Número</Label>
+                    <Input 
+                      placeholder="Nº" 
+                      className="h-10"
+                      value={formData.number}
+                      onChange={(e) => handleChange("number", e.target.value)}
+                    />
+                  </div>
+
+                  <div className="space-y-1.5 md:col-span-1">
+                    <Label className="text-[10px] font-bold uppercase text-slate-500">Complemento</Label>
+                    <Input 
+                      placeholder="Apto, Bloco..." 
+                      className="h-10"
+                      value={formData.complement}
+                      onChange={(e) => handleChange("complement", e.target.value)}
+                    />
+                  </div>
+
+                  <div className="space-y-1.5 md:col-span-2">
+                    <Label className="text-[10px] font-bold uppercase text-slate-500">Bairro</Label>
+                    <Input 
+                      placeholder="Bairro" 
+                      className="h-10"
+                      value={formData.neighborhood}
+                      onChange={(e) => handleChange("neighborhood", e.target.value)}
+                    />
+                  </div>
+
+                  <div className="space-y-1.5 md:col-span-2">
+                    <Label className="text-[10px] font-bold uppercase text-slate-500">Cidade</Label>
+                    <Input 
+                      placeholder="Cidade" 
+                      className="h-10"
+                      value={formData.city}
+                      onChange={(e) => handleChange("city", e.target.value)}
+                    />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <Label className="text-[10px] font-bold uppercase text-slate-500">UF</Label>
+                    <Input 
+                      placeholder="UF" 
+                      maxLength={2}
+                      className="h-10 uppercase"
+                      value={formData.state}
+                      onChange={(e) => handleChange("state", e.target.value.toUpperCase())}
+                    />
+                  </div>
+                  
+                  <div className="space-y-1.5">
+                    <Label className="text-[10px] font-bold uppercase text-slate-500">Celular</Label>
+                    <Input 
+                      placeholder="(00) 00000-0000" 
+                      className="h-10"
+                      value={formData.phone1}
+                      onChange={(e) => handleChange("phone1", e.target.value)}
+                    />
+                  </div>
+                </CardContent>
+              </Card>
+
+              <div className="flex justify-end gap-3 pt-4 sticky bottom-0 bg-slate-50 dark:bg-slate-950 pb-4">
+                <Button type="button" variant="outline" onClick={() => setIsModalOpen(false)} className="px-8 h-12 uppercase font-bold text-xs rounded-xl">
+                  Cancelar
+                </Button>
+                <Button type="submit" className="px-10 h-12 gap-2 bg-[#006699] hover:bg-[#005580] text-white uppercase font-black tracking-widest rounded-xl shadow-lg shadow-sky-500/20">
+                  <Save className="h-4 w-4" />
+                  Salvar Cadastro Completo
+                </Button>
               </div>
-              DADOS DE IDENTIFICAÇÃO
-            </CardTitle>
-            <CardDescription className="font-extrabold text-[10px] uppercase tracking-wider text-muted-foreground dark:text-slate-400 mt-2 opacity-80">REGISTRO OBRIGATÓRIO PARA TRIAGEM</CardDescription>
-          </CardHeader>
-          <CardContent className="p-8 grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="space-y-2 md:col-span-2">
-              <Label className="text-xs font-black uppercase tracking-widest text-[#006699] dark:text-sky-400">Nome Completo *</Label>
-              <Input 
-                placeholder="Insira o nome completo sem abreviações" 
-                className="h-12 rounded-xl border border-slate-200/60 dark:border-slate-800/60 text-foreground transition-all duration-300"
-                value={formData.name}
-                onChange={(e) => handleChange("name", e.target.value)}
-              />
-            </div>
-
-            <div className="space-y-2 md:col-span-1">
-              <Label className="text-xs font-black uppercase tracking-widest text-[#006699] dark:text-sky-400">Nome Social</Label>
-              <Input 
-                placeholder="Como o paciente prefere ser chamado" 
-                className="h-12 rounded-xl border border-slate-200/60 dark:border-slate-800/60 text-foreground transition-all duration-300"
-                value={formData.socialName}
-                onChange={(e) => handleChange("socialName", e.target.value)}
-              />
-            </div>
-            
-            <div className="space-y-2">
-              <Label className="text-xs font-black uppercase tracking-widest text-[#006699] dark:text-sky-400">CPF *</Label>
-              <Input 
-                placeholder="000.000.000-00" 
-                className="h-12 rounded-xl border border-slate-200/60 dark:border-slate-800/60 font-mono text-foreground transition-all duration-300"
-                value={formData.cpf}
-                onChange={(e) => handleChange("cpf", e.target.value)}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label className="text-xs font-black uppercase tracking-widest text-[#006699] dark:text-sky-400">Cartão do SUS</Label>
-              <Input 
-                placeholder="000 0000 0000 0000" 
-                className="h-12 rounded-xl border border-slate-200/60 dark:border-slate-800/60 font-mono text-foreground transition-all duration-300"
-                value={formData.susCard}
-                onChange={(e) => handleChange("susCard", e.target.value)}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label className="text-xs font-black uppercase tracking-widest text-[#006699] dark:text-sky-400">Data de Nascimento *</Label>
-              <Input 
-                type="date"
-                className="h-12 rounded-xl border border-slate-200/60 dark:border-slate-800/60 text-foreground transition-all duration-300"
-                value={formData.birthDate}
-                onChange={(e) => handleChange("birthDate", e.target.value)}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label className="text-xs font-black uppercase tracking-widest text-[#006699] dark:text-sky-400">Sexo</Label>
-              <Select value={formData.gender} onValueChange={(v) => handleChange("gender", v)}>
-                <SelectTrigger 
-                  className={cn(
-                    "h-12 rounded-xl border border-slate-200/60 dark:border-slate-800/60 text-foreground transition-all duration-300",
-                    formData.gender 
-                      ? "bg-white dark:bg-slate-900 shadow-sm" 
-                      : "bg-white/50 dark:bg-slate-900/40 backdrop-blur-sm"
-                  )}
-                >
-                  <SelectValue placeholder="Selecione" />
-                </SelectTrigger>
-                <SelectContent className="border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-foreground">
-                  <SelectItem value="masculino">Masculino</SelectItem>
-                  <SelectItem value="feminino">Feminino</SelectItem>
-                  <SelectItem value="outro">Outro</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-2">
-              <Label className="text-xs font-black uppercase tracking-widest text-[#006699] dark:text-sky-400">Celular</Label>
-              <Input 
-                placeholder="(00) 00000-0000" 
-                className="h-12 rounded-xl border border-slate-200/60 dark:border-slate-800/60 text-foreground transition-all duration-300"
-                value={formData.phone1}
-                onChange={(e) => handleChange("phone1", e.target.value)}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label className="text-xs font-black uppercase tracking-widest text-[#006699] dark:text-sky-400">Telefone p/ Contato</Label>
-              <Input 
-                placeholder="(00) 0000-0000" 
-                className="h-12 rounded-xl border border-slate-200/60 dark:border-slate-800/60 text-foreground transition-all duration-300"
-                value={formData.phone2}
-                onChange={(e) => handleChange("phone2", e.target.value)}
-              />
-            </div>
-
-            <div className="space-y-2 md:col-span-2">
-              <Label className="text-xs font-black uppercase tracking-widest text-[#006699] dark:text-sky-400">E-mail</Label>
-              <Input 
-                type="email"
-                placeholder="exemplo@email.com" 
-                className="h-12 rounded-xl border border-slate-200/60 dark:border-slate-800/60 text-foreground transition-all duration-300"
-                value={formData.email}
-                onChange={(e) => handleChange("email", e.target.value)}
-              />
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* ENDEREÇO */}
-        <Card className="glass-card border border-slate-200/40 dark:border-slate-800/40 shadow-xl rounded-xl overflow-hidden bg-white/70 dark:bg-slate-900/45 transition-colors duration-500 relative">
-          <CardHeader className="bg-slate-105/30 dark:bg-slate-800/30 border-b border-slate-200/40 dark:border-slate-800/40 p-8">
-            <CardTitle className="text-xl mission-control-title flex items-center gap-3 text-foreground dark:text-white">
-              <div className="h-10 w-10 rounded-xl bg-[#006699]/10 dark:bg-sky-500/20 flex items-center justify-center border border-[#006699]/20 dark:border-sky-500/30 shadow-sm backdrop-blur-md transition-all">
-                <MapPin className="h-5.5 w-5.5 text-[#006699] dark:text-sky-400" />
-              </div>
-              LOCALIZAÇÃO E CONTATO
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="p-8 grid grid-cols-1 md:grid-cols-4 gap-6">
-            <div className="space-y-2">
-              <Label className="text-xs font-black uppercase tracking-widest text-[#006699] dark:text-sky-400">CEP</Label>
-              <Input 
-                placeholder="00000-000" 
-                className="h-12 rounded-xl border border-slate-200/60 dark:border-slate-800/60 text-foreground transition-all duration-300"
-                value={formData.cep}
-                onChange={(e) => handleChange("cep", e.target.value)}
-              />
-            </div>
-            
-            <div className="space-y-2 md:col-span-3">
-              <Label className="text-xs font-black uppercase tracking-widest text-[#006699] dark:text-sky-400">Logradouro</Label>
-              <Input 
-                placeholder="Rua, Avenida..." 
-                className="h-12 rounded-xl border border-slate-200/60 dark:border-slate-800/60 text-foreground transition-all duration-300"
-                value={formData.street}
-                onChange={(e) => handleChange("street", e.target.value)}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label className="text-xs font-black uppercase tracking-widest text-[#006699] dark:text-sky-400">Número</Label>
-              <Input 
-                placeholder="Nº" 
-                className="h-12 rounded-xl border border-slate-200/60 dark:border-slate-800/60 text-foreground transition-all duration-300"
-                value={formData.number}
-                onChange={(e) => handleChange("number", e.target.value)}
-              />
-            </div>
-
-            <div className="space-y-2 md:col-span-2">
-              <Label className="text-xs font-black uppercase tracking-widest text-[#006699] dark:text-sky-400">Complemento</Label>
-              <Input 
-                placeholder="Apto, Bloco, etc." 
-                className="h-12 rounded-xl border border-slate-200/60 dark:border-slate-800/60 text-foreground transition-all duration-300"
-                value={formData.complement}
-                onChange={(e) => handleChange("complement", e.target.value)}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label className="text-xs font-black uppercase tracking-widest text-[#006699] dark:text-sky-400">Bairro</Label>
-              <Input 
-                placeholder="Ex: Centro" 
-                className="h-12 rounded-xl border border-slate-200/60 dark:border-slate-800/60 text-foreground transition-all duration-300"
-                value={formData.neighborhood}
-                onChange={(e) => handleChange("neighborhood", e.target.value)}
-              />
-            </div>
-
-            <div className="space-y-2 md:col-span-3">
-              <Label className="text-xs font-black uppercase tracking-widest text-[#006699] dark:text-sky-400">Cidade</Label>
-              <Input 
-                placeholder="Cidade" 
-                className="h-12 rounded-xl border border-slate-200/60 dark:border-slate-800/60 text-foreground transition-all duration-300"
-                value={formData.city}
-                onChange={(e) => handleChange("city", e.target.value)}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label className="text-xs font-black uppercase tracking-widest text-[#006699] dark:text-sky-400">UF</Label>
-              <Input 
-                placeholder="UF" 
-                maxLength={2}
-                className="h-12 rounded-xl border border-slate-200/60 dark:border-slate-800/60 text-foreground uppercase transition-all duration-300"
-                value={formData.state}
-                onChange={(e) => handleChange("state", e.target.value.toUpperCase())}
-              />
-            </div>
-          </CardContent>
-        </Card>
-
-        <div className="flex flex-col md:flex-row justify-between items-center gap-4 p-4">
-           <div className="flex items-center gap-2 text-muted-foreground dark:text-slate-400">
-              <div className="h-10 w-10 rounded-xl bg-orange-500/10 dark:bg-amber-500/15 flex items-center justify-center border border-orange-500/20 dark:border-amber-500/30 shadow-sm shadow-orange-500/5 backdrop-blur-sm transition-all">
-                <AlertTriangle className="h-5 w-5 text-orange-600 dark:text-amber-400" />
-              </div>
-              <p className="text-xs font-bold italic text-orange-700/90 dark:text-amber-300/90">Confirme as informações antes de finalizar o registro.</p>
-           </div>
-           <div className="flex gap-3 w-full md:w-auto">
-              <Button type="button" variant="outline" onClick={() => navigate(-1)} className="rounded-xl px-8 h-12 font-bold uppercase tracking-wider border-slate-200 dark:border-slate-800 text-foreground hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors bg-transparent">
-                Cancelar
-              </Button>
-              <Button type="submit" className="flex-1 md:flex-none gap-2 rounded-xl px-10 h-12 font-black uppercase tracking-widest bg-[#006699] hover:bg-[#005580] dark:bg-sky-600 dark:hover:bg-sky-500 text-white shadow-lg shadow-sky-500/25 border-0">
-                <Save className="h-5 w-5" />
-                Cadastrar Paciente
-              </Button>
-           </div>
-        </div>
-      </form>
+            </form>
+          </div>
+        </DialogContent>
+      </Dialog>
     </motion.div>
   );
 }

@@ -3,7 +3,7 @@ import { usePatients, Patient } from "@/hooks/use-patients";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Stethoscope, User, Calendar, ExternalLink, Activity, Megaphone, X, Volume2, VolumeX, Building2, Info } from "lucide-react";
+import { Stethoscope, User, Calendar, ExternalLink, Activity, Megaphone, X, Volume2, VolumeX, Building2, Info, LogOut } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
@@ -12,7 +12,9 @@ import { cn, formatWords, formatPatientNameLGPD } from "@/lib/utils";
 import { PatientDetailsModal } from "@/components/PatientDetailsModal";
 import { ExamsModal } from "@/components/PatientEvolution/Modals/ExamsModal";
 import { useEffect, useRef } from "react";
-import { AlertTriangle, FlaskConical } from "lucide-react";
+import { AlertTriangle, FlaskConical, FileText } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import PatientRecord from "@/pages/PatientRecord";
 
 export default function Attendances() {
   const navigate = useNavigate();
@@ -25,8 +27,18 @@ export default function Attendances() {
     updatePatient,
     resetSystem
   } = usePatients();
+  
+  const [selectedRoom, setSelectedRoom] = useState<string>(() => {
+    return localStorage.getItem('selectedClinicalRoom') || "CONSULTÓRIO MÉDICO 1";
+  });
+
+  useEffect(() => {
+    localStorage.setItem('selectedClinicalRoom', selectedRoom);
+  }, [selectedRoom]);
+
   const [showCallControl, setShowCallControl] = useState(false);
   const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
+  const [recordPatientId, setRecordPatientId] = useState<number | null>(null);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
   const [isExamsModalOpen, setIsExamsModalOpen] = useState(false);
   const [patientForExams, setPatientForExams] = useState<Patient | null>(null);
@@ -40,6 +52,8 @@ export default function Attendances() {
     age?: number;
     cpf?: string;
   } | null>(null);
+  const [evasaoPatient, setEvasaoPatient] = useState<{id: string, name: string} | null>(null);
+  const [evasaoReason, setEvasaoReason] = useState<string>("");
 
   const getRiskDetails = (risk: string) => {
     switch(risk) {
@@ -53,13 +67,28 @@ export default function Attendances() {
     }
   };
 
-  const attendingPatients = patients.filter(p => p.status === 'attending');
-  const classifiedPatients = patients.filter(p => !attendingPatients.includes(p) && p.status === 'waiting' && p.risk);
+  const riskRank: Record<string, number> = {
+    'emergency': 0,
+    'very-urgent': 1,
+    'urgent': 2,
+    'less-urgent': 3,
+    'not-urgent': 4,
+    'evasion': 5,
+  };
+
+  const attendingPatients = patients
+    .filter(p => p.status === 'attending')
+    .sort((a, b) => {
+      const riskA = riskRank[a.risk || 'not-urgent'] ?? 99;
+      const riskB = riskRank[b.risk || 'not-urgent'] ?? 99;
+      return riskA - riskB;
+    });
+  const classifiedPatients = patients.filter(p => !attendingPatients.includes(p) && p.status === 'waiting' && p.risk && (p.registrationComplete !== false || p.risk === 'emergency'));
 
   const handleCall = (patient: Patient) => {
     const ticketToUse = patient.ticket || "GERAL";
     
-    const roomToUse = patient.sector || 'CONSULTÓRIO MÉDICO';
+    const roomToUse = selectedRoom;
     
     setCallingTicket({ 
       ticket: ticketToUse, 
@@ -81,7 +110,7 @@ export default function Attendances() {
   };
 
   const handleAttend = (patient: Patient) => {
-    updatePatient(patient.id, { status: 'attending' });
+    updatePatient(patient.id, { status: 'attending', sector: selectedRoom });
     toast.success(`Iniciando atendimento: ${formatWords(patient.name)}`, {
       icon: <Stethoscope className="h-4 w-4 text-green-500" />,
     });
@@ -109,7 +138,7 @@ export default function Attendances() {
     >
 
       {/* Header */}
-      <div className="flex flex-col gap-1">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div className="flex items-center gap-3">
           <div className="h-11 w-11 rounded-2xl bg-[#006699]/10 dark:bg-sky-400/15 flex items-center justify-center text-[#006699] dark:text-sky-400 shadow-inner">
             <Stethoscope className="h-6 w-6" />
@@ -121,6 +150,27 @@ export default function Attendances() {
             <p className="text-muted-foreground text-xs font-black uppercase tracking-[0.3em] flex items-center gap-2 mt-1">
               Gerenciamento de consultas e procedimentos médicos
             </p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-3 bg-white/50 dark:bg-slate-900/40 p-2 rounded-2xl border border-slate-200/50 dark:border-slate-800/50 shadow-sm">
+          <div className="flex items-center justify-center h-10 w-10 rounded-xl bg-[#006699]/10 text-[#006699] dark:bg-sky-400/10 dark:text-sky-400 shrink-0">
+            <Building2 className="h-5 w-5" />
+          </div>
+          <div className="flex flex-col gap-1 pr-2">
+            <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground">Meu Consultório</span>
+            <Select value={selectedRoom} onValueChange={setSelectedRoom}>
+              <SelectTrigger className="h-7 w-[220px] border-none bg-transparent shadow-none p-0 focus:ring-0 text-sm font-black text-foreground">
+                <SelectValue placeholder="Selecione o consultório" />
+              </SelectTrigger>
+              <SelectContent className="glass-card-premium rounded-xl border-white/20">
+                {Array.from({ length: 8 }, (_, i) => (
+                  <SelectItem key={i} value={`CONSULTÓRIO MÉDICO ${i + 1}`} className="font-bold text-xs">
+                    CONSULTÓRIO MÉDICO {i + 1}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
         </div>
       </div>
@@ -224,54 +274,59 @@ export default function Attendances() {
               {attendingPatients.map((patient) => {
                 const risk = getRiskDetails(patient.risk || 'not-urgent');
                 return (
-                  <Card key={patient.id} className="glass-card border border-slate-200/40 dark:border-slate-800/40 shadow-xl rounded-xl overflow-hidden bg-white/70 dark:bg-slate-900/45 transition-colors duration-500 group">
-                    <CardHeader className="pb-2">
-                      <div className="flex items-center justify-between">
+                  <div key={patient.id} className="p-4 glass-card border border-slate-200/40 dark:border-slate-800/40 shadow-md hover:shadow-lg rounded-xl bg-white/70 dark:bg-slate-900/45 transition-all duration-300 flex flex-col xl:flex-row items-start xl:items-center justify-between gap-4">
+                    <div className="flex items-center gap-4 flex-1 min-w-0">
+                      <div className="min-w-[120px] flex justify-center shrink-0">
                         <Badge className={cn(
                           risk.color,
-                          "text-[10px] font-bold px-2 py-1.5 border-0 rounded-full shadow-sm min-w-[125px] justify-center transition-transform hover:scale-105 active:scale-95"
+                          "text-[10px] font-bold px-2 py-1.5 border-0 rounded-full shadow-sm w-full justify-center transition-transform hover:scale-105 active:scale-95"
                         )}>
                           {risk.label}
                         </Badge>
-                        <span className="text-xs text-slate-500 dark:text-slate-400 font-medium flex items-center gap-1">
-                          Iniciado há 15 min
-                        </span>
                       </div>
-                      <CardTitle className="mt-2 text-sm font-black text-slate-800 dark:text-slate-100 uppercase tracking-tight">{formatWords(patient.name)}</CardTitle>
-                      <div className="flex flex-col gap-1 mt-2">
-                        <div className="flex items-center gap-2 text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase">
-                           <Building2 className="h-3 w-3 text-[#006699] dark:text-sky-405" />
-                           Setor: <span className="text-slate-800 dark:text-slate-200 font-black">{patient.sector || 'Não definido'}</span>
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-2">
+                          <p className="font-black text-sm text-slate-800 dark:text-slate-100 uppercase tracking-tight truncate">{formatWords(patient.name)}</p>
+                          <span className="text-[9px] text-slate-500 dark:text-slate-400 font-bold uppercase shrink-0 px-2 py-0.5 bg-slate-100 dark:bg-slate-800 rounded-full">
+                            Iniciado há 15 min
+                          </span>
                         </div>
-                        <div className="flex items-center gap-2 text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase">
-                           <User className="h-3 w-3 text-[#006699] dark:text-sky-405" />
-                           Responsável: <span className="text-[#006699] dark:text-sky-400 font-black">{patient.responsibleProfessional || 'Não atribuído'}</span>
+                        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-1.5">
+                          <div className="flex items-center gap-1.5 text-[9px] text-slate-500 dark:text-slate-400 font-bold uppercase">
+                            <User className="h-3 w-3 text-[#006699] dark:text-sky-400" />
+                            Resp: <span className="text-slate-700 dark:text-slate-300 font-black">{patient.responsibleProfessional || 'Não atribuído'}</span>
+                          </div>
+                          <div className="flex items-center gap-1.5 text-[9px] text-slate-500 dark:text-slate-400 font-bold uppercase">
+                            <Building2 className="h-3 w-3 text-[#006699] dark:text-sky-400" />
+                            Setor: <span className="text-slate-700 dark:text-slate-300 font-black">{patient.sector || 'Não definido'}</span>
+                          </div>
+                          <div className="flex items-center gap-1.5 text-[9px] text-slate-400 dark:text-slate-500 font-bold uppercase">
+                            <span>ID: {patient.id}</span>
+                            <span className="w-1 h-1 rounded-full bg-slate-300 dark:bg-slate-700"></span>
+                            <span>{patient.age} anos</span>
+                          </div>
                         </div>
                       </div>
-                      <div className="flex items-center gap-2 text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase mt-2">
-                         <span>ID: {patient.id}</span>
-                         <span className="w-1 h-1 rounded-full bg-slate-300 dark:bg-slate-800"></span>
-                         <span>{patient.age} anos</span>
-                      </div>
-                    </CardHeader>
-                    <CardContent className="flex justify-end gap-2 pb-4 pt-2">
+                    </div>
+                    
+                    <div className="flex flex-wrap items-center gap-2 w-full xl:w-auto justify-end shrink-0 pt-2 xl:pt-0 border-t xl:border-0 border-slate-100 dark:border-slate-800/50 mt-2 xl:mt-0">
                       <Button 
                         variant="ghost" 
                         size="sm" 
-                        className="h-9 rounded-xl gap-2 font-black uppercase text-[10px] tracking-wider text-slate-550 dark:text-slate-450 hover:text-primary dark:hover:text-sky-400 hover:bg-primary/5 dark:hover:bg-sky-400/5 cursor-pointer border-0" 
+                        className="h-8 rounded-lg gap-1.5 font-black uppercase text-[9px] tracking-wider text-slate-550 dark:text-slate-450 hover:text-primary dark:hover:text-sky-400 hover:bg-primary/5 dark:hover:bg-sky-400/5 cursor-pointer border-0 px-2" 
                         onClick={() => {
                           setSelectedPatient(patient);
                           setIsDetailsModalOpen(true);
                         }}
                       >
                         <Info className="h-3.5 w-3.5" />
-                        Detalhes
+                        <span className="hidden sm:inline">Detalhes</span>
                       </Button>
                       <Button 
                         variant="outline" 
                         size="sm" 
-                        className="h-9 rounded-xl gap-2 font-black uppercase text-[10px] tracking-wider text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-900 cursor-pointer" 
-                        onClick={() => navigate(`/paciente/${patient.id}`, { state: { from: '/atendimentos', label: 'Atendimentos' } })}
+                        className="h-8 rounded-lg gap-1.5 font-black uppercase text-[9px] tracking-wider text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-900 cursor-pointer px-2" 
+                        onClick={() => setRecordPatientId(patient.id)}
                       >
                         <User className="h-3.5 w-3.5" />
                         Prontuário
@@ -279,7 +334,7 @@ export default function Attendances() {
                       <Button 
                         variant="outline"
                         size="sm" 
-                        className="h-9 rounded-xl gap-2 font-black uppercase text-[10px] tracking-wider text-blue-600 border-blue-200 hover:bg-blue-50 dark:text-blue-400 dark:border-blue-900 dark:hover:bg-blue-900/20 cursor-pointer" 
+                        className="h-8 rounded-lg gap-1.5 font-black uppercase text-[9px] tracking-wider text-blue-600 border-blue-200 hover:bg-blue-50 dark:text-blue-400 dark:border-blue-900 dark:hover:bg-blue-900/20 cursor-pointer px-2" 
                         onClick={() => navigate(`/paciente/${patient.id}`, { state: { from: '/atendimentos', label: 'Atendimentos', activeTab: 'exams' } })}
                       >
                         <FlaskConical className="h-3.5 w-3.5" />
@@ -287,14 +342,14 @@ export default function Attendances() {
                       </Button>
                       <Button 
                         size="sm" 
-                        className="h-9 rounded-xl gap-2 font-black uppercase text-[10px] tracking-wider bg-[#006699] hover:bg-[#005580] dark:bg-sky-600 dark:hover:bg-sky-500 text-white shadow-lg shadow-[#006699]/10 dark:shadow-none border-0 cursor-pointer" 
+                        className="h-8 rounded-lg gap-1.5 font-black uppercase text-[9px] tracking-wider bg-[#006699] hover:bg-[#005580] dark:bg-sky-600 dark:hover:bg-sky-500 text-white shadow-md border-0 cursor-pointer px-3" 
                         onClick={() => navigate(`/paciente/${patient.id}/evolucao`, { state: { from: '/atendimentos', label: 'Atendimentos' } })}
                       >
                         <Stethoscope className="h-3.5 w-3.5" />
                         Evoluir
                       </Button>
-                    </CardContent>
-                  </Card>
+                    </div>
+                  </div>
                 );
               })}
               {attendingPatients.length === 0 && (
@@ -351,6 +406,15 @@ export default function Attendances() {
                           <Button 
                             size="sm" 
                             variant="ghost" 
+                            className="h-9 w-9 rounded-xl p-0 text-slate-500 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 cursor-pointer border-0"
+                            onClick={() => setEvasaoPatient({ id: patient.id, name: patient.name })}
+                            title="Registrar Evasão"
+                          >
+                            <LogOut className="h-4 w-4" />
+                          </Button>
+                          <Button 
+                            size="sm" 
+                            variant="ghost" 
                             className="h-9 rounded-xl px-3 gap-2 text-primary dark:text-sky-400 hover:bg-primary/5 dark:hover:bg-sky-400/5 font-black uppercase text-[10px] tracking-wider cursor-pointer border-0"
                             onClick={() => handleCall(patient)}
                           >
@@ -370,7 +434,7 @@ export default function Attendances() {
                             size="sm" 
                             variant="ghost" 
                             className="h-9 w-9 rounded-xl p-0 text-slate-500 hover:text-[#006699] dark:hover:text-sky-400 hover:bg-slate-50 dark:hover:bg-slate-900 border-0 cursor-pointer"
-                            onClick={() => navigate(`/paciente/${patient.id}`, { state: { from: '/atendimentos', label: 'Atendimentos' } })}
+                            onClick={() => setRecordPatientId(patient.id)}
                             title="Ver Prontuário"
                           >
                             <ExternalLink className="h-4 w-4" />
@@ -491,6 +555,89 @@ export default function Attendances() {
           </div>
         </DialogContent>
       </Dialog>
+      <Dialog open={!!evasaoPatient} onOpenChange={(open) => {
+        if (!open) {
+          setEvasaoPatient(null);
+          setEvasaoReason("");
+        }
+      }}>
+        <DialogContent className="sm:max-w-[450px] rounded-xl p-8 border-none shadow-2xl bg-white dark:bg-slate-950 text-foreground">
+          <div className="flex flex-col items-center text-center space-y-4">
+            <div className="h-16 w-16 rounded-full bg-red-500/10 dark:bg-red-500/20 flex items-center justify-center text-red-550 dark:text-red-400 animate-pulse">
+              <LogOut className="h-8 w-8" />
+            </div>
+            <div className="space-y-2">
+              <DialogTitle className="text-xl font-black uppercase tracking-tight text-slate-800 dark:text-white">Confirmar Evasão?</DialogTitle>
+              <DialogDescription className="text-sm font-medium leading-relaxed px-2 text-slate-500 dark:text-slate-400">
+                Você está registrando que o paciente <strong className="text-red-550 dark:text-red-400">{formatWords(evasaoPatient?.name || "")}</strong> se retirou da unidade sem concluir o atendimento clínico.
+              </DialogDescription>
+            </div>
+            
+            <div className="w-full text-left mt-2 mb-2">
+              <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 block mb-2">
+                Motivo da Evasão (Opcional)
+              </label>
+              <div className="grid grid-cols-1 gap-2">
+                {[
+                  "Demora no atendimento",
+                  "Melhora dos sintomas",
+                  "Procurou outro serviço",
+                  "Desistência voluntária",
+                  "Ausente após 3 chamadas"
+                ].map((reason) => (
+                  <button
+                    key={reason}
+                    onClick={() => setEvasaoReason(reason === evasaoReason ? "" : reason)}
+                    className={cn(
+                      "w-full text-left px-3 py-2.5 rounded-xl border-2 transition-all flex items-center justify-between group cursor-pointer",
+                      evasaoReason === reason 
+                        ? "border-red-500 bg-red-500/5 font-bold text-red-600 dark:text-red-400" 
+                        : "border-slate-100 dark:border-slate-800 hover:border-slate-200 dark:hover:border-slate-700 text-slate-600 dark:text-slate-400 bg-slate-50/50 dark:bg-slate-900/40"
+                    )}
+                  >
+                    <span className="text-[11px] font-bold uppercase tracking-tight truncate">{reason}</span>
+                    <div className={cn(
+                      "h-3.5 w-3.5 rounded-full border-2 flex items-center justify-center transition-all shrink-0",
+                      evasaoReason === reason ? "border-red-500 bg-red-500" : "border-slate-300 dark:border-slate-700"
+                    )}>
+                      {evasaoReason === reason && <div className="h-1.5 w-1.5 rounded-full bg-white dark:bg-slate-950" />}
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3 w-full pt-2">
+              <Button 
+                variant="outline" 
+                className="h-12 rounded-xl font-bold uppercase tracking-widest border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-900 transition-colors cursor-pointer"
+                onClick={() => {
+                  setEvasaoPatient(null);
+                  setEvasaoReason("");
+                }}
+              >
+                Cancelar
+              </Button>
+              <Button 
+                className="h-12 rounded-xl bg-red-500 hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-500 text-white font-black uppercase tracking-widest shadow-lg shadow-red-200 dark:shadow-none border-0 cursor-pointer"
+                onClick={() => {
+                  if (evasaoPatient) {
+                    updatePatient(evasaoPatient.id, { 
+                      status: 'evasao',
+                      justification: evasaoReason ? `Motivo da evasão: ${evasaoReason}` : undefined
+                    });
+                    toast.warning(evasaoReason ? `Evasão registrada: ${evasaoReason}` : `Evasão registrada: ${evasaoPatient.name}`);
+                    setEvasaoPatient(null);
+                    setEvasaoReason("");
+                  }
+                }}
+              >
+                Confirmar
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
       <PatientDetailsModal 
         patient={selectedPatient}
         isOpen={isDetailsModalOpen}
@@ -507,6 +654,24 @@ export default function Attendances() {
           {patientForExams && (
             <ExamsModal patient={patientForExams} onClose={() => setIsExamsModalOpen(false)} />
           )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Patient Record Modal (Quick View) */}
+      <Dialog open={!!recordPatientId} onOpenChange={(open) => !open && setRecordPatientId(null)}>
+        <DialogContent className="max-w-5xl w-[95vw] h-[85vh] p-0 overflow-y-auto glass-card-premium border-white/40 dark:border-white/10 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.3)] rounded-[2rem] flex flex-col bg-white dark:bg-slate-950">
+          <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-white/10 dark:from-slate-900/80 dark:to-slate-950/90 pointer-events-none -z-10" />
+          <div className="p-4 sm:p-6 sticky top-0 z-50 bg-white/40 dark:bg-slate-900/60 backdrop-blur-xl border-b border-white/20 dark:border-white/10 flex justify-between items-center shrink-0 shadow-sm rounded-t-[2rem]">
+            <h2 className="text-xl font-black uppercase tracking-widest text-foreground flex items-center gap-3 drop-shadow-sm">
+              <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-[#006699]/20 to-[#006699]/5 dark:from-sky-400/20 dark:to-sky-400/5 flex items-center justify-center border border-[#006699]/20 dark:border-sky-400/20 shadow-[inset_0_1px_1px_rgba(255,255,255,0.4)]">
+                <FileText className="h-5 w-5 text-[#006699] dark:text-sky-400 drop-shadow-[0_0_8px_rgba(0,102,153,0.5)] dark:drop-shadow-[0_0_8px_rgba(56,189,248,0.5)]" />
+              </div>
+              Prontuário Completo
+            </h2>
+          </div>
+          <div className="flex-1 overflow-y-auto p-4 sm:p-8 relative z-10">
+            {recordPatientId && <PatientRecord patientId={String(recordPatientId)} />}
+          </div>
         </DialogContent>
       </Dialog>
     </motion.div>

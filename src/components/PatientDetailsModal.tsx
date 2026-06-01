@@ -11,7 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Patient } from "@/context/PatientsContext";
-import { Phone, Mail, MapPin, User, Activity, Pill, History, Clock } from "lucide-react";
+import { Phone, Mail, MapPin, User, Activity, Pill, History, Clock, IdCard, Users } from "lucide-react";
 import { cn, formatWords } from "@/lib/utils";
 
 interface PatientDetailsModalProps {
@@ -67,7 +67,7 @@ export function PatientDetailsModal({ patient, isOpen, onClose }: PatientDetails
 
         <div className="p-8">
           <Tabs defaultValue="evolution" className="w-full">
-            <TabsList className="grid w-full grid-cols-3 h-12 bg-white/10 dark:bg-slate-950/25 border border-white/20 dark:border-slate-800/20 p-1 rounded-2xl mb-2">
+            <TabsList className="grid w-full grid-cols-4 h-12 bg-white/10 dark:bg-slate-950/25 border border-white/20 dark:border-slate-800/20 p-1 rounded-2xl mb-2">
               <TabsTrigger value="evolution" className="rounded-xl data-[state=active]:bg-[#006699] data-[state=active]:text-white transition-all font-black text-xs gap-2">
                 <History className="h-4 w-4" />
                 EVOLUÇÃO
@@ -79,6 +79,10 @@ export function PatientDetailsModal({ patient, isOpen, onClose }: PatientDetails
               <TabsTrigger value="contact" className="rounded-xl data-[state=active]:bg-[#006699] data-[state=active]:text-white transition-all font-black text-xs gap-2">
                 <Phone className="h-4 w-4" />
                 CONTATO
+              </TabsTrigger>
+              <TabsTrigger value="cadastro" className="rounded-xl data-[state=active]:bg-[#006699] data-[state=active]:text-white transition-all font-black text-xs gap-2">
+                <IdCard className="h-4 w-4" />
+                CADASTRO
               </TabsTrigger>
             </TabsList>
 
@@ -232,6 +236,85 @@ export function PatientDetailsModal({ patient, isOpen, onClose }: PatientDetails
                          <p className="text-sm font-black uppercase text-foreground">{patient.motherName || 'Não informado'}</p>
                        </div>
                     </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              {/* Demographic & Companion Information */}
+              <TabsContent value="cadastro" className="m-0 space-y-6 pt-4">
+                <Card className="border border-white/40 dark:border-slate-800/20 bg-white/20 dark:bg-slate-900/15 rounded-2xl shadow-inner">
+                  <CardHeader className="py-4 px-6 border-b border-white/10 dark:border-slate-800/10">
+                    <CardTitle className="text-xs font-black uppercase tracking-widest text-[#006699] dark:text-sky-400 flex items-center gap-2">
+                      <IdCard className="h-4 w-4" />
+                      Dados Sócio-Demográficos
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-6">
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-y-6 gap-x-4">
+                      <div>
+                        <p className="text-[9px] font-black text-muted-foreground uppercase">RG / Órgão</p>
+                        <p className="text-sm font-bold">{patient.rg ? `${patient.rg} - ${patient.organIssuer || ''}` : 'Não informado'}</p>
+                      </div>
+                      <div>
+                        <p className="text-[9px] font-black text-muted-foreground uppercase">Raça / Cor</p>
+                        <p className="text-sm font-bold capitalize">{patient.race || 'Não informado'}</p>
+                      </div>
+                      <div>
+                        <p className="text-[9px] font-black text-muted-foreground uppercase">Estado Civil</p>
+                        <p className="text-sm font-bold capitalize">{patient.maritalStatus || 'Não informado'}</p>
+                      </div>
+                      <div>
+                        <p className="text-[9px] font-black text-muted-foreground uppercase">Nacionalidade / Naturalidade</p>
+                        <p className="text-sm font-bold">{patient.nationality || 'Brasil'} / {patient.birthPlace || '-'}</p>
+                      </div>
+                      <div className="col-span-2">
+                        <p className="text-[9px] font-black text-muted-foreground uppercase">Profissão</p>
+                        <p className="text-sm font-bold">{patient.profession || 'Não informado'}</p>
+                      </div>
+                      <div>
+                        <p className="text-[9px] font-black text-muted-foreground uppercase">Religião</p>
+                        <p className="text-sm font-bold">{patient.religion || 'Não informado'}</p>
+                      </div>
+                      <div>
+                        <p className="text-[9px] font-black text-muted-foreground uppercase">PCD</p>
+                        <p className="text-sm font-bold capitalize">{patient.pcd === 'nao' ? 'Não possui' : (patient.pcd || 'Não informado')}</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card className="border border-white/40 dark:border-slate-800/20 bg-white/20 dark:bg-slate-900/15 rounded-2xl shadow-inner">
+                  <CardHeader className="py-4 px-6 border-b border-white/10 dark:border-slate-800/10">
+                    <CardTitle className="text-xs font-black uppercase tracking-widest text-[#006699] dark:text-sky-400 flex items-center gap-2">
+                      <Users className="h-4 w-4" />
+                      Dados do Acompanhante / Responsável
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-6">
+                    {patient.companionName ? (
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                        <div className="col-span-2">
+                          <p className="text-[9px] font-black text-muted-foreground uppercase">Nome do Acompanhante</p>
+                          <p className="text-sm font-bold uppercase">{patient.companionName}</p>
+                        </div>
+                        <div>
+                          <p className="text-[9px] font-black text-muted-foreground uppercase">Parentesco</p>
+                          <p className="text-sm font-bold capitalize">{patient.companionRelation || 'Não informado'}</p>
+                        </div>
+                        <div>
+                          <p className="text-[9px] font-black text-muted-foreground uppercase">Telefone</p>
+                          <p className="text-sm font-bold">{patient.companionPhone || 'Não informado'}</p>
+                        </div>
+                        <div className="col-span-2">
+                          <p className="text-[9px] font-black text-muted-foreground uppercase">CPF do Acompanhante</p>
+                          <p className="text-sm font-bold">{patient.companionCpf || 'Não informado'}</p>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="text-center py-6 text-muted-foreground">
+                        <p className="text-sm font-bold">Paciente sem acompanhante registrado.</p>
+                      </div>
+                    )}
                   </CardContent>
                 </Card>
               </TabsContent>

@@ -33,6 +33,7 @@ export default function Queue() {
     cpf?: string;
   } | null>(null);
   const [evasaoPatient, setEvasaoPatient] = useState<{id: string, name: string} | null>(null);
+  const [evasaoReason, setEvasaoReason] = useState<string>("");
   const [transferPatient, setTransferPatient] = useState<{id: string, name: string, sector: string} | null>(null);
   const [newSector, setNewSector] = useState("");
   const [printingPatient, setPrintingPatient] = useState<Patient | null>(null);
@@ -649,23 +650,66 @@ export default function Queue() {
         </DialogContent>
       </Dialog>
       {/* Confirmação de Evasão */}
-      <Dialog open={!!evasaoPatient} onOpenChange={(open) => !open && setEvasaoPatient(null)}>
-        <DialogContent className="sm:max-w-[400px] rounded-xl p-8 border-none shadow-2xl bg-white dark:bg-slate-950 text-foreground">
+      <Dialog open={!!evasaoPatient} onOpenChange={(open) => {
+        if (!open) {
+          setEvasaoPatient(null);
+          setEvasaoReason("");
+        }
+      }}>
+        <DialogContent className="sm:max-w-[450px] rounded-xl p-8 border-none shadow-2xl bg-white dark:bg-slate-950 text-foreground">
           <div className="flex flex-col items-center text-center space-y-4">
-            <div className="h-20 w-20 rounded-full bg-red-500/10 dark:bg-red-500/20 flex items-center justify-center text-red-550 dark:text-red-400 animate-pulse">
-              <LogOut className="h-10 w-10" />
+            <div className="h-16 w-16 rounded-full bg-red-500/10 dark:bg-red-500/20 flex items-center justify-center text-red-550 dark:text-red-400 animate-pulse">
+              <LogOut className="h-8 w-8" />
             </div>
             <div className="space-y-2">
               <DialogTitle className="text-xl font-black uppercase tracking-tight text-slate-800 dark:text-white">Confirmar Evasão?</DialogTitle>
-              <DialogDescription className="text-sm font-medium leading-relaxed px-4 text-slate-500 dark:text-slate-400">
+              <DialogDescription className="text-sm font-medium leading-relaxed px-2 text-slate-500 dark:text-slate-400">
                 Você está registrando que o paciente <strong className="text-red-550 dark:text-red-400">{formatWords(evasaoPatient?.name || "")}</strong> se retirou da unidade sem concluir o atendimento.
               </DialogDescription>
             </div>
-            <div className="grid grid-cols-2 gap-3 w-full pt-4">
+            
+            <div className="w-full text-left mt-2 mb-2">
+              <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 block mb-2">
+                Motivo da Evasão (Opcional)
+              </label>
+              <div className="grid grid-cols-1 gap-2">
+                {[
+                  "Demora no atendimento",
+                  "Melhora dos sintomas",
+                  "Procurou outro serviço",
+                  "Desistência voluntária",
+                  "Ausente após 3 chamadas"
+                ].map((reason) => (
+                  <button
+                    key={reason}
+                    onClick={() => setEvasaoReason(reason === evasaoReason ? "" : reason)}
+                    className={cn(
+                      "w-full text-left px-3 py-2.5 rounded-xl border-2 transition-all flex items-center justify-between group cursor-pointer",
+                      evasaoReason === reason 
+                        ? "border-red-500 bg-red-500/5 font-bold text-red-600 dark:text-red-400" 
+                        : "border-slate-100 dark:border-slate-800 hover:border-slate-200 dark:hover:border-slate-700 text-slate-600 dark:text-slate-400 bg-slate-50/50 dark:bg-slate-900/40"
+                    )}
+                  >
+                    <span className="text-[11px] font-bold uppercase tracking-tight truncate">{reason}</span>
+                    <div className={cn(
+                      "h-3.5 w-3.5 rounded-full border-2 flex items-center justify-center transition-all shrink-0",
+                      evasaoReason === reason ? "border-red-500 bg-red-500" : "border-slate-300 dark:border-slate-700"
+                    )}>
+                      {evasaoReason === reason && <div className="h-1.5 w-1.5 rounded-full bg-white dark:bg-slate-950" />}
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3 w-full pt-2">
               <Button 
                 variant="outline" 
                 className="h-12 rounded-xl font-bold uppercase tracking-widest border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-900 transition-colors cursor-pointer"
-                onClick={() => setEvasaoPatient(null)}
+                onClick={() => {
+                  setEvasaoPatient(null);
+                  setEvasaoReason("");
+                }}
               >
                 Cancelar
               </Button>
@@ -673,9 +717,13 @@ export default function Queue() {
                 className="h-12 rounded-xl bg-red-500 hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-500 text-white font-black uppercase tracking-widest shadow-lg shadow-red-200 dark:shadow-none border-0 cursor-pointer"
                 onClick={() => {
                   if (evasaoPatient) {
-                    updatePatient(evasaoPatient.id, { status: 'evasao' });
-                    toast.warning(`Evasão registrada: ${evasaoPatient.name}`);
+                    updatePatient(evasaoPatient.id, { 
+                      status: 'evasao',
+                      justification: evasaoReason ? `Motivo da evasão: ${evasaoReason}` : undefined
+                    });
+                    toast.warning(evasaoReason ? `Evasão registrada: ${evasaoReason}` : `Evasão registrada: ${evasaoPatient.name}`);
                     setEvasaoPatient(null);
+                    setEvasaoReason("");
                   }
                 }}
               >

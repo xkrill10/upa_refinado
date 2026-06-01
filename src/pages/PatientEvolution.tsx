@@ -549,7 +549,7 @@ export default function PatientEvolution() {
       <h2 className="text-2xl font-bold">Paciente não encontrado</h2>
       <p className="text-muted-foreground text-center">O registro que você está tentando acessar não existe ou foi removido.</p>
       <Button asChild variant="outline">
-        <Link to={fromPath} className="flex items-center gap-2">
+        <Link to={fromPath} state={location.state} className="flex items-center gap-2">
           <ChevronLeft className="h-4 w-4" />
           Voltar
         </Link>
@@ -816,7 +816,7 @@ export default function PatientEvolution() {
             size="icon"
             className="h-10 w-10 rounded-full hover:bg-muted"
           >
-            <Link to={fromPath}>
+            <Link to={fromPath} state={location.state}>
               <ArrowLeft className="h-5 w-5" />
             </Link>
           </Button>

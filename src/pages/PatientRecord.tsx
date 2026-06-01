@@ -29,7 +29,7 @@ export default function PatientRecord({ patientId }: { patientId?: string }) {
         <p className="text-muted-foreground text-center">O prontuário que você está tentando acessar não existe ou foi removido.</p>
         {!patientId && (
           <Button asChild variant="outline">
-            <Link to={fromPath} className="flex items-center gap-2">
+            <Link to={fromPath} state={location.state} className="flex items-center gap-2">
               <ChevronLeft className="h-4 w-4" />
               Voltar
             </Link>
@@ -115,7 +115,7 @@ export default function PatientRecord({ patientId }: { patientId?: string }) {
               variant="ghost" 
               className="rounded-xl gap-2 font-bold text-muted-foreground hover:text-foreground"
             >
-              <Link to={fromPath}>
+              <Link to={fromPath} state={location.state}>
                 <ChevronLeft className="h-4 w-4" />
                 Voltar
               </Link>

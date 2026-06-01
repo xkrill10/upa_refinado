@@ -94,6 +94,12 @@ const generateBeds = () => {
       room: `Box ${i + 1}`,
       lastUpdated: '15min',
       patientId: status === 'occupied' ? occupiedPatientIds[i] : undefined,
+      bedHistory: status === 'occupied' ? [
+        {
+          patientId: occupiedPatientIds[i],
+          admittedAt: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(),
+        }
+      ] : undefined,
       ...(status === 'cleaning' && {
         cleaningStatus: 'waiting',
         priority: 'urgent',
@@ -120,6 +126,12 @@ const generateBeds = () => {
       room: `Quarto ${Math.floor(i / 4) + 1}`,
       lastUpdated: '45min',
       patientId: status === 'occupied' ? occupiedPatientIds[(i + 4) % occupiedPatientIds.length] : undefined,
+      bedHistory: status === 'occupied' ? [
+        {
+          patientId: occupiedPatientIds[(i + 4) % occupiedPatientIds.length],
+          admittedAt: new Date(Date.now() - 1000 * 60 * 60 * 1.5).toISOString(),
+        }
+      ] : undefined,
       ...(i === 8 && {
         cleaningStatus: 'waiting',
         priority: 'high',

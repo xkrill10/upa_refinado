@@ -96,6 +96,11 @@ export default function Beds() {
   /* ─── Quick Record Modal Flow State ─── */
   const [recordPatientId, setRecordPatientId] = useState<number | null>(null);
 
+  /* ─── Transfer Request Modal Flow State ─── */
+  const [showTransferModal, setShowTransferModal] = useState(false);
+  const [patientForTransfer, setPatientForTransfer] = useState<Patient | null>(null);
+  const [transferRequestForm, setTransferRequestForm] = useState<{priority: 'normal' | 'urgent' | 'emergency', reason: string}>({ priority: "normal", reason: "" });
+
   useEffect(() => {
     if (!editingVitalsPatient) return;
     
@@ -994,7 +999,9 @@ export default function Beds() {
                                   className="h-8 px-2 text-[9px] font-black uppercase tracking-widest rounded-lg bg-white/50 dark:bg-slate-800/50 hover:bg-orange-500 hover:text-white border-orange-500/30 text-orange-600"
                                   onClick={(e) => {
                                     e.stopPropagation();
-                                    requestTransfer(patient.id, 'normal', 'Solicitação via Censo Global');
+                                    setPatientForTransfer(patient);
+                                    setTransferRequestForm({ priority: 'normal', reason: '' });
+                                    setShowTransferModal(true);
                                   }}
                                 >
                                   <Ambulance className="h-3 w-3" />
@@ -1226,8 +1233,7 @@ export default function Beds() {
                     onClick={() => {
                       const patient = getBedPatient(selectedBed);
                       if (patient) {
-                        navigate(`/paciente/${patient.id}`, { state: { from: '/leitos', label: 'Leitos' } });
-                        setSelectedBedId(null);
+                        setRecordPatientId(patient.id as any);
                       } else {
                         toast.info("Leito não possui paciente associado.");
                       }
@@ -1810,6 +1816,88 @@ export default function Beds() {
                 className="px-6 h-12 rounded-xl font-black text-[11px] uppercase tracking-wider bg-sky-500 text-white hover:bg-sky-600 transition-colors shadow-lg shadow-sky-500/25 flex items-center gap-2"
               >
                 Enviar Pedido <ArrowRight className="h-4 w-4" />
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
+
+      {/* Transfer Request Modal */}
+      {showTransferModal && patientForTransfer && (
+        <Dialog open={showTransferModal} onOpenChange={setShowTransferModal}>
+          <DialogContent className="max-w-lg glass-card-premium border-border/50 rounded-[2rem] shadow-2xl p-0 overflow-hidden">
+            <div className="p-6 border-b border-border/50 flex items-center justify-between bg-orange-500/10">
+              <div className="flex items-center gap-3">
+                <div className="h-10 w-10 rounded-xl bg-orange-500/20 flex items-center justify-center border border-orange-500/30">
+                  <Ambulance className="h-5 w-5 text-orange-500" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-black tracking-wide text-foreground">Solicitar Transferência</h3>
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Regulação NIR / CROSS • {patientForTransfer.sector || 'Leito'}</p>
+                </div>
+              </div>
+            </div>
+            
+            <div className="p-6 space-y-5">
+              <div className="p-4 rounded-xl bg-muted/30 border border-border/50 flex items-center gap-3">
+                <div className="h-10 w-10 rounded-xl bg-white/50 dark:bg-slate-900/50 flex items-center justify-center text-orange-500 border border-orange-500/20 shrink-0">
+                  <UserRound className="h-6 w-6" />
+                </div>
+                <div>
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Paciente</p>
+                  <p className="text-sm font-black text-foreground uppercase">{patientForTransfer.name}</p>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <div>
+                  <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-1.5 block">Motivo da Transferência</label>
+                  <input 
+                    type="text" 
+                    value={transferRequestForm.reason}
+                    onChange={(e) => setTransferRequestForm({...transferRequestForm, reason: e.target.value})}
+                    placeholder="Ex: Vaga de UTI, Especialidade, Agravamento..." 
+                    className="w-full h-12 bg-background/50 border border-border/50 rounded-xl px-4 text-sm focus:outline-none focus:border-orange-500/50 text-foreground" 
+                  />
+                </div>
+                
+                <div>
+                  <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-1.5 block">Prioridade</label>
+                  <div className="flex bg-background/50 border border-border/50 rounded-xl p-1 h-12">
+                     <button 
+                       onClick={() => setTransferRequestForm({...transferRequestForm, priority: 'normal'})}
+                       className={cn("flex-1 text-[11px] font-black uppercase tracking-wider rounded-lg transition-all", transferRequestForm.priority === 'normal' ? "bg-muted text-foreground shadow" : "text-muted-foreground hover:text-foreground")}
+                     >
+                       Normal
+                     </button>
+                     <button 
+                       onClick={() => setTransferRequestForm({...transferRequestForm, priority: 'urgent'})}
+                       className={cn("flex-1 text-[11px] font-black uppercase tracking-wider rounded-lg transition-all", transferRequestForm.priority === 'urgent' ? "bg-orange-500 text-white shadow-lg shadow-orange-500/20" : "text-orange-500/50 hover:text-orange-500")}
+                     >
+                       Urgente
+                     </button>
+                     <button 
+                       onClick={() => setTransferRequestForm({...transferRequestForm, priority: 'emergency'})}
+                       className={cn("flex-1 text-[11px] font-black uppercase tracking-wider rounded-lg transition-all", transferRequestForm.priority === 'emergency' ? "bg-red-500 text-white shadow-lg shadow-red-500/20" : "text-red-500/50 hover:text-red-500")}
+                     >
+                       Emergência
+                     </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="p-6 border-t border-border/50 bg-muted/10 flex justify-end gap-3">
+              <Button variant="ghost" onClick={() => setShowTransferModal(false)} className="px-5 h-12 rounded-xl font-bold text-sm">Cancelar</Button>
+              <Button 
+                onClick={() => {
+                  requestTransfer(patientForTransfer.id, transferRequestForm.priority, transferRequestForm.reason || 'Solicitação via Censo Global');
+                  setShowTransferModal(false);
+                  setPatientForTransfer(null);
+                }}
+                className="px-6 h-12 rounded-xl font-black uppercase tracking-widest text-[11px] bg-orange-500 hover:bg-orange-600 text-white shadow-lg shadow-orange-500/20 flex items-center gap-2"
+              >
+                Solicitar Vaga <ArrowRight className="h-4 w-4" />
               </Button>
             </div>
           </DialogContent>

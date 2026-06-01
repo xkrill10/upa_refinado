@@ -33,6 +33,25 @@ export interface Patient {
   priority?: 'normal' | 'preferential' | 'pediatric' | 'emergency';
   triaged?: boolean;
   responsibleProfessional?: string;
+  registrationComplete?: boolean;
+  motherName?: string;
+  companionName?: string;
+  companionRelation?: string;
+  companionCpf?: string;
+  companionPhone?: string;
+  attendanceType?: string;
+  
+  // Novos Campos Complementares (Sócio-demográficos)
+  rg?: string;
+  organIssuer?: string;
+  nationality?: string;
+  birthPlace?: string;
+  race?: string;
+  maritalStatus?: string;
+  profession?: string;
+  religion?: string;
+  pcd?: string;
+
   // Sinais Vitais
   fc?: string;
   pa?: string;
@@ -511,6 +530,7 @@ export function PatientsProvider({ children }: { children: ReactNode }) {
       ticket,
       priority: effectivePriority,
       triaged: autoTriaged,
+      registrationComplete: false,
     };
     setPatients(prev => [...prev, newPatient]);
     return { ticket, patient: newPatient };

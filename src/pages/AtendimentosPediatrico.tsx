@@ -1,9 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { usePatients, Patient } from "@/hooks/use-patients";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Baby, Stethoscope, User, Calendar, ExternalLink, Activity, Megaphone, X, Volume2, VolumeX, Building2, Info, FlaskConical } from "lucide-react";
+import { Baby, Stethoscope, User, Calendar, ExternalLink, Activity, Megaphone, X, Volume2, VolumeX, Building2, Info, FlaskConical, FileText } from "lucide-react";
 import { motion } from "motion/react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
@@ -11,6 +11,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { cn, formatWords, formatPatientNameLGPD } from "@/lib/utils";
 import { PatientDetailsModal } from "@/components/PatientDetailsModal";
 import { ExamsModal } from "@/components/PatientEvolution/Modals/ExamsModal";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import PatientRecord from "@/pages/PatientRecord";
 
 export default function AtendimentosPediatrico() {
   const navigate = useNavigate();
@@ -22,8 +24,18 @@ export default function AtendimentosPediatrico() {
     setIsAudioEnabled,
     updatePatient,
   } = usePatients();
+  
+  const [selectedRoom, setSelectedRoom] = useState<string>(() => {
+    return localStorage.getItem('selectedPediatricRoom') || "CONSULTÓRIO PEDIÁTRICO 1";
+  });
+
+  useEffect(() => {
+    localStorage.setItem('selectedPediatricRoom', selectedRoom);
+  }, [selectedRoom]);
+
   const [showCallControl, setShowCallControl] = useState(false);
   const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
+  const [recordPatientId, setRecordPatientId] = useState<number | null>(null);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
   const [isExamsModalOpen, setIsExamsModalOpen] = useState(false);
   const [patientForExams, setPatientForExams] = useState<Patient | null>(null);
@@ -45,7 +57,7 @@ export default function AtendimentosPediatrico() {
 
   const attendingPatients = pediatricPatients.filter((p) => p.status === "attending");
   const waitingPatients = pediatricPatients.filter(
-    (p) => p.status === "waiting" && p.risk && !attendingPatients.includes(p)
+    (p) => p.status === "waiting" && p.risk && !attendingPatients.includes(p) && (p.registrationComplete !== false || p.risk === 'emergency')
   );
 
   const getRiskDetails = (risk: string) => {
@@ -61,7 +73,7 @@ export default function AtendimentosPediatrico() {
 
   const handleCall = (patient: Patient) => {
     const ticketToUse = patient.ticket || "PED";
-    const roomToUse = patient.sector || "TRIAGEM PEDIÁTRICA";
+    const roomToUse = selectedRoom;
     setCallingTicket({
       ticket: ticketToUse,
       patientName: patient.name,
@@ -81,7 +93,7 @@ export default function AtendimentosPediatrico() {
   };
 
   const handleAttend = (patient: Patient) => {
-    updatePatient(patient.id, { status: "attending" });
+    updatePatient(patient.id, { status: "attending", sector: selectedRoom });
     toast.success(`Iniciando atendimento: ${formatWords(patient.name)}`, {
       icon: <Baby className="h-4 w-4 text-orange-500" />,
     });
@@ -95,7 +107,7 @@ export default function AtendimentosPediatrico() {
     >
 
       {/* Header */}
-      <div className="flex flex-col gap-1">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div className="flex items-center gap-3">
           <div className="h-10 w-10 rounded-2xl bg-orange-500/10 flex items-center justify-center text-orange-500">
             <Baby className="h-5 w-5" />
@@ -107,6 +119,27 @@ export default function AtendimentosPediatrico() {
             <p className="text-muted-foreground text-[11px] font-black uppercase tracking-widest mt-0.5">
               Gerenciamento de consultas e procedimentos pediátricos
             </p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-3 bg-white/50 dark:bg-slate-900/40 p-2 rounded-2xl border border-slate-200/50 dark:border-slate-800/50 shadow-sm">
+          <div className="flex items-center justify-center h-10 w-10 rounded-xl bg-orange-500/10 text-orange-500 shrink-0">
+            <Building2 className="h-5 w-5" />
+          </div>
+          <div className="flex flex-col gap-1 pr-2">
+            <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground">Meu Consultório</span>
+            <Select value={selectedRoom} onValueChange={setSelectedRoom}>
+              <SelectTrigger className="h-7 w-[240px] border-none bg-transparent shadow-none p-0 focus:ring-0 text-sm font-black text-foreground">
+                <SelectValue placeholder="Selecione o consultório" />
+              </SelectTrigger>
+              <SelectContent className="glass-card-premium rounded-xl border-white/20">
+                {Array.from({ length: 3 }, (_, i) => (
+                  <SelectItem key={i} value={`CONSULTÓRIO PEDIÁTRICO ${i + 1}`} className="font-bold text-xs">
+                    CONSULTÓRIO PEDIÁTRICO {i + 1}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
         </div>
       </div>
@@ -183,50 +216,60 @@ export default function AtendimentosPediatrico() {
             {attendingPatients.map((patient) => {
               const risk = getRiskDetails(patient.risk || "not-urgent");
               return (
-                <Card key={patient.id} className="glass-card border border-slate-200/40 dark:border-slate-800/40 shadow-xl rounded-xl overflow-hidden bg-white/70 dark:bg-slate-900/45 transition-colors duration-500 group">
-                  <CardHeader className="pb-2">
-                    <div className="flex items-center justify-between">
-                      <Badge className={cn(risk.color, "text-[10px] font-bold px-2 py-1.5 border-0 rounded-full shadow-sm min-w-[120px] justify-center")}>
+                <div key={patient.id} className="p-4 glass-card border border-slate-200/40 dark:border-slate-800/40 shadow-md hover:shadow-lg rounded-xl bg-white/70 dark:bg-slate-900/45 transition-all duration-300 flex flex-col xl:flex-row items-start xl:items-center justify-between gap-4">
+                  <div className="flex items-center gap-4 flex-1 min-w-0">
+                    <div className="min-w-[120px] flex justify-center shrink-0">
+                      <Badge className={cn(
+                        risk.color,
+                        "text-[10px] font-bold px-2 py-1.5 border-0 rounded-full shadow-sm w-full justify-center transition-transform hover:scale-105 active:scale-95"
+                      )}>
                         {risk.label}
                       </Badge>
-                      <span className="text-xs text-muted-foreground font-medium">Iniciado há 15 min</span>
                     </div>
-                    <CardTitle className="mt-2 text-sm font-bold text-foreground">{formatWords(patient.name)}</CardTitle>
-                    <div className="flex flex-col gap-1 mt-2">
-                      <div className="flex items-center gap-2 text-[10px] text-muted-foreground font-bold uppercase">
-                        <Building2 className="h-3 w-3" />
-                        Setor: <span className="text-foreground">{patient.sector || "Não definido"}</span>
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2">
+                        <p className="font-black text-sm text-slate-800 dark:text-slate-100 uppercase tracking-tight truncate">{formatWords(patient.name)}</p>
+                        <span className="text-[9px] text-slate-500 dark:text-slate-400 font-bold uppercase shrink-0 px-2 py-0.5 bg-slate-100 dark:bg-slate-800 rounded-full">
+                          Iniciado há 15 min
+                        </span>
                       </div>
-                      <div className="flex items-center gap-2 text-[10px] text-muted-foreground font-bold uppercase">
-                        <User className="h-3 w-3" />
-                        Responsável: <span className="text-orange-500">{patient.responsibleProfessional || "Não atribuído"}</span>
+                      <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-1.5">
+                        <div className="flex items-center gap-1.5 text-[9px] text-slate-500 dark:text-slate-400 font-bold uppercase">
+                          <User className="h-3 w-3 text-orange-500 dark:text-orange-450" />
+                          Resp: <span className="text-slate-700 dark:text-slate-300 font-black">{patient.responsibleProfessional || 'Não atribuído'}</span>
+                        </div>
+                        <div className="flex items-center gap-1.5 text-[9px] text-slate-500 dark:text-slate-400 font-bold uppercase">
+                          <Building2 className="h-3 w-3 text-orange-500 dark:text-orange-450" />
+                          Setor: <span className="text-slate-700 dark:text-slate-300 font-black">{patient.sector || 'Não definido'}</span>
+                        </div>
+                        <div className="flex items-center gap-1.5 text-[9px] text-slate-400 dark:text-slate-500 font-bold uppercase">
+                          <span>ID: {patient.id}</span>
+                          <span className="w-1 h-1 rounded-full bg-slate-300 dark:bg-slate-700"></span>
+                          <span>{patient.age} anos</span>
+                        </div>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2 text-[10px] text-muted-foreground font-medium mt-2">
-                      <span>ID: {patient.id}</span>
-                      <span className="w-1 h-1 rounded-full bg-muted-foreground/30" />
-                      <span>{patient.age} anos</span>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="flex justify-end gap-2 pb-4 pt-2">
-                    <Button variant="ghost" size="sm" className="h-9 rounded-xl gap-2 font-bold text-muted-foreground hover:text-orange-500 hover:bg-orange-500/5"
+                  </div>
+                  
+                  <div className="flex flex-wrap items-center gap-2 w-full xl:w-auto justify-end shrink-0 pt-2 xl:pt-0 border-t xl:border-0 border-slate-100 dark:border-slate-800/50 mt-2 xl:mt-0">
+                    <Button variant="ghost" size="sm" className="h-8 rounded-lg gap-1.5 font-black uppercase text-[9px] tracking-wider text-slate-550 dark:text-slate-450 hover:text-orange-500 hover:bg-orange-500/5 cursor-pointer border-0 px-2"
                        onClick={() => { setSelectedPatient(patient); setIsDetailsModalOpen(true); }}>
-                      <Info className="h-3.5 w-3.5" /> Detalhes
+                      <Info className="h-3.5 w-3.5" /> <span className="hidden sm:inline">Detalhes</span>
                     </Button>
-                    <Button variant="outline" size="sm" className="h-9 rounded-xl gap-2 font-bold border-slate-200"
-                       onClick={() => navigate(`/paciente/${patient.id}`, { state: { from: "/atendimentos-pediatrico", label: "Pediátrico" } })}>
+                    <Button variant="outline" size="sm" className="h-8 rounded-lg gap-1.5 font-black uppercase text-[9px] tracking-wider text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-900 cursor-pointer px-2"
+                       onClick={() => setRecordPatientId(patient.id)}>
                       <User className="h-3.5 w-3.5" /> Prontuário
                     </Button>
-                    <Button variant="outline" size="sm" className="h-9 rounded-xl gap-2 font-black uppercase text-[10px] tracking-wider text-purple-600 border-purple-200 hover:bg-purple-50 dark:text-purple-400 dark:border-purple-900/50 dark:hover:bg-purple-900/20 cursor-pointer" 
+                    <Button variant="outline" size="sm" className="h-8 rounded-lg gap-1.5 font-black uppercase text-[9px] tracking-wider text-purple-600 border-purple-200 hover:bg-purple-50 dark:text-purple-400 dark:border-purple-900/50 dark:hover:bg-purple-900/20 cursor-pointer px-2" 
                        onClick={() => navigate(`/paciente/${patient.id}`, { state: { from: "/atendimentos-pediatrico", label: "Pediátrico", activeTab: 'exams' } })}>
                       <FlaskConical className="h-3.5 w-3.5" /> Exames
                     </Button>
-                    <Button size="sm" className="h-9 rounded-xl gap-2 font-bold bg-orange-500 hover:bg-orange-600 text-white shadow-lg shadow-orange-500/20"
+                    <Button size="sm" className="h-8 rounded-lg gap-1.5 font-black uppercase text-[9px] tracking-wider bg-orange-500 hover:bg-orange-600 text-white shadow-md border-0 cursor-pointer px-3"
                        onClick={() => navigate(`/paciente/${patient.id}/evolucao`, { state: { from: "/atendimentos-pediatrico", label: "Pediátrico" } })}>
                       <Stethoscope className="h-3.5 w-3.5" /> Evoluir
                     </Button>
-                  </CardContent>
-                </Card>
+                  </div>
+                </div>
               );
             })}
             {attendingPatients.length === 0 && (
@@ -277,8 +320,8 @@ export default function AtendimentosPediatrico() {
                         <Button size="sm" variant="ghost" className="h-9 rounded-xl px-3 gap-2 text-emerald-600 hover:bg-emerald-50 font-black uppercase text-[10px] tracking-wider" onClick={() => handleAttend(patient)}>
                           <Stethoscope className="h-3.5 w-3.5" /> Atender
                         </Button>
-                        <Button size="sm" variant="ghost" className="h-9 w-9 rounded-xl p-0 text-muted-foreground hover:text-orange-500"
-                          onClick={() => navigate(`/paciente/${patient.id}`, { state: { from: "/atendimentos-pediatrico", label: "Pediátrico" } })}>
+                         <Button size="sm" variant="ghost" className="h-9 w-9 rounded-xl p-0 text-muted-foreground hover:text-orange-500"
+                          onClick={() => setRecordPatientId(patient.id)}>
                           <ExternalLink className="h-4 w-4" />
                         </Button>
                       </div>
@@ -360,6 +403,24 @@ export default function AtendimentosPediatrico() {
           {patientForExams && (
             <ExamsModal patient={patientForExams} onClose={() => setIsExamsModalOpen(false)} />
           )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Patient Record Modal (Quick View) */}
+      <Dialog open={!!recordPatientId} onOpenChange={(open) => !open && setRecordPatientId(null)}>
+        <DialogContent className="max-w-5xl w-[95vw] h-[85vh] p-0 overflow-y-auto glass-card-premium border-white/40 dark:border-white/10 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.3)] rounded-[2rem] flex flex-col bg-white dark:bg-slate-950">
+          <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-white/10 dark:from-slate-900/80 dark:to-slate-950/90 pointer-events-none -z-10" />
+          <div className="p-4 sm:p-6 sticky top-0 z-50 bg-white/40 dark:bg-slate-900/60 backdrop-blur-xl border-b border-white/20 dark:border-white/10 flex justify-between items-center shrink-0 shadow-sm rounded-t-[2rem]">
+            <h2 className="text-xl font-black uppercase tracking-widest text-foreground flex items-center gap-3 drop-shadow-sm">
+              <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-[#006699]/20 to-[#006699]/5 dark:from-sky-400/20 dark:to-sky-400/5 flex items-center justify-center border border-[#006699]/20 dark:border-sky-400/20 shadow-[inset_0_1px_1px_rgba(255,255,255,0.4)]">
+                <FileText className="h-5 w-5 text-[#006699] dark:text-sky-400 drop-shadow-[0_0_8px_rgba(0,102,153,0.5)] dark:drop-shadow-[0_0_8px_rgba(56,189,248,0.5)]" />
+              </div>
+              Prontuário Completo
+            </h2>
+          </div>
+          <div className="flex-1 overflow-y-auto p-4 sm:p-8 relative z-10">
+            {recordPatientId && <PatientRecord patientId={String(recordPatientId)} />}
+          </div>
         </DialogContent>
       </Dialog>
     </motion.div>
