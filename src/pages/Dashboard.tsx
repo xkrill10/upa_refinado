@@ -49,6 +49,9 @@ export default function Dashboard() {
   const [isFeedOpen, setIsFeedOpen] = useState(false);
   const [isStockOpen, setIsStockOpen] = useState(false);
   const [isAbcOpen, setIsAbcOpen] = useState(false);
+  const [isDemandaOpen, setIsDemandaOpen] = useState(false);
+  const [isRiscosOpen, setIsRiscosOpen] = useState(false);
+  const [isFluxoOpen, setIsFluxoOpen] = useState(false);
 
   // Simulated Live Feed generation based on real context data
   useEffect(() => {
@@ -159,7 +162,7 @@ export default function Dashboard() {
         <StatCard title="Aguardando" value={waiting} icon={Clock} variant="warning" onClick={() => setDashboardFilter('waiting')} active={dashboardFilter === 'waiting'} sparklineData={[12, 15, 10, 18, 14, 8, waiting]} />
         <StatCard title="Em Atendimento" value={attending} icon={Stethoscope} variant="success" onClick={() => setDashboardFilter('attending')} active={dashboardFilter === 'attending'} sparklineData={[2, 4, 3, 5, 4, 6, attending]} />
         <StatCard title="Casos Críticos" value={emergencies} icon={AlertTriangle} variant="danger" onClick={() => setDashboardFilter('critical')} active={dashboardFilter === 'critical'} sparklineData={[1, 0, 2, 1, 3, 2, emergencies]} />
-        <StatCard title="Central de Leitos" value={bedStats.occupied} icon={BedDouble} variant="accent" trend="Ocupados" onClick={() => navigate('/leitos')} sparklineData={[10, 12, 11, 14, 15, 13, bedStats.occupied]} />
+        <StatCard title="Central de Leitos" value={bedStats.occupied} icon={BedDouble} variant="accent" trend="Ocupados" onClick={() => setIsHeatmapOpen(true)} sparklineData={[10, 12, 11, 14, 15, 13, bedStats.occupied]} />
       </motion.div>
 
       {/* KPIs Premium com Gradientes */}
@@ -319,13 +322,13 @@ export default function Dashboard() {
       {/* NOVOS GRÁFICOS OPERACIONAIS */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
         <motion.div variants={item} className="lg:col-span-1">
-          <RadarChartDemanda />
+          <RadarChartDemanda onClick={() => setIsDemandaOpen(true)} />
         </motion.div>
         <motion.div variants={item} className="lg:col-span-1">
-          <PieChartRiscos />
+          <PieChartRiscos onClick={() => setIsRiscosOpen(true)} />
         </motion.div>
         <motion.div variants={item} className="lg:col-span-1">
-          <AreaChartFluxo />
+          <AreaChartFluxo onClick={() => setIsFluxoOpen(true)} />
         </motion.div>
       </div>
 
@@ -455,6 +458,48 @@ export default function Dashboard() {
                   </Bar>
                 </BarChart>
               </ResponsiveContainer>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={isDemandaOpen} onOpenChange={setIsDemandaOpen}>
+        <DialogContent className="max-w-4xl glass-panel border-white/10 dark:border-slate-800 p-0 overflow-hidden bg-background">
+          <DialogHeader className="p-6 pb-4 bg-muted/30 border-b border-white/10">
+            <DialogTitle className="flex items-center gap-2 text-xl font-black uppercase text-blue-500">
+              <Activity className="h-6 w-6" /> Demanda por Setor (Visão Expandida)
+            </DialogTitle>
+            <DialogDescription>Análise detalhada da demanda atual comparada à média histórica por setor.</DialogDescription>
+          </DialogHeader>
+          <div className="p-6 h-[500px] flex items-center justify-center">
+             <RadarChartDemanda expanded />
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={isRiscosOpen} onOpenChange={setIsRiscosOpen}>
+        <DialogContent className="max-w-4xl glass-panel border-white/10 dark:border-slate-800 p-0 overflow-hidden bg-background">
+          <DialogHeader className="p-6 pb-4 bg-muted/30 border-b border-white/10">
+            <DialogTitle className="flex items-center gap-2 text-xl font-black uppercase text-orange-500">
+              <AlertTriangle className="h-6 w-6" /> Distribuição de Riscos (Visão Expandida)
+            </DialogTitle>
+            <DialogDescription>Proporção de pacientes aguardando atendimento por classificação de risco.</DialogDescription>
+          </DialogHeader>
+          <div className="p-6 h-[500px]">
+             <PieChartRiscos expanded />
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={isFluxoOpen} onOpenChange={setIsFluxoOpen}>
+        <DialogContent className="max-w-5xl glass-panel border-white/10 dark:border-slate-800 p-0 overflow-hidden bg-background">
+          <DialogHeader className="p-6 pb-4 bg-muted/30 border-b border-white/10">
+            <DialogTitle className="flex items-center gap-2 text-xl font-black uppercase text-blue-500">
+              <Activity className="h-6 w-6" /> Fluxo de Atendimentos vs Altas (Visão Expandida)
+            </DialogTitle>
+            <DialogDescription>Acompanhamento detalhado do volume de entradas na triagem versus altas médicas ao longo do dia.</DialogDescription>
+          </DialogHeader>
+          <div className="p-6 h-[500px]">
+             <AreaChartFluxo expanded />
           </div>
         </DialogContent>
       </Dialog>

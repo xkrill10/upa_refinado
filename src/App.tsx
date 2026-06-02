@@ -6,6 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 import { GlobalClock } from "@/components/GlobalClock";
+import UserManagement from "./pages/Admin/UserManagement";
 const Dashboard = React.lazy(() => import("./pages/Dashboard"));
 const Pharmacy = React.lazy(() => import("./pages/Pharmacy"));
 const SatellitePharmacy = React.lazy(() => import("./pages/SatellitePharmacy"));
@@ -21,6 +22,16 @@ const SUSIntegration = React.lazy(() => import("./pages/SUSIntegration"));
 const Patients = React.lazy(() => import("./pages/Patients"));
 const CallPanel = React.lazy(() => import("./pages/CallPanel"));
 const PatientEvolution = React.lazy(() => import("./pages/PatientEvolution"));
+const EvolucaoMedica = React.lazy(() => import("./pages/EvolucaoMedica"));
+const EvolucaoEnfermagem = React.lazy(() => import("./pages/EvolucaoEnfermagem"));
+const AnotacaoEnfermagem = React.lazy(() => import("./pages/AnotacaoEnfermagem"));
+const EvolucaoFisioterapia = React.lazy(() => import("./pages/EvolucaoFisioterapia"));
+const EvolucaoNutricao = React.lazy(() => import("./pages/EvolucaoNutricao"));
+const EvolucaoPsicologia = React.lazy(() => import("./pages/EvolucaoPsicologia"));
+const EvolucaoServicoSocial = React.lazy(() => import("./pages/EvolucaoServicoSocial"));
+const EvolucaoTerapiaOcupacional = React.lazy(() => import("./pages/EvolucaoTerapiaOcupacional"));
+const EvolucaoFonoaudiologia = React.lazy(() => import("./pages/EvolucaoFonoaudiologia"));
+const EvolucaoFarmaciaClinica = React.lazy(() => import("./pages/EvolucaoFarmaciaClinica"));
 const Reports = React.lazy(() => import("./pages/Reports"));
 const HR = React.lazy(() => import("./pages/HR"));
 const Same = React.lazy(() => import("./pages/Same"));
@@ -123,7 +134,18 @@ const AppContent = () => {
                 <Route path="/same" element={<Same />} />
                 <Route path="/paciente/:id" element={<PatientRecord />} />
                 <Route path="/paciente/:id/evolucao" element={<PatientEvolution />} />
-                <Route path="/pediatria" element={<Pediatria />} />
+                <Route path="/paciente/:id/evolucao/medica" element={<EvolucaoMedica />} />
+                <Route path="/paciente/:id/evolucao/enfermagem" element={<EvolucaoEnfermagem />} />
+                <Route path="/paciente/:id/evolucao/anotacao-enfermagem" element={<AnotacaoEnfermagem />} />
+                <Route path="/paciente/:id/evolucao/fisioterapia" element={<EvolucaoFisioterapia />} />
+                <Route path="/paciente/:id/evolucao/nutricao" element={<EvolucaoNutricao />} />
+                <Route path="/paciente/:id/evolucao/psicologia" element={<EvolucaoPsicologia />} />
+                <Route path="/paciente/:id/evolucao/servico-social" element={<EvolucaoServicoSocial />} />
+                <Route path="/paciente/:id/evolucao/terapia-ocupacional" element={<EvolucaoTerapiaOcupacional />} />
+                <Route path="/paciente/:id/evolucao/fonoaudiologia" element={<EvolucaoFonoaudiologia />} />
+                <Route path="/paciente/:id/evolucao/farmacia-clinica" element={<EvolucaoFarmaciaClinica />} />
+                <Route path="/admin/usuarios" element={<UserManagement />} />
+              <Route path="/pediatria" element={<Pediatria />} />
                 <Route path="/atendimentos-pediatrico" element={<AtendimentosPediatrico />} />
                 <Route path="/painel-medico" element={<DoctorDashboard />} />
                 <Route path="/meu-consultorio" element={<MyWorkspace />} />

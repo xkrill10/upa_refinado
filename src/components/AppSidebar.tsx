@@ -1,10 +1,11 @@
-import { LayoutDashboard, Users, UserPlus, Activity, ClipboardList, Building2, BedDouble, Stethoscope, HeartPulse, FileText, Pill, UserCog, Globe, Megaphone, LogIn, Archive, Baby, FlaskConical, PackageOpen, Syringe, DollarSign, Sparkles, UserSquare2, MessageSquare, ArchiveRestore, Ambulance, Droplets, RotateCcw } from "lucide-react";
+import { Shield, LayoutDashboard, Users, UserPlus, Activity, ClipboardList, Building2, BedDouble, Stethoscope, HeartPulse, FileText, Pill, UserCog, Globe, Megaphone, LogIn, Archive, Baby, FlaskConical, PackageOpen, Syringe, DollarSign, Sparkles, UserSquare2, MessageSquare, ArchiveRestore, Ambulance, Droplets, RotateCcw } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { usePatients } from "@/hooks/use-patients";
 import { Button } from "@/components/ui/button";
 import { useLocation } from "react-router-dom";
+import { useState } from "react";
 import { cn } from "@/lib/utils";
-import { motion } from "motion/react";
+import { motion, AnimatePresence } from "motion/react";
 import {
   Sidebar,
   SidebarContent,
@@ -13,6 +14,7 @@ import {
   SidebarGroupLabel,
   SidebarMenu,
   SidebarMenuItem,
+  SidebarMenuButton,
   SidebarHeader,
   SidebarFooter,
   useSidebar,
@@ -25,6 +27,12 @@ export function AppSidebar() {
   const collapsed = state === "collapsed";
   const location = useLocation();
   const isActive = (path: string) => location.pathname === path;
+  const [openMenus, setOpenMenus] = useState<Record<string, boolean>>({});
+
+  const toggleSubMenu = (title: string, e: React.MouseEvent) => {
+    e.preventDefault();
+    setOpenMenus(prev => ({ ...prev, [title]: !prev[title] }));
+  };
 
   // Extrair o ID do paciente da rota atual ou buscar um paciente em atendimento / fallback padrão
   const match = location.pathname.match(/^\/paciente\/([^/]+)/);
@@ -47,7 +55,23 @@ export function AppSidebar() {
         { title: "Fila de Atendimento", url: "/fila", icon: ClipboardList },
         { title: "Painel Médico", url: "/painel-medico", icon: UserSquare2 },
         { title: "Clínico", url: "/atendimentos", icon: HeartPulse },
-        { title: "Evolução", url: `/paciente/${currentPatientId}/evolucao`, icon: FileText },
+        { 
+          title: "Evoluções", 
+          icon: FileText,
+          subItems: [
+            { title: "Geral (Pesquisa)", url: `/paciente/${currentPatientId}/evolucao` },
+            { title: "Médica", url: `/paciente/${currentPatientId}/evolucao/medica` },
+            { title: "Enfermagem", url: `/paciente/${currentPatientId}/evolucao/enfermagem` },
+            { title: "Anotação Técnica", url: `/paciente/${currentPatientId}/evolucao/anotacao-enfermagem` },
+            { title: "Fisioterapia", url: `/paciente/${currentPatientId}/evolucao/fisioterapia` },
+            { title: "Nutrição", url: `/paciente/${currentPatientId}/evolucao/nutricao` },
+            { title: "Psicologia", url: `/paciente/${currentPatientId}/evolucao/psicologia` },
+            { title: "Serviço Social", url: `/paciente/${currentPatientId}/evolucao/servico-social` },
+            { title: "Terapia Ocupacional", url: `/paciente/${currentPatientId}/evolucao/terapia-ocupacional` },
+            { title: "Fonoaudiologia", url: `/paciente/${currentPatientId}/evolucao/fonoaudiologia` },
+            { title: "Farmácia Clínica", url: `/paciente/${currentPatientId}/evolucao/farmacia-clinica` },
+          ]
+        },
         { title: "Pediátrico", url: "/atendimentos-pediatrico", icon: Baby },
         { title: "Laboratório", url: "/laboratorio", icon: FlaskConical },
         { title: "Leitos", url: "/leitos", icon: BedDouble },
@@ -111,58 +135,136 @@ export function AppSidebar() {
                <SidebarMenu className={cn("gap-0.5", collapsed && "items-center")}>
                  {group.items.map((item) => {
                    const active = isActive(item.url);
+                   const hasSubItems = !!item.subItems;
+                   const isSubOpen = !!openMenus[item.title];
+                   const isAnySubActive = hasSubItems && item.subItems.some(sub => isActive(sub.url));
+                   
                    return (
-                     <SidebarMenuItem key={item.title} className="w-full flex justify-center py-0">
-                           <NavLink 
-                             to={item.url} 
-                             end 
-                             className={({ isActive: linkActive }) => cn(
-                                "flex items-center transition-all duration-300 relative group/item rounded-xl",
+                     <SidebarMenuItem key={item.title} className="w-full flex flex-col justify-center py-0">
+                           {hasSubItems ? (
+                             <div 
+                               className={cn(
+                                "flex items-center cursor-pointer transition-all duration-300 relative group/item rounded-xl w-full",
                                  collapsed 
-                                   ? "justify-center h-10 w-10" 
-                                   : "w-full gap-3 px-3 py-2.5",
-                                 linkActive 
-                                   ? "bg-sky-500/25 backdrop-blur-md border border-sky-400/40 shadow-[0_0_20px_rgba(14,165,233,0.3),inset_0_1px_1px_rgba(255,255,255,0.2)] text-white font-black" 
-                                   : "text-blue-100/70 hover:text-white hover:bg-white/5 border border-transparent"
-                             )}
-                           >
-                             <div className={cn(
-                               "flex items-center gap-3 relative z-10",
-                               collapsed ? "justify-center" : "w-full"
-                             )}>
-                               <motion.div 
-                                 animate={active ? { scale: 1.05 } : { scale: 1 }}
-                                 whileTap={{ scale: 0.95 }}
-                                 className={cn(
-                                    "flex items-center justify-center shrink-0 transition-all duration-300",
-                                   active 
-                                     ? "text-sky-300 drop-shadow-[0_0_8px_rgba(14,165,233,0.8)]" 
-                                     : "text-blue-100/70 group-hover/item:text-blue-50"
-                                 )}
-                               >
-                                 <item.icon className={cn(
-                                    "h-[22px] w-[22px] transition-all duration-300",
-                                   active ? "stroke-[2.5px] animate-pulse-slow" : "stroke-[2px]"
-                                 )} />
-                               </motion.div>
- 
-                               {!collapsed && (
-                                 <span className={cn(
-                                   "text-[13px] font-bold tracking-wide transition-all duration-300 whitespace-nowrap",
-                                   active ? "text-white" : "text-blue-100/70 group-hover/item:text-blue-50"
-                                 )}>
-                                   {item.title}
-                                 </span>
+                                   ? "justify-center h-10 w-10 px-0" 
+                                   : "gap-3 px-3 py-2.5",
+                                 isAnySubActive 
+                                   ? "bg-sky-500/10 text-white font-bold" 
+                                   : "text-blue-100/70 hover:text-white hover:bg-white/5"
                                )}
+                               onClick={(e) => toggleSubMenu(item.title, e)}
+                             >
+                                <div className={cn("flex items-center gap-3 relative z-10 w-full", collapsed && "justify-center")}>
+                                   <div className={cn("flex items-center justify-center shrink-0 transition-all duration-300", isAnySubActive ? "text-sky-300" : "text-blue-100/70 group-hover/item:text-blue-50")}>
+                                     <item.icon className={cn("h-[22px] w-[22px] transition-all duration-300", isAnySubActive ? "stroke-[2.5px]" : "stroke-[2px]")} />
+                                   </div>
+                                   {!collapsed && (
+                                     <span className={cn("text-[13px] font-bold tracking-wide transition-all duration-300 whitespace-nowrap flex-1", isAnySubActive ? "text-white" : "text-blue-100/70 group-hover/item:text-blue-50")}>
+                                       {item.title}
+                                     </span>
+                                   )}
+                                </div>
                              </div>
-                           </NavLink>
+                           ) : (
+                             <NavLink 
+                               to={item.url!} 
+                               end 
+                               className={({ isActive: linkActive }) => cn(
+                                  "flex items-center transition-all duration-300 relative group/item rounded-xl",
+                                   collapsed 
+                                     ? "justify-center h-10 w-10" 
+                                     : "w-full gap-3 px-3 py-2.5",
+                                   linkActive 
+                                     ? "bg-sky-500/25 backdrop-blur-md border border-sky-400/40 shadow-[0_0_20px_rgba(14,165,233,0.3),inset_0_1px_1px_rgba(255,255,255,0.2)] text-white font-black" 
+                                     : "text-blue-100/70 hover:text-white hover:bg-white/5 border border-transparent"
+                               )}
+                             >
+                               <div className={cn(
+                                 "flex items-center gap-3 relative z-10",
+                                 collapsed ? "justify-center" : "w-full"
+                               )}>
+                                 <motion.div 
+                                   animate={active ? { scale: 1.05 } : { scale: 1 }}
+                                   whileTap={{ scale: 0.95 }}
+                                   className={cn(
+                                      "flex items-center justify-center shrink-0 transition-all duration-300",
+                                     active 
+                                       ? "text-sky-300 drop-shadow-[0_0_8px_rgba(14,165,233,0.8)]" 
+                                       : "text-blue-100/70 group-hover/item:text-blue-50"
+                                   )}
+                                 >
+                                   <item.icon className={cn(
+                                      "h-[22px] w-[22px] transition-all duration-300",
+                                     active ? "stroke-[2.5px] animate-pulse-slow" : "stroke-[2px]"
+                                   )} />
+                                 </motion.div>
+   
+                                 {!collapsed && (
+                                   <span className={cn(
+                                     "text-[13px] font-bold tracking-wide transition-all duration-300 whitespace-nowrap",
+                                     active ? "text-white" : "text-blue-100/70 group-hover/item:text-blue-50"
+                                   )}>
+                                     {item.title}
+                                   </span>
+                                 )}
+                               </div>
+                             </NavLink>
+                           )}
+
+                           {!collapsed && hasSubItems && (
+                             <AnimatePresence>
+                               {isSubOpen && (
+                                 <motion.div
+                                   initial={{ height: 0, opacity: 0 }}
+                                   animate={{ height: "auto", opacity: 1 }}
+                                   exit={{ height: 0, opacity: 0 }}
+                                   className="overflow-hidden ml-6 pl-3 border-l border-white/10 flex flex-col gap-1 mt-1"
+                                 >
+                                   {item.subItems.map(subItem => (
+                                     <NavLink
+                                       key={subItem.title}
+                                       to={subItem.url}
+                                       className={({ isActive: subActive }) => cn(
+                                         "px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200",
+                                         subActive 
+                                           ? "text-sky-300 bg-sky-500/10" 
+                                           : "text-blue-100/60 hover:text-white hover:bg-white/5"
+                                       )}
+                                     >
+                                       {subItem.title}
+                                     </NavLink>
+                                   ))}
+                                 </motion.div>
+                               )}
+                             </AnimatePresence>
+                           )}
                       </SidebarMenuItem>
                     );
                   })}
+                
                 </SidebarMenu>
               </SidebarGroupContent>
           </SidebarGroup>
         ))}
+      <SidebarGroup className="mt-auto px-4 pb-4">
+        <SidebarGroupContent>
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <SidebarMenuButton asChild tooltip="Gestão de Acessos">
+                <NavLink to="/admin/usuarios" className={cn(
+                  "flex items-center gap-3 px-3 py-2 rounded-xl transition-all w-full",
+                  location.pathname === "/admin/usuarios" 
+                    ? "bg-[#006699] text-white shadow-lg shadow-[#006699]/30" 
+                    : "text-blue-100 hover:bg-white/10 hover:text-white"
+                )}>
+                  <Shield className="h-4 w-4" />
+                  <span className="font-semibold tracking-wide text-[11px] uppercase">Acessos</span>
+                </NavLink>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        </SidebarGroupContent>
+      </SidebarGroup>
       </SidebarContent>
       <SidebarFooter className="p-3 border-t border-white/10 bg-transparent">
         <div className="flex items-center justify-between gap-3">
