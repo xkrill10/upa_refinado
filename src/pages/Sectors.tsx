@@ -267,25 +267,7 @@ export default function Sectors() {
           </div>
         </div>
 
-        <div className="flex items-center gap-3">
-          <Button 
-            variant={isAudioEnabled ? "default" : "outline"}
-            onClick={() => setIsAudioEnabled(!isAudioEnabled)}
-            size="sm"
-            className={cn(
-              "h-9 px-4 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all shadow-sm border-none",
-              isAudioEnabled 
-                ? "bg-emerald-500 hover:bg-emerald-600 dark:bg-emerald-600 dark:hover:bg-emerald-500 text-white shadow-sm" 
-                : "border border-white/40 dark:border-white/10 text-foreground glass-card-premium hover:text-[#006699] dark:hover:text-sky-400"
-            )}
-          >
-            {isAudioEnabled ? "Áudio do Painel: ATIVO" : "Áudio do Painel: INATIVO"}
-          </Button>
-          <div className="h-8 w-[1px] bg-slate-200/40 dark:bg-slate-800/40 mx-1 hidden md:block" />
-          <Badge variant="outline" className="h-9 px-4 font-black uppercase tracking-widest border border-slate-200/40 dark:border-slate-800/40 bg-white/50 dark:bg-slate-900/40 text-foreground shadow-sm">
-            CENSO TOTAL: {allPatients.filter(p => p.status !== 'completed').length}
-          </Badge>
-        </div>
+
       </div>
 
       <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-6">
@@ -333,7 +315,33 @@ export default function Sectors() {
         </TabsList>
 
         <TabsContent value="census" className="mt-0">
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-6">
+          <div className="grid grid-cols-2 md:grid-cols-6 gap-3 mb-6">
+            <Card 
+              className={cn(
+                "rounded-2xl border cursor-pointer transition-all duration-300 overflow-hidden group select-none",
+                !selectedRisk 
+                  ? "glass-card-premium font-black ring-2 ring-offset-2 ring-slate-400 dark:ring-slate-600 shadow-2xl scale-[1.02] relative z-10 border-[#006699]/50 dark:border-sky-500/50" 
+                  : "border-white/40 dark:border-white/10 glass-card-premium opacity-80 hover:opacity-100 hover:scale-[1.02] shadow-[0_8px_30px_rgba(0,0,0,0.12)] hover:shadow-xl"
+              )}
+              onClick={() => setSelectedRisk(null)}
+            >
+              <CardContent className="p-4 flex items-center gap-3">
+                <div className="p-2 rounded-xl shadow-lg transition-transform group-hover:rotate-6 bg-slate-800 text-white dark:bg-slate-100 dark:text-slate-900">
+                  <Globe className="h-5 w-5" />
+                </div>
+                <div className="overflow-hidden">
+                  <p className="text-[9px] font-black uppercase text-muted-foreground/80 tracking-tighter truncate">Censo Total</p>
+                  <p className="text-xl font-black">{allPatients.filter(p => p.status !== 'completed').length}</p>
+                </div>
+              </CardContent>
+              {!selectedRisk && (
+                <motion.div 
+                  layoutId="risk-active-indicator"
+                  className="h-1 w-full mt-auto bg-slate-800 dark:bg-slate-100"
+                />
+              )}
+            </Card>
+
             {riskStats.map(stat => (
               <Card 
                 key={stat.risk} 
@@ -417,51 +425,74 @@ export default function Sectors() {
                   }).map(patient => {
                     const pDiff = (now.getTime() - new Date(patient.arrivalTime).getTime()) / 60000;
                     return (
-                      <div key={patient.id} className="rounded-2xl border border-white/40 dark:border-white/10 glass-card-premium p-4 flex flex-col gap-4 hover:scale-[1.02] hover:shadow-[0_8px_30px_rgba(0,0,0,0.12)] transition-all duration-300 group relative z-10">
-                        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                          <div className="flex items-center gap-3">
-                            <div className="h-10 w-10 rounded-lg bg-slate-100/50 dark:bg-slate-900/40 flex items-center justify-center font-black text-[10px] text-slate-550 dark:text-slate-400 border border-slate-200/30 dark:border-slate-850 transition-colors group-hover:bg-[#006699]/10 group-hover:text-[#006699] dark:group-hover:text-sky-400 group-hover:border-[#006699]/10 dark:group-hover:border-sky-500/10 shrink-0">
-                              {patient.ticket}
+                      <Card key={patient.id} className={cn(
+                        "group hover:shadow-xl transition-all duration-300 border overflow-hidden rounded-2xl border-l-[4px] h-full flex flex-col glass-card-premium relative z-10 hover:scale-[1.02]",
+                        patient.risk === 'emergency' ? "border-l-red-500 border-white/40 dark:border-white/10" : 
+                        patient.risk === 'very-urgent' ? "border-l-orange-500 border-white/40 dark:border-white/10" :
+                        patient.risk === 'urgent' ? "border-l-[#FFDE21] border-white/40 dark:border-white/10" : 
+                        patient.risk === 'less-urgent' ? "border-l-green-500 border-white/40 dark:border-white/10" : "border-l-blue-600 border-white/40 dark:border-white/10"
+                      )}>
+                        <CardHeader className="p-4 pb-3 space-y-0 shrink-0">
+                          <div className="flex items-center justify-between mb-4">
+                            <div className="flex flex-col">
+                              <Badge 
+                                variant="outline" 
+                                className="text-[10px] font-black tracking-widest uppercase border-0 p-0 text-muted-foreground"
+                              >
+                                {patient.ticket}
+                              </Badge>
                             </div>
-                            <div className="overflow-hidden">
-                              <p className="text-sm font-bold truncate">
-                                {patient.name.toUpperCase().includes('NÃO IDENTIFICADO') || patient.name.toUpperCase().includes('DESCONHECIDO') 
-                                  ? "PACIENTE NÃO IDENTIFICADO" 
-                                  : formatWords(patient.name)}
-                              </p>
-                              <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mt-0.5">{patient.age} Anos • CPF: {patient.cpf || '***'}</p>
+                            <div className="flex flex-col items-end">
+                              <Badge className={cn("text-[9px] font-black uppercase px-2 py-0.5 shadow-sm border-none", getRiskDetails(patient.risk).color)}>
+                                {getRiskDetails(patient.risk).label}
+                              </Badge>
                             </div>
                           </div>
-                          <div className="flex flex-col items-end gap-1.5 shrink-0">
-                            <Badge className={cn("text-[9px] font-black uppercase px-2 py-0.5 shadow-sm border-none", getRiskDetails(patient.risk).color)}>
-                              {getRiskDetails(patient.risk).label}
-                            </Badge>
-                            <span className="text-[10px] font-bold text-muted-foreground flex items-center gap-1.5">
-                              <div className={cn("h-1.5 w-1.5 rounded-full", patient.risk === 'emergency' ? "bg-red-500 animate-pulse" : patient.risk === 'very-urgent' ? "bg-orange-500 animate-pulse" : patient.risk === 'urgent' ? "bg-amber-400 animate-pulse" : patient.risk === 'less-urgent' ? "bg-emerald-500" : "bg-blue-600")} />
-                              {patient.sector || 'TRIAGEM'}
+                          
+                          <CardTitle className="text-sm font-black uppercase tracking-tight transition-colors truncate mb-1">
+                            {patient.name.toUpperCase().includes('NÃO IDENTIFICADO') || patient.name.toUpperCase().includes('DESCONHECIDO') 
+                              ? "PACIENTE NÃO IDENTIFICADO" 
+                              : formatWords(patient.name)}
+                          </CardTitle>
+                          <p className="text-[10px] text-muted-foreground/80 font-bold uppercase tracking-wider">
+                            {patient.age} Anos • CPF: {patient.cpf || '***'}
+                          </p>
+                        </CardHeader>
+                        
+                        <CardContent className="p-4 pt-0 flex-1 flex flex-col justify-end">
+                          <div className="flex items-center gap-2 mb-4 mt-2">
+                             <div className={cn(
+                               "h-1.5 w-1.5 rounded-full animate-pulse",
+                               patient.risk === 'emergency' ? "bg-red-500" : 
+                               patient.risk === 'very-urgent' ? "bg-orange-500" :
+                               patient.risk === 'urgent' ? "bg-amber-400" : 
+                               patient.risk === 'less-urgent' ? "bg-emerald-500" : "bg-blue-600"
+                             )} />
+                             <span className="text-[10px] font-bold text-muted-foreground uppercase">
+                               {patient.sector || 'TRIAGEM'}
+                             </span>
+                          </div>
+
+                          <div className="flex items-center justify-between bg-white/30 dark:bg-slate-950/40 px-3 py-2 rounded-xl border border-white/40 dark:border-white/10 text-[10px] font-bold text-muted-foreground uppercase shadow-inner mb-4">
+                            <span className="flex items-center gap-1.5">
+                              <Clock className="h-3.5 w-3.5 text-[#006699] dark:text-sky-400" />
+                              Entrada: {format(new Date(patient.arrivalTime), "HH:mm", { locale: ptBR })}
+                            </span>
+                            <span className={cn(pDiff > 15 ? "text-amber-600 dark:text-amber-400 font-extrabold animate-pulse" : "text-muted-foreground/80")}>
+                              Há {Math.floor(pDiff)} min
                             </span>
                           </div>
-                        </div>
-                        
-                        <div className="flex items-center justify-between bg-white/30 dark:bg-slate-950/40 px-3 py-2 rounded-xl border border-white/40 dark:border-white/10 text-[10px] font-bold text-muted-foreground uppercase shadow-inner">
-                          <span className="flex items-center gap-1.5">
-                            <Clock className="h-3.5 w-3.5 text-[#006699] dark:text-sky-400" />
-                            Entrada: {format(new Date(patient.arrivalTime), "HH:mm", { locale: ptBR })}
-                          </span>
-                          <span className={cn(pDiff > 15 ? "text-amber-600 dark:text-amber-400 font-extrabold animate-pulse" : "text-muted-foreground/80")}>
-                            Há {Math.floor(pDiff)} min
-                          </span>
-                        </div>
-                        
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          className="w-full text-[10px] font-black uppercase tracking-widest rounded-xl h-10 border border-white/40 dark:border-white/10 glass-card-premium hover:text-[#006699] dark:hover:text-sky-400 transition-all shadow-sm hover:scale-[1.02]"
-                          onClick={() => navigate(`/paciente/${patient.id}`, { state: { from: '/setores', label: 'Setores' } })}
-                        >
-                          Visualizar Prontuário <ChevronRight className="h-3.5 w-3.5 ml-1" />
-                        </Button>
-                      </div>
+                          
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            className="w-full text-[10px] font-black uppercase tracking-widest rounded-xl h-10 border border-white/40 dark:border-white/10 glass-card-premium hover:text-[#006699] dark:hover:text-sky-400 transition-all shadow-sm hover:scale-[1.02]"
+                            onClick={() => setRecordPatientId(patient.id)}
+                          >
+                            Visualizar Prontuário <ChevronRight className="h-3.5 w-3.5 ml-1" />
+                          </Button>
+                        </CardContent>
+                      </Card>
                     );
                   })}
                   {allPatients.filter(p => p.status !== 'completed' && (!selectedRisk || p.risk === selectedRisk)).length === 0 && (
@@ -809,40 +840,6 @@ export default function Sectors() {
                                   onClick={() => setRecordPatientId(patient.id)}
                                 >
                                   Prontuário
-                                </Button>
-                                <Button 
-                                  variant="outline"
-                                  className="w-full h-9 text-[10px] font-black uppercase border border-emerald-200/50 dark:border-emerald-900/40 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20"
-                                  onClick={() => navigate(`/paciente/${patient.id}/evolucao`, { state: { from: '/setores', label: 'Setores', reopenSector: selectedSector?.name } })}
-                                >
-                                  Evoluir
-                                </Button>
-                                <Button 
-                                  className="w-full h-9 text-[10px] font-black uppercase bg-[#006699] hover:bg-[#005580] dark:bg-sky-500 dark:hover:bg-sky-400 dark:text-slate-950 text-white border-none shadow-sm"
-                                  onClick={() => {
-                                    const ticketToUse = patient.ticket || "GERAL";
-                                    const roomToUse = selectedSector?.name || "CONSULTÓRIO";
-                                    
-                                    setCallingTicket({ 
-                                      ticket: ticketToUse, 
-                                      patientName: patient.name,
-                                      risk: patient.risk || 'not-urgent',
-                                      priority: patient.priority || 'normal',
-                                      room: roomToUse,
-                                      age: patient.age,
-                                      cpf: patient.cpf
-                                    });
-                                    setShowCallControl(true);
-                                    callTicket(ticketToUse, roomToUse, patient.risk || 'not-urgent', patient.name);
-                                    
-                                    toast.success(`Chamando: ${formatWords(patient.name)}`, {
-                                      description: "Paciente notificado no painel da sala de espera.",
-                                      duration: 5000,
-                                      icon: <Megaphone className="h-4 w-4 text-primary" />,
-                                    });
-                                  }}
-                                >
-                                  Chamar Senha
                                 </Button>
                                 <Button 
                                   variant="outline"

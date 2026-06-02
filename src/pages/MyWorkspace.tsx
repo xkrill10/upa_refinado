@@ -62,9 +62,9 @@ export default function MyWorkspace() {
   const relevantPatients = patients.filter(p => {
     if (p.status === 'completed' || p.status === 'evasion') return false;
     const isPatientPediatric = p.priority === "pediatric" || (p.age !== undefined && p.age <= 14);
-    const isCritical = p.risk === 'emergency' || p.risk === 'very-urgent';
+    const isCritical = p.risk === 'emergency';
 
-    // Se o médico estiver na Sala Vermelha: Só atende os críticos (Vermelho/Laranja)
+    // Se o médico estiver na Sala Vermelha: Só atende os críticos (Vermelho)
     if (isEmergencyRoom) {
       if (!isCritical) return false;
       
@@ -78,7 +78,7 @@ export default function MyWorkspace() {
       return true;
     }
 
-    // Se o médico estiver no Consultório Clínico Normal: Só atende os estáveis (Amarelo, Verde, Azul)
+    // Se o médico estiver no Consultório Clínico Normal: Só atende Laranja, Amarelo, Verde, Azul
     if (isCritical) return false;
 
     return isPediatric ? isPatientPediatric : !isPatientPediatric;
@@ -234,7 +234,7 @@ export default function MyWorkspace() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+          <div className="flex flex-col gap-4">
             <AnimatePresence>
               {myAttendingPatients.length === 0 ? (
                 <motion.div 
@@ -283,8 +283,8 @@ export default function MyWorkspace() {
                         patient.risk === 'urgent' ? "bg-[#FFDE21]" : 
                         patient.risk === 'less-urgent' ? "bg-green-500" : "bg-blue-600"
                       )} />
-                      <CardContent className="p-5">
-                        <div className="flex items-start justify-between mb-4">
+                      <CardContent className="p-0 flex flex-col md:flex-row items-stretch">
+                        <div className="p-5 flex-1 min-w-[250px] flex flex-col justify-center border-b md:border-b-0 md:border-r border-slate-200/50 dark:border-slate-800/50">
                           <div>
                             <h3 className="text-lg font-black text-foreground leading-tight tracking-tight">
                               {formatWords(patient.name)}
@@ -293,57 +293,58 @@ export default function MyWorkspace() {
                               {formatPatientAge(patient.age, patient.birthDate)} • Ticket: {patient.ticket}
                             </p>
                           </div>
+                          <div className="flex items-center gap-2 mt-4">
+                            <Clock className="h-4 w-4 text-slate-400" />
+                            <span className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">
+                              Tempo em sala: {(() => {
+                                const diff = Math.floor((new Date().getTime() - new Date(patient.arrivalTime).getTime()) / 60000);
+                                return diff > 60 ? `${Math.floor(diff/60)}h ${diff%60}m` : `${diff} min`;
+                              })()}
+                            </span>
+                          </div>
                         </div>
 
-                        <div className="flex items-center gap-2 mb-6">
-                          <Clock className="h-4 w-4 text-slate-400" />
-                          <span className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">
-                            Tempo em sala: {(() => {
-                              const diff = Math.floor((new Date().getTime() - new Date(patient.arrivalTime).getTime()) / 60000);
-                              return diff > 60 ? `${Math.floor(diff/60)}h ${diff%60}m` : `${diff} min`;
-                            })()}
-                          </span>
-                        </div>
-
-                        <div className="flex flex-col gap-2">
+                        <div className="p-5 flex flex-col justify-center gap-3 border-b md:border-b-0 md:border-r border-slate-200/50 dark:border-slate-800/50 flex-1 md:max-w-[250px]">
                           <Button 
                             variant="outline"
                             className="h-10 text-[10px] font-black uppercase border-[#006699]/20 text-[#006699] hover:bg-[#006699]/5 dark:border-sky-400/20 dark:text-sky-400 dark:hover:bg-sky-400/5 w-full transition-all"
                             onClick={() => setDetailsPatient(patient)}
                           >
-                            <Info className="h-3.5 w-3.5 mr-1.5" /> Detalhes do Paciente
+                            <Info className="h-3.5 w-3.5 mr-1.5" /> Detalhes da Triagem
                           </Button>
-                          <div className="grid grid-cols-2 gap-2">
-                            <Button 
+                          <Button 
                             variant="outline"
-                            className="h-10 text-[10px] font-black uppercase border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-900"
+                            className="h-10 text-[10px] font-black uppercase border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-900 w-full transition-all text-slate-600 dark:text-slate-300"
                             onClick={() => setRecordPatientId(patient.id)}
                           >
-                            <User className="h-3.5 w-3.5 mr-1.5" /> Prontuário
-                          </Button>
-                          <Button 
-                            variant="outline"
-                            className="h-10 text-[10px] font-black uppercase border-blue-200 dark:border-blue-900/40 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20"
-                            onClick={() => navigate(`/paciente/${patient.id}/evolucao`, { state: { from: '/meu-consultorio', label: 'Meu Consultório', expressEvolution: true } })}
-                          >
-                            <Stethoscope className="h-3.5 w-3.5 mr-1.5" /> Evoluir
-                          </Button>
-                          <Button 
-                            variant="outline"
-                            className="h-10 text-[10px] font-black uppercase border-amber-200 dark:border-amber-900/40 text-amber-600 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-900/20"
-                            onClick={() => handlePause(patient)}
-                          >
-                            <PauseCircle className="h-3.5 w-3.5 mr-1.5" /> Pausar
-                          </Button>
-                          <Button 
-                            className="h-10 text-[10px] font-black uppercase bg-emerald-500 hover:bg-emerald-600 text-white shadow-md border-0"
-                            onClick={() => setFinishingPatient(patient)}
-                          >
-                            <CheckCircle2 className="h-3.5 w-3.5 mr-1.5" /> Dar Alta
+                            <User className="h-3.5 w-3.5 mr-1.5" /> Ver Prontuário
                           </Button>
                         </div>
-                      </div>
-                    </CardContent>
+
+                        <div className="p-5 flex-1 min-w-[300px] flex flex-col justify-center gap-3 bg-slate-50/50 dark:bg-slate-900/20">
+                          <Button 
+                            className="h-12 text-xs font-black uppercase bg-[#006699] hover:bg-[#005580] dark:bg-sky-600 dark:hover:bg-sky-500 text-white shadow-md shadow-[#006699]/20 dark:shadow-sky-900/20 w-full transition-all border-0"
+                            onClick={() => navigate(`/paciente/${patient.id}/evolucao`, { state: { from: '/meu-consultorio', label: 'Meu Consultório', expressEvolution: true } })}
+                          >
+                            <Stethoscope className="h-4 w-4 mr-2" /> Iniciar Evolução
+                          </Button>
+                          <div className="grid grid-cols-2 gap-3 w-full">
+                            <Button 
+                              variant="outline"
+                              className="h-10 text-[10px] font-black uppercase border-amber-200 dark:border-amber-900/40 text-amber-600 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-900/20"
+                              onClick={() => handlePause(patient)}
+                            >
+                              <PauseCircle className="h-3.5 w-3.5 mr-1.5" /> Pausar (Exame)
+                            </Button>
+                            <Button 
+                              className="h-10 text-[10px] font-black uppercase bg-emerald-500 hover:bg-emerald-600 text-white shadow-md border-0"
+                              onClick={() => setFinishingPatient(patient)}
+                            >
+                              <CheckCircle2 className="h-3.5 w-3.5 mr-1.5" /> Dar Alta
+                            </Button>
+                          </div>
+                        </div>
+                      </CardContent>
                     </Card>
                   </motion.div>
                 ))
@@ -391,7 +392,7 @@ export default function MyWorkspace() {
                         <div className={cn(
                           "px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest text-center min-w-[120px] shadow-sm",
                           patient.risk === 'emergency' ? "bg-red-600 text-white" : 
-                          patient.risk === 'very-urgent' ? "bg-orange-500 text-white" :
+                          patient.risk === 'very-urgent' ? "bg-orange-500 text-white animate-pulse shadow-[0_0_15px_rgba(249,115,22,0.5)] ring-2 ring-orange-400 ring-offset-2 ring-offset-white dark:ring-offset-slate-900" :
                           patient.risk === 'urgent' ? "bg-[#FFDE21] text-black" : 
                           patient.risk === 'less-urgent' ? "bg-green-500 text-white" : "bg-blue-500 text-white"
                         )}>

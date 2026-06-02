@@ -156,40 +156,21 @@ export default function AtendimentosPediatrico() {
           <div className="flex items-center justify-center h-10 w-10 rounded-xl bg-orange-500/10 text-orange-500 shrink-0">
             <Building2 className="h-5 w-5" />
           </div>
-          {activeDoctor ? (
-            <div className="flex items-center gap-4 pr-2">
-              <div className="flex flex-col gap-0.5">
-                <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground leading-none">Operando</span>
-                <span className="text-sm font-black text-foreground uppercase tracking-tight leading-none">{selectedRoom}</span>
-                <span className="text-[10px] font-bold text-[#006699] dark:text-sky-400 uppercase tracking-widest mt-0.5">{activeDoctor}</span>
-              </div>
-              <div className="w-px h-8 bg-slate-200 dark:bg-slate-800 mx-1" />
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                className="h-8 rounded-lg gap-2 text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 px-3 font-black uppercase text-[10px] tracking-wider"
-                onClick={handleEndShift}
-              >
-                <LogOut className="h-3.5 w-3.5" /> Sair
-              </Button>
-            </div>
-          ) : (
-            <div className="flex flex-col gap-1 pr-2">
-              <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground">Modo Administrador</span>
-              <Select value={selectedRoom} onValueChange={setSelectedRoom}>
-                <SelectTrigger className="h-7 w-[240px] border-none bg-transparent shadow-none p-0 focus:ring-0 text-sm font-black text-foreground">
-                  <SelectValue placeholder="Selecione o consultório" />
-                </SelectTrigger>
-                <SelectContent className="glass-card-premium rounded-xl border-white/20">
-                  {Array.from({ length: 3 }, (_, i) => (
-                    <SelectItem key={i} value={`CONSULTÓRIO PEDIÁTRICO ${i + 1}`} className="font-bold text-xs">
-                      CONSULTÓRIO PEDIÁTRICO {i + 1}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          )}
+          <div className="flex flex-col gap-1 pr-2">
+            <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground">Visão de Gestão</span>
+            <Select value={selectedRoom} onValueChange={setSelectedRoom}>
+              <SelectTrigger className="h-7 w-[240px] border-none bg-transparent shadow-none p-0 focus:ring-0 text-sm font-black text-foreground">
+                <SelectValue placeholder="Filtrar por consultório" />
+              </SelectTrigger>
+              <SelectContent className="glass-card-premium rounded-xl border-white/20">
+                {Array.from({ length: 3 }, (_, i) => (
+                  <SelectItem key={i} value={`CONSULTÓRIO PEDIÁTRICO ${i + 1}`} className="font-bold text-xs">
+                    CONSULTÓRIO PEDIÁTRICO {i + 1}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         </div>
       </div>
 
@@ -210,13 +191,6 @@ export default function AtendimentosPediatrico() {
               </p>
             </div>
           </div>
-          <Button 
-            className="w-full sm:w-auto h-12 bg-white hover:bg-slate-100 text-red-600 font-black uppercase tracking-[0.15em] text-xs shadow-xl rounded-xl transition-all hover:scale-105 border-0 cursor-pointer"
-            onClick={() => handleAttend(gravePatients[0])}
-          >
-            <Baby className="h-4 w-4 mr-2" />
-            Atender Imediatamente
-          </Button>
         </motion.div>
       )}
 
@@ -336,14 +310,6 @@ export default function AtendimentosPediatrico() {
                        onClick={() => setRecordPatientId(patient.id)}>
                       <User className="h-3.5 w-3.5" /> Prontuário
                     </Button>
-                    <Button variant="outline" size="sm" className="h-8 rounded-lg gap-1.5 font-black uppercase text-[9px] tracking-wider text-purple-600 border-purple-200 hover:bg-purple-50 dark:text-purple-400 dark:border-purple-900/50 dark:hover:bg-purple-900/20 cursor-pointer px-2" 
-                       onClick={() => navigate(`/paciente/${patient.id}`, { state: { from: "/atendimentos-pediatrico", label: "Pediátrico", activeTab: 'exams' } })}>
-                      <FlaskConical className="h-3.5 w-3.5" /> Exames
-                    </Button>
-                    <Button size="sm" className="h-8 rounded-lg gap-1.5 font-black uppercase text-[9px] tracking-wider bg-orange-500 hover:bg-orange-600 text-white shadow-md border-0 cursor-pointer px-3"
-                       onClick={() => navigate(`/paciente/${patient.id}/evolucao`, { state: { from: "/atendimentos-pediatrico", label: "Pediátrico" } })}>
-                      <Stethoscope className="h-3.5 w-3.5" /> Evoluir
-                    </Button>
                   </div>
                 </div>
               );
@@ -420,12 +386,7 @@ export default function AtendimentosPediatrico() {
                           onClick={() => setEvasaoPatient({ id: patient.id, name: patient.name })} title="Registrar Evasão">
                           <LogOut className="h-4 w-4" />
                         </Button>
-                        <Button size="sm" variant="ghost" className="h-9 rounded-xl px-3 gap-2 text-orange-500 hover:bg-orange-500/5 font-black uppercase text-[10px] tracking-wider" onClick={() => handleCall(patient)}>
-                          <Volume2 className="h-3.5 w-3.5" /> Chamar Senha
-                        </Button>
-                        <Button size="sm" variant="ghost" className="h-9 rounded-xl px-3 gap-2 text-emerald-600 hover:bg-emerald-50 font-black uppercase text-[10px] tracking-wider" onClick={() => handleAttend(patient)}>
-                          <Stethoscope className="h-3.5 w-3.5" /> Atender
-                        </Button>
+
                         <Button size="sm" variant="ghost" className="h-9 w-9 rounded-xl p-0 text-muted-foreground hover:text-orange-500"
                           onClick={() => setRecordPatientId(patient.id)}>
                           <ExternalLink className="h-4 w-4" />

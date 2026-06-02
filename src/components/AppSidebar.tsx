@@ -1,5 +1,7 @@
-import { LayoutDashboard, Users, UserPlus, Activity, ClipboardList, Building2, BedDouble, Stethoscope, HeartPulse, FileText, Pill, UserCog, Globe, Megaphone, LogIn, Archive, Baby, FlaskConical, PackageOpen, Syringe, DollarSign, Sparkles, UserSquare2, MessageSquare, ArchiveRestore, Ambulance, Droplets } from "lucide-react";
+import { LayoutDashboard, Users, UserPlus, Activity, ClipboardList, Building2, BedDouble, Stethoscope, HeartPulse, FileText, Pill, UserCog, Globe, Megaphone, LogIn, Archive, Baby, FlaskConical, PackageOpen, Syringe, DollarSign, Sparkles, UserSquare2, MessageSquare, ArchiveRestore, Ambulance, Droplets, RotateCcw } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
+import { usePatients } from "@/hooks/use-patients";
+import { Button } from "@/components/ui/button";
 import { useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { motion } from "motion/react";
@@ -69,6 +71,7 @@ const menuGroups = [
 
 export function AppSidebar() {
   const { state } = useSidebar();
+  const { resetSystem } = usePatients();
   const collapsed = state === "collapsed";
   const location = useLocation();
   const isActive = (path: string) => location.pathname === path;
@@ -164,7 +167,12 @@ export function AppSidebar() {
               <span className="text-xs font-semibold text-sidebar-foreground opacity-80">Aparência</span>
             </div>
           )}
-          <ThemeToggle position="bottom" />
+          <div className="flex items-center gap-2">
+            <Button variant="ghost" size="icon" onClick={resetSystem} className="h-8 w-8 text-sidebar-foreground/50 hover:text-red-400 hover:bg-red-400/10" title="Resetar Dados de Teste">
+              <RotateCcw className="h-4 w-4" />
+            </Button>
+            <ThemeToggle position="bottom" />
+          </div>
         </div>
       </SidebarFooter>
     </Sidebar>

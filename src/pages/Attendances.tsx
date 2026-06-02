@@ -172,40 +172,21 @@ export default function Attendances() {
             <Building2 className="h-5 w-5" />
           </div>
           
-          {activeDoctor ? (
-            <div className="flex items-center gap-4 pr-2">
-              <div className="flex flex-col gap-0.5">
-                <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground leading-none">Operando</span>
-                <span className="text-sm font-black text-foreground uppercase tracking-tight leading-none">{selectedRoom}</span>
-                <span className="text-[10px] font-bold text-[#006699] dark:text-sky-400 uppercase tracking-widest mt-0.5">{activeDoctor}</span>
-              </div>
-              <div className="w-px h-8 bg-slate-200 dark:bg-slate-800 mx-1" />
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                className="h-8 rounded-lg gap-2 text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 px-3 font-black uppercase text-[10px] tracking-wider"
-                onClick={handleEndShift}
-              >
-                <LogOut className="h-3.5 w-3.5" /> Sair
-              </Button>
-            </div>
-          ) : (
-            <div className="flex flex-col gap-1 pr-2">
-              <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground">Modo Administrador</span>
-              <Select value={selectedRoom} onValueChange={setSelectedRoom}>
-                <SelectTrigger className="h-7 w-[220px] border-none bg-transparent shadow-none p-0 focus:ring-0 text-sm font-black text-foreground">
-                  <SelectValue placeholder="Selecione o consultório" />
-                </SelectTrigger>
-                <SelectContent className="glass-card-premium rounded-xl border-white/20">
-                  {Array.from({ length: 9 }, (_, i) => (
-                    <SelectItem key={i} value={`CONSULTÓRIO CLÍNICO ${i + 1}`} className="font-bold text-xs">
-                      CONSULTÓRIO CLÍNICO {i + 1}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          )}
+          <div className="flex flex-col gap-1 pr-2">
+            <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground">Visão de Gestão</span>
+            <Select value={selectedRoom} onValueChange={setSelectedRoom}>
+              <SelectTrigger className="h-7 w-[220px] border-none bg-transparent shadow-none p-0 focus:ring-0 text-sm font-black text-foreground">
+                <SelectValue placeholder="Filtrar por consultório" />
+              </SelectTrigger>
+              <SelectContent className="glass-card-premium rounded-xl border-white/20">
+                {Array.from({ length: 9 }, (_, i) => (
+                  <SelectItem key={i} value={`CONSULTÓRIO CLÍNICO ${i + 1}`} className="font-bold text-xs">
+                    CONSULTÓRIO CLÍNICO {i + 1}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         </div>
       </div>
 
@@ -226,13 +207,6 @@ export default function Attendances() {
               </p>
             </div>
           </div>
-          <Button 
-            className="w-full sm:w-auto h-12 bg-white hover:bg-slate-100 text-red-600 font-black uppercase tracking-[0.15em] text-xs shadow-xl rounded-xl transition-all hover:scale-105"
-            onClick={() => handleAttend(gravePatients[0])}
-          >
-            <Stethoscope className="h-4 w-4 mr-2" />
-            Atender Imediatamente
-          </Button>
         </motion.div>
       )}
 
@@ -365,23 +339,6 @@ export default function Attendances() {
                         <User className="h-3.5 w-3.5" />
                         Prontuário
                       </Button>
-                      <Button 
-                        variant="outline"
-                        size="sm" 
-                        className="h-8 rounded-lg gap-1.5 font-black uppercase text-[9px] tracking-wider text-blue-600 border-blue-200 hover:bg-blue-50 dark:text-blue-400 dark:border-blue-900 dark:hover:bg-blue-900/20 cursor-pointer px-2" 
-                        onClick={() => navigate(`/paciente/${patient.id}`, { state: { from: '/atendimentos', label: 'Atendimentos', activeTab: 'exams' } })}
-                      >
-                        <FlaskConical className="h-3.5 w-3.5" />
-                        Exames
-                      </Button>
-                      <Button 
-                        size="sm" 
-                        className="h-8 rounded-lg gap-1.5 font-black uppercase text-[9px] tracking-wider bg-[#006699] hover:bg-[#005580] dark:bg-sky-600 dark:hover:bg-sky-500 text-white shadow-md border-0 cursor-pointer px-3" 
-                        onClick={() => navigate(`/paciente/${patient.id}/evolucao`, { state: { from: '/atendimentos', label: 'Atendimentos' } })}
-                      >
-                        <Stethoscope className="h-3.5 w-3.5" />
-                        Evoluir
-                      </Button>
                     </div>
                   </div>
                 );
@@ -472,24 +429,7 @@ export default function Attendances() {
                           >
                             <LogOut className="h-4 w-4" />
                           </Button>
-                          <Button 
-                            size="sm" 
-                            variant="ghost" 
-                            className="h-9 rounded-xl px-3 gap-2 text-primary dark:text-sky-400 hover:bg-primary/5 dark:hover:bg-sky-400/5 font-black uppercase text-[10px] tracking-wider cursor-pointer border-0"
-                            onClick={() => handleCall(patient)}
-                          >
-                            <Volume2 className="h-3.5 w-3.5" />
-                            Chamar Senha
-                          </Button>
-                          <Button 
-                            size="sm" 
-                            variant="ghost" 
-                            className="h-9 rounded-xl px-3 gap-2 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/20 font-black uppercase text-[10px] tracking-wider cursor-pointer border-0"
-                            onClick={() => handleAttend(patient)}
-                          >
-                            <Stethoscope className="h-3.5 w-3.5" />
-                            Atender
-                          </Button>
+
                           <Button 
                             size="sm" 
                             variant="ghost" 
