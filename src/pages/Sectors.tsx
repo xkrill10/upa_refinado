@@ -284,6 +284,15 @@ export default function Sectors() {
               <span className="text-xs font-black uppercase tracking-tight">Censo Global</span>
             </div>
           </TabsTrigger>
+          <TabsTrigger 
+            value="map"
+            className="px-6 rounded-lg transition-all border-b-2 border-transparent data-[state=active]:bg-white/95 dark:data-[state=active]:bg-slate-900/60 data-[state=active]:shadow-md data-[state=active]:text-[#006699] dark:data-[state=active]:text-sky-400 data-[state=active]:border-[#006699]/30 dark:data-[state=active]:border-sky-500/30"
+          >
+            <div className="flex items-center gap-2">
+              <Building2 className="h-4 w-4" />
+              <span className="text-xs font-black uppercase tracking-tight">Mapa da Unidade</span>
+            </div>
+          </TabsTrigger>
           {sectorGroups.map(group => {
             const criticalCount = allPatients.filter(p => 
               group.sectors.some(s => s.name === p.sector) && 
@@ -504,6 +513,63 @@ export default function Sectors() {
                     </div>
                   )}
               </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="map" className="mt-0">
+          <Card className="glass-card-premium border-none shadow-[0_8px_30px_rgba(0,0,0,0.12)] overflow-hidden rounded-2xl">
+            <CardHeader className="p-6 bg-gradient-to-r from-white/40 to-white/10 dark:from-slate-900/40 dark:to-slate-900/10 backdrop-blur-md border-b border-white/40 dark:border-white/10">
+              <CardTitle className="text-sm font-black tracking-widest text-[#006699] dark:text-sky-400 uppercase">Mapa da Unidade (Todos os Setores)</CardTitle>
+            </CardHeader>
+            <CardContent className="p-6 bg-transparent space-y-10">
+              {sectorGroups.map(group => (
+                <div key={group.id} className={cn("p-6 rounded-2xl border-2 relative bg-white/30 dark:bg-slate-950/20 backdrop-blur-sm", group.borderColor)}>
+                  <div className={cn("absolute -top-3 left-6 px-3 bg-background font-black text-xs uppercase tracking-widest rounded-full shadow-sm", group.color, group.borderColor, "border")}>
+                    {group.label}
+                  </div>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-3 mt-3">
+                    {group.sectors.map((sector, idx) => {
+                      const sectorPatients = allPatients.filter(p => p.sector === sector.name && p.status !== 'completed');
+                      const occupancy = (sectorPatients.length / sector.max) * 100;
+                      
+                      const maxTimeInMinutes = sectorPatients.reduce((max, p) => {
+                         const diff = (now.getTime() - new Date(p.arrivalTime).getTime()) / 60000;
+                         return Math.max(max, diff);
+                      }, 0);
+
+                      const isRedAlert = maxTimeInMinutes > 30;
+                      const isAmberAlert = maxTimeInMinutes > 15;
+
+                      return (
+                        <div 
+                          key={sector.name}
+                          className={cn(
+                            "p-3 rounded-xl border flex flex-col items-center justify-center text-center gap-1.5 transition-all cursor-pointer hover:scale-105 min-h-[90px]", 
+                            occupancy >= 100 
+                               ? "bg-red-500/20 border-red-500/40 shadow-sm" 
+                               : occupancy > 0 
+                                 ? "bg-emerald-500/10 border-emerald-500/30" 
+                                 : cn(group.bgColor, group.borderColor, "opacity-70 hover:opacity-100"),
+                            isRedAlert ? "animate-blink-red shadow-md shadow-red-500/20 border-red-500" : isAmberAlert ? "animate-blink-amber shadow-md shadow-amber-400/20 border-amber-500" : ""
+                          )}
+                          onClick={() => {
+                            setSelectedSector({ ...sector, group });
+                            setShowSectorDialog(true);
+                          }}
+                        >
+                          <group.icon className={cn("h-5 w-5 mb-0.5", occupancy >= 100 ? "text-red-500" : occupancy > 0 ? "text-emerald-500" : group.color)} />
+                          <span className="text-[9px] font-black uppercase tracking-widest text-foreground line-clamp-2 leading-tight">{sector.name}</span>
+                          <div className="flex flex-col items-center gap-0.5 mt-auto">
+                            {occupancy > 0 && <span className="text-[8px] font-bold text-muted-foreground truncate w-full pointer-events-none">{sectorPatients.length}/{sector.max} Pacientes</span>}
+                            {isAmberAlert && <span className={cn("text-[7px] font-black uppercase", isRedAlert ? "text-red-500" : "text-amber-500")}>{isRedAlert ? "Atraso Crítico" : "No Limite"}</span>}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              ))}
             </CardContent>
           </Card>
         </TabsContent>
