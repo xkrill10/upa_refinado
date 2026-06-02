@@ -19,62 +19,67 @@ import {
 } from "@/components/ui/sidebar";
 import { ThemeToggle } from "./ThemeToggle";
 
-const menuGroups = [
-  {
-    label: "Operacional",
-    items: [
-      { title: "Dashboard", url: "/", icon: LayoutDashboard },
-      { title: "Senhas", url: "/entrada", icon: LogIn },
-      { title: "Triagem", url: "/triagem", icon: Stethoscope },
-      { title: "Pediatria", url: "/pediatria", icon: Baby },
-      { title: "Recepção", url: "/novo-paciente", icon: UserPlus },
-    ]
-  },
-  {
-    label: "Atendimento Clínico",
-    items: [
-      { title: "Fila de Atendimento", url: "/fila", icon: ClipboardList },
-      { title: "Painel Médico", url: "/painel-medico", icon: UserSquare2 },
-      { title: "Clínico", url: "/atendimentos", icon: HeartPulse },
-      { title: "Pediátrico", url: "/atendimentos-pediatrico", icon: Baby },
-      { title: "Laboratório", url: "/laboratorio", icon: FlaskConical },
-      { title: "Leitos", url: "/leitos", icon: BedDouble },
-      { title: "Checagem Leito", url: "/checagem-enfermagem", icon: Syringe },
-      { title: "Regulação (NIR)", url: "/nir", icon: Ambulance },
-    ]
-  },
-  {
-    label: "Gestão e Administração",
-    items: [
-      { title: "Pacientes", url: "/pacientes", icon: Users },
-      { title: "Setores", url: "/setores", icon: Building2 },
-      { title: "SAME", url: "/same", icon: Archive },
-      { title: "Recursos Humanos", url: "/rh", icon: UserCog },
-      { title: "Meu RH", url: "/meu-rh", icon: UserSquare2 },
-      { title: "Faturamento", url: "/faturamento", icon: DollarSign },
-      { title: "Relatórios", url: "/relatorios", icon: FileText },
-    ]
-  },
-  {
-    label: "Serviços e Apoio",
-    items: [
-      { title: "Painel de Chamadas", url: "/painel-chamadas", icon: Megaphone },
-      { title: "Farmácia Central", url: "/farmacia", icon: Pill },
-      { title: "Farm. Satélite", url: "/farmacia-satelite", icon: ArchiveRestore },
-      { title: "Almoxarifado", url: "/almoxarifado", icon: PackageOpen },
-      { title: "Governança", url: "/governanca", icon: Sparkles },
-      { title: "Higienização", url: "/higiene", icon: Droplets },
-      { title: "SUS Cross Vagas", url: "/sus", icon: Globe },
-    ]
-  }
-];
-
 export function AppSidebar() {
   const { state } = useSidebar();
-  const { resetSystem } = usePatients();
+  const { resetSystem, patients } = usePatients();
   const collapsed = state === "collapsed";
   const location = useLocation();
   const isActive = (path: string) => location.pathname === path;
+
+  // Extrair o ID do paciente da rota atual ou buscar um paciente em atendimento / fallback padrão
+  const match = location.pathname.match(/^\/paciente\/([^/]+)/);
+  const currentPatientId = match ? match[1] : (patients?.find(p => p.status === 'attending')?.id || '3');
+
+  const menuGroups = [
+    {
+      label: "Operacional",
+      items: [
+        { title: "Dashboard", url: "/", icon: LayoutDashboard },
+        { title: "Senhas", url: "/entrada", icon: LogIn },
+        { title: "Triagem", url: "/triagem", icon: Stethoscope },
+        { title: "Pediatria", url: "/pediatria", icon: Baby },
+        { title: "Recepção", url: "/novo-paciente", icon: UserPlus },
+      ]
+    },
+    {
+      label: "Atendimento Clínico",
+      items: [
+        { title: "Fila de Atendimento", url: "/fila", icon: ClipboardList },
+        { title: "Painel Médico", url: "/painel-medico", icon: UserSquare2 },
+        { title: "Clínico", url: "/atendimentos", icon: HeartPulse },
+        { title: "Evolução", url: `/paciente/${currentPatientId}/evolucao`, icon: FileText },
+        { title: "Pediátrico", url: "/atendimentos-pediatrico", icon: Baby },
+        { title: "Laboratório", url: "/laboratorio", icon: FlaskConical },
+        { title: "Leitos", url: "/leitos", icon: BedDouble },
+        { title: "Checagem Leito", url: "/checagem-enfermagem", icon: Syringe },
+        { title: "Regulação (NIR)", url: "/nir", icon: Ambulance },
+      ]
+    },
+    {
+      label: "Gestão e Administração",
+      items: [
+        { title: "Pacientes", url: "/pacientes", icon: Users },
+        { title: "Setores", url: "/setores", icon: Building2 },
+        { title: "SAME", url: "/same", icon: Archive },
+        { title: "Recursos Humanos", url: "/rh", icon: UserCog },
+        { title: "Meu RH", url: "/meu-rh", icon: UserSquare2 },
+        { title: "Faturamento", url: "/faturamento", icon: DollarSign },
+        { title: "Relatórios", url: "/relatorios", icon: FileText },
+      ]
+    },
+    {
+      label: "Serviços e Apoio",
+      items: [
+        { title: "Painel de Chamadas", url: "/painel-chamadas", icon: Megaphone },
+        { title: "Farmácia Central", url: "/farmacia", icon: Pill },
+        { title: "Farm. Satélite", url: "/farmacia-satelite", icon: ArchiveRestore },
+        { title: "Almoxarifado", url: "/almoxarifado", icon: PackageOpen },
+        { title: "Governança", url: "/governanca", icon: Sparkles },
+        { title: "Higienização", url: "/higiene", icon: Droplets },
+        { title: "SUS Cross Vagas", url: "/sus", icon: Globe },
+      ]
+    }
+  ];
 
   return (
     <Sidebar variant="floating" collapsible="icon" className="border-none shadow-[0_20px_60px_-15px_rgba(0,0,0,0.5)] z-30 [&>div[data-sidebar=sidebar]]:bg-gradient-to-b [&>div[data-sidebar=sidebar]]:from-[#004466]/95 [&>div[data-sidebar=sidebar]]:to-[#001a33]/95 [&>div[data-sidebar=sidebar]]:backdrop-blur-xl [&>div[data-sidebar=sidebar]]:border [&>div[data-sidebar=sidebar]]:border-blue-700/30">

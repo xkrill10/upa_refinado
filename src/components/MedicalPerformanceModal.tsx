@@ -5,6 +5,7 @@ import { formatWords } from "@/lib/utils";
 import { Activity, Clock, Stethoscope, Users, User, ChevronDown, ChevronRight } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { DoctorPolarArea } from "@/components/charts/DoctorPolarArea";
 
 interface MedicalPerformanceModalProps {
   patients: Patient[];
@@ -87,6 +88,8 @@ export function MedicalPerformanceModal({ patients, isOpen, onClose, onViewTimel
             </div>
           ) : (
             <div className="space-y-4">
+              <DoctorPolarArea data={performanceData} />
+              
               {performanceData.map((doc, idx) => {
                 const isExpanded = expandedDoctor === doc.doctorName;
 

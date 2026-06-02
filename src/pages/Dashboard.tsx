@@ -13,7 +13,16 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "motion/react";
 import { useTheme } from "@/components/ThemeProvider";
-
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { AreaChartFluxo } from "@/components/charts/AreaChartFluxo";
+import { PieChartRiscos } from "@/components/charts/PieChartRiscos";
+import { HeatmapOcupacao } from "@/components/charts/HeatmapOcupacao";
+import { GanttPermanencia } from "@/components/charts/GanttPermanencia";
+import { BoxPlotEspera } from "@/components/charts/BoxPlotEspera";
+import { ParetoProblemas } from "@/components/charts/ParetoProblemas";
+import { SankeyFluxoPaciente } from "@/components/charts/SankeyFluxoPaciente";
+import { RadialGaugeLeitos } from "@/components/charts/RadialGaugeLeitos";
+import { RadarChartDemanda } from "@/components/charts/RadarChartDemanda";
 const container = {
   hidden: { opacity: 0 },
   show: { opacity: 1, transition: { staggerChildren: 0.1 } }
@@ -134,13 +143,23 @@ export default function Dashboard() {
         </div>
       </motion.div>
 
+      <Tabs defaultValue="operacional" className="w-full space-y-6">
+        <div className="flex justify-center w-full mb-2">
+          <TabsList className="grid w-full max-w-md grid-cols-2 bg-black/10 dark:bg-black/40 border border-white/10 p-1 rounded-full h-10 shadow-sm">
+            <TabsTrigger value="operacional" className="rounded-full data-[state=active]:bg-primary data-[state=active]:text-primary-foreground font-black uppercase tracking-widest text-[10px] h-8">Visão Operacional</TabsTrigger>
+            <TabsTrigger value="gestao" className="rounded-full data-[state=active]:bg-purple-600 data-[state=active]:text-white font-black uppercase tracking-widest text-[10px] h-8">Visão Estratégica</TabsTrigger>
+          </TabsList>
+        </div>
+
+        <TabsContent value="operacional" className="space-y-6 mt-0 focus-visible:outline-none focus-visible:ring-0">
+
       {/* Cards de Triagem/Pacientes */}
       <motion.div variants={item} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-        <StatCard title="Total Pacientes" value={patients.length} icon={Users} variant="primary" trend="Hoje" onClick={() => setDashboardFilter('all')} active={dashboardFilter === 'all'} />
-        <StatCard title="Aguardando" value={waiting} icon={Clock} variant="warning" onClick={() => setDashboardFilter('waiting')} active={dashboardFilter === 'waiting'} />
-        <StatCard title="Em Atendimento" value={attending} icon={Stethoscope} variant="success" onClick={() => setDashboardFilter('attending')} active={dashboardFilter === 'attending'} />
-        <StatCard title="Casos Críticos" value={emergencies} icon={AlertTriangle} variant="danger" onClick={() => setDashboardFilter('critical')} active={dashboardFilter === 'critical'} />
-        <StatCard title="Central de Leitos" value={bedStats.occupied} icon={BedDouble} variant="accent" trend="Ocupados" onClick={() => navigate('/beds')} />
+        <StatCard title="Total Pacientes" value={patients.length} icon={Users} variant="primary" trend="Hoje" onClick={() => setDashboardFilter('all')} active={dashboardFilter === 'all'} sparklineData={[5, 10, 8, 15, 20, 18, 25]} />
+        <StatCard title="Aguardando" value={waiting} icon={Clock} variant="warning" onClick={() => setDashboardFilter('waiting')} active={dashboardFilter === 'waiting'} sparklineData={[12, 15, 10, 18, 14, 8, waiting]} />
+        <StatCard title="Em Atendimento" value={attending} icon={Stethoscope} variant="success" onClick={() => setDashboardFilter('attending')} active={dashboardFilter === 'attending'} sparklineData={[2, 4, 3, 5, 4, 6, attending]} />
+        <StatCard title="Casos Críticos" value={emergencies} icon={AlertTriangle} variant="danger" onClick={() => setDashboardFilter('critical')} active={dashboardFilter === 'critical'} sparklineData={[1, 0, 2, 1, 3, 2, emergencies]} />
+        <StatCard title="Central de Leitos" value={bedStats.occupied} icon={BedDouble} variant="accent" trend="Ocupados" onClick={() => navigate('/leitos')} sparklineData={[10, 12, 11, 14, 15, 13, bedStats.occupied]} />
       </motion.div>
 
       {/* KPIs Premium com Gradientes */}
@@ -188,43 +207,16 @@ export default function Dashboard() {
 
         {/* Heatmap de Leitos e Live Feed */}
         <motion.div variants={item} className="space-y-6 flex flex-col">
-          {/* Mapa de Calor de Leitos */}
-          <Card 
-            className="glass-card-premium rounded-xl overflow-hidden group transition-all cursor-pointer hover:shadow-xl hover:scale-[1.02]"
-            onClick={() => setIsHeatmapOpen(true)}
-          >
-            <CardHeader className="p-5 pb-2 border-b border-white/20 bg-muted/30">
-              <CardTitle className="flex items-center gap-2 text-xs font-black uppercase tracking-widest text-primary">
-                <BedDouble className="h-4 w-4" /> MAPA DE CALOR: LEITOS
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="pt-5 space-y-4">
-              <div className="h-6 w-full flex rounded-full overflow-hidden shadow-inner border border-border/50">
-                {bedStats.occupied > 0 && <div style={{width: `${(bedStats.occupied/totalBeds)*100}%`}} className="bg-red-500 hover:opacity-80 transition-opacity" title="Ocupados" />}
-                {bedStats.cleaning > 0 && <div style={{width: `${(bedStats.cleaning/totalBeds)*100}%`}} className="bg-cyan-500 hover:opacity-80 transition-opacity" title="Higienização" />}
-                {bedStats.maintenance > 0 && <div style={{width: `${(bedStats.maintenance/totalBeds)*100}%`}} className="bg-orange-500 hover:opacity-80 transition-opacity" title="Manutenção" />}
-                {bedStats.available > 0 && <div style={{width: `${(bedStats.available/totalBeds)*100}%`}} className="bg-emerald-500 hover:opacity-80 transition-opacity" title="Livres" />}
-              </div>
-              <div className="grid grid-cols-2 gap-2 pt-2">
-                <div className="flex items-center justify-between bg-muted/40 p-2 rounded-lg">
-                  <span className="flex items-center gap-1.5 text-[9px] font-black uppercase tracking-wider text-muted-foreground"><div className="w-2 h-2 rounded-full bg-red-500"/> Ocupados</span>
-                  <span className="text-xs font-bold">{bedStats.occupied}</span>
-                </div>
-                <div className="flex items-center justify-between bg-muted/40 p-2 rounded-lg">
-                  <span className="flex items-center gap-1.5 text-[9px] font-black uppercase tracking-wider text-muted-foreground"><div className="w-2 h-2 rounded-full bg-emerald-500"/> Livres</span>
-                  <span className="text-xs font-bold">{bedStats.available}</span>
-                </div>
-                <div className="flex items-center justify-between bg-muted/40 p-2 rounded-lg">
-                  <span className="flex items-center gap-1.5 text-[9px] font-black uppercase tracking-wider text-muted-foreground"><div className="w-2 h-2 rounded-full bg-cyan-500 animate-pulse"/> Limpeza</span>
-                  <span className="text-xs font-bold text-cyan-600">{bedStats.cleaning}</span>
-                </div>
-                <div className="flex items-center justify-between bg-muted/40 p-2 rounded-lg">
-                  <span className="flex items-center gap-1.5 text-[9px] font-black uppercase tracking-wider text-muted-foreground"><div className="w-2 h-2 rounded-full bg-orange-500"/> Interdit.</span>
-                  <span className="text-xs font-bold">{bedStats.maintenance}</span>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          
+          <div onClick={() => setIsHeatmapOpen(true)} className="cursor-pointer">
+            <RadialGaugeLeitos 
+              occupied={bedStats.occupied} 
+              available={bedStats.available} 
+              cleaning={bedStats.cleaning} 
+              maintenance={bedStats.maintenance} 
+              total={totalBeds} 
+            />
+          </div>
 
           {/* Live Activity Feed */}
           <Card 
@@ -323,6 +315,44 @@ export default function Dashboard() {
           </Card>
         </motion.div>
       </div>
+
+      {/* NOVOS GRÁFICOS OPERACIONAIS */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
+        <motion.div variants={item} className="lg:col-span-1">
+          <RadarChartDemanda />
+        </motion.div>
+        <motion.div variants={item} className="lg:col-span-1">
+          <PieChartRiscos />
+        </motion.div>
+        <motion.div variants={item} className="lg:col-span-1">
+          <AreaChartFluxo />
+        </motion.div>
+      </div>
+
+      </TabsContent>
+
+      <TabsContent value="gestao" className="space-y-6 mt-0 focus-visible:outline-none focus-visible:ring-0">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <motion.div variants={item}>
+            <HeatmapOcupacao />
+          </motion.div>
+          <motion.div variants={item}>
+            <GanttPermanencia />
+          </motion.div>
+        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <motion.div variants={item} className="lg:col-span-1">
+            <SankeyFluxoPaciente />
+          </motion.div>
+          <motion.div variants={item} className="lg:col-span-1">
+            <BoxPlotEspera />
+          </motion.div>
+          <motion.div variants={item} className="lg:col-span-1">
+            <ParetoProblemas />
+          </motion.div>
+        </div>
+      </TabsContent>
+      </Tabs>
 
       {/* MODALS */}
       <Dialog open={isHeatmapOpen} onOpenChange={setIsHeatmapOpen}>

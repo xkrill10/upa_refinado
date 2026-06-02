@@ -34,9 +34,33 @@ export default function DoctorDashboard() {
   const navigate = useNavigate();
   const [selectedRoom, setSelectedRoom] = useState<typeof ROOMS[0] | null>(null);
   const [doctorName, setDoctorName] = useState("");
+  const [crmNumber, setCrmNumber] = useState(() => localStorage.getItem("upa_stamp_number") || "");
+  const [crmState, setCrmState] = useState(() => localStorage.getItem("upa_stamp_state") || "SP");
   const [occupiedRooms, setOccupiedRooms] = useState<Record<string, string>>({});
   const currentRoomId = localStorage.getItem("upa_active_room");
   const lastColorRef = useRef<string>("blue");
+
+  const handleSelectRoom = (room: typeof ROOMS[0]) => {
+    setSelectedRoom(room);
+    const savedDoctor = localStorage.getItem("upa_active_doctor");
+    const savedCrm = localStorage.getItem("upa_stamp_number") || "";
+    const savedState = localStorage.getItem("upa_stamp_state") || "SP";
+    const isMyRoom = localStorage.getItem("upa_active_room") === room.id;
+    
+    if (isMyRoom && savedDoctor) {
+      let initialName = savedDoctor;
+      if (!/^dr[a]?\.?\s+/i.test(initialName.trim())) {
+        initialName = `Dr. ${initialName.trim()}`;
+      }
+      setDoctorName(initialName);
+      setCrmNumber(savedCrm);
+      setCrmState(savedState);
+    } else {
+      setDoctorName("Dr. ");
+      setCrmNumber("");
+      setCrmState("SP");
+    }
+  };
 
   useEffect(() => {
     if (selectedRoom) {
@@ -59,7 +83,14 @@ export default function DoctorDashboard() {
     if (!selectedRoom || !doctorName.trim()) return;
 
     localStorage.setItem("upa_active_room", selectedRoom.id);
-    localStorage.setItem("upa_active_doctor", doctorName);
+    localStorage.setItem("upa_active_doctor", doctorName.trim());
+    
+    // Salvar carimbo digital integrado para evoluções e prescrições
+    localStorage.setItem("upa_stamp_name", doctorName.trim());
+    localStorage.setItem("upa_stamp_council", "CRM");
+    localStorage.setItem("upa_stamp_number", crmNumber.trim());
+    localStorage.setItem("upa_stamp_state", crmState.trim());
+    localStorage.setItem("upa_shift_start", new Date().toISOString());
 
     navigate("/meu-consultorio");
   };
@@ -132,10 +163,7 @@ export default function DoctorDashboard() {
                           ? "opacity-80 border-slate-300 dark:border-slate-700 bg-white/40 dark:bg-slate-900/20 backdrop-blur-md hover:border-slate-400 dark:hover:border-slate-600" 
                           : "border-[#006699]/20 dark:border-sky-400/20 hover:border-[#006699]/40 dark:hover:border-sky-400/40 hover:shadow-[0_8px_32px_0_rgba(0,102,153,0.15)] dark:hover:shadow-[0_8px_32px_0_rgba(14,165,233,0.15)] bg-gradient-to-br from-[#006699]/10 to-[#006699]/5 dark:from-[#006699]/20 dark:to-[#006699]/10 backdrop-blur-xl shadow-[0_4px_16px_0_rgba(0,0,0,0.05)]"
                       )}
-                      onClick={() => {
-                        setSelectedRoom(room);
-                        setDoctorName("");
-                      }}
+                      onClick={() => handleSelectRoom(room)}
                     >
                       <CardContent className="p-6 sm:p-8 flex flex-col items-center text-center space-y-4">
                         <div className={cn(
@@ -203,10 +231,7 @@ export default function DoctorDashboard() {
                           ? "opacity-80 border-slate-300 dark:border-slate-700 bg-white/40 dark:bg-slate-900/20 backdrop-blur-md hover:border-slate-400 dark:hover:border-slate-600" 
                           : "border-orange-500/20 dark:border-orange-400/20 hover:border-orange-500/40 dark:hover:border-orange-400/40 hover:shadow-[0_8px_32px_0_rgba(249,115,22,0.15)] dark:hover:shadow-[0_8px_32px_0_rgba(249,115,22,0.15)] bg-gradient-to-br from-orange-500/10 to-orange-500/5 dark:from-orange-500/20 dark:to-orange-500/10 backdrop-blur-xl shadow-[0_4px_16px_0_rgba(0,0,0,0.05)]"
                       )}
-                      onClick={() => {
-                        setSelectedRoom(room);
-                        setDoctorName("");
-                      }}
+                      onClick={() => handleSelectRoom(room)}
                     >
                       <CardContent className="p-6 sm:p-8 flex flex-col items-center text-center space-y-4">
                         <div className={cn(
@@ -274,10 +299,7 @@ export default function DoctorDashboard() {
                           ? "opacity-80 border-slate-300 dark:border-slate-700 bg-white/40 dark:bg-slate-900/20 backdrop-blur-md hover:border-slate-400 dark:hover:border-slate-600" 
                           : "border-red-600/20 dark:border-red-500/20 hover:border-red-600/40 dark:hover:border-red-500/40 hover:shadow-[0_8px_32px_0_rgba(220,38,38,0.15)] dark:hover:shadow-[0_8px_32px_0_rgba(239,68,68,0.15)] bg-gradient-to-br from-red-600/10 to-red-600/5 dark:from-red-500/20 dark:to-red-500/10 backdrop-blur-xl shadow-[0_4px_16px_0_rgba(0,0,0,0.05)]"
                       )}
-                      onClick={() => {
-                        setSelectedRoom(room);
-                        setDoctorName("");
-                      }}
+                      onClick={() => handleSelectRoom(room)}
                     >
                       <CardContent className="p-6 sm:p-8 flex flex-col items-center text-center space-y-4">
                         <div className={cn(
@@ -362,48 +384,74 @@ export default function DoctorDashboard() {
                 </DialogDescription>
               </div>
               
-              <div className="p-8 space-y-6">
-                <div className="space-y-3">
-                  <label className="text-xs font-black uppercase tracking-widest text-muted-foreground flex justify-between">
-                    <span>Para entrar, confirme sua Identificação:</span>
+              <div className="p-8 space-y-5">
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground block">
+                    Nome Completo do Médico:
                   </label>
                   <Input 
                     value={doctorName}
                     onChange={(e) => setDoctorName(formatWords(e.target.value))}
-                    placeholder="Ex: Dr. João Silva"
+                    placeholder="Ex: Dr. Ricardo Braga"
                     className={cn(
-                      "h-14 rounded-xl px-4 text-base font-bold border-2 focus-visible:ring-2",
+                      "h-12 rounded-xl px-4 text-sm font-bold border-2 focus-visible:ring-2",
                       willOverwrite ? "border-red-500 bg-red-50 dark:bg-red-950/30 text-red-700 dark:text-red-400" :
                       willResume ? "border-emerald-500 bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400" :
                       "border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900"
                     )}
                     autoFocus
                   />
-                  {isSelectedRoomOccupied && (
-                    <p className={cn(
-                      "text-[10px] font-bold uppercase tracking-widest text-center mt-2",
-                      willOverwrite ? "text-red-500" :
-                      willResume ? "text-emerald-500" :
-                      "text-slate-500"
-                    )}>
-                      {willResume ? "Identidade confirmada! Pronto para retomar sessão." :
-                       willOverwrite ? "Cuidado! Você irá encerrar a sessão do outro colega." :
-                       "Digite seu nome para continuar ou assumir."}
-                    </p>
-                  )}
                 </div>
+
+                <div className="grid grid-cols-3 gap-3">
+                  <div className="col-span-2 space-y-2">
+                    <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground block">
+                      Número do CRM:
+                    </label>
+                    <Input 
+                      value={crmNumber}
+                      onChange={(e) => setCrmNumber(e.target.value.replace(/\D/g, ""))}
+                      placeholder="Ex: 123456"
+                      className="h-12 rounded-xl px-4 text-sm font-bold border-2 border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground block">
+                      UF (Estado):
+                    </label>
+                    <Input 
+                      value={crmState}
+                      onChange={(e) => setCrmState(e.target.value.toUpperCase().slice(0, 2))}
+                      placeholder="SP"
+                      className="h-12 rounded-xl px-4 text-sm font-bold border-2 border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 text-center"
+                    />
+                  </div>
+                </div>
+
+                {isSelectedRoomOccupied && (
+                  <p className={cn(
+                    "text-[10px] font-bold uppercase tracking-widest text-center mt-2",
+                    willOverwrite ? "text-red-500" :
+                    willResume ? "text-emerald-500" :
+                    "text-slate-500"
+                  )}>
+                    {willResume ? "Identidade confirmada! Pronto para retomar sessão." :
+                     willOverwrite ? "Cuidado! Você irá encerrar a sessão do outro colega." :
+                     "Digite seu nome para continuar ou assumir."}
+                  </p>
+                )}
                 
                 <div className="grid grid-cols-2 gap-3 pt-2">
                   <Button 
                     variant="outline" 
-                    className="h-14 rounded-xl font-bold uppercase tracking-widest border-slate-200 dark:border-slate-800"
+                    className="h-12 rounded-xl font-bold uppercase tracking-widest border-slate-200 dark:border-slate-800"
                     onClick={() => setSelectedRoom(null)}
                   >
                     Cancelar
                   </Button>
                   <Button 
                     className={cn(
-                      "h-14 rounded-xl text-white font-black uppercase tracking-widest border-0 shadow-lg text-[10px] leading-tight",
+                      "h-12 rounded-xl text-white font-black uppercase tracking-widest border-0 shadow-lg text-[10px] leading-tight",
                       willOverwrite 
                         ? "bg-red-600 hover:bg-red-700 shadow-red-500/20"
                         : willResume

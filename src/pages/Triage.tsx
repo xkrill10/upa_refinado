@@ -125,6 +125,7 @@ const getVitalSeverity = (key: string, value: string): 'normal' | 'caution' | 'e
 
 import { PatientDetailsModal } from "@/components/PatientDetailsModal";
 import { ExamsModal } from "@/components/PatientEvolution/Modals/ExamsModal";
+import { TriageBubbleChart } from "@/components/charts/TriageBubbleChart";
 
 export default function Triage() {
   const { patients, updatePatient, addPatient, callTicket, isAudioEnabled, setIsAudioEnabled } = usePatients();
@@ -834,6 +835,16 @@ export default function Triage() {
           </div>
         </div>
       </div>
+
+      <TriageBubbleChart 
+        patientsWaiting={waitingForTriage.map(p => ({
+          id: p.id,
+          name: formatWords(p.name),
+          age: p.age || 0,
+          waitTime: Math.floor((new Date().getTime() - new Date(p.arrivalTime).getTime()) / 60000),
+          risk: p.risk || 'not-urgent'
+        }))}
+      />
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
         <Card className="glass-card border-none shadow-xl hover:shadow-2xl hover:-translate-y-1 rounded-xl overflow-hidden transition-all duration-300 relative">

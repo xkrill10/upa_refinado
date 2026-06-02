@@ -3,6 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { motion } from "motion/react";
 import { useTheme } from "@/components/ThemeProvider";
+import Chart from 'react-apexcharts';
 
 interface StatCardProps {
   title: string;
@@ -13,6 +14,7 @@ interface StatCardProps {
   onClick?: () => void;
   className?: string;
   active?: boolean;
+  sparklineData?: number[];
 }
 
 const inactiveStyles = {
@@ -87,7 +89,7 @@ const iconBgActive = {
   success: 'bg-emerald-500/25 text-emerald-700 dark:bg-emerald-500/35 dark:text-emerald-200 shadow-[0_0_15px_rgba(16,185,129,0.3)]',
 };
 
-export function StatCard({ title, value, icon: Icon, trend, variant = 'default', onClick, className, active = false }: StatCardProps) {
+export function StatCard({ title, value, icon: Icon, trend, variant = 'default', onClick, className, active = false, sparklineData }: StatCardProps) {
   const { theme } = useTheme();
 
   const gradientsLightInactive = {
@@ -182,6 +184,24 @@ export function StatCard({ title, value, icon: Icon, trend, variant = 'default',
                   )}>
                     {trend}
                   </span>
+                </div>
+              )}
+              
+              {sparklineData && (
+                <div className="h-8 w-24 mt-3 opacity-80">
+                  <Chart 
+                    options={{
+                      chart: { type: 'area', sparkline: { enabled: true }, animations: { enabled: false } },
+                      stroke: { curve: 'smooth', width: 2 },
+                      fill: { opacity: 0.2, type: 'solid' },
+                      colors: [variant === 'danger' ? '#ef4444' : variant === 'success' ? '#10b981' : variant === 'warning' ? '#f59e0b' : variant === 'accent' ? '#a855f7' : '#3b82f6'],
+                      tooltip: { fixed: { enabled: false }, x: { show: false }, y: { title: { formatter: function () { return '' } } }, marker: { show: false } }
+                    }} 
+                    series={[{ data: sparklineData }]} 
+                    type="area" 
+                    height="100%" 
+                    width="100%" 
+                  />
                 </div>
               )}
             </div>

@@ -182,12 +182,24 @@ export default function MyWorkspace() {
             <div className="h-12 w-12 rounded-2xl flex items-center justify-center shadow-inner bg-red-600/10 text-red-600 dark:bg-red-500/15 dark:text-red-400">
               <AlertTriangle className="h-6 w-6 animate-pulse" />
             </div>
+            
+            {/* Avatar do médico maior e destacado */}
+            <div className="relative group shrink-0">
+              <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-red-500 to-orange-600 blur-[1px] opacity-40" />
+              <img 
+                src="/doctor_avatar.png" 
+                className="relative h-20 w-20 rounded-2xl object-cover border-2 border-white dark:border-slate-800 shadow-md transition-transform duration-300 group-hover:scale-105"
+                alt="Foto do Médico"
+              />
+              <div className="absolute -bottom-1 -right-1 h-3.5 w-3.5 rounded-full bg-emerald-500 border-2 border-white dark:border-slate-900 shadow-sm animate-pulse" />
+            </div>
+
             <div>
               <h1 className="text-2xl font-black uppercase tracking-tight leading-none text-red-600 dark:text-red-400">
                 {activeRoom}
               </h1>
-              <p className="text-muted-foreground text-[11px] font-black uppercase tracking-[0.2em] mt-1 flex items-center gap-2">
-                <User className="h-3.5 w-3.5" /> Operando: {activeDoctor}
+              <p className="text-muted-foreground text-[11px] font-black uppercase tracking-[0.2em] mt-1.5 flex items-center gap-2">
+                Operando: {activeDoctor}
               </p>
             </div>
           </div>
@@ -199,6 +211,21 @@ export default function MyWorkspace() {
             )}>
               {isPediatric ? <Baby className="h-6 w-6" /> : <Stethoscope className="h-6 w-6" />}
             </div>
+
+            {/* Avatar do médico maior e destacado */}
+            <div className="relative group shrink-0">
+              <div className={cn(
+                "absolute inset-0 rounded-2xl blur-[1px] opacity-45",
+                isBlueTheme ? "bg-gradient-to-r from-sky-400 to-blue-600" : "bg-gradient-to-r from-orange-400 to-amber-500"
+              )} />
+              <img 
+                src="/doctor_avatar.png" 
+                className="relative h-20 w-20 rounded-2xl object-cover border-2 border-white dark:border-slate-800 shadow-md transition-transform duration-300 group-hover:scale-105"
+                alt="Foto do Médico"
+              />
+              <div className="absolute -bottom-1 -right-1 h-3.5 w-3.5 rounded-full bg-emerald-500 border-2 border-white dark:border-slate-900 shadow-sm animate-pulse" />
+            </div>
+
             <div>
               <h1 className={cn(
                 "text-2xl font-black uppercase tracking-tight leading-none",
@@ -206,8 +233,8 @@ export default function MyWorkspace() {
               )}>
                 {activeRoom}
               </h1>
-              <p className="text-muted-foreground text-[11px] font-black uppercase tracking-[0.2em] mt-1 flex items-center gap-2">
-                <User className="h-3.5 w-3.5" /> Operando: {activeDoctor}
+              <p className="text-muted-foreground text-[11px] font-black uppercase tracking-[0.2em] mt-1.5 flex items-center gap-2">
+                Operando: {activeDoctor}
               </p>
             </div>
           </div>
