@@ -42,6 +42,7 @@ import {
   DialogTitle, 
   DialogTrigger 
 } from "@/components/ui/dialog";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Label } from "@/components/ui/label";
 import { 
   Select, 
@@ -53,8 +54,11 @@ import {
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "motion/react";
 import { usePatients } from "@/hooks/use-patients";
+import { useSame } from "@/context/SameContext";
+import type { Patient } from "@/context/PatientsContext";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer } from "recharts";
 import { toast } from "sonner";
+import { PatientDetailsModal } from "@/components/PatientDetailsModal";
 
 const statsData = [
   { name: "Jan", records: 400, requests: 240 },
@@ -66,13 +70,6 @@ const statsData = [
   { name: "Jul", records: 349, requests: 430 },
 ];
 
-const auditLogs = [
-  { id: 1, user: "Dr. Ricardo Braga", action: "Acessou Prontuário", target: "Maria Silva", time: "10:45", date: "12/05/2026", severity: "low" },
-  { id: 2, user: "Enf. Ana Paula", action: "Digitalizou Exame", target: "João Santos", time: "09:30", date: "12/05/2026", severity: "low" },
-  { id: 3, user: "Admin", action: "Alterou Localização", target: "CX-12 / ALA-A", time: "08:15", date: "12/05/2026", severity: "medium" },
-  { id: 4, user: "Dr. Paulo Souza", action: "Exportou Prontuário", target: "Ana Oliveira", time: "16:40", date: "11/05/2026", severity: "high" },
-];
-
 const storageUnits = [
   { zone: "ALA-A", capacity: 85, used: 72, units: 1200 },
   { zone: "ALA-B", capacity: 90, used: 45, units: 850 },
@@ -82,9 +79,22 @@ const storageUnits = [
 
 export default function Same() {
   const { patients } = usePatients();
+  const { 
+    documentRequests, 
+    digitalUploads, 
+    auditLogs, 
+    addDocumentRequest, 
+    updateRequestStatus, 
+    addDigitalUpload, 
+    addAuditLog 
+  } = useSame();
   const [searchTerm, setSearchTerm] = useState("");
   const [activeTab, setActiveTab] = useState("files");
   const [isNewRecordOpen, setIsNewRecordOpen] = useState(false);
+  const [isNewRequestOpen, setIsNewRequestOpen] = useState(false);
+  const [isExportModalOpen, setIsExportModalOpen] = useState(false);
+  const [selectedPatientForModal, setSelectedPatientForModal] = useState<Patient | null>(null);
+  const [selectedPatientForExport, setSelectedPatientForExport] = useState<{id: string, name: string} | null>(null);
 
   const filteredPatients = useMemo(() => {
     return patients.filter(p => 
@@ -94,18 +104,21 @@ export default function Same() {
     );
   }, [patients, searchTerm]);
 
-  const documentRequests = [
-    { id: "REQ001", patient: "Maria Silva", type: "Cópia de Prontuário", date: "12/05/2026", status: "Pronto" },
-    { id: "REQ002", patient: "João Santos", type: "Laudo Médico", date: "11/05/2026", status: "Em processamento" },
-    { id: "REQ003", patient: "Ana Oliveira", type: "Exames de Imagem", date: "10/05/2026", status: "Pronto" },
-  ];
-
   const navigate = useNavigate();
 
   const handleAction = (type: string, patientId: string, patientName: string) => {
     switch(type) {
       case 'view':
-        navigate(`/paciente/${patientId}`, { state: { from: '/same', label: 'SAME' } });
+        const patientToView = patients.find(p => p.id === patientId);
+        if (patientToView) {
+          setSelectedPatientForModal(patientToView);
+          addAuditLog({
+            user: "DR. RICARDO BRAGA",
+            action: "Acessou Prontuário",
+            target: patientName,
+            severity: "low"
+          });
+        }
         break;
       case 'print':
         toast.success(`Enviando prontuário de ${patientName} para fila de impressão`, {
@@ -113,9 +126,8 @@ export default function Same() {
         });
         break;
       case 'export':
-        toast.warning(`Proteção LGPD: Gerando link temporário para exportação de ${patientName}`, {
-          icon: <ExternalLink className="h-4 w-4" />
-        });
+        setSelectedPatientForExport({ id: patientId, name: patientName });
+        setIsExportModalOpen(true);
         break;
     }
   };
@@ -163,10 +175,10 @@ export default function Same() {
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         {[
-          { label: "Prontuários Arquivados", value: "12,480", icon: Database, color: "text-blue-600", bg: "bg-blue-50" },
-          { label: "Digitalizados (Digital SAME)", value: "8,920", icon: FileScan, color: "text-emerald-600", bg: "bg-emerald-50" },
-          { label: "Pedidos Pendentes", value: "14", icon: Clock, color: "text-orange-600", bg: "bg-orange-50" },
-          { label: "Entregues Hoje", value: "28", icon: CheckCircle2, color: "text-primary", bg: "bg-primary/10" },
+          { label: "Prontuários Arquivados", value: patients.length + 12000, icon: Database, color: "text-blue-600", bg: "bg-blue-50" },
+          { label: "Digitalizados (Digital SAME)", value: digitalUploads.length + 8900, icon: FileScan, color: "text-emerald-600", bg: "bg-emerald-50" },
+          { label: "Pedidos Pendentes", value: documentRequests.filter(r => r.status !== 'Pronto').length, icon: Clock, color: "text-orange-600", bg: "bg-orange-50" },
+          { label: "Entregues Hoje", value: documentRequests.filter(r => r.status === 'Pronto').length + 20, icon: CheckCircle2, color: "text-primary", bg: "bg-primary/10" },
         ].map((stat, i) => (
           <Card key={i} className="glass-card-premium border-white/40 dark:border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.12)] overflow-hidden group hover:scale-[1.02] transition-all">
             <CardContent className="p-6">
@@ -325,48 +337,79 @@ export default function Same() {
                             <td className="p-5">
                               <div className="flex items-center gap-2">
                                 <Clock className="h-3 w-3 text-muted-foreground" />
-                                <span className="text-xs font-bold text-muted-foreground">12/05/2026 10:45</span>
+                                <span className="text-xs font-bold text-muted-foreground">
+                                  {new Date(p.arrivalTime).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                                </span>
                               </div>
                             </td>
                             <td className="p-5">
                               <div className="flex justify-center">
                                 <Badge variant="outline" className={cn(
-                                  "text-[9px] font-black uppercase px-2 shadow-sm rounded-full",
-                                  i % 3 === 0 ? "bg-emerald-50 text-emerald-700 border-emerald-200" : "bg-blue-50 text-blue-700 border-blue-200"
+                                  "text-[9px] font-black uppercase px-2 shadow-sm rounded-full border-none",
+                                  p.status === 'completed' ? "bg-emerald-500/10 text-emerald-600" :
+                                  p.status === 'attending' ? "bg-blue-500/10 text-blue-600" :
+                                  p.status === 'waiting' ? "bg-orange-500/10 text-orange-600" : "bg-red-500/10 text-red-600"
                                 )}>
-                                  {i % 3 === 0 ? "Digitalizado" : "Arquivo Físico"}
+                                  {p.status === 'completed' ? (i % 3 === 0 ? "Digitalizado" : "Arquivo Físico") :
+                                   p.status === 'attending' ? "Em Atendimento" :
+                                   p.status === 'waiting' ? "Aguardando" : "Evasão"}
                                 </Badge>
                               </div>
                             </td>
                             <td className="p-5 text-center">
-                              <span className="text-xs font-bold font-mono tracking-tighter">ALA-A / EST-04 / CX-12</span>
+                              <span className="text-[10px] font-black uppercase text-muted-foreground tracking-widest bg-muted/40 px-3 py-1 rounded-full">
+                                {p.status === 'completed' 
+                                  ? (i % 3 === 0 ? "NUVEM / AWS" : "ALA-A / EST-04") 
+                                  : (p.sector || 'TRIAGEM INICIAL')}
+                              </span>
                             </td>
                             <td className="p-5 text-right pr-10">
                               <div className="flex items-center justify-end gap-2">
-                                <Button 
-                                  variant="ghost" 
-                                  size="sm" 
-                                  className="h-8 w-8 rounded-lg p-0 hover:bg-primary/10 hover:text-primary transition-colors"
-                                  onClick={() => handleAction('view', p.id, p.name)}
-                                >
-                                  <FileText className="h-4 w-4" />
-                                </Button>
-                                <Button 
-                                  variant="ghost" 
-                                  size="sm" 
-                                  className="h-8 w-8 rounded-lg p-0 hover:bg-blue-600/10 hover:text-blue-600 transition-colors"
-                                  onClick={() => handleAction('print', p.id, p.name)}
-                                >
-                                  <Printer className="h-4 w-4" />
-                                </Button>
-                                <Button 
-                                  variant="ghost" 
-                                  size="sm" 
-                                  className="h-8 w-8 rounded-lg p-0 hover:bg-muted transition-colors"
-                                  onClick={() => handleAction('export', p.id, p.name)}
-                                >
-                                  <ExternalLink className="h-4 w-4" />
-                                </Button>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <Button 
+                                      variant="ghost" 
+                                      size="sm" 
+                                      className="h-8 w-8 rounded-lg p-0 hover:bg-primary/10 hover:text-primary transition-colors"
+                                      onClick={() => handleAction('view', p.id, p.name)}
+                                    >
+                                      <FileText className="h-4 w-4" />
+                                    </Button>
+                                  </TooltipTrigger>
+                                  <TooltipContent className="bg-black/90 text-white font-bold text-xs border-none">
+                                    Visualizar Arquivo Completo
+                                  </TooltipContent>
+                                </Tooltip>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <Button 
+                                      variant="ghost" 
+                                      size="sm" 
+                                      className="h-8 w-8 rounded-lg p-0 hover:bg-muted transition-colors"
+                                      onClick={() => handleAction('export', p.id, p.name)}
+                                    >
+                                      <ExternalLink className="h-4 w-4" />
+                                    </Button>
+                                  </TooltipTrigger>
+                                  <TooltipContent className="bg-black/90 text-white font-bold text-xs border-none">
+                                    Exportar via API / ERP Central
+                                  </TooltipContent>
+                                </Tooltip>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <Button 
+                                      variant="ghost" 
+                                      size="sm" 
+                                      className="h-8 w-8 rounded-lg p-0 hover:bg-blue-600/10 hover:text-blue-600 transition-colors"
+                                      onClick={() => handleAction('print', p.id, p.name)}
+                                    >
+                                      <Printer className="h-4 w-4" />
+                                    </Button>
+                                  </TooltipTrigger>
+                                  <TooltipContent className="bg-black/90 text-white font-bold text-xs border-none">
+                                    Imprimir Etiqueta
+                                  </TooltipContent>
+                                </Tooltip>
                               </div>
                             </td>
                           </tr>
@@ -414,16 +457,32 @@ export default function Same() {
                                   <div className="flex justify-center">
                                     <Badge className={cn(
                                       "text-[9px] font-black uppercase px-2 border-none",
-                                      req.status === "Pronto" ? "bg-emerald-500 text-white" : "bg-orange-500 text-white"
+                                      req.status === "Pronto" ? "bg-emerald-500 text-white" : 
+                                      req.status === "Em processamento" ? "bg-blue-500 text-white" : "bg-orange-500 text-white"
                                     )}>
                                       {req.status}
                                     </Badge>
                                   </div>
                                 </td>
                                 <td className="p-5 text-right pr-10">
-                                  <Button size="sm" variant="outline" className="h-8 rounded-lg text-[9px] font-black uppercase tracking-widest border-primary/20 text-primary hover:bg-primary/10 transition-all">
+                                  <Button 
+                                    size="sm" 
+                                    variant="outline" 
+                                    className="h-8 rounded-lg text-[9px] font-black uppercase tracking-widest border-primary/20 text-primary hover:bg-primary/10 transition-all"
+                                    onClick={() => {
+                                      if(req.status === "Pendente") {
+                                        updateRequestStatus(req.id, "Em processamento");
+                                        toast.info(`Pedido ${req.id} em processamento.`);
+                                      } else if (req.status === "Em processamento") {
+                                        updateRequestStatus(req.id, "Pronto");
+                                        toast.success(`Pedido ${req.id} finalizado.`);
+                                      } else {
+                                        toast.success("Download iniciado.");
+                                      }
+                                    }}
+                                  >
                                     {req.status === "Pronto" ? <Download className="h-3 w-3 mr-2" /> : <Clock className="h-3 w-3 mr-2" />}
-                                    {req.status === "Pronto" ? "Baixar" : "Processar"}
+                                    {req.status === "Pronto" ? "Baixar" : req.status === "Pendente" ? "Processar" : "Finalizar"}
                                   </Button>
                                 </td>
                               </tr>
@@ -466,9 +525,53 @@ export default function Same() {
                         </div>
                       </div>
                     </div>
-                    <Button className="w-full mt-8 h-12 rounded-xl bg-white text-primary font-black uppercase tracking-widest text-[11px] hover:bg-white/90 shadow-xl transition-all">
-                      Nova Solicitação
-                    </Button>
+                    <Dialog open={isNewRequestOpen} onOpenChange={setIsNewRequestOpen}>
+                      <DialogTrigger asChild>
+                        <Button className="w-full mt-8 h-12 rounded-xl bg-white text-primary font-black uppercase tracking-widest text-[11px] hover:bg-white/90 shadow-xl transition-all">
+                          Nova Solicitação
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className="sm:max-w-[400px] rounded-[2rem] p-0 overflow-hidden border-none shadow-2xl">
+                        <form onSubmit={(e) => {
+                          e.preventDefault();
+                          const formData = new FormData(e.currentTarget);
+                          addDocumentRequest({
+                            patient: formData.get('patient') as string,
+                            type: formData.get('type') as string,
+                          });
+                          toast.success("Nova solicitação adicionada à fila.");
+                          setIsNewRequestOpen(false);
+                        }}>
+                          <DialogHeader className="p-8 bg-primary text-white">
+                            <DialogTitle className="text-xl font-black uppercase tracking-tight mission-control-title">Nova Solicitação</DialogTitle>
+                            <DialogDescription className="text-white/70 font-medium mt-2">Criar pedido de cópia ou laudo.</DialogDescription>
+                          </DialogHeader>
+                          <div className="p-8 space-y-4">
+                            <div className="space-y-2">
+                              <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Paciente</Label>
+                              <Input name="patient" placeholder="Nome completo" className="h-12 rounded-xl" required />
+                            </div>
+                            <div className="space-y-2">
+                              <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Tipo de Documento</Label>
+                              <Select name="type" defaultValue="Cópia de Prontuário">
+                                <SelectTrigger className="h-12 rounded-xl">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="Cópia de Prontuário">Cópia de Prontuário</SelectItem>
+                                  <SelectItem value="Laudo Médico">Laudo Médico</SelectItem>
+                                  <SelectItem value="Exames de Imagem">Exames de Imagem</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+                          </div>
+                          <DialogFooter className="p-8 pt-0 flex gap-3">
+                            <Button type="button" variant="ghost" className="rounded-xl h-12" onClick={() => setIsNewRequestOpen(false)}>Cancelar</Button>
+                            <Button type="submit" className="rounded-xl h-12 px-8 font-black uppercase">Criar Pedido</Button>
+                          </DialogFooter>
+                        </form>
+                      </DialogContent>
+                    </Dialog>
                   </CardContent>
                 </Card>
               </div>
@@ -487,7 +590,29 @@ export default function Same() {
                     </p>
                   </div>
                   <div className="flex flex-wrap items-center justify-center gap-3">
-                    <Button className="h-12 px-8 rounded-xl bg-primary text-white font-black uppercase tracking-widest text-[11px] hover:shadow-lg hover:shadow-primary/30 transition-all">
+                    <Button 
+                      className="h-12 px-8 rounded-xl bg-primary text-white font-black uppercase tracking-widest text-[11px] hover:shadow-lg hover:shadow-primary/30 transition-all"
+                      onClick={() => {
+                        toast.info("Iniciando escaneamento do documento...", {
+                          icon: <FileScan className="h-4 w-4" />
+                        });
+                        setTimeout(() => {
+                          addDigitalUpload({
+                            patient: patients[Math.floor(Math.random() * patients.length)]?.name || "Paciente Desconhecido",
+                            type: "Documento Escaneado",
+                            size: (Math.random() * 5 + 1).toFixed(1) + " MB",
+                            professional: "DR. RICARDO BRAGA"
+                          });
+                          toast.success("Documento digitalizado e salvo com sucesso!");
+                          addAuditLog({
+                            user: "DR. RICARDO BRAGA",
+                            action: "Digitalizou Documento",
+                            target: "Scanner Local",
+                            severity: "medium"
+                          });
+                        }, 2000);
+                      }}
+                    >
                       Iniciar Digitalização
                     </Button>
                     <Button variant="outline" className="h-12 px-8 rounded-xl border-border/40 font-black uppercase tracking-widest text-[11px] transition-all">
@@ -506,24 +631,19 @@ export default function Same() {
                     <CardDescription className="text-xs font-bold uppercase tracking-widest text-muted-foreground mt-1">Últimos documentos processados no SAME Digital</CardDescription>
                   </CardHeader>
                   <CardContent className="p-8 space-y-4">
-                    {[
-                      { name: "Laudo Laboratorial", patient: "CARLOS SOUZA", time: "Há 12 min", size: "1.2 MB" },
-                      { name: "Termo de Consentimento", patient: "JULIANA LIMA", time: "Há 25 min", size: "450 KB" },
-                      { name: "Histórico Clínico", patient: "ROBERTO PEREIRA", time: "Há 45 min", size: "3.1 MB" },
-                      { name: "Receituário Especial", patient: "AMANDA COSTA", time: "Há 1h", size: "820 KB" },
-                    ].map((upload, i) => (
-                      <div key={i} className="flex items-center justify-between p-4 rounded-2xl bg-muted/20 border border-border/50 hover:bg-muted/30 transition-all group/upload">
+                    {digitalUploads.map((upload) => (
+                      <div key={upload.id} className="flex items-center justify-between p-4 rounded-2xl bg-muted/20 border border-border/50 hover:bg-muted/30 transition-all group/upload">
                         <div className="flex items-center gap-4">
                           <div className="h-10 w-10 rounded-xl bg-white flex items-center justify-center text-primary shadow-sm group-hover/upload:bg-primary group-hover/upload:text-white transition-colors">
                             <FileText className="h-5 w-5" />
                           </div>
                           <div>
-                            <p className="text-xs font-black uppercase tracking-tight">{upload.name}</p>
+                            <p className="text-xs font-black uppercase tracking-tight">{upload.type}</p>
                             <p className="text-[9px] font-bold text-muted-foreground uppercase">{upload.patient} • {upload.size}</p>
                           </div>
                         </div>
                         <div className="text-right">
-                          <p className="text-[9px] font-black uppercase text-muted-foreground tracking-widest">{upload.time}</p>
+                          <p className="text-[9px] font-black uppercase text-muted-foreground tracking-widest">{upload.date}</p>
                           <Button variant="ghost" size="sm" className="h-6 text-[9px] font-black uppercase p-0 h-fit hover:bg-transparent text-primary transition-colors">Visualizar</Button>
                         </div>
                       </div>
@@ -785,6 +905,86 @@ export default function Same() {
           </div>
         </div>
       </div>
+      
+      <PatientDetailsModal 
+        patient={selectedPatientForModal} 
+        isOpen={!!selectedPatientForModal} 
+        onClose={() => setSelectedPatientForModal(null)} 
+      />
+
+      {/* Modal de Exportação via API */}
+      <Dialog open={isExportModalOpen} onOpenChange={setIsExportModalOpen}>
+        <DialogContent className="sm:max-w-[450px] rounded-[2rem] p-0 overflow-hidden border-none shadow-2xl">
+          <form onSubmit={(e) => {
+            e.preventDefault();
+            const formData = new FormData(e.currentTarget);
+            const destination = formData.get('destination') as string;
+            const justification = formData.get('justification') as string;
+            
+            toast.success("Documento exportado com sucesso!", {
+              description: `Enviado para ${destination}. Link protegido gerado.`,
+              icon: <CheckCircle2 className="h-4 w-4 text-emerald-500" />
+            });
+            
+            addAuditLog({
+              user: "DR. RICARDO BRAGA",
+              action: "Exportou Prontuário",
+              target: selectedPatientForExport?.name || "Desconhecido",
+              severity: "medium"
+            });
+            
+            setIsExportModalOpen(false);
+            setSelectedPatientForExport(null);
+          }}>
+            <DialogHeader className="p-8 bg-slate-900 text-white">
+              <div className="flex items-center gap-3 mb-2">
+                <div className="h-10 w-10 rounded-full bg-white/10 flex items-center justify-center">
+                  <ExternalLink className="h-5 w-5 text-blue-400" />
+                </div>
+                <div>
+                  <DialogTitle className="text-xl font-black uppercase tracking-tight mission-control-title text-white">Exportar Prontuário</DialogTitle>
+                  <DialogDescription className="text-white/60 font-medium text-xs mt-1">Conexão segura API / ERP Central</DialogDescription>
+                </div>
+              </div>
+            </DialogHeader>
+            <div className="p-8 space-y-6">
+              <div className="space-y-1">
+                <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Paciente Selecionado</Label>
+                <div className="h-12 rounded-xl bg-muted/30 flex items-center px-4 border border-border/50">
+                  <span className="font-bold text-sm">{selectedPatientForExport?.name}</span>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Destino da Exportação</Label>
+                <Select name="destination" defaultValue="SISTEMA ERP">
+                  <SelectTrigger className="h-12 rounded-xl border-border/50 bg-white shadow-sm hover:border-primary/30 transition-colors focus:ring-primary/20">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="SISTEMA ERP">Sistema ERP Central</SelectItem>
+                    <SelectItem value="Link Seguro (E-mail)">Gerar Link Seguro LGPD</SelectItem>
+                    <SelectItem value="Arquivo PDF">Download em PDF (Local)</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Justificativa do Acesso (LGPD)</Label>
+                <Input name="justification" placeholder="Ex: Solicitação do paciente, auditoria..." className="h-12 rounded-xl border-border/50 shadow-sm focus-visible:ring-primary/20" required />
+                <p className="text-[9px] font-bold uppercase text-orange-500 tracking-widest ml-1 mt-1 flex items-center gap-1">
+                  <ShieldAlert className="h-3 w-3" />
+                  Este acesso será auditado
+                </p>
+              </div>
+            </div>
+            <DialogFooter className="p-8 pt-0 flex gap-3">
+              <Button type="button" variant="ghost" className="rounded-xl h-12 hover:bg-red-50 hover:text-red-600 transition-colors" onClick={() => setIsExportModalOpen(false)}>Cancelar</Button>
+              <Button type="submit" className="rounded-xl h-12 px-8 font-black uppercase tracking-widest text-[10px] bg-slate-900 text-white hover:bg-slate-800 shadow-lg shadow-slate-900/20">Confirmar Exportação</Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

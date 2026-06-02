@@ -82,8 +82,10 @@ export interface Patient {
   dischargePrediction?: string;
   isolation?: ('contact' | 'droplet' | 'airborne')[];
   transferRequest?: {
-    status: 'requested' | 'accepted' | 'denied';
+    status: 'requested' | 'accepted' | 'denied' | 'transporting';
     hospitalName?: string;
+    crossCode?: string;
+    ambulanceType?: string;
     requestedAt: string;
     reason: string;
     priority: 'normal' | 'urgent' | 'emergency';
@@ -162,7 +164,20 @@ const mockPatients: Patient[] = [
     ticket: 'PED-02', 
     priority: 'pediatric',
     motherName: 'Carla Santos',
-    gender: 'F'
+    gender: 'F',
+    exams: [
+      {
+        id: 'ex-3',
+        type: 'lab',
+        name: 'Hemograma Completo',
+        priority: 'normal',
+        status: 'completed',
+        requestedAt: getPastTime(60),
+        doctor: 'Dra. Claudia Ramos',
+        releasedAt: getPastTime(10),
+        result: 'Leucocitose moderada (12.000 mm3). Sem desvio à esquerda.',
+      }
+    ]
   },
   { 
     id: '1', 
@@ -186,6 +201,29 @@ const mockPatients: Patient[] = [
     state: 'SP',
     evolutions: [
       { id: 'ev-1', type: 'Triagem', professional: 'Enf. Juliana', description: 'Paciente apresenta dor precordial súbita, escala de dor 8/10.', timestamp: getPastTime(10) }
+    ],
+    exams: [
+      {
+        id: 'ex-1',
+        type: 'lab',
+        name: 'Marcadores Cardíacos (Troponina / CK-MB)',
+        priority: 'urgent',
+        status: 'pending_collection',
+        requestedAt: getPastTime(5),
+        doctor: 'Dr. Ricardo Braga',
+        deadline: new Date(now.getTime() + 45 * 60000).toISOString(),
+        isCritical: true,
+      },
+      {
+        id: 'ex-2',
+        type: 'image',
+        name: 'Raio-X de Tórax (PA/Perfil)',
+        priority: 'urgent',
+        status: 'in_analysis',
+        requestedAt: getPastTime(10),
+        doctor: 'Dr. Ricardo Braga',
+        deadline: new Date(now.getTime() + 15 * 60000).toISOString(),
+      }
     ]
   },
   { 
@@ -213,7 +251,26 @@ const mockPatients: Patient[] = [
       }
     ] 
   },
-  { id: '2', name: 'Antônio Rocha', age: 60, cpf: '012.345.678-99', susCard: '700000000000002', status: 'waiting', risk: 'emergency', arrivalTime: getPastTime(5), sector: 'Emergência 1', mainComplaint: 'AVC - sinais neurológicos', ticket: 'E002', priority: 'emergency' },
+  { 
+    id: '2', 
+    name: 'Antônio Rocha', 
+    age: 60, 
+    cpf: '012.345.678-99', 
+    susCard: '700000000000002', 
+    status: 'waiting', 
+    risk: 'emergency', 
+    arrivalTime: getPastTime(5), 
+    sector: 'Emergência 1', 
+    mainComplaint: 'AVC - sinais neurológicos', 
+    ticket: 'E002', 
+    priority: 'emergency',
+    transferRequest: {
+      status: 'requested',
+      requestedAt: getPastTime(140),
+      reason: 'Vaga de UTI Neurológica - AVC Isquêmico Extenso',
+      priority: 'emergency'
+    }
+  },
   { id: '3', name: 'João Santos', age: 32, cpf: '234.567.890-11', susCard: '700000000000003', status: 'waiting', risk: 'very-urgent', arrivalTime: getPastTime(25), sector: 'Emergência 2', mainComplaint: 'Febre alta e convulsão', ticket: 'P001', priority: 'preferential' },
   { id: '4', name: 'Pedro Almeida', age: 72, cpf: '987.654.321-02', susCard: '700000000000004', status: 'attending', risk: 'very-urgent', arrivalTime: getPastTime(45), sector: 'Emergência 2', responsibleProfessional: 'Dra. Claudia Ramos', mainComplaint: 'Dispneia severa', ticket: 'P002', priority: 'preferential' },
   { id: '5', name: 'Ana Oliveira', age: 67, cpf: '345.678.901-22', susCard: '700000000000005', status: 'waiting', risk: 'urgent', arrivalTime: getPastTime(20), sector: 'Consultório Clínico 1', mainComplaint: 'Dor abdominal aguda', ticket: 'N001', priority: 'normal' },
@@ -243,7 +300,7 @@ interface PatientsContextType {
   cancelExam: (patientId: string, examId: string) => void;
   recollectExam: (patientId: string, examId: string, reason: string) => void;
   requestTransfer: (patientId: string, priority: 'normal' | 'urgent' | 'emergency', reason: string) => void;
-  updateTransferStatus: (patientId: string, status: 'accepted' | 'denied', hospitalName?: string) => void;
+  updateTransferStatus: (patientId: string, status: 'accepted' | 'denied' | 'transporting', hospitalName?: string, crossCode?: string, ambulanceType?: string) => void;
 }
 
 const PatientsContext = createContext<PatientsContextType | undefined>(undefined);
@@ -254,12 +311,29 @@ export function PatientsProvider({ children }: { children: ReactNode }) {
     if (saved) {
       try {
         const parsed = JSON.parse(saved) as Patient[];
-        // Merge mock patients that might be missing (like the new pediatric ones)
-        const missingMock = mockPatients.filter(mp => !parsed.some(p => p.id === mp.id));
+        
+        // Healing step: merge updated properties from mock patients if missing in cache
+        const healedParsed = parsed.map(p => {
+          const mock = mockPatients.find(mp => mp.id === p.id);
+          if (mock) {
+            const merged = { ...p };
+            if (mock.transferRequest && !p.transferRequest) {
+              merged.transferRequest = mock.transferRequest;
+            }
+            if (mock.exams && (!p.exams || p.exams.length === 0)) {
+              merged.exams = mock.exams;
+            }
+            return merged;
+          }
+          return p;
+        });
+
+        // Merge mock patients that might be missing entirely
+        const missingMock = mockPatients.filter(mp => !healedParsed.some(p => p.id === mp.id));
         if (missingMock.length > 0) {
-          return [...parsed, ...missingMock];
+          return [...healedParsed, ...missingMock];
         }
-        return parsed;
+        return healedParsed;
       } catch (e) {
         return mockPatients;
       }
@@ -749,7 +823,7 @@ export function PatientsProvider({ children }: { children: ReactNode }) {
     new BroadcastChannel('upa_sync_channel').postMessage('sync_all');
   };
 
-  const updateTransferStatus = (patientId: string, status: 'accepted' | 'denied', hospitalName?: string) => {
+  const updateTransferStatus = (patientId: string, status: 'accepted' | 'denied' | 'transporting', hospitalName?: string, crossCode?: string, ambulanceType?: string) => {
     setPatients(prev => prev.map(p => {
       if (p.id === patientId && p.transferRequest) {
         return {
@@ -757,14 +831,17 @@ export function PatientsProvider({ children }: { children: ReactNode }) {
           transferRequest: {
             ...p.transferRequest,
             status,
-            hospitalName: hospitalName || p.transferRequest.hospitalName
+            hospitalName: hospitalName || p.transferRequest.hospitalName,
+            crossCode: crossCode || p.transferRequest.crossCode,
+            ambulanceType: ambulanceType || p.transferRequest.ambulanceType
           }
         };
       }
       return p;
     }));
     if (status === 'accepted') toast.success(`Transferência aceita para: ${hospitalName}`);
-    else toast.error("Transferência negada pela regulação.");
+    else if (status === 'denied') toast.error("Transferência negada pela regulação.");
+    else if (status === 'transporting') toast.success("Ambulância do SAMU em deslocamento.");
     new BroadcastChannel('upa_sync_channel').postMessage('sync_all');
   };
 

@@ -47,6 +47,7 @@ import { PatientsProvider } from "@/context/PatientsContext";
 import { BedsProvider } from "@/context/BedsContext";
 import { AuthProvider } from "@/context/AuthContext";
 import { PrescriptionsProvider } from "@/context/PrescriptionsContext";
+import { SameProvider } from "@/context/SameContext";
 import { CallAnnouncer } from "./components/CallAnnouncer";
 import { useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -155,10 +156,12 @@ const App = () => (
           <PatientsProvider>
             <BedsProvider>
               <PrescriptionsProvider>
-                <TooltipProvider>
-                  <Sonner />
-                  <AppContent />
-                </TooltipProvider>
+                <SameProvider>
+                  <TooltipProvider>
+                    <Sonner />
+                    <AppContent />
+                  </TooltipProvider>
+                </SameProvider>
               </PrescriptionsProvider>
             </BedsProvider>
           </PatientsProvider>

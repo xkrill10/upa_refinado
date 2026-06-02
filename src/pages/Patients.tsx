@@ -347,14 +347,6 @@ export default function Patients() {
                                 </TooltipTrigger>
                                 <TooltipContent>Sinalizar Evasão</TooltipContent>
                               </Tooltip>
-
-                               <Button 
-                                 onClick={() => navigate(`/paciente/${patient.id}/evolucao`, { state: { from: '/pacientes', label: 'Pacientes' } })}
-                                 className="h-9 px-4 rounded-xl bg-[#006699] hover:bg-[#005580] dark:bg-sky-500 dark:hover:bg-sky-400 text-white dark:text-slate-950 font-black uppercase text-[10px] tracking-wider ml-2 gap-2 shadow-sm transition-all hover:scale-[1.02] active:scale-95 border-none"
-                               >
-                                <FileText className="h-3.5 w-3.5" />
-                                Evolução
-                              </Button>
                             </div>
                           </TableCell>
                         </TableRow>

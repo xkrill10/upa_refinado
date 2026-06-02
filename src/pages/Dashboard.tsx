@@ -35,6 +35,12 @@ export default function Dashboard() {
   const [showKpiDialog, setShowKpiDialog] = useState(false);
   const [liveFeed, setLiveFeed] = useState<{id: number, text: string, time: string, type: 'gov' | 'med' | 'alert'}[]>([]);
 
+  // Modal States
+  const [isHeatmapOpen, setIsHeatmapOpen] = useState(false);
+  const [isFeedOpen, setIsFeedOpen] = useState(false);
+  const [isStockOpen, setIsStockOpen] = useState(false);
+  const [isAbcOpen, setIsAbcOpen] = useState(false);
+
   // Simulated Live Feed generation based on real context data
   useEffect(() => {
     // Generate initial feed
@@ -183,7 +189,10 @@ export default function Dashboard() {
         {/* Heatmap de Leitos e Live Feed */}
         <motion.div variants={item} className="space-y-6 flex flex-col">
           {/* Mapa de Calor de Leitos */}
-          <Card className="glass-card-premium rounded-xl overflow-hidden group transition-all">
+          <Card 
+            className="glass-card-premium rounded-xl overflow-hidden group transition-all cursor-pointer hover:shadow-xl hover:scale-[1.02]"
+            onClick={() => setIsHeatmapOpen(true)}
+          >
             <CardHeader className="p-5 pb-2 border-b border-white/20 bg-muted/30">
               <CardTitle className="flex items-center gap-2 text-xs font-black uppercase tracking-widest text-primary">
                 <BedDouble className="h-4 w-4" /> MAPA DE CALOR: LEITOS
@@ -218,7 +227,10 @@ export default function Dashboard() {
           </Card>
 
           {/* Live Activity Feed */}
-          <Card className="glass-card-premium rounded-xl overflow-hidden flex-1 flex flex-col group border-primary/20">
+          <Card 
+            className="glass-card-premium rounded-xl overflow-hidden flex-1 flex flex-col group border-primary/20 cursor-pointer hover:shadow-xl hover:scale-[1.02] transition-all"
+            onClick={() => setIsFeedOpen(true)}
+          >
             <CardHeader className="p-4 pb-2 border-b border-primary/10 bg-primary/5 flex flex-row items-center justify-between">
               <CardTitle className="flex items-center gap-2 text-xs font-black uppercase tracking-widest text-primary">
                 <TerminalSquare className="h-4 w-4" /> SYSTEM FEED
@@ -259,7 +271,10 @@ export default function Dashboard() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8">
         <motion.div variants={item}>
-          <Card className="glass-card-premium rounded-xl overflow-hidden h-full">
+          <Card 
+            className="glass-card-premium rounded-xl overflow-hidden h-full cursor-pointer hover:shadow-xl hover:scale-[1.02] transition-all"
+            onClick={() => setIsStockOpen(true)}
+          >
             <CardHeader className="p-6 pb-3 border-b border-white/20 bg-muted/30">
               <CardTitle className="text-xs font-black uppercase tracking-widest flex items-center gap-2">
                 <Pill className="h-4 w-4 text-emerald-500" /> Estoque de Apoio
@@ -283,7 +298,10 @@ export default function Dashboard() {
         </motion.div>
 
         <motion.div variants={item}>
-          <Card className="glass-card-premium rounded-xl overflow-hidden h-full">
+          <Card 
+            className="glass-card-premium rounded-xl overflow-hidden h-full cursor-pointer hover:shadow-xl hover:scale-[1.02] transition-all"
+            onClick={() => setIsAbcOpen(true)}
+          >
             <CardHeader className="p-6 pb-3 border-b border-white/20 bg-muted/30">
               <CardTitle className="text-xs font-black uppercase tracking-widest flex items-center gap-2">
                 <PackageMinus className="h-4 w-4 text-purple-500" /> Curva ABC Farmácia
@@ -305,6 +323,112 @@ export default function Dashboard() {
           </Card>
         </motion.div>
       </div>
+
+      {/* MODALS */}
+      <Dialog open={isHeatmapOpen} onOpenChange={setIsHeatmapOpen}>
+        <DialogContent className="max-w-4xl glass-panel border-white/10 dark:border-slate-800 p-0 overflow-hidden">
+          <DialogHeader className="p-6 pb-4 bg-muted/30 border-b border-white/10">
+            <DialogTitle className="flex items-center gap-2 text-xl font-black uppercase text-primary">
+              <BedDouble className="h-6 w-6" /> Mapa de Calor de Leitos (Visão Expandida)
+            </DialogTitle>
+            <DialogDescription>Visão detalhada da ocupação de leitos da unidade.</DialogDescription>
+          </DialogHeader>
+          <div className="p-6 space-y-6">
+            <div className="h-8 w-full flex rounded-full overflow-hidden shadow-inner border border-border/50">
+              {bedStats.occupied > 0 && <div style={{width: `${(bedStats.occupied/totalBeds)*100}%`}} className="bg-red-500 flex items-center justify-center text-[10px] font-bold text-white shadow-inner" title="Ocupados">{bedStats.occupied}</div>}
+              {bedStats.cleaning > 0 && <div style={{width: `${(bedStats.cleaning/totalBeds)*100}%`}} className="bg-cyan-500 flex items-center justify-center text-[10px] font-bold text-white shadow-inner" title="Higienização">{bedStats.cleaning}</div>}
+              {bedStats.maintenance > 0 && <div style={{width: `${(bedStats.maintenance/totalBeds)*100}%`}} className="bg-orange-500 flex items-center justify-center text-[10px] font-bold text-white shadow-inner" title="Manutenção">{bedStats.maintenance}</div>}
+              {bedStats.available > 0 && <div style={{width: `${(bedStats.available/totalBeds)*100}%`}} className="bg-emerald-500 flex items-center justify-center text-[10px] font-bold text-white shadow-inner" title="Livres">{bedStats.available}</div>}
+            </div>
+            
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <Card className="bg-red-500/10 border-red-500/20"><CardContent className="p-4 flex flex-col items-center"><span className="text-3xl font-black text-red-500">{bedStats.occupied}</span><span className="text-xs font-bold uppercase text-red-600/70">Ocupados</span></CardContent></Card>
+              <Card className="bg-cyan-500/10 border-cyan-500/20"><CardContent className="p-4 flex flex-col items-center"><span className="text-3xl font-black text-cyan-500">{bedStats.cleaning}</span><span className="text-xs font-bold uppercase text-cyan-600/70">Higienização</span></CardContent></Card>
+              <Card className="bg-orange-500/10 border-orange-500/20"><CardContent className="p-4 flex flex-col items-center"><span className="text-3xl font-black text-orange-500">{bedStats.maintenance}</span><span className="text-xs font-bold uppercase text-orange-600/70">Manutenção</span></CardContent></Card>
+              <Card className="bg-emerald-500/10 border-emerald-500/20"><CardContent className="p-4 flex flex-col items-center"><span className="text-3xl font-black text-emerald-500">{bedStats.available}</span><span className="text-xs font-bold uppercase text-emerald-600/70">Livres</span></CardContent></Card>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={isFeedOpen} onOpenChange={setIsFeedOpen}>
+        <DialogContent className="max-w-2xl glass-panel border-white/10 dark:border-slate-800 p-0 overflow-hidden h-[600px] flex flex-col">
+          <DialogHeader className="p-6 pb-4 bg-muted/30 border-b border-white/10">
+            <DialogTitle className="flex items-center gap-2 text-xl font-black uppercase text-primary">
+              <TerminalSquare className="h-6 w-6" /> System Feed (Histórico Completo)
+            </DialogTitle>
+            <DialogDescription>Todos os eventos recentes registrados pelo sistema operacional da unidade.</DialogDescription>
+          </DialogHeader>
+          <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-black/5 dark:bg-black/20">
+             {liveFeed.map((item, idx) => (
+                <div key={`${item.id}-${idx}`} className="flex gap-4 text-sm font-mono p-3 rounded-lg bg-background/50 border border-white/10">
+                  <span className="text-muted-foreground/60 shrink-0">[{item.time}]</span>
+                  <span className={cn(
+                    "leading-relaxed",
+                    item.type === 'alert' ? 'text-red-500 font-bold' : 
+                    item.type === 'gov' ? 'text-cyan-600 dark:text-cyan-400' : 'text-foreground/80'
+                  )}>
+                    {item.text}
+                  </span>
+                </div>
+              ))}
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={isStockOpen} onOpenChange={setIsStockOpen}>
+        <DialogContent className="max-w-5xl glass-panel border-white/10 dark:border-slate-800 p-0 overflow-hidden">
+          <DialogHeader className="p-6 pb-4 bg-muted/30 border-b border-white/10">
+            <DialogTitle className="flex items-center gap-2 text-xl font-black uppercase text-emerald-500">
+              <Pill className="h-6 w-6" /> Estoque de Apoio (Visão Expandida)
+            </DialogTitle>
+            <DialogDescription>Variação de estoque de medicamentos críticos ao longo das últimas 2 horas.</DialogDescription>
+          </DialogHeader>
+          <div className="p-6 h-[500px]">
+             <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={pharmacyData}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} opacity={0.2} />
+                  <XAxis dataKey="time" tickLine={false} axisLine={false} />
+                  <YAxis tickLine={false} axisLine={false} />
+                  <Tooltip contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 30px rgba(0,0,0,0.2)' }} />
+                  <Legend wrapperStyle={{ paddingTop: '20px' }} />
+                  <Line type="monotone" name="Dipirona" dataKey="dipirona" stroke="#10b981" strokeWidth={4} activeDot={{ r: 8 }} />
+                  <Line type="monotone" name="Tramadol" dataKey="tramadol" stroke="#a855f7" strokeWidth={4} activeDot={{ r: 8 }} />
+                  <Line type="monotone" name="Soro Fisiológico" dataKey="soro" stroke="#3b82f6" strokeWidth={4} activeDot={{ r: 8 }} />
+                </LineChart>
+              </ResponsiveContainer>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={isAbcOpen} onOpenChange={setIsAbcOpen}>
+        <DialogContent className="max-w-5xl glass-panel border-white/10 dark:border-slate-800 p-0 overflow-hidden">
+          <DialogHeader className="p-6 pb-4 bg-muted/30 border-b border-white/10">
+            <DialogTitle className="flex items-center gap-2 text-xl font-black uppercase text-purple-500">
+              <PackageMinus className="h-6 w-6" /> Curva ABC Farmácia (Detalhado)
+            </DialogTitle>
+            <DialogDescription>Consumo de itens da curva A, B e C para otimização de compras e reposição.</DialogDescription>
+          </DialogHeader>
+          <div className="p-6 h-[400px]">
+             <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={pharmacyConsumptionData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} opacity={0.2} />
+                  <XAxis dataKey="name" tickLine={false} axisLine={false} />
+                  <YAxis tickLine={false} axisLine={false} />
+                  <Tooltip cursor={{ fill: 'transparent' }} contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 30px rgba(0,0,0,0.2)' }} />
+                  <Bar dataKey="quantidade" name="Unidades Consumidas">
+                    {
+                      pharmacyConsumptionData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.fill} />
+                      ))
+                    }
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+          </div>
+        </DialogContent>
+      </Dialog>
+
     </motion.div>
   );
 }

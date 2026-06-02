@@ -11,6 +11,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { cn, formatWords, formatPatientNameLGPD } from "@/lib/utils";
 import { PatientDetailsModal } from "@/components/PatientDetailsModal";
 import { ExamsModal } from "@/components/PatientEvolution/Modals/ExamsModal";
+import { PatientTimelineModal } from "@/components/PatientTimelineModal";
+import { MedicalPerformanceModal } from "@/components/MedicalPerformanceModal";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import PatientRecord from "@/pages/PatientRecord";
 
@@ -48,6 +50,8 @@ export default function AtendimentosPediatrico() {
   const [recordPatientId, setRecordPatientId] = useState<number | null>(null);
   const [queueFilterMode, setQueueFilterMode] = useState<'all' | 'my-room'>('all');
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
+  const [isPerformanceModalOpen, setIsPerformanceModalOpen] = useState(false);
+  const [timelinePatient, setTimelinePatient] = useState<Patient | null>(null);
   const [isExamsModalOpen, setIsExamsModalOpen] = useState(false);
   const [patientForExams, setPatientForExams] = useState<Patient | null>(null);
   const [activeFilter, setActiveFilter] = useState<'all' | 'attending' | 'waiting'>('all');
@@ -137,21 +141,20 @@ export default function AtendimentosPediatrico() {
     >
 
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <div className="h-10 w-10 rounded-2xl bg-orange-500/10 flex items-center justify-center text-orange-500">
-            <Baby className="h-5 w-5" />
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 mb-8">
+        <div className="flex items-center gap-4">
+          <div className="h-14 w-14 rounded-2xl bg-[#006699]/10 flex items-center justify-center shrink-0">
+            <Stethoscope className="h-7 w-7 text-[#006699]" />
           </div>
           <div>
-            <h1 className="text-2xl font-black tracking-tight text-foreground uppercase">
+            <h1 className="text-4xl font-black tracking-tight text-[#006699] uppercase leading-none">
               Atendimentos Pediátrico
             </h1>
-            <p className="text-muted-foreground text-[11px] font-black uppercase tracking-widest mt-0.5">
-              Gerenciamento de consultas e procedimentos pediátricos
+            <p className="text-slate-500 text-sm font-bold uppercase tracking-widest mt-2 flex items-center gap-2">
+              Gerenciamento Infantil
             </p>
           </div>
         </div>
-
         <div className="flex items-center gap-3 bg-white/50 dark:bg-slate-900/40 p-2 rounded-2xl border border-slate-200/50 dark:border-slate-800/50 shadow-sm">
           <div className="flex items-center justify-center h-10 w-10 rounded-xl bg-orange-500/10 text-orange-500 shrink-0">
             <Building2 className="h-5 w-5" />
@@ -171,6 +174,16 @@ export default function AtendimentosPediatrico() {
               </SelectContent>
             </Select>
           </div>
+        </div>
+        <div className="flex gap-3 w-full sm:w-auto">
+          <Button 
+            onClick={() => setIsPerformanceModalOpen(true)}
+            variant="outline"
+            className="border-orange-200 dark:border-orange-900/50 hover:bg-orange-50 dark:hover:bg-orange-900/30 text-orange-700 dark:text-orange-400 font-black uppercase tracking-wider rounded-xl gap-2 shadow-sm h-12 px-6"
+          >
+            <Stethoscope className="h-4 w-4" />
+            Desempenho Médico
+          </Button>
         </div>
       </div>
 
@@ -302,6 +315,10 @@ export default function AtendimentosPediatrico() {
                   </div>
                   
                   <div className="flex flex-wrap items-center gap-2 w-full xl:w-auto justify-end shrink-0 pt-2 xl:pt-0 border-t xl:border-0 border-slate-100 dark:border-slate-800/50 mt-2 xl:mt-0">
+                    <Button variant="ghost" size="sm" className="h-8 rounded-lg gap-1.5 font-black uppercase text-[9px] tracking-wider text-slate-550 dark:text-slate-450 hover:text-sky-500 hover:bg-sky-500/5 cursor-pointer border-0 px-2"
+                       onClick={() => setTimelinePatient(patient)}>
+                      <Activity className="h-3.5 w-3.5" /> <span className="hidden sm:inline">Jornada</span>
+                    </Button>
                     <Button variant="ghost" size="sm" className="h-8 rounded-lg gap-1.5 font-black uppercase text-[9px] tracking-wider text-slate-550 dark:text-slate-450 hover:text-orange-500 hover:bg-orange-500/5 cursor-pointer border-0 px-2"
                        onClick={() => { setSelectedPatient(patient); setIsDetailsModalOpen(true); }}>
                       <Info className="h-3.5 w-3.5" /> <span className="hidden sm:inline">Detalhes</span>
@@ -382,6 +399,10 @@ export default function AtendimentosPediatrico() {
                         </div>
                       </div>
                       <div className="flex items-center gap-1">
+                        <Button size="sm" variant="ghost" className="h-9 w-9 rounded-xl p-0 text-muted-foreground hover:text-sky-500 hover:bg-sky-50 dark:hover:bg-sky-950/20 cursor-pointer border-0"
+                          onClick={() => setTimelinePatient(patient)} title="Ver Jornada do Paciente">
+                          <Activity className="h-4 w-4" />
+                        </Button>
                         <Button size="sm" variant="ghost" className="h-9 w-9 rounded-xl p-0 text-muted-foreground hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 cursor-pointer border-0"
                           onClick={() => setEvasaoPatient({ id: patient.id, name: patient.name })} title="Registrar Evasão">
                           <LogOut className="h-4 w-4" />
@@ -545,6 +566,19 @@ export default function AtendimentosPediatrico() {
 
       <PatientDetailsModal patient={selectedPatient} isOpen={isDetailsModalOpen} onClose={() => setIsDetailsModalOpen(false)} />
       
+      <PatientTimelineModal 
+        patient={timelinePatient}
+        isOpen={!!timelinePatient}
+        onClose={() => setTimelinePatient(null)}
+      />
+
+      <MedicalPerformanceModal 
+        patients={patients.filter(p => p.priority === 'pediatric')} // Passando apenas pacientes pediátricos aqui para não misturar no modal infantil
+        isOpen={isPerformanceModalOpen}
+        onClose={() => setIsPerformanceModalOpen(false)}
+        onViewTimeline={(p) => setTimelinePatient(p)}
+      />
+
       {/* Exams Modal Dialog */}
       <Dialog open={isExamsModalOpen} onOpenChange={setIsExamsModalOpen}>
         <DialogContent className="max-w-2xl bg-white dark:bg-slate-900 rounded-2xl border-0 shadow-2xl p-6">

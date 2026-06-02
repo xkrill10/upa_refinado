@@ -112,7 +112,7 @@ const sectorGroups = [
       { name: 'SALA DE COLETA', max: 6, description: 'EXAMES LABORATORIAIS', structure: 'Box de coleta individualizado e área de processamento rápido.' },
       { name: 'SALA DE SUTURA', max: 2, description: 'PROCEDIMENTOS RÁPIDOS', structure: 'Macas de procedimento e foco cirúrgico.' },
       { name: 'SALA DE CURATIVOS', max: 2, description: 'PROCEDIMENTOS RÁPIDOS', structure: 'Materiais esterilizados e pia cirúrgica.' },
-      ...Array.from({ length: 9 }, (_, i) => ({ 
+      ...Array.from({ length: 6 }, (_, i) => ({ 
         name: `CONSULTÓRIO CLÍNICO ${i + 1}`, 
         max: 1, 
         description: 'ATENDIMENTO CLÍNICO',

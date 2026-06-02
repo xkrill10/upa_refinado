@@ -11,6 +11,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { cn, formatWords, formatPatientNameLGPD } from "@/lib/utils";
 import { PatientDetailsModal } from "@/components/PatientDetailsModal";
 import { ExamsModal } from "@/components/PatientEvolution/Modals/ExamsModal";
+import { PatientTimelineModal } from "@/components/PatientTimelineModal";
+import { MedicalPerformanceModal } from "@/components/MedicalPerformanceModal";
 import { useEffect, useRef } from "react";
 import { AlertTriangle, FlaskConical, FileText } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -51,6 +53,8 @@ export default function Attendances() {
   const [recordPatientId, setRecordPatientId] = useState<number | null>(null);
   const [queueFilterMode, setQueueFilterMode] = useState<'all' | 'my-room'>('all');
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
+  const [isPerformanceModalOpen, setIsPerformanceModalOpen] = useState(false);
+  const [timelinePatient, setTimelinePatient] = useState<Patient | null>(null);
   const [isExamsModalOpen, setIsExamsModalOpen] = useState(false);
   const [patientForExams, setPatientForExams] = useState<Patient | null>(null);
   const [activeFilter, setActiveFilter] = useState<'all' | 'attending' | 'waiting'>('all');
@@ -158,12 +162,23 @@ export default function Attendances() {
             <Stethoscope className="h-6 w-6" />
           </div>
           <div>
-            <h1 className="text-4xl font-black tracking-tight text-[#006699] dark:text-sky-400 uppercase leading-none">
-              Atendimentos Clínicos
-            </h1>
-            <p className="text-muted-foreground text-xs font-black uppercase tracking-[0.3em] flex items-center gap-2 mt-1">
-              Gerenciamento de consultas e procedimentos médicos
-            </p>
+              <h1 className="text-4xl font-black tracking-tight text-[#006699] dark:text-sky-400 uppercase leading-none">
+                Atendimentos Clínicos
+              </h1>
+              <p className="text-slate-500 dark:text-slate-400 mt-2 font-medium">
+                Gerenciamento de consultas e procedimentos médicos
+              </p>
+          </div>
+          
+          <div className="flex gap-3 w-full sm:w-auto">
+            <Button 
+              onClick={() => setIsPerformanceModalOpen(true)}
+              variant="outline"
+              className="border-sky-200 dark:border-sky-900/50 hover:bg-sky-50 dark:hover:bg-sky-900/30 text-sky-700 dark:text-sky-400 font-black uppercase tracking-wider rounded-xl gap-2 shadow-sm"
+            >
+              <Stethoscope className="h-4 w-4" />
+              Desempenho Médico
+            </Button>
           </div>
         </div>
 
@@ -321,6 +336,15 @@ export default function Attendances() {
                       <Button 
                         variant="ghost" 
                         size="sm" 
+                        className="h-8 rounded-lg gap-1.5 font-black uppercase text-[9px] tracking-wider text-slate-550 dark:text-slate-450 hover:text-sky-500 hover:bg-sky-500/5 cursor-pointer border-0 px-2" 
+                        onClick={() => setTimelinePatient(patient)}
+                      >
+                        <Activity className="h-3.5 w-3.5" />
+                        <span className="hidden sm:inline">Jornada</span>
+                      </Button>
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
                         className="h-8 rounded-lg gap-1.5 font-black uppercase text-[9px] tracking-wider text-slate-550 dark:text-slate-450 hover:text-primary dark:hover:text-sky-400 hover:bg-primary/5 dark:hover:bg-sky-400/5 cursor-pointer border-0 px-2" 
                         onClick={() => {
                           setSelectedPatient(patient);
@@ -420,6 +444,15 @@ export default function Attendances() {
                           </div>
                         </div>
                         <div className="flex items-center gap-1">
+                          <Button 
+                            size="sm" 
+                            variant="ghost" 
+                            className="h-9 w-9 rounded-xl p-0 text-slate-500 hover:text-sky-500 hover:bg-sky-50 dark:hover:bg-sky-950/20 cursor-pointer border-0"
+                            onClick={() => setTimelinePatient(patient)}
+                            title="Ver Jornada do Paciente"
+                          >
+                            <Activity className="h-4 w-4" />
+                          </Button>
                           <Button 
                             size="sm" 
                             variant="ghost" 
@@ -644,6 +677,17 @@ export default function Attendances() {
         patient={selectedPatient}
         isOpen={isDetailsModalOpen}
         onClose={() => setIsDetailsModalOpen(false)}
+      />
+      <PatientTimelineModal 
+        patient={timelinePatient}
+        isOpen={!!timelinePatient}
+        onClose={() => setTimelinePatient(null)}
+      />
+      <MedicalPerformanceModal 
+        patients={patients}
+        isOpen={isPerformanceModalOpen}
+        onClose={() => setIsPerformanceModalOpen(false)}
+        onViewTimeline={(p) => setTimelinePatient(p)}
       />
 
       <Dialog open={isExamsModalOpen} onOpenChange={setIsExamsModalOpen}>
