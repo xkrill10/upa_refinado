@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 import * as React from "react";
 import { usePatients, Patient } from "@/hooks/use-patients";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
@@ -126,9 +127,11 @@ const getVitalSeverity = (key: string, value: string): 'normal' | 'caution' | 'e
 import { PatientDetailsModal } from "@/components/PatientDetailsModal";
 import { ExamsModal } from "@/components/PatientEvolution/Modals/ExamsModal";
 
+import { NurseWorkspaceHeader } from "@/components/NurseWorkspaceHeader";
 
-export default function Triage() {
+export default function TriageRoom() {
   const { patients, updatePatient, addPatient, callTicket, isAudioEnabled, setIsAudioEnabled } = usePatients();
+  const navigate = useNavigate();
   const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
   const [patientForModal, setPatientForModal] = useState<Patient | null>(null);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
@@ -144,15 +147,28 @@ export default function Triage() {
   const [evasaoPatient, setEvasaoPatient] = useState<{id: string, name: string} | null>(null);
   const [evasaoReason, setEvasaoReason] = useState<string>("");
   const [selectedTriageRoom, setSelectedTriageRoom] = useState<string>(() => {
-    return localStorage.getItem('selectedTriageRoom') || "TRIAGEM 1";
+    const saved = localStorage.getItem('upa_active_room') || "";
+    return saved;
   });
+
+  // Guard: se não tiver sala/enfermeiro logado, volta pro painel
+  useEffect(() => {
+    const room = localStorage.getItem("upa_active_room");
+    const nurse = localStorage.getItem("upa_active_nurse");
+    if (!room || !nurse) {
+      toast.error("Acesso negado", { description: "Por favor, assuma uma sala de triagem primeiro." });
+      navigate("/painel-enfermagem");
+    }
+  }, [navigate]);
   const [autoCallNext, setAutoCallNext] = useState<boolean>(() => {
     return localStorage.getItem('autoCallNext') === 'true';
   });
   const [isExamsModalOpen, setIsExamsModalOpen] = useState(false);
 
   useEffect(() => {
-    localStorage.setItem('selectedTriageRoom', selectedTriageRoom);
+    if (selectedTriageRoom) {
+      localStorage.setItem('upa_active_room', selectedTriageRoom);
+    }
   }, [selectedTriageRoom]);
 
   useEffect(() => {
@@ -162,6 +178,9 @@ export default function Triage() {
   const [equipmentStatus, setEquipmentStatus] = useState<Record<string, Record<string, boolean>>>({
     'TRIAGEM 1': { 'Termômetro': true, 'Esfignomanômetro': true, 'Oxímetro': true, 'Glicosímetro': true, 'Estetoscópio': true },
     'TRIAGEM 2': { 'Termômetro': true, 'Esfignomanômetro': true, 'Oxímetro': true, 'Glicosímetro': true, 'Estetoscópio': true },
+    'TRIAGEM 3': { 'Termômetro': true, 'Esfignomanômetro': true, 'Oxímetro': true, 'Glicosímetro': true, 'Estetoscópio': true },
+    'TRIAGEM INFANTIL 1': { 'Termômetro': true, 'Esfignomanômetro': true, 'Oxímetro': true, 'Glicosímetro': true, 'Estetoscópio': true },
+    'TRIAGEM INFANTIL 2': { 'Termômetro': true, 'Esfignomanômetro': true, 'Oxímetro': true, 'Glicosímetro': true, 'Estetoscópio': true },
   });
 
   const toggleEquipment = (room: string, item: string) => {
@@ -776,24 +795,29 @@ export default function Triage() {
     return "bg-[#006699]/5 dark:bg-[#006699]/10 text-[#006699] dark:text-[#3399cc] border-[#006699]/10 dark:border-[#006699]/20";
   };
 
+  const handleEndShift = () => {
+    localStorage.removeItem("upa_active_room");
+    localStorage.removeItem("upa_active_nurse");
+    navigate("/painel-enfermagem");
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       className="space-y-6 pb-10"
     >
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
-        <div>
-          <h1 className="text-2xl font-black text-[#006699] dark:text-sky-400 flex items-center gap-2">
-            <ClipboardList className="h-6 w-6" /> TRIAGEM
-          </h1>
-          <p className="text-muted-foreground text-xs font-semibold uppercase tracking-widest">Classificação de Risco (Ministério da Saúde)</p>
-        </div>
+      <NurseWorkspaceHeader 
+        activeRoom={selectedTriageRoom} 
+        activeNurse={localStorage.getItem("upa_active_nurse") || ""}
+        corenNumber={localStorage.getItem("upa_stamp_number") || ""}
+        corenState={localStorage.getItem("upa_stamp_state") || ""}
+      />
 
-        <div className="flex items-center gap-3 bg-white/70 dark:bg-slate-900/45 p-2 rounded-2xl border border-slate-200/40 dark:border-slate-800/40 shadow-sm self-start md:self-auto transition-colors duration-500">
+      <div className="flex items-center gap-3 bg-white/70 dark:bg-slate-900/45 p-2 rounded-2xl border border-slate-200/40 dark:border-slate-800/40 shadow-sm self-start md:self-auto transition-colors duration-500">
           <div className="hidden lg:flex items-center gap-4 px-4 border-r border-slate-200 dark:border-slate-800/60 mr-2">
             <div className="flex gap-4">
-              {["TRIAGEM 1", "TRIAGEM 2"].map(roomName => {
+              {["TRIAGEM 1", "TRIAGEM 2", "TRIAGEM 3"].map(roomName => {
                 const isOccupied = patients.some(p => !p.triaged && p.sector === roomName);
                 return (
                   <div key={roomName} className="flex flex-col">
@@ -818,23 +842,12 @@ export default function Triage() {
           </div>
           <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-2">Sua Sala:</span>
           <div className="flex gap-1">
-            {["TRIAGEM 1", "TRIAGEM 2"].map((room) => (
-              <button
-                key={room}
-                onClick={() => setSelectedTriageRoom(room)}
-                className={cn(
-                  "px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all cursor-pointer",
-                  selectedTriageRoom === room 
-                    ? "bg-[#006699] dark:bg-sky-600 text-white shadow-md scale-105" 
-                    : "bg-muted dark:bg-slate-800 text-muted-foreground hover:bg-muted/80 dark:hover:bg-slate-700/85"
-                )}
-              >
-                {room}
-              </button>
-            ))}
+            <div className="px-6 py-2.5 rounded-xl text-[11px] font-black uppercase tracking-widest bg-[#006699] dark:bg-sky-600 text-white shadow-[0_0_15px_rgba(0,102,153,0.3)] border border-white/10 flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+              {selectedTriageRoom}
+            </div>
           </div>
         </div>
-      </div>
 
 
 

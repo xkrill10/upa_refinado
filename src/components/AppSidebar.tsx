@@ -54,6 +54,7 @@ export function AppSidebar() {
       items: [
         { title: "Fila de Atendimento", url: "/fila", icon: ClipboardList },
         { title: "Painel Médico", url: "/painel-medico", icon: UserSquare2 },
+        { title: "Painel Enfermagem", url: "/painel-enfermagem", icon: Activity },
         { title: "Clínico", url: "/atendimentos", icon: HeartPulse },
         { 
           title: "Evoluções", 

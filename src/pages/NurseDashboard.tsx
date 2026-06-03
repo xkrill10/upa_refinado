@@ -3,62 +3,58 @@ import { useNavigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Stethoscope, Baby, DoorOpen, User, AlertTriangle } from "lucide-react";
+import { Stethoscope, Baby, DoorOpen, User, Syringe, BedDouble, HeartPulse, Activity, AlertTriangle } from "lucide-react";
 import { motion } from "motion/react";
 import { cn, formatWords } from "@/lib/utils";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const ROOMS = [
-  { id: "CONSULTÓRIO CLÍNICO 1", name: "Consultório Clínico 1", type: "adult", icon: Stethoscope, color: "blue" },
-  { id: "CONSULTÓRIO CLÍNICO 2", name: "Consultório Clínico 2", type: "adult", icon: Stethoscope, color: "blue" },
-  { id: "CONSULTÓRIO CLÍNICO 3", name: "Consultório Clínico 3", type: "adult", icon: Stethoscope, color: "blue" },
-  { id: "CONSULTÓRIO CLÍNICO 4", name: "Consultório Clínico 4", type: "adult", icon: Stethoscope, color: "blue" },
-  { id: "CONSULTÓRIO CLÍNICO 5", name: "Consultório Clínico 5", type: "adult", icon: Stethoscope, color: "blue" },
-  { id: "CONSULTÓRIO CLÍNICO 6", name: "Consultório Clínico 6", type: "adult", icon: Stethoscope, color: "blue" },
+  { id: "TRIAGEM 1", name: "Triagem 1", type: "triage", destination: "/sala/triagem", icon: Stethoscope, color: "blue" },
+  { id: "TRIAGEM 2", name: "Triagem 2", type: "triage", destination: "/sala/triagem", icon: Stethoscope, color: "blue" },
+  { id: "TRIAGEM 3", name: "Triagem 3", type: "triage", destination: "/sala/triagem", icon: Stethoscope, color: "blue" },
+  { id: "TRIAGEM PEDIÁTRICA 1", name: "Triagem Pediátrica 1", type: "pediatric-triage", destination: "/sala/pediatria", icon: Baby, color: "orange" },
+  { id: "TRIAGEM PEDIÁTRICA 2", name: "Triagem Pediátrica 2", type: "pediatric-triage", destination: "/sala/pediatria", icon: Baby, color: "orange" },
 
-  { id: "CONSULTÓRIO PEDIÁTRICO 1", name: "Consultório Pediátrico 1", type: "pediatric", icon: Baby, color: "orange" },
-  { id: "CONSULTÓRIO PEDIÁTRICO 2", name: "Consultório Pediátrico 2", type: "pediatric", icon: Baby, color: "orange" },
-  { id: "CONSULTÓRIO PEDIÁTRICO 3", name: "Consultório Pediátrico 3", type: "pediatric", icon: Baby, color: "orange" },
-  { id: "SALA VERMELHA", name: "Sala Vermelha", type: "emergency", icon: AlertTriangle, color: "red" },
-  { id: "SALA DE EMERGÊNCIA 1", name: "Sala de Emergência 1", type: "emergency", icon: AlertTriangle, color: "red" },
+  { id: "SALA DE MEDICAÇÃO", name: "Sala de Medicação", type: "medication", destination: "/sala/checagem", icon: Syringe, color: "emerald" },
+  { id: "OBSERVAÇÃO ADULTO", name: "Observação Adulto", type: "medication", destination: "/sala/checagem", icon: BedDouble, color: "emerald" },
+  { id: "OBSERVAÇÃO PEDIÁTRICA", name: "Observação Pediátrica", type: "medication", destination: "/sala/checagem", icon: BedDouble, color: "orange" },
 ];
 
-export default function DoctorDashboard() {
+export default function NurseDashboard() {
   const navigate = useNavigate();
   const [selectedRoom, setSelectedRoom] = useState<typeof ROOMS[0] | null>(null);
-  const [doctorName, setDoctorName] = useState("");
-  const [crmNumber, setCrmNumber] = useState(() => localStorage.getItem("upa_stamp_number") || "");
-  const [crmState, setCrmState] = useState(() => localStorage.getItem("upa_stamp_state") || "");
+  const [nurseName, setNurseName] = useState("");
+  const [corenNumber, setCorenNumber] = useState(() => localStorage.getItem("upa_stamp_number") || "");
+  const [corenState, setCorenState] = useState(() => localStorage.getItem("upa_stamp_state") || "");
   const [occupiedRooms, setOccupiedRooms] = useState<Record<string, string>>({});
   const currentRoomId = localStorage.getItem("upa_active_room");
   const lastColorRef = useRef<string>("blue");
 
   const handleSelectRoom = (room: typeof ROOMS[0]) => {
     setSelectedRoom(room);
-    const savedDoctor = localStorage.getItem("upa_active_doctor");
-    const savedCrm = localStorage.getItem("upa_stamp_number") || "";
+    const savedNurse = localStorage.getItem("upa_active_nurse");
+    const savedCoren = localStorage.getItem("upa_stamp_number") || "";
     const savedState = localStorage.getItem("upa_stamp_state") || "SP";
     const isMyRoom = localStorage.getItem("upa_active_room") === room.id;
     
-    if (isMyRoom && savedDoctor) {
-      let initialName = savedDoctor;
-      if (!/^dr[a]?\.?\s+/i.test(initialName.trim())) {
-        initialName = `Dr. ${initialName.trim()}`;
+    if (isMyRoom && savedNurse) {
+      let initialName = savedNurse;
+      if (!/^enf[a]?\.?\s+/i.test(initialName.trim())) {
+        initialName = `Enf. ${initialName.trim()}`;
       }
-      setDoctorName(initialName);
-      setCrmNumber(savedCrm);
-      setCrmState(savedState);
+      setNurseName(initialName);
+      setCorenNumber(savedCoren);
+      setCorenState(savedState);
     } else {
-      setDoctorName("Dr. ");
-      setCrmNumber("");
-      setCrmState("");
+      setNurseName("Enf. ");
+      setCorenNumber("");
+      setCorenState("");
     }
   };
 
@@ -69,80 +65,85 @@ export default function DoctorDashboard() {
   }, [selectedRoom]);
 
   useEffect(() => {
-    // In a real app, this would be fetched from a server.
-    // For now, let's just see if the current browser has a room logged in.
     const currentRoom = localStorage.getItem("upa_active_room");
-    const currentDoctor = localStorage.getItem("upa_active_doctor");
+    const currentNurse = localStorage.getItem("upa_active_nurse");
     
-    if (currentRoom && currentDoctor) {
-      setOccupiedRooms(prev => ({ ...prev, [currentRoom]: currentDoctor }));
+    if (currentRoom && currentNurse) {
+      // Formata igual ao que aparece no campo de nome
+      let formattedName = currentNurse;
+      if (!/^enf[a]?\.?\s+/i.test(formattedName.trim())) {
+        formattedName = `Enf. ${formattedName.trim()}`;
+      }
+      setOccupiedRooms(prev => ({ ...prev, [currentRoom]: formattedName }));
     }
   }, []);
 
   const handleAssumir = () => {
-    if (!selectedRoom || !doctorName.trim()) return;
+    if (!selectedRoom || !nurseName.trim()) return;
 
     localStorage.setItem("upa_active_room", selectedRoom.id);
-    localStorage.setItem("upa_active_doctor", doctorName.trim());
+    localStorage.setItem("upa_active_nurse", nurseName.trim());
     
-    // Salvar carimbo digital integrado para evoluções e prescrições
-    localStorage.setItem("upa_stamp_name", doctorName.trim());
-    localStorage.setItem("upa_stamp_council", "CRM");
-    localStorage.setItem("upa_stamp_number", crmNumber.trim());
-    localStorage.setItem("upa_stamp_state", (crmState || "SP").trim());
+    // Salvar carimbo digital integrado
+    localStorage.setItem("upa_stamp_name", nurseName.trim());
+    localStorage.setItem("upa_stamp_council", "COREN");
+    localStorage.setItem("upa_stamp_number", corenNumber.trim());
+    localStorage.setItem("upa_stamp_state", (corenState || "SP").trim());
     localStorage.setItem("upa_shift_start", new Date().toISOString());
 
-    navigate("/meu-consultorio");
+    // Redireciona para a respectiva sala de atendimento
+    if (selectedRoom.destination) {
+      navigate(selectedRoom.destination);
+    }
   };
 
   return (
     <div className="flex-1 w-full flex flex-col items-center justify-start min-h-[calc(100vh-6rem)] p-4 sm:p-8 pt-12 sm:pt-20 relative">
-      {/* Background Decor */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-primary/5 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-emerald-500/5 rounded-full blur-[120px] pointer-events-none" />
       
       <div className="max-w-5xl w-full z-10 space-y-8">
         <div className="text-center space-y-3">
           <div className="inline-flex items-center justify-center p-3 rounded-2xl bg-white/60 dark:bg-slate-900/40 backdrop-blur-xl shadow-[0_8px_32px_0_rgba(0,0,0,0.1)] border border-white/50 dark:border-white/10 mb-2">
-            <User className="h-8 w-8 text-primary" />
+            <Activity className="h-8 w-8 text-emerald-500" />
           </div>
           <h1 className="text-2xl sm:text-4xl font-black uppercase tracking-tight text-foreground">
-            Painel de Plantão
+            Painel da Enfermagem
           </h1>
           <p className="text-muted-foreground font-bold uppercase tracking-widest text-xs max-w-xl mx-auto opacity-80">
-            Selecione uma sala disponível para iniciar seu turno de atendimento.
+            Selecione uma sala ou setor disponível para iniciar seu turno.
           </p>
         </div>
 
-        <Tabs defaultValue="adult" className="w-full max-w-4xl mx-auto">
+        <Tabs defaultValue="triage" className="w-full max-w-4xl mx-auto">
           <div className="flex justify-center mb-8">
             <TabsList className="grid w-full max-w-2xl grid-cols-3 p-1.5 bg-white/40 dark:bg-slate-900/40 backdrop-blur-2xl border border-white/50 dark:border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.1)] rounded-2xl h-14">
               <TabsTrigger 
-                value="adult" 
+                value="triage" 
                 className="rounded-xl text-[10px] sm:text-xs font-black uppercase tracking-widest data-[state=active]:bg-[#006699] data-[state=active]:text-white data-[state=active]:shadow-md transition-all duration-300"
               >
                 <Stethoscope className="h-4 w-4 mr-1 sm:mr-2" />
-                Adulto
+                Triagem
               </TabsTrigger>
               <TabsTrigger 
-                value="pediatric" 
+                value="pediatric-triage" 
                 className="rounded-xl text-[10px] sm:text-xs font-black uppercase tracking-widest data-[state=active]:bg-orange-500 data-[state=active]:text-white data-[state=active]:shadow-md transition-all duration-300"
               >
                 <Baby className="h-4 w-4 mr-1 sm:mr-2" />
-                Pediatria
+                Triagem Pediátrica
               </TabsTrigger>
               <TabsTrigger 
-                value="emergency" 
-                className="rounded-xl text-[10px] sm:text-xs font-black uppercase tracking-widest data-[state=active]:bg-red-600 data-[state=active]:text-white data-[state=active]:shadow-md transition-all duration-300"
+                value="medication" 
+                className="rounded-xl text-[10px] sm:text-xs font-black uppercase tracking-widest data-[state=active]:bg-emerald-600 data-[state=active]:text-white data-[state=active]:shadow-md transition-all duration-300"
               >
-                <AlertTriangle className="h-4 w-4 mr-1 sm:mr-2" />
-                Emergência
+                <Syringe className="h-4 w-4 mr-1 sm:mr-2" />
+                Medicação / Leitos
               </TabsTrigger>
             </TabsList>
           </div>
 
-          <TabsContent value="adult" className="mt-0 focus-visible:outline-none focus-visible:ring-0">
+          <TabsContent value="triage" className="mt-0 focus-visible:outline-none focus-visible:ring-0">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {ROOMS.filter(r => r.type === 'adult').map((room) => {
+              {ROOMS.filter(r => r.type === 'triage').map((room) => {
                 const isOccupied = !!occupiedRooms[room.id];
                 const occupant = occupiedRooms[room.id];
                 const isOccupiedByMe = currentRoomId === room.id;
@@ -161,7 +162,7 @@ export default function DoctorDashboard() {
                           ? "border-emerald-500/40 dark:border-emerald-400/40 hover:border-emerald-500/60 shadow-[0_4px_20px_0_rgba(16,185,129,0.1)] bg-emerald-50/50 dark:bg-emerald-950/20 backdrop-blur-xl"
                           : isOccupied 
                           ? "opacity-80 border-slate-300 dark:border-slate-700 bg-white/40 dark:bg-slate-900/20 backdrop-blur-md hover:border-slate-400 dark:hover:border-slate-600" 
-                          : "border-[#006699]/20 dark:border-sky-400/20 hover:border-[#006699]/40 dark:hover:border-sky-400/40 hover:shadow-[0_8px_32px_0_rgba(0,102,153,0.15)] dark:hover:shadow-[0_8px_32px_0_rgba(14,165,233,0.15)] bg-gradient-to-br from-[#006699]/10 to-[#006699]/5 dark:from-[#006699]/20 dark:to-[#006699]/10 backdrop-blur-xl shadow-[0_4px_16px_0_rgba(0,0,0,0.05)]"
+                          : "border-[#006699]/20 dark:border-sky-400/20 hover:border-[#006699]/40 dark:hover:border-sky-400/40 hover:shadow-[0_8px_32px_0_rgba(0,102,153,0.15)] bg-gradient-to-br from-[#006699]/10 to-[#006699]/5 dark:from-[#006699]/20 dark:to-[#006699]/10 backdrop-blur-xl shadow-[0_4px_16px_0_rgba(0,0,0,0.05)]"
                       )}
                       onClick={() => handleSelectRoom(room)}
                     >
@@ -208,9 +209,9 @@ export default function DoctorDashboard() {
             </div>
           </TabsContent>
 
-          <TabsContent value="pediatric" className="mt-0 focus-visible:outline-none focus-visible:ring-0">
+          <TabsContent value="pediatric-triage" className="mt-0 focus-visible:outline-none focus-visible:ring-0">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {ROOMS.filter(r => r.type === 'pediatric').map((room) => {
+              {ROOMS.filter(r => r.type === 'pediatric-triage').map((room) => {
                 const isOccupied = !!occupiedRooms[room.id];
                 const occupant = occupiedRooms[room.id];
                 const isOccupiedByMe = currentRoomId === room.id;
@@ -229,7 +230,7 @@ export default function DoctorDashboard() {
                           ? "border-emerald-500/40 dark:border-emerald-400/40 hover:border-emerald-500/60 shadow-[0_4px_20px_0_rgba(16,185,129,0.1)] bg-emerald-50/50 dark:bg-emerald-950/20 backdrop-blur-xl"
                           : isOccupied 
                           ? "opacity-80 border-slate-300 dark:border-slate-700 bg-white/40 dark:bg-slate-900/20 backdrop-blur-md hover:border-slate-400 dark:hover:border-slate-600" 
-                          : "border-orange-500/20 dark:border-orange-400/20 hover:border-orange-500/40 dark:hover:border-orange-400/40 hover:shadow-[0_8px_32px_0_rgba(249,115,22,0.15)] dark:hover:shadow-[0_8px_32px_0_rgba(249,115,22,0.15)] bg-gradient-to-br from-orange-500/10 to-orange-500/5 dark:from-orange-500/20 dark:to-orange-500/10 backdrop-blur-xl shadow-[0_4px_16px_0_rgba(0,0,0,0.05)]"
+                          : "border-orange-500/20 dark:border-orange-400/20 hover:border-orange-500/40 dark:hover:border-orange-400/40 hover:shadow-[0_8px_32px_0_rgba(249,115,22,0.15)] bg-gradient-to-br from-orange-500/10 to-orange-500/5 dark:from-orange-500/20 dark:to-orange-500/10 backdrop-blur-xl shadow-[0_4px_16px_0_rgba(0,0,0,0.05)]"
                       )}
                       onClick={() => handleSelectRoom(room)}
                     >
@@ -276,9 +277,9 @@ export default function DoctorDashboard() {
             </div>
           </TabsContent>
 
-          <TabsContent value="emergency" className="mt-0 focus-visible:outline-none focus-visible:ring-0">
+          <TabsContent value="medication" className="mt-0 focus-visible:outline-none focus-visible:ring-0">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {ROOMS.filter(r => r.type === 'emergency').map((room) => {
+              {ROOMS.filter(r => r.type === 'medication').map((room) => {
                 const isOccupied = !!occupiedRooms[room.id];
                 const occupant = occupiedRooms[room.id];
                 const isOccupiedByMe = currentRoomId === room.id;
@@ -287,8 +288,8 @@ export default function DoctorDashboard() {
                 return (
                   <motion.div
                     key={room.id}
-                    whileHover={{ scale: 1.02, y: -2 }}
-                    whileTap={{ scale: 0.98 }}
+                    whileHover={!isOccupied || isOccupiedByMe ? { scale: 1.02, y: -2 } : {}}
+                    whileTap={!isOccupied || isOccupiedByMe ? { scale: 0.98 } : {}}
                   >
                     <Card 
                       className={cn(
@@ -297,7 +298,9 @@ export default function DoctorDashboard() {
                           ? "border-emerald-500/40 dark:border-emerald-400/40 hover:border-emerald-500/60 shadow-[0_4px_20px_0_rgba(16,185,129,0.1)] bg-emerald-50/50 dark:bg-emerald-950/20 backdrop-blur-xl"
                           : isOccupied 
                           ? "opacity-80 border-slate-300 dark:border-slate-700 bg-white/40 dark:bg-slate-900/20 backdrop-blur-md hover:border-slate-400 dark:hover:border-slate-600" 
-                          : "border-red-600/20 dark:border-red-500/20 hover:border-red-600/40 dark:hover:border-red-500/40 hover:shadow-[0_8px_32px_0_rgba(220,38,38,0.15)] dark:hover:shadow-[0_8px_32px_0_rgba(239,68,68,0.15)] bg-gradient-to-br from-red-600/10 to-red-600/5 dark:from-red-500/20 dark:to-red-500/10 backdrop-blur-xl shadow-[0_4px_16px_0_rgba(0,0,0,0.05)]"
+                          : room.color === "emerald" 
+                            ? "border-emerald-500/20 dark:border-emerald-400/20 hover:border-emerald-500/40 dark:hover:border-emerald-400/40 hover:shadow-[0_8px_32px_0_rgba(16,185,129,0.15)] bg-gradient-to-br from-emerald-500/10 to-emerald-500/5 dark:from-emerald-500/20 dark:to-emerald-500/10 backdrop-blur-xl shadow-[0_4px_16px_0_rgba(0,0,0,0.05)]"
+                            : "border-orange-500/20 dark:border-orange-400/20 hover:border-orange-500/40 dark:hover:border-orange-400/40 hover:shadow-[0_8px_32px_0_rgba(249,115,22,0.15)] bg-gradient-to-br from-orange-500/10 to-orange-500/5 dark:from-orange-500/20 dark:to-orange-500/10 backdrop-blur-xl shadow-[0_4px_16px_0_rgba(0,0,0,0.05)]"
                       )}
                       onClick={() => handleSelectRoom(room)}
                     >
@@ -307,8 +310,10 @@ export default function DoctorDashboard() {
                           isOccupiedByMe
                             ? "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400"
                             : isOccupied 
-                            ? "bg-slate-500/10 text-slate-500 dark:text-slate-400"
-                            : "bg-red-600/15 text-red-600 dark:bg-red-500/20 dark:text-red-400"
+                            ? "bg-red-500/10 text-red-500 dark:text-red-400"
+                            : room.color === "emerald"
+                            ? "bg-emerald-500/15 text-emerald-600 dark:bg-emerald-400/20 dark:text-emerald-400"
+                            : "bg-orange-500/15 text-orange-600 dark:bg-orange-400/20 dark:text-orange-400"
                         )}>
                           <Icon className="h-8 w-8" />
                         </div>
@@ -324,13 +329,21 @@ export default function DoctorDashboard() {
                                 <span>Sua Sala - Voltar</span>
                               </div>
                             ) : isOccupied ? (
-                              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-500/10 text-[9px] sm:text-[10px] font-bold uppercase tracking-widest text-slate-600 dark:text-slate-400">
-                                <span className="w-1.5 h-1.5 rounded-full bg-slate-500" />
+                              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-500/10 text-[9px] sm:text-[10px] font-bold uppercase tracking-widest text-red-600 dark:text-red-400">
+                                <span className="w-1.5 h-1.5 rounded-full bg-red-500" />
                                 <span>Ocupado: {occupant}</span>
                               </div>
                             ) : (
-                              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[9px] sm:text-[10px] font-bold uppercase tracking-widest bg-red-600/15 text-red-600 dark:bg-red-500/20 dark:text-red-500">
-                                <span className="w-1.5 h-1.5 rounded-full bg-red-600 dark:bg-red-500 animate-pulse" />
+                              <div className={cn(
+                                "inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[9px] sm:text-[10px] font-bold uppercase tracking-widest",
+                                room.color === "emerald" 
+                                  ? "bg-emerald-500/15 text-emerald-600 dark:bg-emerald-400/20 dark:text-emerald-400"
+                                  : "bg-orange-500/15 text-orange-600 dark:bg-orange-400/20 dark:text-orange-400"
+                              )}>
+                                <span className={cn(
+                                  "w-1.5 h-1.5 rounded-full animate-pulse",
+                                  room.color === "emerald" ? "bg-emerald-500 dark:bg-emerald-400" : "bg-orange-500 dark:bg-orange-400"
+                                )} />
                                 Livre para Entrada
                               </div>
                             )}
@@ -352,8 +365,8 @@ export default function DoctorDashboard() {
           const occupantOfSelectedRoom = occupiedRooms[selectedRoom.id];
           const isSelectedOccupiedByMe = currentRoomId === selectedRoom.id;
           
-          const willOverwrite = isSelectedRoomOccupied && doctorName.trim() && doctorName !== occupantOfSelectedRoom;
-          const willResume = isSelectedRoomOccupied && doctorName.trim() === occupantOfSelectedRoom;
+          const willOverwrite = isSelectedRoomOccupied && nurseName.trim() && nurseName.trim() !== occupantOfSelectedRoom?.trim();
+          const willResume = isSelectedRoomOccupied && nurseName.trim() === occupantOfSelectedRoom?.trim();
 
           return (
             <DialogContent className="sm:max-w-[450px] p-0 overflow-hidden border border-white/20 dark:border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.3)] rounded-3xl bg-white/70 dark:bg-slate-950/60 backdrop-blur-xl [&>button]:hidden">
@@ -363,6 +376,8 @@ export default function DoctorDashboard() {
                   ? "bg-gradient-to-br from-red-600/90 to-red-800/90 dark:from-red-600/50 dark:to-red-900/50"
                   : selectedRoom.color === "blue" 
                   ? "bg-gradient-to-br from-[#006699]/90 to-[#004466]/90 dark:from-sky-600/50 dark:to-sky-900/50"
+                  : selectedRoom.color === "emerald"
+                  ? "bg-gradient-to-br from-emerald-600/90 to-emerald-800/90 dark:from-emerald-600/50 dark:to-emerald-900/50"
                   : "bg-gradient-to-br from-orange-500/90 to-orange-700/90 dark:from-orange-600/50 dark:to-orange-900/50"
               )}>
                 <div className="bg-white/20 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4 backdrop-blur-sm">
@@ -374,11 +389,11 @@ export default function DoctorDashboard() {
                 <DialogDescription className="text-white/80 font-medium text-sm">
                   {isSelectedRoomOccupied ? (
                     <>
-                      O <strong className="text-white">{selectedRoom.name}</strong> está logado no momento com o <strong className="text-white">{occupantOfSelectedRoom}</strong>.
+                      {/^(sala|triagem|observação)/i.test(selectedRoom.name) ? 'A' : 'O'} <strong className="text-white">{selectedRoom.name}</strong> está {/^(sala|triagem|observação)/i.test(selectedRoom.name) ? 'logada' : 'logado'} no momento com: <strong className="text-white">{occupantOfSelectedRoom}</strong>.
                     </>
                   ) : (
                     <>
-                      Você está prestes a iniciar os atendimentos {selectedRoom.name.toLowerCase().startsWith('sala') ? 'na' : 'no'}<br />
+                      Você está prestes a iniciar os atendimentos {/^(sala|triagem|observação)/i.test(selectedRoom.name) ? 'na' : 'no'}<br />
                       <strong className="text-white">{selectedRoom.name}</strong>.
                     </>
                   )}
@@ -388,12 +403,12 @@ export default function DoctorDashboard() {
               <div className="p-8 space-y-5">
                 <div className="space-y-2">
                   <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground block">
-                    Nome Completo do Médico:
+                    Nome Completo do Profissional:
                   </label>
                   <Input 
-                    value={doctorName}
-                    onChange={(e) => setDoctorName(formatWords(e.target.value))}
-                    placeholder="Ex: Dr. Ricardo Braga"
+                    value={nurseName}
+                    onChange={(e) => setNurseName(formatWords(e.target.value))}
+                    placeholder="Ex: Enf. Mariana Santos"
                     className={cn(
                       "h-12 rounded-xl px-4 text-sm font-bold border-2 focus-visible:ring-2",
                       willOverwrite ? "border-red-500 bg-red-50 dark:bg-red-950/30 text-red-700 dark:text-red-400" :
@@ -406,20 +421,20 @@ export default function DoctorDashboard() {
 
                 <div className="space-y-2">
                   <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground block">
-                    CRM / UF:
+                    COREN / UF:
                   </label>
                   <div className="relative">
-                    {!crmState && !crmNumber && (
+                    {!corenState && !corenNumber && (
                       <div className="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-bold text-slate-300 dark:text-slate-600 pointer-events-none">
-                        <span className="opacity-0">CRM-</span>SP
+                        <span className="opacity-0">COREN-</span>SP
                       </div>
                     )}
                     <Input 
-                      value={crmState.length === 2 && crmNumber ? `CRM-${crmState} ${crmNumber}` : `CRM-${crmState}`}
+                      value={corenState.length === 2 && corenNumber ? `COREN-${corenState} ${corenNumber}` : `COREN-${corenState}`}
                       onChange={(e) => {
                         let rawValue = e.target.value.toUpperCase();
-                        if (rawValue.startsWith('CRM-')) {
-                          rawValue = rawValue.substring(4);
+                        if (rawValue.startsWith('COREN-')) {
+                          rawValue = rawValue.substring(6);
                         }
                         rawValue = rawValue.replace(/\s+/g, '');
 
@@ -429,8 +444,8 @@ export default function DoctorDashboard() {
                         const remaining = rawValue.substring(letters.length);
                         const numbers = remaining.replace(/[^0-9]/g, '').slice(0, 8);
 
-                        setCrmState(letters);
-                        setCrmNumber(numbers);
+                        setCorenState(letters);
+                        setCorenNumber(numbers);
                       }}
                       placeholder=""
                       className="h-12 rounded-xl px-4 text-sm font-bold border-2 border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900"
@@ -447,7 +462,7 @@ export default function DoctorDashboard() {
                     "text-slate-500"
                   )}>
                     {willResume ? "Identidade confirmada! Pronto para retomar sessão." :
-                     willOverwrite ? "Cuidado! Você irá encerrar a sessão do outro colega." :
+                     willOverwrite ? "Cuidado! Você irá encerrar a sessão do colega." :
                      "Digite seu nome para continuar ou assumir."}
                   </p>
                 )}
@@ -469,10 +484,12 @@ export default function DoctorDashboard() {
                         ? "bg-emerald-500 hover:bg-emerald-600 shadow-emerald-500/20"
                         : selectedRoom.color === "blue" 
                         ? "bg-[#006699] hover:bg-[#005580] shadow-blue-500/20 dark:bg-sky-500 dark:hover:bg-sky-600"
+                        : selectedRoom.color === "emerald"
+                        ? "bg-emerald-600 hover:bg-emerald-700 shadow-emerald-500/20"
                         : "bg-orange-500 hover:bg-orange-600 shadow-orange-500/20"
                     )}
                     onClick={handleAssumir}
-                    disabled={!doctorName.trim()}
+                    disabled={!nurseName.trim()}
                   >
                     {willOverwrite ? "Sobrescrever Sessão" : willResume ? "Retomar Sessão" : "Entrar na Sala"}
                   </Button>

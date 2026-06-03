@@ -86,8 +86,8 @@ const sectorGroups = [
         description: 'SALA PEDIÁTRICA',
         structure: 'Leitos adequados, poltronas para acompanhantes e banheiro exclusivo para pediatria.'
       },
-      { name: 'ACOLHIMENTO INFANTIL 1', max: 4, description: 'AMBIENTE HUMANIZADO', structure: 'Área lúdica e acolhedora para triagem pediátrica.' },
-      { name: 'ACOLHIMENTO INFANTIL 2', max: 4, description: 'AMBIENTE HUMANIZADO', structure: 'Área lúdica e acolhedora para triagem pediátrica.' },
+      { name: 'TRIAGEM INFANTIL 1', max: 4, description: 'AMBIENTE HUMANIZADO', structure: 'Área lúdica e acolhedora para triagem pediátrica.' },
+      { name: 'TRIAGEM INFANTIL 2', max: 4, description: 'AMBIENTE HUMANIZADO', structure: 'Área lúdica e acolhedora para triagem pediátrica.' },
       { name: 'MEDICAÇÃO INFANTIL', max: 6, description: 'SALA DE PROCEDIMENTOS', structure: 'Equipamentos pediátricos para administração segura de medicamentos.' },
       ...Array.from({ length: 3 }, (_, i) => ({ 
         name: `CONSULTÓRIO PEDIÁTRICO ${i + 1}`, 
@@ -109,6 +109,7 @@ const sectorGroups = [
     sectors: [
       { name: 'TRIAGEM 1', max: 1, description: 'TRIAGEM INICIAL', structure: 'Equipamentos de aferição de sinais vitais e sistema de senhas.' },
       { name: 'TRIAGEM 2', max: 1, description: 'TRIAGEM INICIAL', structure: 'Equipamentos de aferição de sinais vitais e sistema de senhas.' },
+      { name: 'TRIAGEM 3', max: 1, description: 'TRIAGEM INICIAL', structure: 'Equipamentos de aferição de sinais vitais e sistema de senhas.' },
       { name: 'SALA DE COLETA', max: 6, description: 'EXAMES LABORATORIAIS', structure: 'Box de coleta individualizado e área de processamento rápido.' },
       { name: 'SALA DE SUTURA', max: 2, description: 'PROCEDIMENTOS RÁPIDOS', structure: 'Macas de procedimento e foco cirúrgico.' },
       { name: 'SALA DE CURATIVOS', max: 2, description: 'PROCEDIMENTOS RÁPIDOS', structure: 'Materiais esterilizados e pia cirúrgica.' },

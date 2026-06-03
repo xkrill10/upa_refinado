@@ -23,6 +23,7 @@ import { ParetoProblemas } from "@/components/charts/ParetoProblemas";
 import { SankeyFluxoPaciente } from "@/components/charts/SankeyFluxoPaciente";
 import { RadialGaugeLeitos } from "@/components/charts/RadialGaugeLeitos";
 import { RadarChartDemanda } from "@/components/charts/RadarChartDemanda";
+import { MiniMapaSatores } from "@/components/charts/MiniMapaSatores";
 const container = {
   hidden: { opacity: 0 },
   show: { opacity: 1, transition: { staggerChildren: 0.1 } }
@@ -343,7 +344,10 @@ export default function Dashboard() {
             <GanttPermanencia />
           </motion.div>
         </div>
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+          <motion.div variants={item} className="lg:col-span-1">
+            <MiniMapaSatores onClick={() => navigate('/setores')} />
+          </motion.div>
           <motion.div variants={item} className="lg:col-span-1">
             <SankeyFluxoPaciente />
           </motion.div>

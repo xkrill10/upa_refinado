@@ -41,12 +41,16 @@ const Pediatria = React.lazy(() => import("./pages/Pediatria"));
 const AtendimentosPediatrico = React.lazy(() => import("./pages/AtendimentosPediatrico"));
 const MyHR = React.lazy(() => import("./pages/MyHR"));
 const DoctorDashboard = React.lazy(() => import("./pages/DoctorDashboard"));
+const NurseDashboard = React.lazy(() => import("./pages/NurseDashboard"));
 const MyWorkspace = React.lazy(() => import("./pages/MyWorkspace"));
 
 // Novas Telas
 const Laboratory = React.lazy(() => import("./pages/Laboratory"));
 const Inventory = React.lazy(() => import("./pages/Inventory"));
 const NursingCheck = React.lazy(() => import("./pages/NursingCheck"));
+const TriageRoom = React.lazy(() => import("./pages/TriageRoom"));
+const PediatriaRoom = React.lazy(() => import("./pages/PediatriaRoom"));
+const NursingCheckRoom = React.lazy(() => import("./pages/NursingCheckRoom"));
 const Billing = React.lazy(() => import("./pages/Billing"));
 const Governance = React.lazy(() => import("./pages/Governance"));
 const Login = React.lazy(() => import("./pages/Login"));
@@ -152,9 +156,13 @@ const AppContent = () => {
                 <Route path="/paciente/:id/evolucao/fonoaudiologia" element={<EvolucaoFonoaudiologia />} />
                 <Route path="/paciente/:id/evolucao/farmacia-clinica" element={<EvolucaoFarmaciaClinica />} />
                 <Route path="/admin/usuarios" element={<UserManagement />} />
-              <Route path="/pediatria" element={<Pediatria />} />
-                <Route path="/atendimentos-pediatrico" element={<AtendimentosPediatrico />} />
+                <Route path="/pediatria" element={<Pediatria />} />
+                <Route path="/sala/triagem" element={<TriageRoom />} />
+                <Route path="/sala/pediatria" element={<PediatriaRoom />} />
+                <Route path="/sala/checagem" element={<NursingCheckRoom />} />
+                <Route path="/atendimentos-pediatricos" element={<AtendimentosPediatrico />} />
                 <Route path="/painel-medico" element={<DoctorDashboard />} />
+                <Route path="/painel-enfermagem" element={<NurseDashboard />} />
                 <Route path="/meu-consultorio" element={<MyWorkspace />} />
                 
                 {/* Novas Rotas (Esqueletos) */}
