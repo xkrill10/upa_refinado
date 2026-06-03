@@ -216,25 +216,7 @@ export default function Attendances() {
         </div>
       </div>
 
-      {gravePatients.length > 0 && (
-        <motion.div 
-          initial={{ opacity: 0, scale: 0.95, y: -20 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          className="bg-red-600 border-2 border-red-500 rounded-2xl p-6 shadow-[0_0_40px_rgba(220,38,38,0.4)] flex flex-col sm:flex-row items-center justify-between gap-4"
-        >
-          <div className="flex items-center gap-4 text-white">
-            <div className="h-12 w-12 rounded-full bg-white/20 flex items-center justify-center animate-pulse shrink-0">
-              <AlertTriangle className="h-7 w-7 text-white" />
-            </div>
-            <div>
-              <h2 className="text-xl font-black uppercase tracking-tight">🚨 Alerta de Risco Grave!</h2>
-              <p className="text-xs font-bold tracking-widest uppercase opacity-90 mt-1">
-                {gravePatients.length} paciente(s) com classificação Vermelha/Laranja aguardando na fila.
-              </p>
-            </div>
-          </div>
-        </motion.div>
-      )}
+
 
       {/* Stats rápidas */}
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">

@@ -15,6 +15,7 @@ import { useSlaTimer } from "@/hooks/useSlaTimer";
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip as RechartsTooltip, AreaChart, Area } from "recharts";
 import { toast } from "sonner";
 import { usePatientsContext, Patient, ExamRequest } from "@/context/PatientsContext";
+import { useInventory } from "@/context/InventoryContext";
 function SlaTimer({ deadline }: { deadline?: string }) {
   const timeRemaining = useSlaTimer(deadline || new Date().toISOString());
   if (!deadline) {
@@ -29,6 +30,7 @@ function SlaTimer({ deadline }: { deadline?: string }) {
 
 export default function Laboratory() {
   const { patients, updateExamStatus, recollectExam } = usePatientsContext();
+  const { decrementStockDirectly } = useInventory();
   const [selectedExam, setSelectedExam] = useState<{patient: Patient, exam: ExamRequest} | null>(null);
   const [printExam, setPrintExam] = useState<{patient: Patient, exam: ExamRequest} | null>(null);
   const [showHistory, setShowHistory] = useState(false);
@@ -107,7 +109,9 @@ export default function Laboratory() {
   const handleStatusChange = (patientId: string, examId: string, newStatus: ExamRequest['status'], examType?: 'lab' | 'image') => {
     updateExamStatus(patientId, examId, newStatus);
     if (newStatus === 'in_analysis') {
-      toast.success(`Almoxarifado: Baixa de ${examType === 'lab' ? '1 Tubo de Coleta' : '1 Filme de Raio-X'} realizada com sucesso.`);
+      const itemName = examType === 'lab' ? 'Tubo de Coleta' : 'Filme de Raio-X';
+      decrementStockDirectly(itemName, 1);
+      toast.success(`Almoxarifado: Baixa de 1 ${itemName} realizada com sucesso.`);
     }
   };
 

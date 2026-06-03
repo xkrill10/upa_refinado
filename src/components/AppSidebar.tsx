@@ -29,6 +29,8 @@ export function AppSidebar() {
   const isActive = (path: string) => location.pathname === path;
   const [openMenus, setOpenMenus] = useState<Record<string, boolean>>({});
 
+
+
   const toggleSubMenu = (title: string, e: React.MouseEvent) => {
     e.preventDefault();
     setOpenMenus(prev => ({ ...prev, [title]: !prev[title] }));
@@ -73,7 +75,7 @@ export function AppSidebar() {
             { title: "Farmácia Clínica", url: `/paciente/${currentPatientId}/evolucao/farmacia-clinica` },
           ]
         },
-        { title: "Pediátrico", url: "/atendimentos-pediatrico", icon: Baby },
+        { title: "Pediátrico", url: "/atendimentos-pediatricos", icon: Baby },
         { title: "Laboratório", url: "/laboratorio", icon: FlaskConical },
         { title: "Leitos", url: "/leitos", icon: BedDouble },
         { title: "Checagem Leito", url: "/checagem-enfermagem", icon: Syringe },
@@ -188,18 +190,18 @@ export function AppSidebar() {
                                    animate={active ? { scale: 1.05 } : { scale: 1 }}
                                    whileTap={{ scale: 0.95 }}
                                    className={cn(
-                                      "flex items-center justify-center shrink-0 transition-all duration-300",
+                                       "flex items-center justify-center shrink-0 transition-all duration-300",
                                      active 
                                        ? "text-sky-300 drop-shadow-[0_0_8px_rgba(14,165,233,0.8)]" 
                                        : "text-blue-100/70 group-hover/item:text-blue-50"
                                    )}
                                  >
                                    <item.icon className={cn(
-                                      "h-[22px] w-[22px] transition-all duration-300",
+                                       "h-[22px] w-[22px] transition-all duration-300",
                                      active ? "stroke-[2.5px] animate-pulse-slow" : "stroke-[2px]"
                                    )} />
                                  </motion.div>
-   
+    
                                  {!collapsed && (
                                    <span className={cn(
                                      "text-[13px] font-bold tracking-wide transition-all duration-300 whitespace-nowrap",

@@ -3,28 +3,36 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { 
-  Calendar, Clock, ShieldAlert, FileText, ArrowRightLeft, CheckCircle2, UserSquare2, FilePlus2, Bell, AlertCircle, CalendarDays, Activity
+  Calendar, Clock, ShieldAlert, FileText, ArrowRightLeft, CheckCircle2, UserSquare2, FilePlus2, Bell, AlertCircle, CalendarDays, Activity, Plane, Plus, Download, ExternalLink
 } from "lucide-react";
 import { motion } from "motion/react";
 import { RequestSwapModal } from "@/components/hr/RequestSwapModal";
 import { UploadCertificateModal } from "@/components/hr/UploadCertificateModal";
+import { TimeTracker } from "@/components/hr/TimeTracker";
 import { cn } from "@/lib/utils";
+import { useHR } from "@/context/HRContext";
+import { toast } from "sonner";
 
 export default function MyHR() {
+  const { activeEmployee, myShifts, swapRequests, pendingSwapsCount } = useHR();
   const [isSwapModalOpen, setIsSwapModalOpen] = useState(false);
   const [isCertModalOpen, setIsCertModalOpen] = useState(false);
 
-  const myShifts = [
-    { date: "25/05/2030", day: "Sábado", time: "07:00 - 19:00", type: "Diurno", sector: "Urgência", status: "confirmed" },
-    { date: "27/05/2030", day: "Segunda", time: "19:00 - 07:00", type: "Noturno", sector: "Clínica Médica", status: "confirmed" },
-    { date: "30/05/2030", day: "Quinta", time: "07:00 - 19:00", type: "Diurno", sector: "Triagem", status: "swap_pending" },
-  ];
+  // Derive shifts with pending swap flag from swapRequests context
+  const enrichedShifts = myShifts.map(shift => {
+    const hasPendingSwap = swapRequests.some(
+      r => r.from === (activeEmployee?.name ?? "") && r.status === "pending" && r.sector === shift.sector
+    );
+    return { ...shift, status: hasPendingSwap ? 'swap_pending' as const : shift.status };
+  });
 
   const myDocuments = [
-    { name: "CRM Ativo", expiry: "15/06/2030", status: "warning" },
-    { name: "Certificado BLS", expiry: "10/12/2032", status: "valid" },
+    { name: "CRM Ativo", expiry: "15/06/2026", status: "warning" },
+    { name: "Certificado BLS", expiry: "10/12/2027", status: "valid" },
     { name: "Treinamento NR-32", status: "missing" },
   ];
+
+  const profile = activeEmployee ?? { name: "Dr. João Mendes", role: "Médico Plantonista", specialty: "Clínica Médica" };
 
   return (
     <motion.div 
@@ -47,13 +55,13 @@ export default function MyHR() {
           
           <div className="flex-1 text-center md:text-left text-white">
             <div className="flex flex-col md:flex-row items-center gap-3 mb-2">
-              <h1 className="text-3xl md:text-4xl font-black tracking-tight drop-shadow-sm">Dr. João Mendes</h1>
+              <h1 className="text-3xl md:text-4xl font-black tracking-tight drop-shadow-sm">{profile.name}</h1>
               <Badge className="bg-emerald-500/20 text-emerald-100 border-emerald-500/30 font-black uppercase tracking-widest text-[9px] backdrop-blur-sm">
                 Ativo na Escala
               </Badge>
             </div>
             <p className="text-blue-100 font-bold uppercase tracking-widest text-sm mb-6 opacity-90">
-              Médico Plantonista • Clínica Médica
+              {profile.role} • {profile.specialty}
             </p>
 
             <div className="flex flex-wrap items-center justify-center md:justify-start gap-3">
@@ -89,16 +97,30 @@ export default function MyHR() {
               <ArrowRightLeft className="h-4 w-4 mr-2" />
               Solicitar Troca de Plantão
             </Button>
-            <Button 
-              onClick={() => setIsCertModalOpen(true)}
-              variant="outline"
-              className="bg-white/10 border-white/20 text-white hover:bg-white/20 font-black uppercase tracking-widest text-[10px] h-12 rounded-xl backdrop-blur-sm"
-            >
-              <FilePlus2 className="h-4 w-4 mr-2" />
-              Enviar Atestado Médico
-            </Button>
+            <div className="flex gap-2">
+              <Button 
+                onClick={() => setIsCertModalOpen(true)}
+                variant="outline"
+                className="flex-1 bg-white/10 border-white/20 text-white hover:bg-white/20 font-black uppercase tracking-widest text-[10px] h-12 rounded-xl backdrop-blur-sm"
+              >
+                <FilePlus2 className="h-4 w-4 mr-2" />
+                Atestado
+              </Button>
+              <Button 
+                onClick={() => toast.info("Funcionalidade em desenvolvimento", { description: "Em breve você poderá solicitar férias por aqui." })}
+                variant="outline"
+                className="flex-1 bg-white/10 border-white/20 text-white hover:bg-white/20 font-black uppercase tracking-widest text-[10px] h-12 rounded-xl backdrop-blur-sm"
+              >
+                <Plane className="h-4 w-4 mr-2" />
+                Férias
+              </Button>
+            </div>
           </div>
         </div>
+      </div>
+
+      <div className="mb-8">
+        <TimeTracker />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -113,13 +135,18 @@ export default function MyHR() {
                 </CardTitle>
                 <CardDescription className="text-[10px] font-bold uppercase tracking-widest mt-1">Próximos Plantões Confirmados</CardDescription>
               </div>
-              <Button variant="ghost" size="sm" className="font-black uppercase tracking-widest text-[10px]">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="font-black uppercase tracking-widest text-[10px] border-border/50"
+                onClick={() => toast.info("Visualização mensal abrindo...")}
+              >
                 Ver Mês Completo
               </Button>
             </CardHeader>
             <CardContent className="p-0">
               <div className="divide-y divide-border/50">
-                {myShifts.map((shift, i) => (
+                {enrichedShifts.map((shift, i) => (
                   <div key={i} className="p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 hover:bg-black/[0.02] dark:hover:bg-white/[0.02] transition-colors group">
                     <div className="flex items-center gap-4">
                       <div className="h-14 w-14 rounded-2xl bg-primary/10 border border-primary/20 flex flex-col items-center justify-center shadow-inner group-hover:scale-105 transition-transform">
@@ -144,7 +171,12 @@ export default function MyHR() {
                       </div>
                     </div>
                     {shift.status !== 'swap_pending' && (
-                      <Button variant="outline" size="sm" className="font-black uppercase tracking-widest text-[9px] w-full md:w-auto hover:text-primary hover:bg-primary/5 hover:border-primary/30 transition-all opacity-0 group-hover:opacity-100">
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="font-black uppercase tracking-widest text-[10px] w-full md:w-auto text-primary border-primary/30 hover:bg-primary hover:text-white transition-all shadow-sm"
+                        onClick={() => setIsSwapModalOpen(true)}
+                      >
                         Repassar
                       </Button>
                     )}
@@ -156,26 +188,44 @@ export default function MyHR() {
 
           {/* Quick Actions Grid */}
           <div className="grid grid-cols-2 gap-4">
-            <Card className="glass-card-premium rounded-2xl hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer border-blue-500/20 group">
+            <Card className="glass-card-premium rounded-2xl border-border/50 group">
               <CardContent className="p-6 flex flex-col items-center text-center gap-4">
-                <div className="h-12 w-12 rounded-full bg-blue-500/10 flex items-center justify-center text-blue-600 group-hover:scale-110 transition-transform">
+                <div className="h-12 w-12 rounded-full bg-blue-500/10 flex items-center justify-center text-blue-600 transition-transform">
                   <FileText className="h-6 w-6" />
                 </div>
                 <div>
                   <h3 className="font-bold text-sm">Contracheque</h3>
                   <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest mt-1">Disponível ref. Abril</p>
                 </div>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="w-full text-[10px] font-black uppercase tracking-widest mt-2 border-border/50"
+                  onClick={() => {
+                    toast.success("Download iniciado", { description: "O contracheque será salvo no seu dispositivo." });
+                  }}
+                >
+                  <Download className="h-3 w-3 mr-2" /> Baixar PDF
+                </Button>
               </CardContent>
             </Card>
-            <Card className="glass-card-premium rounded-2xl hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer border-emerald-500/20 group">
+            <Card className="glass-card-premium rounded-2xl border-border/50 group">
               <CardContent className="p-6 flex flex-col items-center text-center gap-4">
-                <div className="h-12 w-12 rounded-full bg-emerald-500/10 flex items-center justify-center text-emerald-600 group-hover:scale-110 transition-transform">
+                <div className="h-12 w-12 rounded-full bg-emerald-500/10 flex items-center justify-center text-emerald-600 transition-transform">
                   <CheckCircle2 className="h-6 w-6" />
                 </div>
                 <div>
                   <h3 className="font-bold text-sm">Avaliação de Desempenho</h3>
                   <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest mt-1">Nenhuma pendência</p>
                 </div>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="w-full text-[10px] font-black uppercase tracking-widest mt-2 border-border/50"
+                  onClick={() => toast.info("Redirecionando para o portal de avaliação...")}
+                >
+                  <ExternalLink className="h-3 w-3 mr-2" /> Ver Detalhes
+                </Button>
               </CardContent>
             </Card>
           </div>
@@ -184,11 +234,14 @@ export default function MyHR() {
         {/* Right Column: Docs & Notifications */}
         <div className="space-y-6">
           <Card className="glass-card-premium rounded-2xl overflow-hidden border-white/40 dark:border-white/10 shadow-lg">
-            <CardHeader className="p-6 border-b border-border/50 bg-black/[0.02] dark:bg-white/[0.02]">
+            <CardHeader className="p-6 border-b border-border/50 bg-black/[0.02] dark:bg-white/[0.02] flex flex-row items-center justify-between">
               <CardTitle className="text-xs font-black uppercase tracking-widest flex items-center gap-2">
                 <FileText className="h-4 w-4 text-amber-500" />
                 Meus Documentos
               </CardTitle>
+              <Button size="icon" variant="outline" className="h-8 w-8 rounded-lg" onClick={() => setIsCertModalOpen(true)}>
+                <Plus className="h-4 w-4 text-muted-foreground" />
+              </Button>
             </CardHeader>
             <CardContent className="p-6 space-y-4">
               {myDocuments.map((doc, i) => (

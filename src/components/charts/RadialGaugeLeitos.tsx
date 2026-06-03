@@ -4,7 +4,16 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BedDouble } from "lucide-react";
 import { useTheme } from "@/components/ThemeProvider";
 
-export function RadialGaugeLeitos({ occupied, available, cleaning, maintenance, total }: any) {
+interface RadialGaugeProps {
+  occupied: number;
+  available: number;
+  cleaning: number;
+  maintenance: number;
+  total: number;
+  pure?: boolean;
+}
+
+export function RadialGaugeLeitos({ occupied, available, cleaning, maintenance, total, pure }: RadialGaugeProps) {
   const { theme } = useTheme();
   const isDark = theme === 'dark';
 
@@ -53,6 +62,14 @@ export function RadialGaugeLeitos({ occupied, available, cleaning, maintenance, 
 
   const series = [occupiedPct, availablePct, cleaningPct];
 
+  const chartContent = (
+    <div className="w-full h-[260px] flex items-center justify-center">
+      <Chart options={options} series={series} type="radialBar" height="100%" width="100%" />
+    </div>
+  );
+
+  if (pure) return chartContent;
+
   return (
     <Card className="glass-card-premium rounded-xl overflow-hidden group transition-all hover:shadow-xl">
       <CardHeader className="p-5 pb-0 border-b border-white/20 bg-muted/30">
@@ -61,9 +78,7 @@ export function RadialGaugeLeitos({ occupied, available, cleaning, maintenance, 
         </CardTitle>
       </CardHeader>
       <CardContent className="pt-2 pb-0 flex items-center justify-center">
-        <div className="w-full h-[260px] flex items-center justify-center">
-          <Chart options={options} series={series} type="radialBar" height="100%" width="100%" />
-        </div>
+        {chartContent}
       </CardContent>
     </Card>
   );

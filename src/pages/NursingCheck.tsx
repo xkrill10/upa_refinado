@@ -33,6 +33,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { usePatients } from "@/hooks/use-patients";
+import { useBeds } from "@/context/BedsContext";
 import { usePrescriptions, AprazamentoHour as ContextAprazamentoHour } from "@/context/PrescriptionsContext";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -70,29 +71,39 @@ interface PatientCheckData {
   prescriptions: PrescriptionItem[];
 }
 
-/* ─── Avatar Dynamic Resolver ─── */
-const getPatientAvatar = (name?: string): string => {
+const getPatientAvatar = (name?: string, gender?: string, age?: number): string => {
   if (!name) return "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=120";
-  const normalized = name.toLowerCase();
-  if (normalized.includes("maria silva")) {
-    return "/src/assets/images/female_patient_1.png";
-  }
-  if (normalized.includes("ricardo braga") || normalized.includes("joão mendes")) {
-    return "/src/assets/images/dr_joao_mendes.png";
-  }
-  if (normalized.includes("antônio rocha")) {
-    return "/src/assets/images/male_patient_1.png";
-  }
-  if (normalized.includes("ana oliveira") || normalized.includes("maria clara")) {
-    return "/src/assets/images/female_patient_2.png";
-  }
   
-  // High quality Unsplash face fallbacks according to name patterns
-  if (normalized.includes("ana") || normalized.includes("maria") || normalized.includes("lucia") || normalized.includes("ferreir") || normalized.includes("lima") || normalized.includes("dias")) {
-    return "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=120";
+  if (age !== undefined) {
+    const isMale = gender?.toUpperCase() === 'M' || name.toLowerCase().includes('joão') || name.toLowerCase().includes('pedro');
+    const isFemale = gender?.toUpperCase() === 'F' || name.toLowerCase().includes('maria') || name.toLowerCase().includes('helena');
+    
+    // Baby (0-2 years)
+    if (age <= 2) {
+      return isFemale 
+        ? "https://images.unsplash.com/photo-1513254921616-6c17e3381a17?auto=format&fit=crop&q=80&w=120" // baby girl
+        : "https://images.unsplash.com/photo-1519689680058-324335c77eba?auto=format&fit=crop&q=80&w=120"; // baby boy
+    }
+    // Child (3-12 years)
+    if (age <= 12) {
+      return isFemale
+        ? "https://images.unsplash.com/photo-1603569283847-aa295f0d016a?auto=format&fit=crop&q=80&w=120" // girl
+        : "https://images.unsplash.com/photo-1519340241574-2c6f10c1f5de?auto=format&fit=crop&q=80&w=120"; // boy
+    }
+    // Elderly (60+ years)
+    if (age >= 60) {
+      return isFemale
+        ? "https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&q=80&w=120" // elderly woman
+        : "https://images.unsplash.com/photo-1534308143481-c55f00be8bd7?auto=format&fit=crop&q=80&w=120"; // elderly man
+    }
+    // Adult (default)
+    return isFemale
+      ? "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=120" // adult woman
+      : "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=120"; // adult man
   }
-  
-  return "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=120";
+
+  // Default fallback if age is missing
+  return `https://api.dicebear.com/7.x/adventurer/svg?seed=${name}`;
 };
 
 /* ─── Safe Time Formatter Helper ─── */
@@ -109,10 +120,23 @@ const formatArrivalTime = (timeStr?: string): string => {
 
 export default function NursingCheck() {
   const { patients } = usePatients();
+  const { beds } = useBeds();
   const { orders, updateMedicationHours } = usePrescriptions();
   
-  // Filter active hospitalized/triaged patients
-  const activePatients = patients.filter(p => p.status === 'attending' || p.status === 'waiting');
+  const [filterSector, setFilterSector] = useState<string>("all");
+
+  // Map active hospitalized/triaged patients with their beds
+  const activePatients = patients
+    .filter(p => p.status === 'attending' || p.status === 'waiting')
+    .map(p => {
+      const assignedBed = beds.find(b => b.patientId === p.id);
+      return {
+        ...p,
+        computedSector: assignedBed ? assignedBed.ward : "Sala de Medicação",
+        computedRoom: assignedBed ? assignedBed.name : "Recepção / Poltronas"
+      };
+    })
+    .filter(p => filterSector === "all" || p.computedSector === filterSector);
   
   const [selectedPatientId, setSelectedPatientId] = useState<string>("");
   
@@ -616,7 +640,9 @@ export default function NursingCheck() {
   };
 
   return (
-    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-16">
+    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-16 relative">
+      <div className="absolute top-0 right-1/4 w-[500px] h-[500px] bg-rose-500/10 rounded-full blur-[100px] pointer-events-none -z-10" />
+      <div className="absolute bottom-0 left-1/4 w-[600px] h-[600px] bg-sky-500/10 rounded-full blur-[120px] pointer-events-none -z-10" />
       
       {/* HEADER */}
       <header className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -663,7 +689,7 @@ export default function NursingCheck() {
           { title: "Sinais Pendentes", icon: Activity, value: selectedPatient?.triaged ? "0" : "5", color: "text-purple-500", bg: "bg-purple-500/10" },
           { title: "Atrasadas / Alertas", icon: AlertTriangle, value: totalDelayed, color: totalDelayed > 0 ? "text-amber-500" : "text-muted-foreground/40", bg: totalDelayed > 0 ? "bg-amber-500/10 animate-pulse" : "bg-muted/5" },
         ].map((stat, i) => (
-          <Card key={i} className="p-4 glass-card border-white/15 dark:border-white/5 relative overflow-hidden flex flex-col justify-between h-28">
+          <Card key={i} className="p-4 glass-card-premium border-white/40 dark:border-white/10 shadow-lg relative overflow-hidden flex flex-col justify-between h-28 group hover:-translate-y-1 transition-all duration-300">
             <div className="flex justify-between items-start">
               <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground leading-tight">{stat.title}</span>
               <div className={`h-8 w-8 rounded-xl ${stat.bg} ${stat.color} flex items-center justify-center shrink-0`}>
@@ -680,13 +706,30 @@ export default function NursingCheck() {
         
         {/* PATIENT LIST (COL-SPAN-4) */}
         <div className="lg:col-span-4 space-y-4">
-          <Card className="glass-card-premium border-white/40 dark:border-white/10 shadow-xl overflow-hidden rounded-[2rem]">
-            <CardHeader className="bg-muted/15 border-b py-5 px-6">
-              <div className="flex items-center gap-3">
-                <div className="h-2 w-2 rounded-full bg-rose-500 animate-pulse" />
-                <CardTitle className="text-sm font-black uppercase tracking-widest">Pacientes Internados</CardTitle>
+          <Card className="glass-card-premium border-white/40 dark:border-white/10 shadow-xl overflow-hidden rounded-xl">
+            <CardHeader className="bg-black/[0.02] dark:bg-white/[0.02] border-b border-border/50 py-5 px-6">
+              <div className="flex flex-col gap-4">
+                <div>
+                  <div className="flex items-center gap-3">
+                    <div className="h-2 w-2 rounded-full bg-rose-500 animate-pulse" />
+                    <CardTitle className="text-sm font-black uppercase tracking-widest">Pacientes na Assistência</CardTitle>
+                  </div>
+                  <CardDescription className="text-[10px] font-bold uppercase tracking-wider mt-1">Diretório ativo na rede beira-leito</CardDescription>
+                </div>
+                
+                <Select value={filterSector} onValueChange={setFilterSector}>
+                  <SelectTrigger className="h-10 border-border/50 bg-background shadow-sm rounded-xl text-xs font-bold w-full uppercase tracking-widest">
+                    <SelectValue placeholder="FILTRAR POR SETOR" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all" className="font-bold text-xs">TODOS OS SETORES</SelectItem>
+                    <SelectItem value="Emergência" className="font-bold text-xs">EMERGÊNCIA</SelectItem>
+                    <SelectItem value="Amarela" className="font-bold text-xs">OBS. AMARELA</SelectItem>
+                    <SelectItem value="Verde" className="font-bold text-xs">OBS. VERDE</SelectItem>
+                    <SelectItem value="Sala de Medicação" className="font-bold text-xs">SALA DE MEDICAÇÃO</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
-              <CardDescription className="text-[10px] font-bold uppercase tracking-wider mt-1">Diretório ativo na rede beira-leito</CardDescription>
             </CardHeader>
             <CardContent className="p-3 space-y-2 max-h-[500px] overflow-y-auto custom-scrollbar">
               {activePatients.map(p => {
@@ -708,7 +751,7 @@ export default function NursingCheck() {
                         isSelected ? "ring-2 ring-rose-500 bg-rose-500/10" : "bg-muted"
                       )}>
                         <img 
-                          src={getPatientAvatar(p.name)} 
+                          src={getPatientAvatar(p.name, p.gender, p.age)} 
                           alt={p.name} 
                           className="h-full w-full object-cover transition-transform group-hover:scale-105" 
                           onError={(e) => {
@@ -719,7 +762,7 @@ export default function NursingCheck() {
                       <div className="truncate">
                         <p className="text-xs font-black uppercase leading-tight truncate">{p.name}</p>
                         <p className="text-[9px] font-bold text-muted-foreground mt-1 uppercase tracking-wider truncate">
-                          {p.sector || "Leito Sem Endereço"}
+                          {p.computedSector} • {p.computedRoom}
                         </p>
                       </div>
                     </div>
@@ -745,18 +788,17 @@ export default function NursingCheck() {
           </Card>
         </div>
 
-        {/* NURSING CHART & PRESCRIPTION SHEET (COL-SPAN-8) */}
         <div className="lg:col-span-8 space-y-6">
           {selectedPatient ? (
-            <Card className="glass-card-premium border-white/40 dark:border-white/10 shadow-xl overflow-hidden rounded-[2rem]">
+            <Card className="glass-card-premium border-white/40 dark:border-white/10 shadow-xl overflow-hidden rounded-xl">
               
               {/* SELECTED PATIENT SUMMARY */}
-              <div className="p-6 bg-rose-600 text-white relative">
+              <div className="p-6 bg-gradient-to-r from-rose-600/90 to-red-500/80 backdrop-blur-xl border-b border-white/20 dark:border-white/5 text-white relative">
                 <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full blur-2xl pointer-events-none -translate-y-1/2 translate-x-1/3" />
                 <div className="relative z-10 flex flex-col md:flex-row md:items-center gap-4">
                   <div className="h-16 w-16 rounded-2xl overflow-hidden shrink-0 border-2 border-white/30 shadow-lg">
                     <img 
-                      src={getPatientAvatar(selectedPatient.name)} 
+                      src={getPatientAvatar(selectedPatient.name, selectedPatient.gender, selectedPatient.age)} 
                       alt={selectedPatient.name} 
                       className="h-full w-full object-cover"
                       onError={(e) => {
@@ -767,7 +809,7 @@ export default function NursingCheck() {
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1">
                       <Badge variant="outline" className="bg-white/20 border-none text-white text-[9px] font-black uppercase tracking-widest">
-                        {selectedPatient.sector || "Leito Clinico"}
+                        {selectedPatient.computedSector} • {selectedPatient.computedRoom}
                       </Badge>
                       {selectedPatient.risk === 'emergency' && (
                         <Badge className="bg-red-900 border-none text-white text-[9px] font-black uppercase tracking-widest animate-bounce">

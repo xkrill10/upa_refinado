@@ -64,6 +64,8 @@ import { BedsProvider } from "@/context/BedsContext";
 import { AuthProvider } from "@/context/AuthContext";
 import { PrescriptionsProvider } from "@/context/PrescriptionsContext";
 import { SameProvider } from "@/context/SameContext";
+import { InventoryProvider } from "@/context/InventoryContext";
+import { HRProvider } from "@/context/HRContext";
 import { CallAnnouncer } from "./components/CallAnnouncer";
 import { useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -194,10 +196,14 @@ const App = () => (
             <BedsProvider>
               <PrescriptionsProvider>
                 <SameProvider>
-                  <TooltipProvider>
-                    <Sonner />
-                    <AppContent />
-                  </TooltipProvider>
+                  <InventoryProvider>
+                    <HRProvider>
+                      <TooltipProvider>
+                        <Sonner />
+                        <AppContent />
+                      </TooltipProvider>
+                    </HRProvider>
+                  </InventoryProvider>
                 </SameProvider>
               </PrescriptionsProvider>
             </BedsProvider>

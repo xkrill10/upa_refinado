@@ -1,8 +1,7 @@
 import { useState, useEffect } from "react";
 import { Users, Clock, Stethoscope, CheckCircle, AlertTriangle, BedDouble, TrendingUp, Activity, Pill, PackageMinus, Building2, LogOut, Baby, HeartPulse, Sparkles, TerminalSquare } from "lucide-react";
-import { AreaChart, Area, BarChart, Bar, LineChart, Line, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, RadialBarChart, RadialBar, Legend } from 'recharts';
+import { BarChart, Bar, LineChart, Line, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import { useNavigate } from "react-router-dom";
-import { StatCard } from "@/components/StatCard";
 import { PatientQueueTable } from "@/components/PatientQueueTable";
 import { usePatients } from "@/hooks/use-patients";
 import { useBeds } from "@/context/BedsContext";
@@ -24,6 +23,7 @@ import { SankeyFluxoPaciente } from "@/components/charts/SankeyFluxoPaciente";
 import { RadialGaugeLeitos } from "@/components/charts/RadialGaugeLeitos";
 import { RadarChartDemanda } from "@/components/charts/RadarChartDemanda";
 import { MiniMapaSatores } from "@/components/charts/MiniMapaSatores";
+
 const container = {
   hidden: { opacity: 0 },
   show: { opacity: 1, transition: { staggerChildren: 0.1 } }
@@ -102,16 +102,25 @@ export default function Dashboard() {
   const bedStats = getStats();
   const totalBeds = beds.length;
 
-  const chartData = [
-    { time: '06:00', atendimentos: 5 }, { time: '08:00', atendimentos: 12 }, { time: '10:00', atendimentos: 15 },
-    { time: '12:00', atendimentos: 8 }, { time: '14:00', atendimentos: 20 }, { time: '16:00', atendimentos: 18 },
-    { time: '18:00', atendimentos: 25 },
-  ];
-
   const pharmacyConsumptionData = [
     { name: 'Dipirona',  quantidade: 145, fill: '#10b981' }, { name: 'Tramadol',  quantidade: 56, fill: '#a855f7' },
     { name: 'Soro',  quantidade: 230, fill: '#3b82f6' }, { name: 'Ondansetrona', quantidade: 89, fill: '#f59e0b' },
     { name: 'Ceftriaxona', quantidade: 34, fill: '#ef4444' }
+  ];
+
+  const predictiveDemandData = [
+    { hour: '12:00', real: 15, previsto: 14 },
+    { hour: '14:00', real: 20, previsto: 18 },
+    { hour: '16:00', real: 18, previsto: 19 },
+    { hour: '18:00', real: 25, previsto: 23 },
+    { hour: '20:00', real: 22, previsto: 24 },
+    { hour: '22:00', real: 15, previsto: 16 },
+    { hour: '00:00', real: undefined, previsto: 10 },
+    { hour: '02:00', real: undefined, previsto: 6 },
+    { hour: '04:00', real: undefined, previsto: 5 },
+    { hour: '06:00', real: undefined, previsto: 8 },
+    { hour: '08:00', real: undefined, previsto: 13 },
+    { hour: '10:00', real: undefined, previsto: 17 },
   ];
 
   const [pharmacyData] = useState([
@@ -149,216 +158,329 @@ export default function Dashboard() {
 
       <Tabs defaultValue="operacional" className="w-full space-y-6">
         <div className="flex justify-center w-full mb-2">
-          <TabsList className="grid w-full max-w-md grid-cols-2 bg-black/10 dark:bg-black/40 border border-white/10 p-1 rounded-full h-10 shadow-sm">
+          <TabsList className="grid w-full max-w-xl grid-cols-3 bg-black/10 dark:bg-black/40 border border-white/10 p-1 rounded-full h-10 shadow-sm">
             <TabsTrigger value="operacional" className="rounded-full data-[state=active]:bg-primary data-[state=active]:text-primary-foreground font-black uppercase tracking-widest text-[10px] h-8">Visão Operacional</TabsTrigger>
             <TabsTrigger value="gestao" className="rounded-full data-[state=active]:bg-purple-600 data-[state=active]:text-white font-black uppercase tracking-widest text-[10px] h-8">Visão Estratégica</TabsTrigger>
+            <TabsTrigger value="preditiva" className="rounded-full data-[state=active]:bg-indigo-600 data-[state=active]:text-white font-black uppercase tracking-widest text-[10px] h-8">Visão Preditiva (IA)</TabsTrigger>
           </TabsList>
         </div>
 
         <TabsContent value="operacional" className="space-y-6 mt-0 focus-visible:outline-none focus-visible:ring-0">
 
-      {/* Cards de Triagem/Pacientes */}
-      <motion.div variants={item} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-        <StatCard title="Total Pacientes" value={patients.length} icon={Users} variant="primary" trend="Hoje" onClick={() => setDashboardFilter('all')} active={dashboardFilter === 'all'} sparklineData={[5, 10, 8, 15, 20, 18, 25]} />
-        <StatCard title="Aguardando" value={waiting} icon={Clock} variant="warning" onClick={() => setDashboardFilter('waiting')} active={dashboardFilter === 'waiting'} sparklineData={[12, 15, 10, 18, 14, 8, waiting]} />
-        <StatCard title="Em Atendimento" value={attending} icon={Stethoscope} variant="success" onClick={() => setDashboardFilter('attending')} active={dashboardFilter === 'attending'} sparklineData={[2, 4, 3, 5, 4, 6, attending]} />
-        <StatCard title="Casos Críticos" value={emergencies} icon={AlertTriangle} variant="danger" onClick={() => setDashboardFilter('critical')} active={dashboardFilter === 'critical'} sparklineData={[1, 0, 2, 1, 3, 2, emergencies]} />
-        <StatCard title="Central de Leitos" value={bedStats.occupied} icon={BedDouble} variant="accent" trend="Ocupados" onClick={() => setIsHeatmapOpen(true)} sparklineData={[10, 12, 11, 14, 15, 13, bedStats.occupied]} />
-      </motion.div>
-
-      {/* KPIs Premium com Gradientes */}
-      <motion.div variants={item} className="grid grid-cols-2 md:grid-cols-5 gap-4">
-        {kpis.map((kpi) => (
+          {/* Barra de Telemetria Consolidada - Alta Densidade */}
           <motion.div 
-            key={kpi.label} 
-            onClick={() => { setSelectedKpi(kpi.id); setShowKpiDialog(true); }}
-            whileHover={{ scale: 1.02, y: -4 }} whileTap={{ scale: 0.98 }}
-            className="glass-card-premium p-4 rounded-xl flex flex-col gap-1 relative overflow-hidden group cursor-pointer transition-all border shadow-sm hover:shadow-lg"
+            variants={item} 
+            className="glass-card-premium rounded-[2.5rem] p-6 border border-white/20 dark:border-white/5 shadow-lg bg-gradient-to-r from-white/10 to-white/5 dark:from-slate-900/40 dark:to-slate-900/10 backdrop-blur-xl"
           >
-            <div className="absolute right-[-10%] top-[-10%] opacity-5 group-hover:opacity-10 group-hover:rotate-12 transition-all">
-              <kpi.icon className="h-16 w-16" />
-            </div>
-            <div className="flex items-center gap-2 relative z-10">
-              <kpi.icon className={cn("h-4 w-4", kpi.color)} />
-              <span className="text-[9px] font-black uppercase tracking-wider text-muted-foreground">{kpi.label}</span>
-            </div>
-            <div className="flex items-baseline gap-2 mt-1 relative z-10">
-              <span className="text-xl font-black leading-none">{kpi.value}</span>
-              <span className={cn("text-[10px] font-bold", kpi.trend.startsWith('+') ? 'text-emerald-500' : 'text-orange-500')}>{kpi.trend}</span>
+            <div className="grid grid-cols-2 md:grid-cols-5 divide-y md:divide-y-0 md:divide-x divide-border/30 gap-y-4 md:gap-y-0 text-left">
+              {/* Coluna 1: Total Pacientes */}
+              <div className="px-6 flex flex-col justify-center first:pl-0">
+                <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-1">Pacientes Ativos</p>
+                <div className="flex items-baseline gap-2">
+                  <span className="text-3.5xl font-black tracking-tight">{patients.length}</span>
+                  <Badge variant="outline" className="bg-sky-500/10 text-sky-600 border-none text-[8px] font-bold">TOTAL</Badge>
+                </div>
+                <p className="text-[9px] text-muted-foreground mt-1">Registrados na UPA hoje</p>
+              </div>
+
+              {/* Coluna 2: Aguardando */}
+              <div className="px-6 flex flex-col justify-center">
+                <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-1">Aguardando Atendimento</p>
+                <div className="flex items-baseline gap-2">
+                  <span className="text-3.5xl font-black tracking-tight">{waiting}</span>
+                  {waiting > 0 && (
+                    <span className="flex h-2 w-2 relative -top-3">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
+                    </span>
+                  )}
+                </div>
+                <p className="text-[9px] text-muted-foreground mt-1">Fila da triagem concluída</p>
+              </div>
+
+              {/* Coluna 3: Em Atendimento */}
+              <div className="px-6 flex flex-col justify-center">
+                <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-1">Em Consulta</p>
+                <div className="flex items-baseline gap-2">
+                  <span className="text-3.5xl font-black tracking-tight">{attending}</span>
+                  {attending > 0 && (
+                    <span className="flex h-2 w-2 relative -top-3">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                    </span>
+                  )}
+                </div>
+                <p className="text-[9px] text-muted-foreground mt-1">Consultas em andamento</p>
+              </div>
+
+              {/* Coluna 4: Casos Críticos */}
+              <div className="px-6 flex flex-col justify-center">
+                <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-1">Casos Críticos (P0/P1)</p>
+                <div className="flex items-baseline gap-2">
+                  <span className="text-3.5xl font-black tracking-tight text-red-500">{emergencies}</span>
+                  {emergencies > 0 && (
+                    <span className="flex h-2 w-2 relative -top-3">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
+                    </span>
+                  )}
+                </div>
+                <p className="text-[9px] text-muted-foreground mt-1">Emergência / Muito Urgente</p>
+              </div>
+
+              {/* Coluna 5: Ocupação Leitos */}
+              <div className="px-6 flex flex-col justify-center last:pr-0">
+                <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-1">Ocupação de Leitos</p>
+                <div className="flex items-baseline gap-2">
+                  <span className="text-3.5xl font-black tracking-tight">
+                    {totalBeds > 0 ? Math.round((bedStats.occupied / totalBeds) * 100) : 0}%
+                  </span>
+                  <Badge variant="outline" className={cn(
+                    "border-none text-[8px] font-bold",
+                    (bedStats.occupied / totalBeds) > 0.8 ? "bg-red-500/10 text-red-500" : "bg-emerald-500/10 text-emerald-500"
+                  )}>
+                    {bedStats.occupied}/{totalBeds} LEITOS
+                  </Badge>
+                </div>
+                <p className="text-[9px] text-muted-foreground mt-1">Emergência e observação</p>
+              </div>
             </div>
           </motion.div>
-        ))}
-      </motion.div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Painel Central de Atendimento */}
-        <motion.div variants={item} className="lg:col-span-2">
-          <Card className="glass-card-premium overflow-hidden h-full rounded-xl group transition-all duration-300 hover:shadow-2xl">
-            <CardHeader className="p-6 pb-3 border-b border-white/20 dark:border-slate-800/20 bg-muted/30">
-              <CardTitle className="text-sm flex items-center justify-between gap-2 uppercase font-black">
-                <div className="flex items-center gap-2 text-primary">
-                  <Users className="h-4 w-4" />
-                  ATENDIMENTOS CLÍNICOS
-                </div>
-                <Badge variant="outline" className="text-[10px]">{filteredPatients.length} resultados</Badge>
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="p-0 max-h-[450px] overflow-y-auto scrollbar-thin">
-              <PatientQueueTable patients={displayPatients} />
-            </CardContent>
-          </Card>
-        </motion.div>
+          {/* Área Principal de Trabalho: Fila (Esquerda) e Hub de Recursos (Direita) */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            
+            {/* Esquerda: Fila de Atendimento */}
+            <motion.div variants={item} className="lg:col-span-8">
+              <Card className="glass-card-premium overflow-hidden h-full rounded-[2.5rem] border border-white/20 dark:border-white/5 shadow-lg">
+                <CardHeader className="p-8 pb-4 border-b border-border/20 bg-muted/10 flex flex-row items-center justify-between flex-wrap gap-4">
+                  <div className="text-left">
+                    <CardTitle className="text-lg font-black uppercase tracking-tight flex items-center gap-2">
+                      <Activity className="h-5 w-5 text-primary animate-pulse" />
+                      Fila de Atendimento UPA
+                    </CardTitle>
+                    <p className="text-xs text-muted-foreground mt-1 font-medium">Controle de fluxo de pacientes triados e consultas médicas</p>
+                  </div>
+                  
+                  {/* Filtro inline em formato de pílulas premium */}
+                  <div className="flex flex-wrap gap-2">
+                    {[
+                      { id: 'all', label: 'Todos' },
+                      { id: 'waiting', label: 'Aguardando' },
+                      { id: 'attending', label: 'Em Consulta' },
+                      { id: 'critical', label: 'Críticos' }
+                    ].map((filterOpt) => (
+                      <Button
+                        key={filterOpt.id}
+                        variant="ghost"
+                        onClick={() => setDashboardFilter(filterOpt.id as any)}
+                        className={cn(
+                          "h-8 px-3 rounded-full text-[10px] font-black uppercase tracking-wider transition-all",
+                          dashboardFilter === filterOpt.id 
+                            ? "bg-primary text-primary-foreground shadow-sm shadow-primary/20"
+                            : "text-muted-foreground hover:bg-muted/50"
+                        )}
+                      >
+                        {filterOpt.label}
+                      </Button>
+                    ))}
+                  </div>
+                </CardHeader>
+                <CardContent className="p-0 overflow-x-auto max-h-[500px]">
+                  <PatientQueueTable patients={displayPatients} />
+                </CardContent>
+              </Card>
+            </motion.div>
 
-        {/* Heatmap de Leitos e Live Feed */}
-        <motion.div variants={item} className="space-y-6 flex flex-col">
-          
-          <div onClick={() => setIsHeatmapOpen(true)} className="cursor-pointer">
-            <RadialGaugeLeitos 
-              occupied={bedStats.occupied} 
-              available={bedStats.available} 
-              cleaning={bedStats.cleaning} 
-              maintenance={bedStats.maintenance} 
-              total={totalBeds} 
-            />
+            {/* Direita: Hub de Recursos e Analytics em abas */}
+            <motion.div variants={item} className="lg:col-span-4 h-full">
+              <Card className="glass-card-premium rounded-[2.5rem] border border-white/20 dark:border-white/5 shadow-lg overflow-hidden flex flex-col">
+                <Tabs defaultValue="leitos" className="w-full flex flex-col">
+                  <div className="p-6 pb-2 border-b border-border/20 bg-muted/15">
+                    <TabsList className="grid w-full grid-cols-4 bg-black/10 dark:bg-black/40 border border-white/10 p-0.5 rounded-2xl h-11 shadow-inner">
+                      <TabsTrigger value="leitos" className="rounded-xl text-[8px] font-black uppercase tracking-wider h-9">Leitos</TabsTrigger>
+                      <TabsTrigger value="insumos" className="rounded-xl text-[8px] font-black uppercase tracking-wider h-9">Insumos</TabsTrigger>
+                      <TabsTrigger value="operacional" className="rounded-xl text-[8px] font-black uppercase tracking-wider h-9">Gráficos</TabsTrigger>
+                      <TabsTrigger value="feed" className="rounded-xl text-[8px] font-black uppercase tracking-wider h-9 flex items-center gap-1">
+                        Feed
+                        <span className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
+                      </TabsTrigger>
+                    </TabsList>
+                  </div>
+
+                  <div className="p-6 flex-1 min-h-[420px] flex flex-col justify-between">
+                    
+                    {/* Tab 1: Censo de Leitos */}
+                    <TabsContent value="leitos" className="space-y-6 mt-0 focus-visible:outline-none focus-visible:ring-0 text-left flex-1 flex flex-col justify-between">
+                      <div className="flex-1 flex items-center justify-center">
+                        <RadialGaugeLeitos 
+                          occupied={bedStats.occupied} 
+                          available={bedStats.available} 
+                          cleaning={bedStats.cleaning} 
+                          maintenance={bedStats.maintenance} 
+                          total={totalBeds} 
+                          pure={true}
+                        />
+                      </div>
+                      <div className="bg-muted/20 p-4 rounded-2xl border border-border/40 text-xs">
+                        <div className="flex justify-between items-center mb-2 font-bold">
+                          <span className="text-[10px] font-black uppercase tracking-wider text-muted-foreground">Status de Giro</span>
+                          <span className="text-sky-500 font-extrabold">{avgSla} min</span>
+                        </div>
+                        <p className="text-muted-foreground text-[10px] leading-relaxed">
+                          Higienização operacional estável. {bedStats.cleaning} leito(s) aguardando limpeza.
+                        </p>
+                      </div>
+                    </TabsContent>
+
+                    {/* Tab 2: Farmácia e Insumos */}
+                    <TabsContent value="insumos" className="space-y-6 mt-0 focus-visible:outline-none focus-visible:ring-0 text-left flex-1 flex flex-col justify-between">
+                      <div className="space-y-4">
+                        <div className="flex justify-between items-center">
+                          <h4 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Demanda Farmácia (ABC)</h4>
+                          <Badge className="bg-emerald-500/10 text-emerald-600 border-none text-[8px] font-bold">CONSUMO</Badge>
+                        </div>
+                        <div className="h-[140px] w-full">
+                          <ResponsiveContainer width="100%" height="100%">
+                            <BarChart data={pharmacyConsumptionData.slice(0, 4)}>
+                              <XAxis dataKey="name" fontSize={8} tickLine={false} axisLine={false} />
+                              <YAxis fontSize={8} tickLine={false} axisLine={false} />
+                              <Tooltip contentStyle={{ borderRadius: '8px', fontSize: 10 }} />
+                              <Bar dataKey="quantidade" fill="#10b981" radius={[3, 3, 0, 0]} />
+                            </BarChart>
+                          </ResponsiveContainer>
+                        </div>
+                      </div>
+                      
+                      <div className="space-y-4 pt-4 border-t border-dashed border-border/40">
+                        <h4 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Nível Crítico Almoxarifado</h4>
+                        <div className="space-y-2">
+                          <div className="flex justify-between text-[10px] font-semibold">
+                            <span>Seringas 10ml</span>
+                            <span className="text-red-500 font-bold">12% (Crítico)</span>
+                          </div>
+                          <div className="h-1.5 w-full bg-muted rounded-full overflow-hidden">
+                            <div className="h-full bg-red-500" style={{ width: '12%' }} />
+                          </div>
+                        </div>
+                      </div>
+                    </TabsContent>
+
+                    {/* Tab 3: Graficos Rápidos */}
+                    <TabsContent value="operacional" className="space-y-4 mt-0 focus-visible:outline-none focus-visible:ring-0 text-left flex-1 flex flex-col justify-center">
+                      <h4 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-2">Classificação de Riscos Atual</h4>
+                      <div className="h-[250px] w-full flex items-center justify-center">
+                        <PieChartRiscos expanded={true} />
+                      </div>
+                    </TabsContent>
+
+                    {/* Tab 4: Live Activity Feed */}
+                    <TabsContent value="feed" className="space-y-4 mt-0 focus-visible:outline-none focus-visible:ring-0 text-left flex-1 flex flex-col justify-between">
+                      <div className="flex justify-between items-center">
+                        <h4 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Logs Operacionais Recentes</h4>
+                        <span className="text-[8px] font-black text-primary bg-primary/10 px-2 py-0.5 rounded-full uppercase tracking-wider">CONECTADO</span>
+                      </div>
+                      
+                      <div className="bg-slate-950/80 dark:bg-black/40 border border-white/5 p-4 rounded-2xl h-[240px] overflow-y-auto font-mono text-[10px] leading-relaxed text-slate-300 scrollbar-thin">
+                        <AnimatePresence>
+                          {liveFeed.slice(0, 8).map(item => (
+                            <motion.div 
+                              key={item.id}
+                              initial={{ opacity: 0, x: -10 }}
+                              animate={{ opacity: 1, x: 0 }}
+                              className="flex gap-2 mb-2 last:mb-0"
+                            >
+                              <span className="text-slate-500/80">[{item.time}]</span>
+                              <span className={cn(
+                                item.type === 'alert' ? 'text-red-400 font-bold' : 
+                                item.type === 'gov' ? 'text-cyan-400' : 'text-slate-200'
+                              )}>
+                                {item.text}
+                              </span>
+                            </motion.div>
+                          ))}
+                        </AnimatePresence>
+                      </div>
+                      <p className="text-[8px] text-muted-foreground text-center">Registro de auditoria operacional em tempo real</p>
+                    </TabsContent>
+
+                  </div>
+                </Tabs>
+              </Card>
+            </motion.div>
+
           </div>
 
-          {/* Live Activity Feed */}
-          <Card 
-            className="glass-card-premium rounded-xl overflow-hidden flex-1 flex flex-col group border-primary/20 cursor-pointer hover:shadow-xl hover:scale-[1.02] transition-all"
-            onClick={() => setIsFeedOpen(true)}
-          >
-            <CardHeader className="p-4 pb-2 border-b border-primary/10 bg-primary/5 flex flex-row items-center justify-between">
-              <CardTitle className="flex items-center gap-2 text-xs font-black uppercase tracking-widest text-primary">
-                <TerminalSquare className="h-4 w-4" /> SYSTEM FEED
-              </CardTitle>
-              <div className="flex items-center gap-2">
-                <span className="relative flex h-2 w-2"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span><span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span></span>
-                <span className="text-[8px] font-black uppercase tracking-widest text-primary">Live</span>
-              </div>
-            </CardHeader>
-            <CardContent className="p-0 overflow-hidden relative flex-1 min-h-[220px] bg-black/5 dark:bg-black/20">
-              <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-background/90 z-10 pointer-events-none" />
-              <div className="p-4 space-y-3 relative z-0">
-                <AnimatePresence>
-                  {liveFeed.map(item => (
-                    <motion.div 
-                      key={item.id}
-                      initial={{ opacity: 0, x: -20, height: 0 }}
-                      animate={{ opacity: 1, x: 0, height: 'auto' }}
-                      exit={{ opacity: 0, scale: 0.9 }}
-                      className="flex gap-3 text-xs font-mono"
-                    >
-                      <span className="text-muted-foreground/60 shrink-0">[{item.time}]</span>
-                      <span className={cn(
-                        "leading-relaxed",
-                        item.type === 'alert' ? 'text-red-500 font-bold' : 
-                        item.type === 'gov' ? 'text-cyan-600 dark:text-cyan-400' : 'text-foreground/80'
-                      )}>
-                        {item.text}
-                      </span>
-                    </motion.div>
-                  ))}
-                </AnimatePresence>
-              </div>
-            </CardContent>
-          </Card>
-        </motion.div>
-      </div>
+          {/* Gráfico de Tendência de Fluxo Macro no Final */}
+          <div className="grid grid-cols-1 gap-6 mt-6">
+            <motion.div variants={item}>
+              <AreaChartFluxo onClick={() => setIsFluxoOpen(true)} />
+            </motion.div>
+          </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8">
-        <motion.div variants={item}>
-          <Card 
-            className="glass-card-premium rounded-xl overflow-hidden h-full cursor-pointer hover:shadow-xl hover:scale-[1.02] transition-all"
-            onClick={() => setIsStockOpen(true)}
-          >
-            <CardHeader className="p-6 pb-3 border-b border-white/20 bg-muted/30">
-              <CardTitle className="text-xs font-black uppercase tracking-widest flex items-center gap-2">
-                <Pill className="h-4 w-4 text-emerald-500" /> Estoque de Apoio
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="pt-6">
-              <div className="h-[200px] w-full">
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={pharmacyData}>
-                    <CartesianGrid strokeDasharray="3 3" vertical={false} opacity={0.2} />
-                    <XAxis dataKey="time" fontSize={10} tickLine={false} axisLine={false} />
-                    <YAxis fontSize={10} tickLine={false} axisLine={false} />
-                    <Tooltip contentStyle={{ borderRadius: '12px' }} />
-                    <Line type="monotone" dataKey="dipirona" stroke="#10b981" strokeWidth={3} dot={false} />
-                    <Line type="monotone" dataKey="soro" stroke="#3b82f6" strokeWidth={3} dot={false} />
-                  </LineChart>
-                </ResponsiveContainer>
-              </div>
-            </CardContent>
-          </Card>
-        </motion.div>
+        </TabsContent>
 
-        <motion.div variants={item}>
-          <Card 
-            className="glass-card-premium rounded-xl overflow-hidden h-full cursor-pointer hover:shadow-xl hover:scale-[1.02] transition-all"
-            onClick={() => setIsAbcOpen(true)}
-          >
-            <CardHeader className="p-6 pb-3 border-b border-white/20 bg-muted/30">
-              <CardTitle className="text-xs font-black uppercase tracking-widest flex items-center gap-2">
-                <PackageMinus className="h-4 w-4 text-purple-500" /> Curva ABC Farmácia
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="pt-6">
-              <div className="h-[200px] w-full">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={pharmacyConsumptionData}>
-                    <CartesianGrid strokeDasharray="3 3" vertical={false} opacity={0.2} />
-                    <XAxis dataKey="name" fontSize={10} tickLine={false} axisLine={false} />
-                    <YAxis fontSize={10} tickLine={false} axisLine={false} />
-                    <Tooltip contentStyle={{ borderRadius: '12px' }} />
-                    <Bar dataKey="quantidade" fill="#a855f7" radius={[4, 4, 0, 0]} />
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
-            </CardContent>
-          </Card>
-        </motion.div>
-      </div>
+        <TabsContent value="gestao" className="space-y-6 mt-0 focus-visible:outline-none focus-visible:ring-0">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <motion.div variants={item}>
+              <HeatmapOcupacao />
+            </motion.div>
+            <motion.div variants={item}>
+              <SankeyFluxoPaciente />
+            </motion.div>
+          </div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <motion.div variants={item}>
+              <MiniMapaSatores onClick={() => navigate('/setores')} />
+            </motion.div>
+            <motion.div variants={item}>
+              <ParetoProblemas />
+            </motion.div>
+          </div>
+        </TabsContent>
 
-      {/* NOVOS GRÁFICOS OPERACIONAIS */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
-        <motion.div variants={item} className="lg:col-span-1">
-          <RadarChartDemanda onClick={() => setIsDemandaOpen(true)} />
-        </motion.div>
-        <motion.div variants={item} className="lg:col-span-1">
-          <PieChartRiscos onClick={() => setIsRiscosOpen(true)} />
-        </motion.div>
-        <motion.div variants={item} className="lg:col-span-1">
-          <AreaChartFluxo onClick={() => setIsFluxoOpen(true)} />
-        </motion.div>
-      </div>
-
-      </TabsContent>
-
-      <TabsContent value="gestao" className="space-y-6 mt-0 focus-visible:outline-none focus-visible:ring-0">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <motion.div variants={item}>
-            <HeatmapOcupacao />
-          </motion.div>
-          <motion.div variants={item}>
-            <GanttPermanencia />
-          </motion.div>
-        </div>
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-          <motion.div variants={item} className="lg:col-span-1">
-            <MiniMapaSatores onClick={() => navigate('/setores')} />
-          </motion.div>
-          <motion.div variants={item} className="lg:col-span-1">
-            <SankeyFluxoPaciente />
-          </motion.div>
-          <motion.div variants={item} className="lg:col-span-1">
-            <BoxPlotEspera />
-          </motion.div>
-          <motion.div variants={item} className="lg:col-span-1">
-            <ParetoProblemas />
-          </motion.div>
-        </div>
-      </TabsContent>
+        <TabsContent value="preditiva" className="space-y-6 mt-0 focus-visible:outline-none focus-visible:ring-0">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <motion.div variants={item} className="lg:col-span-2">
+              <Card className="glass-card-premium rounded-xl overflow-hidden h-full">
+                <CardHeader className="p-6 pb-3 border-b border-white/20 bg-muted/30 flex flex-row items-center justify-between">
+                  <CardTitle className="text-xs font-black uppercase tracking-widest flex items-center gap-2">
+                    <TrendingUp className="h-4 w-4 text-purple-500 animate-pulse" /> Previsão de Demanda por IA (Próximas 24h)
+                  </CardTitle>
+                  <Badge className="bg-purple-500/10 text-purple-600 border border-purple-500/20 text-[9px] font-black uppercase tracking-wider">
+                    Algoritmo preditivo ativo
+                  </Badge>
+                </CardHeader>
+                <CardContent className="pt-6">
+                  <div className="h-[280px] w-full">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <LineChart data={predictiveDemandData}>
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} opacity={0.2} />
+                        <XAxis dataKey="hour" fontSize={10} tickLine={false} axisLine={false} />
+                        <YAxis fontSize={10} tickLine={false} axisLine={false} />
+                        <Tooltip contentStyle={{ borderRadius: '12px', background: 'rgba(0,0,0,0.8)', border: 'none', color: '#fff' }} />
+                        <Legend verticalAlign="top" height={36} iconType="circle" />
+                        <Line type="monotone" name="Demanda Real" dataKey="real" stroke="#3b82f6" strokeWidth={3} dot={{ r: 4 }} activeDot={{ r: 6 }} />
+                        <Line type="monotone" name="Previsão (IA)" dataKey="previsto" stroke="#a855f7" strokeWidth={2} strokeDasharray="5 5" dot={{ r: 3 }} />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </div>
+                  <p className="text-[10px] text-muted-foreground mt-4 text-center leading-relaxed">
+                    O modelo calcula a admissão futura com base no histórico de feriados, sazonalidade de temperatura ({new Date().toLocaleDateString('pt-BR')}) e fila de triagem atual.
+                  </p>
+                </CardContent>
+              </Card>
+            </motion.div>
+            <motion.div variants={item} className="lg:col-span-1">
+              <BoxPlotEspera />
+            </motion.div>
+          </div>
+          <div className="grid grid-cols-1 gap-6">
+            <motion.div variants={item}>
+              <GanttPermanencia />
+            </motion.div>
+          </div>
+        </TabsContent>
       </Tabs>
 
       {/* MODALS */}

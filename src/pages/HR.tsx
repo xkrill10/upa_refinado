@@ -44,51 +44,35 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { TimeTracker } from "@/components/hr/TimeTracker";
 import { NewStaffModal } from "@/components/hr/NewStaffModal";
-import { SwapRequestsModal, SwapRequest } from "@/components/hr/SwapRequestsModal";
+import { SwapRequestsModal } from "@/components/hr/SwapRequestsModal";
 import { StaffDocumentsModal } from "@/components/hr/StaffDocumentsModal";
 import { StaffDetailsModal } from "@/components/hr/StaffDetailsModal";
+import { useHR, StaffMember } from "@/context/HRContext";
 
 export default function HR() {
+  const {
+    staff,
+    addStaff,
+    swapRequests,
+    updateSwapStatus,
+    onShiftCount,
+    deficitCount,
+    notifications,
+    pendingSwapsCount,
+  } = useHR();
+
   const [isScheduleOpen, setIsScheduleOpen] = useState(false);
   const [isNewStaffModalOpen, setIsNewStaffModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [activeCategory, setActiveCategory] = useState("todos");
   
-  const [staff, setStaff] = useState([
-    { id: 1, name: 'Dr. João Mendes', role: 'Médico Plantonista', status: 'In-Shift', shift: '07:00 - 19:00', specialty: 'Clínica Médica', category: 'medico', docStatus: 'active', training: 90 },
-    { id: 2, name: 'Dra. Maria Clara', role: 'Médico Plantonista', status: 'Off-Shift', shift: 'N/A', specialty: 'Pediatria', category: 'medico', docStatus: 'warning', training: 45 },
-    { id: 3, name: 'Ricardo Silva', role: 'Enfermeiro Triagem', status: 'In-Shift', shift: '13:00 - 01:00', specialty: 'Emergência', category: 'enfermagem', docStatus: 'active', training: 100 },
-    { id: 4, name: 'Amanda Lemos', role: 'Técnico Enfermagem', status: 'On-Call', specialty: 'Geral', shift: 'Sobreaviso', category: 'enfermagem', docStatus: 'active', training: 85 },
-    { id: 5, name: 'Soraia Alves', role: 'Gestão/Adm', status: 'In-Shift', shift: '08:00 - 18:00', specialty: 'Recursos Humanos', category: 'administrativo', docStatus: 'active', training: 100 },
-  ]);
-
   const [isSwapModalOpen, setIsSwapModalOpen] = useState(false);
   const [isDocModalOpen, setIsDocModalOpen] = useState(false);
   const [selectedStaffForDoc, setSelectedStaffForDoc] = useState<{name: string, role: string} | null>(null);
 
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
   const [detailsModalTab, setDetailsModalTab] = useState<'details' | 'history'>('details');
-  const [selectedStaffForDetails, setSelectedStaffForDetails] = useState<{
-    id: number; name: string; role: string; status: string; shift: string;
-    specialty: string; category: string; docStatus: string; training: number;
-  } | null>(null);
-
-  const [swapRequests, setSwapRequests] = useState<SwapRequest[]>([
-    { id: 1, from: "Dr. João Mendes", to: "Dra. Maria Clara", date: "15/05/2030", shift: "Diurno", status: "pending", reason: "Participação em congresso médico internacional" },
-    { id: 2, from: "Ricardo Silva", to: "Ana Paula", date: "18/05/2030", shift: "Noturno", status: "pending", reason: "Motivos pessoais familiares" },
-    { id: 3, from: "Enf. Carla", to: "Soraia Alves", date: "20/05/2030", shift: "Noturno", status: "approved", reason: "Consulta médica agendada" }
-  ]);
-
-  const pendingSwaps = swapRequests.filter(r => r.status === 'pending');
-
-  const handleSwapAction = (id: number, status: 'approved' | 'denied') => {
-    setSwapRequests(prev => prev.map(req => req.id === id ? { ...req, status } : req));
-  };
-
-  const notifications = [
-    { id: 1, text: "CRM vencendo em 15 dias: Dra. Maria Clara", type: "warning" },
-    { id: 2, text: "Atraso registrado: Ricardo Silva (15 min)", type: "info" }
-  ];
+  const [selectedStaffForDetails, setSelectedStaffForDetails] = useState<StaffMember | null>(null);
 
   const [newStaff, setNewStaff] = useState({
     name: "",
@@ -96,6 +80,12 @@ export default function HR() {
     specialty: "",
     shift: "07:00 - 19:00"
   });
+
+  const pendingSwaps = swapRequests.filter(r => r.status === 'pending');
+
+  const handleSwapAction = (id: number, status: 'approved' | 'denied') => {
+    updateSwapStatus(id, status);
+  };
 
   const filteredStaff = useMemo(() => {
     return staff.filter(member => {
@@ -121,7 +111,6 @@ export default function HR() {
       return;
     }
     
-    // In a real app we'd get the actual staff data
     const memberNames: Record<string, string> = {
       "1": "Dr. Carlos Souza",
       "2": "Enf. Ana Paula",
@@ -140,14 +129,12 @@ export default function HR() {
       "3": "Pediatria"
     };
 
-    const id = Date.now();
     const name = memberNames[newStaff.name] || "Novo Profissional";
     const role = roles[newStaff.name] || "Plantonista";
     const specialty = specialties[newStaff.name] || "Geral";
     const shift = newStaff.shift === 'day' ? "07:00 - 19:00" : (newStaff.shift === 'night' ? "19:00 - 07:00" : "24h");
 
-    setStaff(prev => [...prev, {
-      id,
+    addStaff({
       name,
       role,
       specialty,
@@ -156,7 +143,7 @@ export default function HR() {
       category: 'geral',
       docStatus: 'active',
       training: 0
-    }]);
+    });
 
     toast.success(`${name} adicionado à escala.`);
   };
@@ -320,7 +307,7 @@ export default function HR() {
           </CardHeader>
           <CardContent className="flex items-center justify-between pb-6">
             <div className="flex items-center gap-4">
-              <div className="h-12 w-12 bg-green-500/10 rounded-2xl flex items-center justify-center text-green-600 font-black text-xl border border-green-500/20 shadow-inner">12</div>
+              <div className="h-12 w-12 bg-green-500/10 rounded-2xl flex items-center justify-center text-green-600 font-black text-xl border border-green-500/20 shadow-inner">{onShiftCount}</div>
               <p className="text-sm font-medium text-foreground/80">Profissionais ativos na unidade</p>
             </div>
           </CardContent>
@@ -335,7 +322,7 @@ export default function HR() {
           </CardHeader>
           <CardContent className="flex items-center justify-between pb-6">
             <div className="flex items-center gap-4">
-              <div className="h-12 w-12 bg-red-500/10 rounded-2xl flex items-center justify-center text-red-600 font-black text-xl border border-red-500/20 shadow-inner">2</div>
+              <div className="h-12 w-12 bg-red-500/10 rounded-2xl flex items-center justify-center text-red-600 font-black text-xl border border-red-500/20 shadow-inner">{deficitCount}</div>
               <p className="text-sm font-medium text-foreground/80">Postos sem cobertura p/ noite</p>
             </div>
             <ShieldAlert className="h-6 w-6 text-red-500 animate-pulse" />
@@ -351,7 +338,7 @@ export default function HR() {
           </CardHeader>
           <CardContent className="flex items-center justify-between pb-6">
             <div className="flex items-center gap-4">
-              <div className="h-12 w-12 bg-blue-500/10 rounded-2xl flex items-center justify-center text-blue-600 font-black text-xl border border-blue-500/20 shadow-inner">6</div>
+              <div className="h-12 w-12 bg-blue-500/10 rounded-2xl flex items-center justify-center text-blue-600 font-black text-xl border border-blue-500/20 shadow-inner">{new Set(staff.map(s => s.specialty)).size}</div>
               <p className="text-sm font-medium text-foreground/80">Áreas cobertas no plantão</p>
             </div>
             <Award className="h-6 w-6 text-blue-500" />

@@ -82,7 +82,7 @@ export interface Patient {
   dischargePrediction?: string;
   isolation?: ('contact' | 'droplet' | 'airborne')[];
   transferRequest?: {
-    status: 'requested' | 'accepted' | 'denied' | 'transporting';
+    status: 'requested' | 'accepted' | 'denied' | 'transporting' | 'completed';
     hospitalName?: string;
     crossCode?: string;
     ambulanceType?: string;
@@ -300,7 +300,7 @@ interface PatientsContextType {
   cancelExam: (patientId: string, examId: string) => void;
   recollectExam: (patientId: string, examId: string, reason: string) => void;
   requestTransfer: (patientId: string, priority: 'normal' | 'urgent' | 'emergency', reason: string) => void;
-  updateTransferStatus: (patientId: string, status: 'accepted' | 'denied' | 'transporting', hospitalName?: string, crossCode?: string, ambulanceType?: string) => void;
+  updateTransferStatus: (patientId: string, status: 'accepted' | 'denied' | 'transporting' | 'completed', hospitalName?: string, crossCode?: string, ambulanceType?: string) => void;
 }
 
 const PatientsContext = createContext<PatientsContextType | undefined>(undefined);
@@ -823,7 +823,7 @@ export function PatientsProvider({ children }: { children: ReactNode }) {
     new BroadcastChannel('upa_sync_channel').postMessage('sync_all');
   };
 
-  const updateTransferStatus = (patientId: string, status: 'accepted' | 'denied' | 'transporting', hospitalName?: string, crossCode?: string, ambulanceType?: string) => {
+  const updateTransferStatus = (patientId: string, status: 'accepted' | 'denied' | 'transporting' | 'completed', hospitalName?: string, crossCode?: string, ambulanceType?: string) => {
     setPatients(prev => prev.map(p => {
       if (p.id === patientId && p.transferRequest) {
         return {
@@ -842,6 +842,7 @@ export function PatientsProvider({ children }: { children: ReactNode }) {
     if (status === 'accepted') toast.success(`Transferência aceita para: ${hospitalName}`);
     else if (status === 'denied') toast.error("Transferência negada pela regulação.");
     else if (status === 'transporting') toast.success("Ambulância do SAMU em deslocamento.");
+    else if (status === 'completed') toast.success("Transferência concluída com sucesso.");
     new BroadcastChannel('upa_sync_channel').postMessage('sync_all');
   };
 
