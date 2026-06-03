@@ -17,6 +17,7 @@ import { useEffect, useRef } from "react";
 import { AlertTriangle, FlaskConical, FileText } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import PatientRecord from "@/pages/PatientRecord";
+import { QuickConsultModal } from "@/components/QuickConsultModal";
 
 export default function Attendances() {
   const navigate = useNavigate();
@@ -50,6 +51,7 @@ export default function Attendances() {
 
   const [showCallControl, setShowCallControl] = useState(false);
   const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
+  const [fastConsultPatient, setFastConsultPatient] = useState<Patient | null>(null);
   const [recordPatientId, setRecordPatientId] = useState<number | null>(null);
   const [queueFilterMode, setQueueFilterMode] = useState<'all' | 'my-room'>('all');
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
@@ -132,6 +134,15 @@ export default function Attendances() {
     toast.success(`Iniciando atendimento: ${formatWords(patient.name)}`, {
       icon: <Stethoscope className="h-4 w-4 text-green-500" />,
     });
+  };
+
+  const handleFinishFastConsult = (patientId: string, outcome: string) => {
+    // Atualiza paciente para completed ou o status de acordo com o outcome
+    let newStatus: Patient['status'] = 'completed';
+    if (outcome === 'observacao') newStatus = 'observation';
+    else if (outcome === 'internacao') newStatus = 'observation'; // ou admitted
+    
+    updatePatient(patientId, { status: newStatus });
   };
 
   const gravePatients = classifiedPatients.filter(p => p.risk === 'emergency' || p.risk === 'very-urgent');
@@ -334,6 +345,17 @@ export default function Attendances() {
                     
                     <div className="flex flex-wrap items-center gap-2 w-full xl:w-auto justify-end shrink-0 pt-2 xl:pt-0 border-t xl:border-0 border-slate-100 dark:border-slate-800/50 mt-2 xl:mt-0">
                       <Button 
+                        size="sm" 
+                        className="h-8 rounded-lg gap-1.5 font-black uppercase text-[9px] tracking-wider bg-[#006699] hover:bg-[#005580] dark:bg-sky-600 dark:hover:bg-sky-500 text-white cursor-pointer border-0 px-3 shadow-md" 
+                        onClick={(e) => {
+                           e.stopPropagation();
+                           setFastConsultPatient(patient);
+                        }}
+                      >
+                        <Stethoscope className="h-3.5 w-3.5" />
+                        Continuar
+                      </Button>
+                      <Button 
                         variant="ghost" 
                         size="sm" 
                         className="h-8 rounded-lg gap-1.5 font-black uppercase text-[9px] tracking-wider text-slate-550 dark:text-slate-450 hover:text-sky-500 hover:bg-sky-500/5 cursor-pointer border-0 px-2" 
@@ -444,6 +466,18 @@ export default function Attendances() {
                           </div>
                         </div>
                         <div className="flex items-center gap-1">
+                          <Button
+                            size="sm"
+                            className="h-9 px-3 rounded-xl gap-1.5 font-black uppercase text-[10px] tracking-widest bg-[#006699] hover:bg-[#005580] dark:bg-sky-600 dark:hover:bg-sky-500 text-white shadow-md border-0 mr-2"
+                            onClick={(e) => {
+                               e.stopPropagation();
+                               handleAttend(patient);
+                               setFastConsultPatient(patient);
+                            }}
+                          >
+                            <Stethoscope className="h-3.5 w-3.5" />
+                            Atender
+                          </Button>
                           <Button 
                             size="sm" 
                             variant="ghost" 
@@ -720,6 +754,14 @@ export default function Attendances() {
           </div>
         </DialogContent>
       </Dialog>
+      
+      <QuickConsultModal 
+        patient={fastConsultPatient}
+        isOpen={!!fastConsultPatient}
+        onClose={() => setFastConsultPatient(null)}
+        onComplete={handleFinishFastConsult}
+        hidePediatricOptions={true}
+      />
     </motion.div>
   );
 }

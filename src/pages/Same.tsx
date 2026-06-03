@@ -26,7 +26,8 @@ import {
   ArrowRight,
   Archive,
   X,
-  FileType
+  FileType,
+  ClipboardList
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -378,6 +379,21 @@ export default function Same() {
                                   </TooltipTrigger>
                                   <TooltipContent className="bg-black/90 text-white font-bold text-xs border-none">
                                     Visualizar Arquivo Completo
+                                  </TooltipContent>
+                                </Tooltip>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <Button 
+                                      variant="ghost" 
+                                      size="sm" 
+                                      className="h-8 w-8 rounded-lg p-0 hover:bg-sky-600/10 hover:text-sky-600 transition-colors"
+                                      onClick={() => navigate(`/paciente/${p.id}`, { state: { from: '/same', label: 'SAME' } })}
+                                    >
+                                      <ClipboardList className="h-4 w-4" />
+                                    </Button>
+                                  </TooltipTrigger>
+                                  <TooltipContent className="bg-black/90 text-white font-bold text-xs border-none">
+                                    Abrir Prontuário Completo
                                   </TooltipContent>
                                 </Tooltip>
                                 <Tooltip>

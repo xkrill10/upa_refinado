@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { 
   Search, 
   ChevronDown, 
@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Button } from "@/components/ui/button";
 import { CID10_DATABASE, CID10Item } from "@/data/cid10";
 import { cn } from "@/lib/utils";
 
@@ -194,6 +195,13 @@ function getCategoryMeta(category: string): CategoryMeta {
 export function SmartCidSelector({ selectedCid, onSelectCid }: SmartCidSelectorProps) {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
+  const [tempCid, setTempCid] = useState<CID10Item | null>(null);
+
+  useEffect(() => {
+    if (open) {
+      setTempCid(selectedCid);
+    }
+  }, [open, selectedCid]);
   
   // Extract unique categories
   const categories = useMemo(() => {
@@ -217,10 +225,14 @@ export function SmartCidSelector({ selectedCid, onSelectCid }: SmartCidSelectorP
     return CID10_DATABASE.filter(item => item.category === cat);
   };
 
-  const handleSelect = (item: CID10Item) => {
-    onSelectCid(item);
+  const handleConfirm = () => {
+    onSelectCid(tempCid);
     setOpen(false);
     setSearch("");
+  };
+
+  const handleClear = () => {
+    setTempCid(null);
   };
 
   return (
@@ -287,14 +299,27 @@ export function SmartCidSelector({ selectedCid, onSelectCid }: SmartCidSelectorP
                     filteredItems.map(item => (
                       <button
                         key={item.code}
-                        onClick={() => handleSelect(item)}
-                        className="w-full text-left px-5 py-4 rounded-2xl transition-all duration-300 hover:scale-[1.01] active:scale-[0.99] flex items-center justify-between border border-transparent hover:border-white/35 dark:hover:border-slate-800/40 hover:bg-white/45 dark:hover:bg-slate-900/45 text-foreground hover:shadow-[0_10px_20px_-8px_rgba(0,0,0,0.04)] group"
+                        onClick={() => setTempCid(item)}
+                        className={cn(
+                          "w-full text-left px-5 py-4 rounded-2xl transition-all duration-300 hover:scale-[1.01] active:scale-[0.99] flex items-center justify-between border group",
+                          tempCid?.code === item.code
+                            ? "border-primary bg-primary/10 shadow-sm"
+                            : "border-transparent hover:border-white/35 dark:hover:border-slate-800/40 hover:bg-white/45 dark:hover:bg-slate-900/45 text-foreground hover:shadow-[0_10px_20px_-8px_rgba(0,0,0,0.04)]"
+                        )}
                       >
                         <div className="flex items-center gap-4 min-w-0">
-                          <span className="font-bold text-xs uppercase tracking-wider px-3 py-1.5 rounded-lg bg-primary/10 text-primary border border-primary/20 group-hover:bg-primary group-hover:text-primary-foreground group-hover:border-transparent transition-all duration-300 shadow-sm shrink-0">
+                          <span className={cn(
+                            "font-bold text-xs uppercase tracking-wider px-3 py-1.5 rounded-lg border transition-all duration-300 shadow-sm shrink-0",
+                            tempCid?.code === item.code
+                              ? "bg-primary text-primary-foreground border-transparent"
+                              : "bg-primary/10 text-primary border-primary/20 group-hover:bg-primary group-hover:text-primary-foreground group-hover:border-transparent"
+                          )}>
                             {item.code}
                           </span>
-                          <span className="text-sm font-semibold truncate group-hover:text-primary transition-colors duration-300">
+                          <span className={cn(
+                            "text-sm font-semibold truncate transition-colors duration-300",
+                            tempCid?.code === item.code ? "text-primary" : "group-hover:text-primary"
+                          )}>
                             {item.name}
                           </span>
                         </div>
@@ -302,7 +327,12 @@ export function SmartCidSelector({ selectedCid, onSelectCid }: SmartCidSelectorP
                           <span className="text-[9px] uppercase font-black tracking-widest text-muted-foreground bg-white/40 dark:bg-slate-800/40 px-2.5 py-1 rounded-full border border-border/40">
                             {item.category}
                           </span>
-                          <div className="w-6 h-6 rounded-full flex items-center justify-center bg-muted/40 opacity-0 group-hover:opacity-100 group-hover:bg-primary/10 group-hover:text-primary transition-all duration-300 translate-x-2 group-hover:translate-x-0">
+                          <div className={cn(
+                            "w-6 h-6 rounded-full flex items-center justify-center transition-all duration-300",
+                            tempCid?.code === item.code
+                              ? "opacity-100 bg-primary/10 text-primary translate-x-0"
+                              : "bg-muted/40 opacity-0 group-hover:opacity-100 group-hover:bg-primary/10 group-hover:text-primary translate-x-2 group-hover:translate-x-0"
+                          )}>
                             <ChevronRight className="w-3.5 h-3.5" />
                           </div>
                         </div>
@@ -417,18 +447,36 @@ export function SmartCidSelector({ selectedCid, onSelectCid }: SmartCidSelectorP
                     {getItemsByCategory(activeTab).map(item => (
                       <button
                         key={item.code}
-                        onClick={() => handleSelect(item)}
-                        className="w-full text-left px-5 py-4 rounded-2xl transition-all duration-300 hover:scale-[1.01] active:scale-[0.99] flex items-center justify-between border border-transparent hover:border-white/35 dark:hover:border-slate-800/40 hover:bg-white/45 dark:hover:bg-slate-900/45 text-foreground hover:shadow-[0_10px_20px_-8px_rgba(0,0,0,0.04)] group"
+                        onClick={() => setTempCid(item)}
+                        className={cn(
+                          "w-full text-left px-5 py-4 rounded-2xl transition-all duration-300 hover:scale-[1.01] active:scale-[0.99] flex items-center justify-between border group",
+                          tempCid?.code === item.code
+                            ? "border-primary bg-primary/10 shadow-sm"
+                            : "border-transparent hover:border-white/35 dark:hover:border-slate-800/40 hover:bg-white/45 dark:hover:bg-slate-900/45 text-foreground hover:shadow-[0_10px_20px_-8px_rgba(0,0,0,0.04)]"
+                        )}
                       >
                         <div className="flex items-center gap-4 min-w-0">
-                          <span className="font-bold text-xs uppercase tracking-wider px-3 py-1.5 rounded-lg bg-primary/10 text-primary border border-primary/20 group-hover:bg-primary group-hover:text-primary-foreground group-hover:border-transparent transition-all duration-300 shadow-sm shrink-0">
+                          <span className={cn(
+                            "font-bold text-xs uppercase tracking-wider px-3 py-1.5 rounded-lg border transition-all duration-300 shadow-sm shrink-0",
+                            tempCid?.code === item.code
+                              ? "bg-primary text-primary-foreground border-transparent"
+                              : "bg-primary/10 text-primary border-primary/20 group-hover:bg-primary group-hover:text-primary-foreground group-hover:border-transparent"
+                          )}>
                             {item.code}
                           </span>
-                          <span className="text-sm font-semibold truncate group-hover:text-primary transition-colors duration-300">
+                          <span className={cn(
+                            "text-sm font-semibold truncate transition-colors duration-300",
+                            tempCid?.code === item.code ? "text-primary" : "group-hover:text-primary"
+                          )}>
                             {item.name}
                           </span>
                         </div>
-                        <div className="w-6 h-6 rounded-full flex items-center justify-center bg-muted/40 opacity-0 group-hover:opacity-100 group-hover:bg-primary/10 group-hover:text-primary transition-all duration-300 translate-x-2 group-hover:translate-x-0">
+                        <div className={cn(
+                          "w-6 h-6 rounded-full flex items-center justify-center transition-all duration-300",
+                          tempCid?.code === item.code
+                            ? "opacity-100 bg-primary/10 text-primary translate-x-0"
+                            : "bg-muted/40 opacity-0 group-hover:opacity-100 group-hover:bg-primary/10 group-hover:text-primary translate-x-2 group-hover:translate-x-0"
+                        )}>
                           <ChevronRight className="w-3.5 h-3.5" />
                         </div>
                       </button>
@@ -438,6 +486,36 @@ export function SmartCidSelector({ selectedCid, onSelectCid }: SmartCidSelectorP
               </div>
             </>
           )}
+        </div>
+        
+        {/* FOOTER */}
+        <div className="shrink-0 p-4 bg-white/30 dark:bg-slate-900/30 backdrop-blur-md border-t border-white/20 dark:border-white/5 flex items-center justify-between gap-4 z-10">
+          <div className="flex-1">
+            {tempCid ? (
+              <p className="text-xs font-bold text-primary truncate px-2">
+                Selecionado: {tempCid.code} - {tempCid.name}
+              </p>
+            ) : (
+              <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground px-2">
+                Nenhum CID selecionado
+              </p>
+            )}
+          </div>
+          <div className="flex items-center gap-3 shrink-0">
+            <Button 
+              variant="outline" 
+              className="h-10 px-6 rounded-xl font-black uppercase tracking-widest text-[10px] border-slate-200 dark:border-slate-800"
+              onClick={handleClear}
+            >
+              Limpar
+            </Button>
+            <Button 
+              className="h-10 px-8 rounded-xl font-black uppercase tracking-widest text-[10px] bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg shadow-primary/20"
+              onClick={handleConfirm}
+            >
+              Confirmar
+            </Button>
+          </div>
         </div>
       </DialogContent>
     </Dialog>

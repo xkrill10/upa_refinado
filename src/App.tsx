@@ -7,6 +7,7 @@ import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 import { GlobalClock } from "@/components/GlobalClock";
 import UserManagement from "./pages/Admin/UserManagement";
+import { useAuth } from "./context/AuthContext";
 const Dashboard = React.lazy(() => import("./pages/Dashboard"));
 const Pharmacy = React.lazy(() => import("./pages/Pharmacy"));
 const SatellitePharmacy = React.lazy(() => import("./pages/SatellitePharmacy"));
@@ -71,6 +72,10 @@ const AppContent = () => {
   const isCallPanel = location.pathname === "/painel-chamadas";
   const isCleaning = location.pathname === "/higiene";
   const isLogin = location.pathname === "/login";
+  
+  const { user } = useAuth();
+  const localDoctor = typeof window !== 'undefined' ? localStorage.getItem("upa_active_doctor") : null;
+  const displayName = user?.user_metadata?.full_name || user?.user_metadata?.name || user?.email?.split('@')[0] || localDoctor || "OPERADOR DO SISTEMA";
 
   React.useEffect(() => {
     const handleFullscreenChange = () => {
@@ -102,10 +107,12 @@ const AppContent = () => {
               </div>
               <div className="flex items-center gap-6">
                 <GlobalClock />
-                <div className="hidden md:flex flex-col items-end px-5 border-r border-border/30">
-                  <span className="text-[11px] md:text-[12px] font-black text-muted-foreground uppercase tracking-widest leading-none mb-1 opacity-60">Operador do Sistema</span>
-                  <span className="text-sm md:text-[15px] font-black text-foreground tracking-tight mission-control-title">DR. RICARDO BRAGA</span>
-                </div>
+                {(user || localDoctor) && (
+                  <div className="hidden md:flex flex-col items-end px-5 border-r border-border/30">
+                    <span className="text-[11px] md:text-[12px] font-black text-muted-foreground uppercase tracking-widest leading-none mb-1 opacity-60">Operador do Sistema</span>
+                    <span className="text-sm md:text-[15px] font-black text-foreground tracking-tight mission-control-title uppercase">{displayName}</span>
+                  </div>
+                )}
                 <ThemeToggle position="top" />
               </div>
             </header>

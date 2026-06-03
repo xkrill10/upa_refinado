@@ -10,6 +10,7 @@ import { cn, formatWords, formatPatientNameLGPD, formatPatientAge } from "@/lib/
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import PatientRecord from "@/pages/PatientRecord";
 import { PatientDetailsModal } from "@/components/PatientDetailsModal";
+import { QuickConsultModal } from "@/components/QuickConsultModal";
 
 const RISK_ORDER: Record<string, number> = { 
   'emergency': 0, 
@@ -26,11 +27,14 @@ export default function MyWorkspace() {
   
   const [activeRoom, setActiveRoom] = useState<string>("");
   const [activeDoctor, setActiveDoctor] = useState<string>("");
+  const [crmNumber, setCrmNumber] = useState("");
+  const [crmState, setCrmState] = useState("");
   const [showCallControl, setShowCallControl] = useState(false);
   const [recordPatientId, setRecordPatientId] = useState<string | null>(null);
   const [isEndShiftModalOpen, setIsEndShiftModalOpen] = useState(false);
   const [finishingPatient, setFinishingPatient] = useState<Patient | null>(null);
   const [detailsPatient, setDetailsPatient] = useState<Patient | null>(null);
+  const [fastConsultPatient, setFastConsultPatient] = useState<Patient | null>(null);
   const [callingTicket, setCallingTicket] = useState<{
     ticket: string;
     patientName: string;
@@ -53,15 +57,18 @@ export default function MyWorkspace() {
     
     setActiveRoom(room);
     setActiveDoctor(doctor);
+    setCrmNumber(localStorage.getItem("upa_stamp_number") || "");
+    setCrmState(localStorage.getItem("upa_stamp_state") || "");
   }, [navigate]);
 
   const isEmergencyRoom = activeRoom.toUpperCase().includes("VERMELHA");
   const isPediatric = activeRoom.toUpperCase().includes("PEDIÁTRICO") || activeRoom.toUpperCase().includes("PEDIATRIA");
+  const isAdultClinical = !isPediatric && !isEmergencyRoom;
 
   // Filter patients for this specific queue
   const relevantPatients = patients.filter(p => {
     if (p.status === 'completed' || p.status === 'evasion') return false;
-    const isPatientPediatric = p.priority === "pediatric" || (p.age !== undefined && p.age <= 14);
+    const isPatientPediatric = p.priority === "pediatric" || (p.age !== undefined && p.age < 12);
     const isCritical = p.risk === 'emergency';
 
     // Se o médico estiver na Sala Vermelha: Só atende os críticos (Vermelho)
@@ -157,6 +164,23 @@ export default function MyWorkspace() {
     });
   };
 
+  const handleFinishFastConsult = (patientId: string, outcome: string) => {
+    const finalStatus = outcome === 'alta' ? 'completed' : 
+                        outcome === 'observacao' ? 'observation' :
+                        outcome === 'internacao' ? 'interned' :
+                        outcome === 'exames' ? 'waiting' :
+                        'completed';
+    
+    updatePatient(patientId, { 
+      status: finalStatus,
+      subStatus: outcome === 'exames' ? 'reaval' : undefined
+    });
+    
+    toast.success(`Atendimento Finalizado!`, {
+      description: `Destino: ${outcome.toUpperCase()}`
+    });
+  };
+
   if (!activeRoom) return null;
 
   const isBlueTheme = !isPediatric;
@@ -199,7 +223,7 @@ export default function MyWorkspace() {
                 {activeRoom}
               </h1>
               <p className="text-muted-foreground text-[11px] font-black uppercase tracking-[0.2em] mt-1.5 flex items-center gap-2">
-                Operando: {activeDoctor}
+                Operando: {activeDoctor} {crmNumber ? `• CRM: ${crmNumber}${crmState ? `/${crmState}` : ''}` : ''}
               </p>
             </div>
           </div>
@@ -234,7 +258,7 @@ export default function MyWorkspace() {
                 {activeRoom}
               </h1>
               <p className="text-muted-foreground text-[11px] font-black uppercase tracking-[0.2em] mt-1.5 flex items-center gap-2">
-                Operando: {activeDoctor}
+                Operando: {activeDoctor} {crmNumber ? `• CRM: ${crmNumber}${crmState ? `/${crmState}` : ''}` : ''}
               </p>
             </div>
           </div>
@@ -351,9 +375,9 @@ export default function MyWorkspace() {
                         <div className="p-5 flex-1 min-w-[300px] flex flex-col justify-center gap-3 bg-slate-50/50 dark:bg-slate-900/20">
                           <Button 
                             className="h-12 text-xs font-black uppercase bg-[#006699] hover:bg-[#005580] dark:bg-sky-600 dark:hover:bg-sky-500 text-white shadow-md shadow-[#006699]/20 dark:shadow-sky-900/20 w-full transition-all border-0"
-                            onClick={() => navigate(`/paciente/${patient.id}/evolucao`, { state: { from: '/meu-consultorio', label: 'Meu Consultório', expressEvolution: true } })}
+                            onClick={() => setFastConsultPatient(patient)}
                           >
-                            <Stethoscope className="h-4 w-4 mr-2" /> Iniciar Evolução
+                            <Stethoscope className="h-4 w-4 mr-2" /> Iniciar Atendimento
                           </Button>
                           <div className="grid grid-cols-2 gap-3 w-full">
                             <Button 
@@ -662,6 +686,15 @@ export default function MyWorkspace() {
         patient={detailsPatient} 
         isOpen={!!detailsPatient} 
         onClose={() => setDetailsPatient(null)} 
+      />
+
+      <QuickConsultModal 
+        patient={fastConsultPatient}
+        isOpen={!!fastConsultPatient}
+        onClose={() => setFastConsultPatient(null)}
+        onComplete={handleFinishFastConsult}
+        isPediatric={isPediatric}
+        hidePediatricOptions={isAdultClinical}
       />
     </div>
   );

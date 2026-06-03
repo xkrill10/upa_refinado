@@ -83,7 +83,7 @@ export default function Queue() {
       const matchesRisk = riskFilter === "all" || 
                           (riskFilter === "critical" ? (p.risk === 'emergency' || p.risk === 'very-urgent') : p.risk === riskFilter);
       const matchesStatus = (statusFilter === "all" || p.status === statusFilter) && p.status !== 'evasao';
-      const isPediatric = p.priority === 'pediatric' || (p.age !== undefined && p.age <= 14);
+      const isPediatric = p.priority === 'pediatric' || (p.age !== undefined && p.age < 12);
       const matchesAudience = audienceFilter === "all" || 
                               (audienceFilter === "pediatric" ? isPediatric : !isPediatric);
       return matchesSearch && matchesRisk && matchesStatus && matchesAudience;
@@ -154,7 +154,7 @@ export default function Queue() {
     : 0;
 
   const pediatricPatientsList = patients.filter(
-    (p) => p.priority === "pediatric" || (p.age !== undefined && p.age <= 14)
+    (p) => p.priority === "pediatric" || (p.age !== undefined && p.age < 12)
   );
 
   const stats = {

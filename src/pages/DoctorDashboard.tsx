@@ -35,7 +35,7 @@ export default function DoctorDashboard() {
   const [selectedRoom, setSelectedRoom] = useState<typeof ROOMS[0] | null>(null);
   const [doctorName, setDoctorName] = useState("");
   const [crmNumber, setCrmNumber] = useState(() => localStorage.getItem("upa_stamp_number") || "");
-  const [crmState, setCrmState] = useState(() => localStorage.getItem("upa_stamp_state") || "SP");
+  const [crmState, setCrmState] = useState(() => localStorage.getItem("upa_stamp_state") || "");
   const [occupiedRooms, setOccupiedRooms] = useState<Record<string, string>>({});
   const currentRoomId = localStorage.getItem("upa_active_room");
   const lastColorRef = useRef<string>("blue");
@@ -58,7 +58,7 @@ export default function DoctorDashboard() {
     } else {
       setDoctorName("Dr. ");
       setCrmNumber("");
-      setCrmState("SP");
+      setCrmState("");
     }
   };
 
@@ -89,7 +89,7 @@ export default function DoctorDashboard() {
     localStorage.setItem("upa_stamp_name", doctorName.trim());
     localStorage.setItem("upa_stamp_council", "CRM");
     localStorage.setItem("upa_stamp_number", crmNumber.trim());
-    localStorage.setItem("upa_stamp_state", crmState.trim());
+    localStorage.setItem("upa_stamp_state", (crmState || "SP").trim());
     localStorage.setItem("upa_shift_start", new Date().toISOString());
 
     navigate("/meu-consultorio");
@@ -403,29 +403,25 @@ export default function DoctorDashboard() {
                   />
                 </div>
 
-                <div className="grid grid-cols-3 gap-3">
-                  <div className="col-span-2 space-y-2">
-                    <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground block">
-                      Número do CRM:
-                    </label>
-                    <Input 
-                      value={crmNumber}
-                      onChange={(e) => setCrmNumber(e.target.value.replace(/\D/g, ""))}
-                      placeholder="Ex: 123456"
-                      className="h-12 rounded-xl px-4 text-sm font-bold border-2 border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground block">
-                      UF (Estado):
-                    </label>
-                    <Input 
-                      value={crmState}
-                      onChange={(e) => setCrmState(e.target.value.toUpperCase().slice(0, 2))}
-                      placeholder="SP"
-                      className="h-12 rounded-xl px-4 text-sm font-bold border-2 border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 text-center"
-                    />
-                  </div>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground block">
+                    CRM / UF:
+                  </label>
+                  <Input 
+                    value={`CRM-${crmState}${crmNumber ? ` ${crmNumber}` : ''}`}
+                    onChange={(e) => {
+                      // Remove fixed prefix and clean
+                      const val = e.target.value.toUpperCase().replace('CRM-', '').replace(/[^0-9A-Z]/g, '');
+                      // Separate letters (UF) and numbers (CRM)
+                      const letters = val.replace(/[^A-Z]/g, '').slice(0, 2);
+                      const numbers = val.replace(/[^0-9]/g, '').slice(0, 8);
+                      setCrmState(letters);
+                      setCrmNumber(numbers);
+                    }}
+                    placeholder="CRM-SP 123456"
+                    className="h-12 rounded-xl px-4 text-sm font-bold border-2 border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900"
+                  />
+                  <p className="text-[10px] text-muted-foreground">Digite a UF e depois os números (ex: SP123456).</p>
                 </div>
 
                 {isSelectedRoomOccupied && (

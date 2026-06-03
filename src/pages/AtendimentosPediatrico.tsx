@@ -15,6 +15,7 @@ import { PatientTimelineModal } from "@/components/PatientTimelineModal";
 import { MedicalPerformanceModal } from "@/components/MedicalPerformanceModal";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import PatientRecord from "@/pages/PatientRecord";
+import { QuickConsultModal } from "@/components/QuickConsultModal";
 
 export default function AtendimentosPediatrico() {
   const navigate = useNavigate();
@@ -47,6 +48,7 @@ export default function AtendimentosPediatrico() {
 
   const [showCallControl, setShowCallControl] = useState(false);
   const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
+  const [fastConsultPatient, setFastConsultPatient] = useState<Patient | null>(null);
   const [recordPatientId, setRecordPatientId] = useState<number | null>(null);
   const [queueFilterMode, setQueueFilterMode] = useState<'all' | 'my-room'>('all');
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
@@ -67,9 +69,9 @@ export default function AtendimentosPediatrico() {
   const [evasaoPatient, setEvasaoPatient] = useState<{id: string, name: string} | null>(null);
   const [evasaoReason, setEvasaoReason] = useState<string>("");
 
-  // Filtra apenas pacientes pediátricos (priority === 'pediatric' ou age <= 14)
+  // Filtra apenas pacientes pediátricos (priority === 'pediatric' ou age < 12)
   const pediatricPatients = patients.filter(
-    (p) => p.priority === "pediatric" || (p.age !== undefined && p.age <= 14)
+    (p) => p.priority === "pediatric" || (p.age !== undefined && p.age < 12)
   );
 
   const attendingPatients = pediatricPatients.filter((p) => p.status === "attending");
@@ -131,6 +133,14 @@ export default function AtendimentosPediatrico() {
     toast.success(`Iniciando atendimento: ${formatWords(patient.name)}`, {
       icon: <Baby className="h-4 w-4 text-orange-500" />,
     });
+  };
+
+  const handleFinishFastConsult = (patientId: string, outcome: string) => {
+    let newStatus: Patient['status'] = 'completed';
+    if (outcome === 'observacao') newStatus = 'observation';
+    else if (outcome === 'internacao') newStatus = 'observation';
+    
+    updatePatient(patientId, { status: newStatus });
   };
 
   return (
@@ -315,6 +325,16 @@ export default function AtendimentosPediatrico() {
                   </div>
                   
                   <div className="flex flex-wrap items-center gap-2 w-full xl:w-auto justify-end shrink-0 pt-2 xl:pt-0 border-t xl:border-0 border-slate-100 dark:border-slate-800/50 mt-2 xl:mt-0">
+                    <Button 
+                      size="sm" 
+                      className="h-8 rounded-lg gap-1.5 font-black uppercase text-[9px] tracking-wider bg-orange-500 hover:bg-orange-600 dark:bg-orange-600 dark:hover:bg-orange-500 text-white cursor-pointer border-0 px-3 shadow-md" 
+                      onClick={(e) => {
+                         e.stopPropagation();
+                         setFastConsultPatient(patient);
+                      }}
+                    >
+                      <Baby className="h-3.5 w-3.5" /> Continuar
+                    </Button>
                     <Button variant="ghost" size="sm" className="h-8 rounded-lg gap-1.5 font-black uppercase text-[9px] tracking-wider text-slate-550 dark:text-slate-450 hover:text-sky-500 hover:bg-sky-500/5 cursor-pointer border-0 px-2"
                        onClick={() => setTimelinePatient(patient)}>
                       <Activity className="h-3.5 w-3.5" /> <span className="hidden sm:inline">Jornada</span>
@@ -399,6 +419,17 @@ export default function AtendimentosPediatrico() {
                         </div>
                       </div>
                       <div className="flex items-center gap-1">
+                        <Button
+                          size="sm"
+                          className="h-9 px-3 rounded-xl gap-1.5 font-black uppercase text-[10px] tracking-widest bg-orange-500 hover:bg-orange-600 dark:bg-orange-600 dark:hover:bg-orange-500 text-white shadow-md border-0 mr-2"
+                          onClick={(e) => {
+                             e.stopPropagation();
+                             handleAttend(patient);
+                             setFastConsultPatient(patient);
+                          }}
+                        >
+                          <Baby className="h-3.5 w-3.5" /> Atender
+                        </Button>
                         <Button size="sm" variant="ghost" className="h-9 w-9 rounded-xl p-0 text-muted-foreground hover:text-sky-500 hover:bg-sky-50 dark:hover:bg-sky-950/20 cursor-pointer border-0"
                           onClick={() => setTimelinePatient(patient)} title="Ver Jornada do Paciente">
                           <Activity className="h-4 w-4" />
@@ -610,6 +641,14 @@ export default function AtendimentosPediatrico() {
           </div>
         </DialogContent>
       </Dialog>
+      
+      <QuickConsultModal 
+        patient={fastConsultPatient}
+        isOpen={!!fastConsultPatient}
+        onClose={() => setFastConsultPatient(null)}
+        onComplete={handleFinishFastConsult}
+        isPediatric={true}
+      />
     </motion.div>
   );
 }

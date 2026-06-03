@@ -11,7 +11,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Patient } from "@/context/PatientsContext";
-import { Phone, Mail, MapPin, User, Activity, Pill, History, Clock, IdCard, Users } from "lucide-react";
+import { usePrescriptions } from "@/context/PrescriptionsContext";
+import { Phone, Mail, MapPin, User, Activity, Pill, History, Clock, IdCard, Users, Stethoscope } from "lucide-react";
 import { cn, formatWords } from "@/lib/utils";
 
 interface PatientDetailsModalProps {
@@ -21,7 +22,11 @@ interface PatientDetailsModalProps {
 }
 
 export function PatientDetailsModal({ patient, isOpen, onClose }: PatientDetailsModalProps) {
+  const { orders } = usePrescriptions();
+  
   if (!patient) return null;
+  
+  const patientOrders = orders.filter(o => String(o.patientId) === String(patient.id));
 
   const riskColor: Record<string, string> = {
     'emergency': 'bg-red-500/15 text-red-700 border border-red-500/20 dark:bg-red-500/25 dark:text-red-300',
@@ -125,12 +130,56 @@ export function PatientDetailsModal({ patient, isOpen, onClose }: PatientDetails
 
               {/* Medications and Clinical Info */}
               <TabsContent value="medications" className="m-0 space-y-6 pt-4">
+                <div className="space-y-4 mb-4">
+                  <Card className="border border-white/40 dark:border-slate-800/20 bg-white/20 dark:bg-slate-900/15 rounded-2xl shadow-inner mb-4">
+                    <CardHeader className="py-4 px-5 border-b border-[#006699]/10 dark:border-sky-900/20 bg-[#006699]/5 dark:bg-sky-900/10">
+                      <CardTitle className="text-xs font-black uppercase tracking-widest text-[#006699] dark:text-sky-400 flex items-center gap-2">
+                        <Stethoscope className="h-4 w-4" />
+                        Prescrições Médicas (Prontuário)
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="p-5">
+                      {patientOrders.length === 0 ? (
+                        <p className="text-sm font-medium text-muted-foreground italic">Nenhuma prescrição médica registrada.</p>
+                      ) : (
+                        <div className="space-y-4">
+                          {patientOrders.map((order, orderIdx) => (
+                            <div key={orderIdx} className="p-4 rounded-xl border border-border/50 bg-white/50 dark:bg-slate-950/50 shadow-sm">
+                              <div className="flex justify-between items-center mb-3 border-b border-border/50 pb-2">
+                                <span className="text-xs font-bold text-muted-foreground">Médico: {order.doctorName}</span>
+                                <span className="text-[10px] font-mono opacity-60">{new Date(order.createdAt).toLocaleString()}</span>
+                              </div>
+                              <div className="space-y-3">
+                                {order.medications.map((med, medIdx) => (
+                                  <div key={medIdx} className="flex flex-col p-3 rounded-lg border border-border/30 bg-muted/20">
+                                    <div className="flex justify-between items-center">
+                                      <span className="text-sm font-black uppercase">{med.medication}</span>
+                                      <Badge variant="outline" className="text-[9px] uppercase tracking-widest h-5">
+                                        {med.status}
+                                      </Badge>
+                                    </div>
+                                    <div className="text-[10px] font-bold text-muted-foreground mt-1 flex gap-2 uppercase tracking-wider">
+                                      <span>Dose: {med.dosage}</span> •
+                                      <span>Via: {med.route}</span> •
+                                      <span>Freq: {med.frequency}</span>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                </div>
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <Card className="border border-white/40 dark:border-slate-800/20 bg-white/20 dark:bg-slate-900/15 rounded-2xl shadow-inner">
                     <CardHeader className="py-4 px-5 border-b border-white/10 dark:border-slate-800/10">
                       <CardTitle className="text-xs font-black uppercase tracking-widest text-[#006699] dark:text-sky-400 flex items-center gap-2">
                         <Pill className="h-4 w-4" />
-                        Medicamentos em Uso
+                        Medicamentos Pré-existentes
                       </CardTitle>
                     </CardHeader>
                     <CardContent className="p-5">

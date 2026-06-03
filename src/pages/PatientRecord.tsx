@@ -1,5 +1,6 @@
 import { useParams, useLocation } from "react-router-dom";
 import { usePatients } from "@/hooks/use-patients";
+import { usePrescriptions } from "@/context/PrescriptionsContext";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -15,8 +16,11 @@ export default function PatientRecord({ patientId }: { patientId?: string }) {
   const id = patientId || paramId;
   const location = useLocation();
   const { patients } = usePatients();
+  const { orders } = usePrescriptions();
   const patient = patients.find(p => String(p.id) === String(id));
   const [isTimelineOpen, setIsTimelineOpen] = useState(false);
+
+  const patientOrders = orders.filter(o => String(o.patientId) === String(id));
 
   const fromPath = location.state?.from || "/leitos";
   const fromLabel = location.state?.label || "Leitos";
@@ -402,13 +406,59 @@ export default function PatientRecord({ patientId }: { patientId?: string }) {
         </TabsContent>
 
         <TabsContent value="meds">
+          <Card className="glass-card mb-6">
+            <CardHeader className="border-b bg-[#006699]/10">
+              <CardTitle className="text-lg flex items-center gap-2">
+                <Stethoscope className="h-5 w-5 text-[#006699]" />
+                Prescrições Médicas (Atendimento Atual)
+              </CardTitle>
+              <CardDescription>Medicamentos prescritos durante o atendimento na UPA.</CardDescription>
+            </CardHeader>
+            <CardContent className="pt-6 space-y-4">
+              {patientOrders.length === 0 ? (
+                <p className="text-sm italic text-muted-foreground">Nenhuma prescrição médica registrada para este atendimento.</p>
+              ) : (
+                <div className="space-y-4">
+                  {patientOrders.map((order, orderIdx) => (
+                    <div key={orderIdx} className="p-4 rounded-xl border border-[#006699]/20 bg-white dark:bg-slate-900 shadow-sm">
+                      <div className="flex justify-between items-center mb-3 border-b pb-2">
+                        <span className="text-xs font-bold text-muted-foreground">Médico: {order.doctorName}</span>
+                        <span className="text-xs font-mono opacity-60">{new Date(order.createdAt).toLocaleString()}</span>
+                      </div>
+                      <div className="space-y-3">
+                        {order.medications.map((med, medIdx) => (
+                          <div key={medIdx} className="flex flex-col p-3 rounded-lg border border-border/50 bg-slate-50 dark:bg-slate-800">
+                            <div className="flex justify-between">
+                              <span className="text-sm font-black uppercase">{med.medication}</span>
+                              <Badge variant={med.status === 'completed' ? 'default' : 'outline'} className="text-[9px] uppercase tracking-widest h-5">
+                                {med.status === 'awaiting_pharmacy' ? 'Aguardando Farmácia' : 
+                                 med.status === 'awaiting_nursing' ? 'Aguardando Enfermagem' : 
+                                 med.status === 'active' ? 'Em Uso' : 
+                                 med.status === 'completed' ? 'Finalizado' : med.status}
+                              </Badge>
+                            </div>
+                            <div className="text-xs font-medium text-muted-foreground mt-1 flex gap-2">
+                              <span>Dose: {med.dosage}</span> •
+                              <span>Via: {med.route}</span> •
+                              <span>Freq: {med.frequency}</span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
           <Card className="glass-card">
             <CardHeader className="border-b bg-muted/20">
               <CardTitle className="text-lg flex items-center gap-2">
                 <Pill className="h-5 w-5 text-primary" />
-                Medicamentos em Uso
+                Medicamentos em Uso (Pré-existentes)
               </CardTitle>
-              <CardDescription>Lista derivada do cadastro do paciente.</CardDescription>
+              <CardDescription>Lista de medicamentos declarados na triagem/cadastro.</CardDescription>
             </CardHeader>
             <CardContent className="pt-6 space-y-4">
               {medicationsList.length === 0 ? (
