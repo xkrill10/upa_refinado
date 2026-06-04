@@ -158,10 +158,10 @@ export default function Dashboard() {
 
       <Tabs defaultValue="operacional" className="w-full space-y-6">
         <div className="flex justify-center w-full mb-2">
-          <TabsList className="grid w-full max-w-xl grid-cols-3 bg-black/10 dark:bg-black/40 border border-white/10 p-1 rounded-full h-10 shadow-sm">
-            <TabsTrigger value="operacional" className="rounded-full data-[state=active]:bg-primary data-[state=active]:text-primary-foreground font-black uppercase tracking-widest text-[10px] h-8">Visão Operacional</TabsTrigger>
-            <TabsTrigger value="gestao" className="rounded-full data-[state=active]:bg-purple-600 data-[state=active]:text-white font-black uppercase tracking-widest text-[10px] h-8">Visão Estratégica</TabsTrigger>
-            <TabsTrigger value="preditiva" className="rounded-full data-[state=active]:bg-indigo-600 data-[state=active]:text-white font-black uppercase tracking-widest text-[10px] h-8">Visão Preditiva (IA)</TabsTrigger>
+          <TabsList className="grid w-full max-w-xl grid-cols-3 bg-black/10 dark:bg-black/40 border border-white/10 p-1 rounded-xl h-10 shadow-sm">
+            <TabsTrigger value="operacional" className="rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground font-black uppercase tracking-widest text-[10px] h-8">Visão Operacional</TabsTrigger>
+            <TabsTrigger value="gestao" className="rounded-lg data-[state=active]:bg-purple-600 data-[state=active]:text-white font-black uppercase tracking-widest text-[10px] h-8">Visão Estratégica</TabsTrigger>
+            <TabsTrigger value="preditiva" className="rounded-lg data-[state=active]:bg-indigo-600 data-[state=active]:text-white font-black uppercase tracking-widest text-[10px] h-8">Visão Preditiva (IA)</TabsTrigger>
           </TabsList>
         </div>
 
@@ -170,7 +170,7 @@ export default function Dashboard() {
           {/* Barra de Telemetria Consolidada - Alta Densidade */}
           <motion.div 
             variants={item} 
-            className="glass-card-premium rounded-[2.5rem] p-6 border border-white/20 dark:border-white/5 shadow-lg bg-gradient-to-r from-white/10 to-white/5 dark:from-slate-900/40 dark:to-slate-900/10 backdrop-blur-xl"
+            className="glass-card-premium rounded-xl p-6 border border-white/20 dark:border-white/5 shadow-lg bg-gradient-to-r from-white/10 to-white/5 dark:from-slate-900/40 dark:to-slate-900/10 backdrop-blur-xl"
           >
             <div className="grid grid-cols-2 md:grid-cols-5 divide-y md:divide-y-0 md:divide-x divide-border/30 gap-y-4 md:gap-y-0 text-left">
               {/* Coluna 1: Total Pacientes */}
@@ -252,7 +252,7 @@ export default function Dashboard() {
             
             {/* Esquerda: Fila de Atendimento */}
             <motion.div variants={item} className="lg:col-span-8">
-              <Card className="glass-card-premium overflow-hidden h-full rounded-[2.5rem] border border-white/20 dark:border-white/5 shadow-lg">
+              <Card className="glass-card-premium overflow-hidden h-full rounded-xl border border-white/20 dark:border-white/5 shadow-lg">
                 <CardHeader className="p-8 pb-4 border-b border-border/20 bg-muted/10 flex flex-row items-center justify-between flex-wrap gap-4">
                   <div className="text-left">
                     <CardTitle className="text-lg font-black uppercase tracking-tight flex items-center gap-2">
@@ -275,7 +275,7 @@ export default function Dashboard() {
                         variant="ghost"
                         onClick={() => setDashboardFilter(filterOpt.id as any)}
                         className={cn(
-                          "h-8 px-3 rounded-full text-[10px] font-black uppercase tracking-wider transition-all",
+                          "h-8 px-3 rounded-md text-[10px] font-black uppercase tracking-wider transition-all",
                           dashboardFilter === filterOpt.id 
                             ? "bg-primary text-primary-foreground shadow-sm shadow-primary/20"
                             : "text-muted-foreground hover:bg-muted/50"
@@ -294,14 +294,14 @@ export default function Dashboard() {
 
             {/* Direita: Hub de Recursos e Analytics em abas */}
             <motion.div variants={item} className="lg:col-span-4 h-full">
-              <Card className="glass-card-premium rounded-[2.5rem] border border-white/20 dark:border-white/5 shadow-lg overflow-hidden flex flex-col">
+              <Card className="glass-card-premium rounded-xl border border-white/20 dark:border-white/5 shadow-lg overflow-hidden flex flex-col">
                 <Tabs defaultValue="leitos" className="w-full flex flex-col">
                   <div className="p-6 pb-2 border-b border-border/20 bg-muted/15">
-                    <TabsList className="grid w-full grid-cols-4 bg-black/10 dark:bg-black/40 border border-white/10 p-0.5 rounded-2xl h-11 shadow-inner">
-                      <TabsTrigger value="leitos" className="rounded-xl text-[8px] font-black uppercase tracking-wider h-9">Leitos</TabsTrigger>
-                      <TabsTrigger value="insumos" className="rounded-xl text-[8px] font-black uppercase tracking-wider h-9">Insumos</TabsTrigger>
-                      <TabsTrigger value="operacional" className="rounded-xl text-[8px] font-black uppercase tracking-wider h-9">Gráficos</TabsTrigger>
-                      <TabsTrigger value="feed" className="rounded-xl text-[8px] font-black uppercase tracking-wider h-9 flex items-center gap-1">
+                    <TabsList className="grid w-full grid-cols-4 bg-black/10 dark:bg-black/40 border border-white/10 p-0.5 rounded-lg h-11 shadow-inner">
+                      <TabsTrigger value="leitos" className="rounded-md text-[8px] font-black uppercase tracking-wider h-9">Leitos</TabsTrigger>
+                      <TabsTrigger value="insumos" className="rounded-md text-[8px] font-black uppercase tracking-wider h-9">Insumos</TabsTrigger>
+                      <TabsTrigger value="operacional" className="rounded-md text-[8px] font-black uppercase tracking-wider h-9">Gráficos</TabsTrigger>
+                      <TabsTrigger value="feed" className="rounded-md text-[8px] font-black uppercase tracking-wider h-9 flex items-center gap-1">
                         Feed
                         <span className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
                       </TabsTrigger>
@@ -381,7 +381,7 @@ export default function Dashboard() {
                         <span className="text-[8px] font-black text-primary bg-primary/10 px-2 py-0.5 rounded-full uppercase tracking-wider">CONECTADO</span>
                       </div>
                       
-                      <div className="bg-slate-950/80 dark:bg-black/40 border border-white/5 p-4 rounded-2xl h-[240px] overflow-y-auto font-mono text-[10px] leading-relaxed text-slate-300 scrollbar-thin">
+                      <div className="bg-slate-950/80 dark:bg-black/40 border border-white/5 p-4 rounded-lg h-[240px] overflow-y-auto font-mono text-[10px] leading-relaxed text-slate-300 scrollbar-thin">
                         <AnimatePresence>
                           {liveFeed.slice(0, 8).map(item => (
                             <motion.div 
