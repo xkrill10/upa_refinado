@@ -469,6 +469,14 @@ export default function AtendimentosPediatrico() {
               <p className="text-sm font-bold text-slate-500 uppercase">{formatPatientNameLGPD(callingTicket?.patientName || "")}</p>
               <p className="text-[10px] text-muted-foreground font-medium">{callingTicket?.age} ANOS • CPF: {callingTicket?.cpf}</p>
             </div>
+
+            <div className="flex flex-col items-center gap-3">
+              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Local de Chamada</p>
+              <div className="px-6 py-2.5 bg-orange-500/10 text-orange-600 dark:bg-orange-550/15 dark:text-orange-400 rounded-xl text-[10px] font-black uppercase tracking-widest border border-orange-500/20 dark:border-orange-500/25 shadow-inner">
+                {selectedRoom}
+              </div>
+            </div>
+
             <div className="grid grid-cols-1 gap-4">
               <Button onClick={() => { if (callingTicket) { callTicket(callingTicket.ticket, callingTicket.room, callingTicket.risk, callingTicket.patientName); toast.success("Chamada enviada novamente ao painel."); } }}
                 className="h-16 rounded-2xl text-white font-black uppercase tracking-widest text-sm shadow-xl gap-3 bg-orange-500 hover:bg-orange-600 shadow-orange-500/20">

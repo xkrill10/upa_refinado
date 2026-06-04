@@ -2702,21 +2702,8 @@ export default function TriageRoom() {
             <div className="space-y-4">
               <div className="flex flex-col items-center gap-3">
                 <p className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Local de Chamada</p>
-                <div className="flex p-1 bg-muted rounded-2xl w-full max-w-xs border border-border shadow-inner">
-                  {["TRIAGEM 1", "TRIAGEM 2"].map((room) => (
-                    <button
-                      key={room}
-                      onClick={() => setSelectedTriageRoom(room)}
-                      className={cn(
-                        "flex-1 py-3 px-4 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all duration-300",
-                        selectedTriageRoom === room 
-                          ? "bg-white text-[#006699] shadow-lg scale-100" 
-                          : "text-muted-foreground hover:text-foreground scale-95"
-                      )}
-                    >
-                      {room}
-                    </button>
-                  ))}
+                <div className="px-6 py-2.5 bg-[#006699]/10 text-[#006699] dark:bg-sky-500/10 dark:text-sky-400 rounded-xl text-[10px] font-black uppercase tracking-widest border border-[#006699]/20 dark:border-sky-500/20 shadow-inner">
+                  {selectedTriageRoom || "TRIAGEM"}
                 </div>
               </div>
 

@@ -536,6 +536,18 @@ export default function MyWorkspace() {
               <p className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase">{formatPatientAge(callingTicket?.age)} • CPF: {callingTicket?.cpf || 'N/A'}</p>
             </div>
 
+            <div className="flex flex-col items-center gap-3">
+              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Local de Chamada</p>
+              <div className={cn(
+                "px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest border shadow-inner",
+                isBlueTheme 
+                  ? "bg-[#006699]/10 text-[#006699] dark:bg-sky-500/10 dark:text-sky-400 border-[#006699]/20 dark:border-sky-500/20" 
+                  : "bg-orange-500/10 text-orange-600 dark:bg-orange-550/15 dark:text-orange-400 border-orange-500/20 dark:border-orange-500/25"
+              )}>
+                {activeRoom}
+              </div>
+            </div>
+
             <div className="grid grid-cols-1 gap-4">
               <Button 
                 onClick={() => {

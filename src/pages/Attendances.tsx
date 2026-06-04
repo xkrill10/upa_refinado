@@ -555,6 +555,13 @@ export default function Attendances() {
               <p className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase">{callingTicket?.age} ANOS • CPF: {callingTicket?.cpf}</p>
             </div>
 
+            <div className="flex flex-col items-center gap-3">
+              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Local de Chamada</p>
+              <div className="px-6 py-2.5 bg-[#006699]/10 text-[#006699] dark:bg-sky-500/10 dark:text-sky-400 rounded-xl text-[10px] font-black uppercase tracking-widest border border-[#006699]/20 dark:border-sky-500/20 shadow-inner">
+                {selectedRoom}
+              </div>
+            </div>
+
             <div className="grid grid-cols-1 gap-4">
               <Button 
                 onClick={() => {
