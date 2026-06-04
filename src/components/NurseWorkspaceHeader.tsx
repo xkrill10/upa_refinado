@@ -124,19 +124,26 @@ export function NurseWorkspaceHeader({ activeRoom, activeNurse, corenNumber, cor
             <div className="absolute -bottom-1 -right-1 h-3.5 w-3.5 rounded-full bg-emerald-500 border-2 border-white dark:border-slate-900 shadow-sm animate-pulse" />
           </div>
 
-          <div>
-            <h1 className={cn(
-              "text-2xl font-black uppercase tracking-tight leading-none",
-              isBlueTheme ? "text-[#006699] dark:text-sky-400" : 
-              isEmeraldTheme ? "text-emerald-600 dark:text-emerald-500" :
-              "text-orange-600 dark:text-orange-500"
-            )}>
-              {displayRoom}
-            </h1>
-            <p className="text-muted-foreground text-[11px] font-black uppercase tracking-[0.2em] mt-1.5 flex items-center gap-2">
-              {isConsultationMode ? displayNurse : `Operando: ${displayNurse} ${corenNumber ? `• COREN: ${corenNumber}${corenState ? `/${corenState}` : ''}` : ''}`}
-            </p>
-          </div>
+            <div className="flex flex-col justify-center items-start">
+              <h1 className={cn(
+                "text-2xl font-black uppercase tracking-tight leading-none",
+                isBlueTheme ? "text-[#006699] dark:text-sky-400" : 
+                isEmeraldTheme ? "text-emerald-600 dark:text-emerald-500" :
+                "text-orange-600 dark:text-orange-500"
+              )}>
+                {displayRoom}
+              </h1>
+              <div className="grid grid-cols-[auto_1fr] mt-1.5 gap-x-1 gap-y-0.5 text-muted-foreground text-[11px] font-black uppercase tracking-[0.2em]">
+                <div>{isConsultationMode ? '' : 'Operando:'}</div>
+                <div>{displayNurse}</div>
+                {!isConsultationMode && corenNumber && (
+                  <>
+                    <div></div>
+                    <div>COREN: {corenNumber}{corenState ? `/${corenState}` : ''}</div>
+                  </>
+                )}
+              </div>
+            </div>
         </div>
 
         {!isConsultationMode && (
