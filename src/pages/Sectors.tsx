@@ -190,7 +190,7 @@ export default function Sectors() {
   const [selectedSector, setSelectedSector] = useState<Sector | null>(null);
   const [showSectorDialog, setShowSectorDialog] = useState(false);
   const [transferringPatientId, setTransferringPatientId] = useState<string | null>(null);
-  const [recordPatientId, setRecordPatientId] = useState<number | null>(null);
+  const [recordPatientId, setRecordPatientId] = useState<string | null>(null);
   const [showCallControl, setShowCallControl] = useState(false);
   const [callingTicket, setCallingTicket] = useState<{ 
     ticket: string; 

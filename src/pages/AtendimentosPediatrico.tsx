@@ -49,7 +49,7 @@ export default function AtendimentosPediatrico() {
   const [showCallControl, setShowCallControl] = useState(false);
   const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
   const [fastConsultPatient, setFastConsultPatient] = useState<Patient | null>(null);
-  const [recordPatientId, setRecordPatientId] = useState<number | null>(null);
+  const [recordPatientId, setRecordPatientId] = useState<string | null>(null);
   const [queueFilterMode, setQueueFilterMode] = useState<'all' | 'my-room'>('all');
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
   const [isPerformanceModalOpen, setIsPerformanceModalOpen] = useState(false);

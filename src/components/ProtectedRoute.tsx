@@ -1,5 +1,7 @@
-import { Navigate, useLocation } from "react";
-import { useAuth, UserRole } from "@/context/AuthContext";
+import { Navigate, useLocation } from "react-router-dom";
+import { useAuth } from "@/context/AuthContext";
+
+export type UserRole = string;
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -15,7 +17,9 @@ export function ProtectedRoute({ children, allowedRoles }: ProtectedRouteProps) 
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  if (allowedRoles && !allowedRoles.includes(user.role)) {
+  const userRole = (user as any).role || user.user_metadata?.role || "";
+
+  if (allowedRoles && !allowedRoles.includes(userRole)) {
     // If the user doesn't have the required role, redirect to their default home
     return <Navigate to="/" replace />;
   }

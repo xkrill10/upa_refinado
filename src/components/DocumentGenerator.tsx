@@ -23,8 +23,8 @@ export function DocumentGenerator({ patient, medications, doctorName, crmNumber,
   const [isGenerating, setIsGenerating] = useState(false);
   const [previewOpen, setPreviewOpen] = useState(false);
   const [docType, setDocType] = useState<"receita" | "atestado" | "resumo_alta">("receita");
-  const [atestadoTemplate, setAtestadoTemplate] = useState<"padrao" | "comparecimento" | "acompanhante" | "fasttrack">("padrao");
-  const [receitaTemplate, setReceitaTemplate] = useState<"padrao" | "pediatrico" | "antimicrobiano" | "controle_especial">("padrao");
+  const [atestadoTemplate, setAtestadoTemplate] = useState<"padrao" | "comparecimento" | "acompanhante" | "fasttrack" | "isolamento" | "encaminhamento" | "transferencia" | "recusa">("padrao");
+  const [receitaTemplate, setReceitaTemplate] = useState<"padrao" | "pediatrico" | "uso_continuo" | "antimicrobiano" | "controle_especial" | "orientacoes">("padrao");
   const printRef = useRef<HTMLDivElement>(null);
 
   // Auto-select pediatric templates if the patient is a child

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { PackageOpen, Boxes, AlertTriangle, ArrowRightLeft, Check, X, Edit, RotateCcw, ClipboardList, MapPin } from "lucide-react";
+import { PackageOpen, Boxes, AlertTriangle, ArrowRightLeft, Check, X, Edit, RotateCcw, ClipboardList, MapPin, History } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";

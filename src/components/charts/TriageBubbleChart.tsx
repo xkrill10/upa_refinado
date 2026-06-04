@@ -53,7 +53,7 @@ export function TriageBubbleChart({ patientsWaiting }: TriageBubbleChartProps) {
       toolbar: { show: false },
       background: 'transparent',
       fontFamily: 'Inter, sans-serif',
-      animations: { enabled: true, easing: 'easeinout', speed: 800 }
+      animations: { enabled: true, speed: 800 }
     },
     dataLabels: { enabled: false },
     fill: { opacity: 0.8 },
@@ -74,8 +74,9 @@ export function TriageBubbleChart({ patientsWaiting }: TriageBubbleChartProps) {
     tooltip: {
       theme: isDark ? 'dark' : 'light',
       custom: function({series, seriesIndex, dataPointIndex, w}) {
-        const patientName = w.config.series[seriesIndex].name;
-        const data = w.config.series[seriesIndex].data[0];
+        const seriesObj = w.config.series[seriesIndex] as any;
+        const patientName = seriesObj.name;
+        const data = seriesObj.data[0];
         const waitTime = data[0];
         const age = data[1];
         return `

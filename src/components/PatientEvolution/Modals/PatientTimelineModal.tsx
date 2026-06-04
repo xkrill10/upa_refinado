@@ -2,7 +2,7 @@ import React, { useMemo } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Clock, Calendar, Activity, AlertTriangle, FileText, Pill, Stethoscope, Droplet, CheckCircle2, ChevronRight, ActivitySquare, HeartPulse } from "lucide-react";
-import { Patient } from "@/types/patient";
+import { Patient } from "@/hooks/use-patients";
 import { motion } from "motion/react";
 import { cn } from "@/lib/utils";
 

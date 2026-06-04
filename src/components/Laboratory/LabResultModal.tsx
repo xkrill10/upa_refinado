@@ -50,8 +50,7 @@ export function LabResultModal({ open, onClose, patientId, exam }: LabResultModa
     addEvolution(patientId, {
       type: "Resultado de Exame",
       description: `Exame: ${exam.name}\n\nLaudo:\n${result}${isCritical ? '\n\nATENÇÃO: VALOR CRÍTICO / PÂNICO' : ''}`,
-      professional: "Laboratório e Imagem",
-      professionalType: "Médico"
+      professional: "Laboratório e Imagem"
     });
     
     onClose();

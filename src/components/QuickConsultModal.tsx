@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, SelectGroup, SelectLabel } from "@/components/ui/select";
 import { Patient } from "@/hooks/use-patients";
+import { CID10Item } from "@/data/cid10";
 import { toast } from "sonner";
 import { Stethoscope, ClipboardCheck, Activity, AlertTriangle, FileText, Pill, Baby, User, CheckCircle2, Plus, X, Brain, ShieldAlert, ExternalLink } from "lucide-react";
 import { SmartCidSelector } from "@/components/SmartCidSelector";
@@ -27,7 +28,7 @@ interface QuickConsultModalProps {
 
 export function QuickConsultModal({ patient, isOpen, onClose, onComplete, isPediatric, hidePediatricOptions }: QuickConsultModalProps) {
   const [anamnesis, setAnamnesis] = useState("");
-  const [diagnosis, setDiagnosis] = useState("");
+  const [diagnosis, setDiagnosis] = useState<CID10Item | null>(null);
   const [outcome, setOutcome] = useState<string>("");
   
   // Super Painel State
@@ -90,7 +91,7 @@ export function QuickConsultModal({ patient, isOpen, onClose, onComplete, isPedi
     toast.success("Atendimento finalizado com sucesso!");
     onComplete(patient.id, outcome);
     setAnamnesis("");
-    setDiagnosis("");
+    setDiagnosis(null);
     setPrescribedMedications([]);
     setOutcome("");
     onClose();
@@ -393,7 +394,7 @@ export function QuickConsultModal({ patient, isOpen, onClose, onComplete, isPedi
                   crmState={crmState}
                   hidePediatricOptions={hidePediatricOptions}
                   anamnesis={anamnesis}
-                  diagnosis={diagnosis}
+                  diagnosis={diagnosis ? `${diagnosis.code} - ${diagnosis.name}` : undefined}
                   outcome={outcome}
                 />
               </div>

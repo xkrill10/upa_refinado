@@ -6,7 +6,7 @@ export interface Patient {
   name: string;
   age: number;
   cpf: string;
-  status: 'waiting' | 'attending' | 'completed' | 'evasion';
+  status: 'waiting' | 'attending' | 'completed' | 'evasion' | 'evasao' | 'observation' | 'interned';
   subStatus?: 'reaval' | 'exam_pending' | 'medication_pending';
   risk: 'emergency' | 'very-urgent' | 'urgent' | 'less-urgent' | 'not-urgent' | 'evasion';
   arrivalTime: string;
@@ -35,7 +35,6 @@ export interface Patient {
   triaged?: boolean;
   responsibleProfessional?: string;
   registrationComplete?: boolean;
-  motherName?: string;
   companionName?: string;
   companionRelation?: string;
   companionCpf?: string;
