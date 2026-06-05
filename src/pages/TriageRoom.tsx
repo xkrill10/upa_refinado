@@ -1407,7 +1407,7 @@ export default function TriageRoom() {
                               className="space-y-10"
                             >
                               {/* Header Card Premium */}
-                              <div className="bg-gradient-to-r from-[#006699] to-[#004466] rounded-[2.5rem] p-8 md:p-10 text-white shadow-2xl shadow-[#006699]/20 relative overflow-hidden group">
+                              <div className="bg-gradient-to-r from-[#006699] to-[#004466] rounded-2xl p-8 md:p-10 text-white shadow-2xl shadow-[#006699]/20 relative overflow-hidden group">
                                 <div className="absolute top-0 right-0 p-12 bg-white/5 rounded-full blur-3xl -translate-y-12 translate-x-12" />
                                 <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
                                   <div className="flex items-center gap-5">
@@ -1452,451 +1452,815 @@ export default function TriageRoom() {
                                 </div>
                               </div>
 
-                              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-                                {/* Bento Lado Esquerdo: Neurologia e Sinais Vitais */}
-                                <div className="lg:col-span-4 space-y-8">
-                                  {/* Sinais Vitais */}
-                                  <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] p-8 md:p-10 border border-border shadow-soft relative overflow-hidden flex flex-col">
-                                    <div className="flex items-center justify-between mb-10 shrink-0">
-                                      <div className="flex items-center gap-3">
-                                        <div className="h-10 w-10 rounded-[1.25rem] bg-[#006699]/10 flex items-center justify-center text-[#006699]">
-                                          <Activity className="h-5 w-5" />
-                                        </div>
-                                        <h4 className="text-[11px] font-black uppercase tracking-[0.25em] text-[#006699]">Sinais Vitais</h4>
+                            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                              {/* Sinais Vitais + Peso lado a lado */}
+                              <div className="lg:col-span-12">
+                                {/* Sinais Vitais */}
+                                <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-border shadow-soft relative overflow-hidden flex flex-col h-full">
+                                  <div className="flex items-center justify-between mb-6 shrink-0">
+                                    <div className="flex items-center gap-3">
+                                      <div className="h-10 w-10 rounded-[1.25rem] bg-[#006699]/10 flex items-center justify-center text-[#006699]">
+                                        <Activity className="h-5 w-5" />
                                       </div>
-                                      
-                                      {lastCalculatedRisk && lastCalculatedRisk !== 'not-urgent' && (
-                                        <motion.div 
+                                      <h4 className="text-[11px] font-black uppercase tracking-[0.25em] text-[#006699]">
+                                        Sinais Vitais
+                                      </h4>
+                                    </div>
+
+                                    {/* Alerta de Risco Detectado - Cor dinmaica conforme nível de risco */}
+                                    {lastCalculatedRisk &&
+                                      lastCalculatedRisk !== "not-urgent" && (
+                                        <motion.div
                                           initial={{ opacity: 0, x: 20 }}
                                           animate={{ opacity: 1, x: 0 }}
                                           className={cn(
                                             "flex items-center gap-2 px-4 py-1.5 rounded-full border shadow-sm transition-all",
-                                            lastCalculatedRisk === 'emergency' ? "bg-red-500 text-white border-red-600" :
-                                            lastCalculatedRisk === 'very-urgent' ? "bg-orange-600 text-white border-orange-700" :
-                                            lastCalculatedRisk === 'urgent' ? "bg-[#FFDE21] text-black border-yellow-400" :
-                                            lastCalculatedRisk === 'less-urgent' ? "bg-green-500 text-white border-green-600" : "bg-blue-600 text-white border-blue-700"
+                                            lastCalculatedRisk === "emergency"
+                                              ? "bg-red-500 text-white border-red-600"
+                                              : lastCalculatedRisk ===
+                                                  "very-urgent"
+                                                ? "bg-orange-600 text-white border-orange-700"
+                                                : lastCalculatedRisk ===
+                                                    "urgent"
+                                                  ? "bg-[#FFDE21] text-black border-yellow-400"
+                                                  : lastCalculatedRisk ===
+                                                      "less-urgent"
+                                                    ? "bg-green-500 text-white border-green-600"
+                                                    : "bg-blue-600 text-white border-blue-700",
                                           )}
                                         >
-                                          <AlertCircle className={cn("h-3.5 w-3.5", (lastCalculatedRisk === 'emergency' || lastCalculatedRisk === 'very-urgent') && "animate-pulse")} />
-                                          <span className="text-[9px] font-black uppercase tracking-widest">Risco Detectado</span>
+                                          <AlertCircle
+                                            className={cn(
+                                              "h-3.5 w-3.5",
+                                              (lastCalculatedRisk ===
+                                                "emergency" ||
+                                                lastCalculatedRisk ===
+                                                  "very-urgent") &&
+                                                "animate-pulse",
+                                            )}
+                                          />
+                                          <span className="text-[9px] font-black uppercase tracking-widest">
+                                            Risco Detectado
+                                          </span>
                                         </motion.div>
                                       )}
-                                    </div>
+                                  </div>
 
-                                    <div className="grid grid-cols-12 gap-4 grow content-start">
-                                        {[
-                                          { label: "PA (mmHg)", key: "pa", icon: Droplets, placeholder: "120/80", color: "text-sky-500", bgColor: "bg-sky-500/10", borderColor: "border-sky-500/20", mask: maskPA, span: "col-span-6" },
-                                          { label: "FC (BPM)", key: "fc", icon: Heart, placeholder: "000", color: "text-red-500", bgColor: "bg-red-500/10", borderColor: "border-red-500/20", mask: maskFC, span: "col-span-6" },
-                                          { label: "SpO2 (%)", key: "spo2", icon: Zap, placeholder: "90", color: "text-amber-500", bgColor: "bg-amber-500/10", borderColor: "border-amber-500/20", mask: maskSPO2, span: "col-span-6" },
-                                          { label: "Temp (°C)", key: "temperature", icon: Thermometer, placeholder: "36.5", color: "text-orange-500", bgColor: "bg-orange-500/10", borderColor: "border-orange-500/20", mask: maskTemp, span: "col-span-6" },
-                                          { label: "Glicemia", key: "glicemia", icon: Syringe, placeholder: "100", color: "text-emerald-500", bgColor: "bg-emerald-500/10", borderColor: "border-emerald-500/20", mask: maskGlicemia, span: "col-span-6" },
-                                          { label: "FR (irpm)", key: "fr", icon: Wind, placeholder: "18", color: "text-indigo-500", bgColor: "bg-indigo-500/10", borderColor: "border-indigo-500/20", mask: maskFR, span: "col-span-6" },
-                                        ].map((vit) => {
-                                          const value = clinicalData[vit.key as keyof typeof clinicalData] as string;
-                                          const hasValue = value && value.trim() !== "";
-                                          const severity = getVitalSeverity(vit.key, value);
-                                          
-                                          return (
-                                            <div key={vit.key} className={cn("space-y-2 group", vit.span)}>
-                                              <div className="flex items-center justify-between px-1">
-                                                <Label className={cn(
-                                                  "text-[9px] font-black uppercase tracking-[0.2em] transition-colors",
-                                                  hasValue ? "text-foreground" : "text-muted-foreground/50 group-focus-within:text-[#006699]"
-                                                )}>
-                                                  {vit.label}
-                                                </Label>
-                                                {severity !== 'normal' && (
-                                                  <motion.span
-                                                    animate={{ opacity: [1, 0.5, 1] }}
-                                                    className={cn(
-                                                      "text-[8px] font-black uppercase tracking-widest",
-                                                      severity === 'emergency' ? "text-red-600" : "text-orange-500"
-                                                    )}
-                                                  >
-                                                    {severity === 'emergency' ? 'Grave' : 'Alerta'}
-                                                  </motion.span>
+                                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 grow content-start">
+                                    {[
+                                      {
+                                        label: "PA (mmHg)",
+                                        key: "pa",
+                                        icon: Droplets,
+                                        placeholder: "120/80",
+                                        color: "text-sky-500",
+                                        bgColor: "bg-sky-500/10",
+                                        borderColor: "border-sky-500/20",
+                                        mask: maskPA,
+                                        span: "col-span-1",
+                                      },
+                                      {
+                                        label: "FC (BPM)",
+                                        key: "fc",
+                                        icon: Heart,
+                                        placeholder: "000",
+                                        color: "text-red-500",
+                                        bgColor: "bg-red-500/10",
+                                        borderColor: "border-red-500/20",
+                                        mask: maskFC,
+                                        span: "col-span-1",
+                                      },
+                                      {
+                                        label: "SpO2 (%)",
+                                        key: "spo2",
+                                        icon: Zap,
+                                        placeholder: "90",
+                                        color: "text-amber-500",
+                                        bgColor: "bg-amber-500/10",
+                                        borderColor: "border-amber-500/20",
+                                        mask: maskSPO2,
+                                        span: "col-span-1",
+                                      },
+                                      {
+                                        label: "Temp (°C)",
+                                        key: "temperature",
+                                        icon: Thermometer,
+                                        placeholder: "36.5",
+                                        color: "text-orange-500",
+                                        bgColor: "bg-orange-500/10",
+                                        borderColor: "border-orange-500/20",
+                                        mask: maskTemp,
+                                        span: "col-span-1",
+                                      },
+                                      {
+                                        label: "Glicemia",
+                                        key: "glicemia",
+                                        icon: Syringe,
+                                        placeholder: "100",
+                                        color: "text-emerald-500",
+                                        bgColor: "bg-emerald-500/10",
+                                        borderColor: "border-emerald-500/20",
+                                        mask: maskGlicemia,
+                                        span: "col-span-1",
+                                      },
+                                      {
+                                        label: "FR (irpm)",
+                                        key: "fr",
+                                        icon: Wind,
+                                        placeholder: "18",
+                                        color: "text-sky-500",
+                                        bgColor: "bg-sky-500/10",
+                                        borderColor: "border-sky-500/20",
+                                        mask: maskFR,
+                                        span: "col-span-1",
+                                      },
+                                    ].map((vit) => {
+                                      const value = clinicalData[
+                                        vit.key as keyof typeof clinicalData
+                                      ] as string;
+                                      const hasValue =
+                                        value && value.trim() !== "";
+                                      const severity = getVitalSeverity(
+                                        vit.key,
+                                        value,
+                                      );
+
+                                      return (
+                                        <div
+                                          key={vit.key}
+                                          className={cn(
+                                            "space-y-2 group",
+                                            vit.span,
+                                          )}
+                                        >
+                                          <div className="flex items-center justify-between px-1">
+                                            <Label
+                                              className={cn(
+                                                "text-[9px] font-black uppercase tracking-[0.2em] transition-colors",
+                                                hasValue
+                                                  ? "text-foreground"
+                                                  : "text-muted-foreground/50 group-focus-within:text-[#006699]",
+                                              )}
+                                            >
+                                              {vit.label}
+                                            </Label>
+                                            {severity !== "normal" && (
+                                              <motion.span
+                                                animate={{
+                                                  opacity: [1, 0.5, 1],
+                                                }}
+                                                className={cn(
+                                                  "text-[8px] font-black uppercase tracking-widest",
+                                                  severity === "emergency"
+                                                    ? "text-red-600"
+                                                    : "text-orange-500",
                                                 )}
-                                              </div>
-                                              <div className="relative">
-                                                <div className={cn(
-                                                  "absolute left-3 top-1/2 -translate-y-1/2 h-8 w-8 rounded-lg flex items-center justify-center transition-all z-20 pointer-events-none shadow-sm",
-                                                  hasValue ? (severity === 'emergency' ? 'bg-red-500 shadow-red-200' : severity === 'caution' ? 'bg-orange-500 shadow-orange-200' : vit.bgColor) : "bg-muted/30 group-focus-within:bg-[#006699]/10"
-                                                )}>
-                                                  <vit.icon className={cn(
-                                                    "h-4 w-4 transition-all",
-                                                    hasValue ? (severity !== 'normal' ? 'text-white' : vit.color) : "text-muted-foreground/30 group-focus-within:text-[#006699]"
-                                                  )} />
-                                                </div>
-                                                <Input
-                                                  value={value}
-                                                  onChange={(e) => {
-                                                    const masked = vit.mask(e.target.value);
-                                                    setClinicalData(prev => ({ ...prev, [vit.key]: masked }));
-                                                  }}
-                                                  placeholder={vit.placeholder}
-                                                  className={cn(
-                                                    "h-16 rounded-2xl border-2 font-black text-xl text-center transition-all shadow-inner placeholder:text-muted-foreground/40 pr-4 pl-4",
-                                                    hasValue 
-                                                      ? (severity === 'emergency' ? "bg-red-50 border-red-200 text-red-900 focus-visible:ring-red-200" : severity === 'caution' ? "bg-orange-50 border-orange-200 text-orange-900 focus-visible:ring-orange-200" : `bg-white dark:bg-slate-900 ${vit.borderColor} border-opacity-70 text-foreground ring-1 ring-offset-0 ${vit.borderColor.replace('border-', 'ring-')}/20`)
-                                                      : "bg-muted/10 border-transparent hover:bg-muted/20 focus-visible:bg-white focus-visible:ring-2 focus-visible:ring-[#006699]/10 focus-visible:border-[#006699]/30"
-                                                  )}
-                                                />
-                                              </div>
+                                              >
+                                                {severity === "emergency"
+                                                  ? "Grave"
+                                                  : "Alerta"}
+                                              </motion.span>
+                                            )}
+                                          </div>
+                                          <div className="relative">
+                                            <div
+                                              className={cn(
+                                                "absolute left-3 top-1/2 -translate-y-1/2 h-8 w-8 rounded-lg flex items-center justify-center transition-all z-20 pointer-events-none shadow-sm",
+                                                hasValue
+                                                  ? severity === "emergency"
+                                                    ? "bg-red-500 shadow-red-200"
+                                                    : severity === "caution"
+                                                      ? "bg-orange-500 shadow-orange-200"
+                                                      : vit.bgColor
+                                                  : "bg-muted/30 group-focus-within:bg-[#006699]/10",
+                                              )}
+                                            >
+                                              <vit.icon
+                                                className={cn(
+                                                  "h-4 w-4 transition-all",
+                                                  hasValue
+                                                    ? severity !== "normal"
+                                                      ? "text-white"
+                                                      : vit.color
+                                                    : "text-muted-foreground/30 group-focus-within:text-[#006699]",
+                                                )}
+                                              />
                                             </div>
-                                          );
-                                        })}
+                                            <Input
+                                              value={value}
+                                              onChange={(e) => {
+                                                const masked = vit.mask(
+                                                  e.target.value,
+                                                );
+                                                setClinicalData((prev) => ({
+                                                  ...prev,
+                                                  [vit.key]: masked,
+                                                }));
+                                              }}
+                                              placeholder={vit.placeholder}
+                                              className={cn(
+                                                "h-12 rounded-xl border-2 font-black text-lg text-center transition-all shadow-inner placeholder:text-muted-foreground/40 pr-4 pl-4",
+                                                hasValue
+                                                  ? severity === "emergency"
+                                                    ? "bg-red-50 border-red-200 text-red-900 focus-visible:ring-red-200"
+                                                    : severity === "caution"
+                                                      ? "bg-orange-50 border-orange-200 text-orange-900 focus-visible:ring-orange-200"
+                                                      : `bg-white dark:bg-slate-900 ${vit.borderColor} border-opacity-70 text-foreground ring-1 ring-offset-0 ${vit.borderColor.replace("border-", "ring-")}/20`
+                                                  : "bg-muted/10 border-transparent hover:bg-muted/20 focus-visible:bg-white focus-visible:ring-2 focus-visible:ring-[#006699]/10 focus-visible:border-[#006699]/30",
+                                              )}
+                                            />
+                                          </div>
+                                        </div>
+                                      );
+                                    })}
+                                  </div>
+                                </div>
+                              </div>
+
+                              {/* Coluna Esquerda: Medicamentos, Glasgow */}
+                              <div className="lg:col-span-4 space-y-4 flex flex-col">
+                                <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-border shadow-soft flex flex-col flex-1">
+                                  <div className="flex items-center justify-between mb-4">
+                                    <div className="flex items-center gap-3">
+                                      <div className="h-10 w-10 rounded-[1.25rem] bg-sky-500/10 flex items-center justify-center text-sky-500">
+                                        <MessageSquare className="h-5 w-5" />
+                                      </div>
+                                      <h4 className="text-[11px] font-black uppercase tracking-[0.25em] text-muted-foreground">
+                                        Relato e Histórico
+                                      </h4>
                                     </div>
                                   </div>
 
-                                  {/* Novo Card Glasgow Premium */}
-                                  <div 
-                                    onClick={() => setOpenGlasgowCalc(true)}
-                                    className="bg-white dark:bg-slate-900 rounded-[2rem] p-6 border border-border shadow-soft relative overflow-hidden group cursor-pointer hover:border-[#006699]/30 transition-all active:scale-[0.98]"
-                                  >
-                                    <div className="absolute top-0 right-0 p-4 opacity-[0.03] group-hover:opacity-[0.05] transition-opacity">
-                                      <Brain className="h-24 w-24 -mr-8 -mt-8" />
+                                  <div className="space-y-4 grow flex flex-col">
+                                    <div className="flex items-center justify-between px-1">
+                                      <Label className="text-[10px] font-black uppercase text-muted-foreground/60 tracking-widest">
+                                        Queixa Principal *
+                                      </Label>
                                     </div>
-                                    <div className="flex items-center gap-4 relative z-10">
-                                      <div className="h-14 w-14 rounded-2xl bg-[#006699]/10 flex items-center justify-center text-[#006699] shadow-inner group-hover:scale-110 transition-transform">
-                                        <Brain className="h-7 w-7" />
+                                    <div className="relative group grow flex flex-col">
+                                      <Textarea
+                                        placeholder="Descreva detalhadamente os sintomas que trouxeram o paciente..."
+                                        className="min-h-[140px] grow rounded-2xl border-none bg-muted/30 focus:bg-white focus:ring-4 focus:ring-sky-500/5 transition-all text-sm font-medium tracking-tight p-5 resize-none shadow-inner leading-relaxed"
+                                        value={clinicalData.mainComplaint}
+                                        onChange={(e) =>
+                                          setClinicalData((prev) => ({
+                                            ...prev,
+                                            mainComplaint: formatMedicalText(
+                                              e.target.value,
+                                            ),
+                                          }))
+                                        }
+                                      />
+                                      <div className="absolute right-4 bottom-4">
+                                        <DropdownMenu>
+                                          <DropdownMenuTrigger asChild>
+                                            <Button
+                                              size="icon"
+                                              variant="outline"
+                                              className="h-12 w-12 rounded-2xl bg-white shadow-xl shadow-sky-100 border-none text-sky-600 hover:bg-sky-600 hover:text-white transition-all"
+                                            >
+                                              <Plus className="h-5 w-5" />
+                                            </Button>
+                                          </DropdownMenuTrigger>
+                                          <DropdownMenuContent
+                                            align="end"
+                                            className="w-[420px] p-2 rounded-2xl bg-white/95 backdrop-blur-xl border-border/50 shadow-2xl"
+                                          >
+                                            <div className="px-3 py-2.5 border-b border-border/50 mb-2">
+                                              <h5 className="text-[10px] font-black uppercase tracking-[0.2em] text-[#006699]">
+                                                Seletor de Queixas (UPA/SUS)
+                                              </h5>
+                                            </div>
+                                            <div className="grid grid-cols-2 gap-1.5">
+                                              {COMPLAINT_OPTIONS.map((opt) => {
+                                                const isSelected =
+                                                  clinicalData.mainComplaint
+                                                    .split(",")
+                                                    .map((i) => i.trim())
+                                                    .includes(opt);
+                                                return (
+                                                  <button
+                                                    key={opt}
+                                                    onClick={() => {
+                                                      const currentItems =
+                                                        clinicalData.mainComplaint
+                                                          .split(",")
+                                                          .map((i) => i.trim())
+                                                          .filter(
+                                                            (i) => i !== "",
+                                                          );
+                                                      let newItems;
+                                                      if (isSelected) {
+                                                        newItems =
+                                                          currentItems.filter(
+                                                            (i) => i !== opt,
+                                                          );
+                                                      } else {
+                                                        newItems = [
+                                                          ...currentItems,
+                                                          opt,
+                                                        ];
+                                                      }
+                                                      setClinicalData(
+                                                        (prev) => ({
+                                                          ...prev,
+                                                          mainComplaint:
+                                                            newItems.join(", "),
+                                                        }),
+                                                      );
+                                                    }}
+                                                    className={cn(
+                                                      "flex items-center gap-2.5 p-2 rounded-xl transition-all group text-left",
+                                                      isSelected
+                                                        ? "bg-sky-50 border-sky-200"
+                                                        : "hover:bg-muted border-transparent",
+                                                    )}
+                                                  >
+                                                    <div
+                                                      className={cn(
+                                                        "h-1.5 w-1.5 rounded-full transition-colors",
+                                                        isSelected
+                                                          ? "bg-sky-500"
+                                                          : "bg-sky-200 group-hover:bg-sky-400",
+                                                      )}
+                                                    />
+                                                    <span
+                                                      className={cn(
+                                                        "text-[11px] font-bold transition-colors",
+                                                        isSelected
+                                                          ? "text-sky-700"
+                                                          : "text-muted-foreground group-hover:text-foreground",
+                                                      )}
+                                                    >
+                                                      {opt}
+                                                    </span>
+                                                    {isSelected && (
+                                                      <Check className="h-3 w-3 ml-auto text-sky-500" />
+                                                    )}
+                                                  </button>
+                                                );
+                                              })}
+                                            </div>
+                                          </DropdownMenuContent>
+                                        </DropdownMenu>
                                       </div>
-                                      <div className="flex flex-col grow">
-                                        <div className="flex items-center justify-between">
-                                          <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-[#006699]">Neurologia</Label>
-                                          <div className={cn(
-                                            "h-2 w-2 rounded-full animate-pulse",
-                                            (() => {
-                                              const score = parseInt(clinicalData.glasgow.split('/')[0]) || 15;
-                                              if (!clinicalData.glasgow) return "bg-slate-300";
-                                              if (score <= 8) return "bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.5)]";
-                                              if (score <= 12) return "bg-orange-500 shadow-[0_0_8px_rgba(249,115,22,0.5)]";
-                                              if (score <= 14) return "bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.5)]";
-                                              return "bg-emerald-500";
-                                            })()
-                                          )} />
-                                        </div>
-                                        <h4 className="text-lg font-black uppercase tracking-tight text-foreground mt-0.5">Escala de Glasgow</h4>
-                                        <div className="flex items-center gap-2 mt-2">
-                                          <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/60 bg-muted/20 px-2 py-1 rounded-md">Status:</span>
-                                          <span className={cn(
-                                            "text-[9px] font-black uppercase tracking-widest px-2 py-1 rounded-md",
-                                            (() => {
-                                              const score = parseInt(clinicalData.glasgow.split('/')[0]) || 15;
-                                              if (!clinicalData.glasgow) return "text-[#006699] bg-sky-500/5";
-                                              if (score <= 8) return "text-red-600 bg-red-500/10";
-                                              if (score <= 12) return "text-orange-600 bg-orange-500/10";
-                                              if (score <= 14) return "text-amber-600 bg-amber-500/10";
-                                              return "text-emerald-600 bg-emerald-500/10";
-                                            })()
-                                          )}>
-                                            {clinicalData.glasgow ? (
-                                              (() => {
-                                                const score = parseInt(clinicalData.glasgow.split('/')[0]) || 15;
-                                                let label = "Normal";
-                                                if (score <= 8) label = "Grave / Emergência";
-                                                else if (score <= 12) label = "Moderado / Muito Urgente";
-                                                else if (score <= 14) label = "Leve / Urgente";
-                                                return `${label} (${score} pts)`;
-                                              })()
-                                            ) : "Aguardando Avaliação"}
-                                          </span>
-                                        </div>
-                                      </div>
-                                      <ChevronRight className="h-5 w-5 text-[#006699]/40 group-hover:translate-x-1 transition-transform" />
                                     </div>
                                   </div>
                                 </div>
 
-                                {/* Bento Lado Direito: Anamnese e Avaliação */}
-                                <div className="lg:col-span-8 space-y-8">
-                                  {/* Queixa e Perfil Clínico */}
-                                  <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
-                                    <div className="md:col-span-12 lg:col-span-7 bg-white dark:bg-slate-900 rounded-[2.5rem] p-8 md:p-10 border border-border shadow-soft">
-                                      <div className="flex items-center justify-between mb-8">
-                                        <div className="flex items-center gap-3">
-                                          <div className="h-10 w-10 rounded-[1.25rem] bg-indigo-500/10 flex items-center justify-center text-indigo-500">
-                                            <MessageSquare className="h-5 w-5" />
-                                          </div>
-                                          <h4 className="text-[11px] font-black uppercase tracking-[0.25em] text-muted-foreground">Relato e Histórico</h4>
-                                        </div>
-                                      </div>
-
-                                      <div className="space-y-4">
-                                        <div className="flex items-center justify-between px-1">
-                                          <Label className="text-[10px] font-black uppercase text-muted-foreground/60 tracking-widest">Queixa Principal *</Label>
-                                        </div>
-                                        <div className="relative group">
-                                          <Textarea
-                                            placeholder="Descreva detalhadamente os sintomas que trouxeram o paciente..."
-                                            className="min-h-[220px] rounded-[2rem] border-none bg-muted/30 focus:bg-white focus:ring-4 focus:ring-indigo-500/5 transition-all text-sm font-medium tracking-tight p-6 resize-none shadow-inner leading-relaxed"
-                                            value={clinicalData.mainComplaint}
-                                            onChange={(e) => setClinicalData(prev => ({ ...prev, mainComplaint: formatMedicalText(e.target.value) }))}
-                                          />
-                                          <div className="absolute right-4 bottom-4">
-                                            <DropdownMenu>
-                                              <DropdownMenuTrigger asChild>
-                                                <Button size="icon" variant="outline" className="h-12 w-12 rounded-2xl bg-white shadow-xl shadow-indigo-100 border-none text-indigo-600 hover:bg-indigo-600 hover:text-white transition-all">
-                                                  <Plus className="h-5 w-5" />
-                                                </Button>
-                                              </DropdownMenuTrigger>
-                                              <DropdownMenuContent align="end" className="w-[420px] p-2 rounded-2xl bg-white/95 backdrop-blur-xl border-border/50 shadow-2xl">
-                                                <div className="px-3 py-2.5 border-b border-border/50 mb-2">
-                                                  <h5 className="text-[10px] font-black uppercase tracking-[0.2em] text-[#006699]">Seletor de Queixas (UPA/SUS)</h5>
-                                                </div>
-                                                <div className="grid grid-cols-2 gap-1.5">
-                                                  {COMPLAINT_OPTIONS.map(opt => {
-                                                    const isSelected = clinicalData.mainComplaint.split(",").map(i => i.trim()).includes(opt);
-                                                    return (
-                                                      <button
-                                                        key={opt}
-                                                        onClick={() => {
-                                                          const currentItems = clinicalData.mainComplaint.split(",").map(i => i.trim()).filter(i => i !== "");
-                                                          let newItems;
-                                                          if (isSelected) {
-                                                            newItems = currentItems.filter(i => i !== opt);
-                                                          } else {
-                                                            newItems = [...currentItems, opt];
-                                                          }
-                                                          setClinicalData(prev => ({ ...prev, mainComplaint: newItems.join(", ") }));
-                                                        }}
-                                                        className={cn(
-                                                          "flex items-center gap-2.5 p-2 rounded-xl transition-all group text-left",
-                                                          isSelected ? "bg-indigo-50 border-indigo-200" : "hover:bg-muted border-transparent"
-                                                        )}
-                                                      >
-                                                        <div className={cn(
-                                                          "h-1.5 w-1.5 rounded-full transition-colors",
-                                                          isSelected ? "bg-indigo-500" : "bg-indigo-200 group-hover:bg-indigo-400"
-                                                        )} />
-                                                        <span className={cn(
-                                                          "text-[11px] font-bold transition-colors",
-                                                          isSelected ? "text-indigo-700" : "text-muted-foreground group-hover:text-foreground"
-                                                        )}>{opt}</span>
-                                                        {isSelected && <Check className="h-3 w-3 ml-auto text-indigo-500" />}
-                                                      </button>
-                                                    );
-                                                  })}
-                                                </div>
-                                              </DropdownMenuContent>
-                                            </DropdownMenu>
-                                          </div>
-                                        </div>
-                                      </div>
-                                    </div>
-
-                                    <div className="md:col-span-12 lg:col-span-5 space-y-6">
-                                      <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] p-8 border border-border shadow-soft">
-                                        <div className="space-y-3">
-                                          <div className="flex items-center justify-between px-1">
-                                            <div className="flex items-center gap-2.5">
-                                              <div className="h-7 w-7 rounded-xl bg-amber-500/10 flex items-center justify-center text-amber-600">
-                                                <Stethoscope className="h-4 w-4" />
-                                              </div>
-                                              <Label className="text-[10px] font-black uppercase text-muted-foreground/60 tracking-widest">Comorbidades</Label>
-                                            </div>
-                                            <DropdownMenu>
-                                              <DropdownMenuTrigger asChild>
-                                                <button className="text-[9px] font-black uppercase tracking-widest text-[#006699] hover:opacity-70 transition-opacity flex items-center gap-1">
-                                                  <Plus className="h-3 w-3" /> Sugestões
-                                                </button>
-                                              </DropdownMenuTrigger>
-                                              <DropdownMenuContent align="end" className="w-[300px] p-2 rounded-2xl bg-white shadow-2xl border-border/50">
-                                                <div className="grid grid-cols-2 gap-1">
-                                                  {HISTORY_OPTIONS.map(opt => {
-                                                    const isSelected = clinicalData.comorbidities.split(",").map(i => i.trim()).includes(opt);
-                                                    return (
-                                                      <button
-                                                        key={opt}
-                                                        onClick={() => {
-                                                          const currentItems = clinicalData.comorbidities.split(",").map(i => i.trim()).filter(i => i !== "");
-                                                          let newItems;
-                                                          if (isSelected) {
-                                                            newItems = currentItems.filter(i => i !== opt);
-                                                          } else {
-                                                            newItems = [...currentItems, opt];
-                                                          }
-                                                          setClinicalData(prev => ({ ...prev, comorbidities: newItems.join(", ") }));
-                                                        }}
-                                                        className={cn(
-                                                          "flex items-center gap-2 p-2 rounded-xl transition-all group text-left",
-                                                          isSelected ? "bg-sky-50 border-sky-100" : "hover:bg-muted border-transparent"
-                                                        )}
-                                                      >
-                                                        <div className={cn(
-                                                          "h-1.5 w-1.5 rounded-full transition-colors",
-                                                          isSelected ? "bg-sky-500" : "bg-border group-hover:bg-[#006699]"
-                                                        )} />
-                                                        <span className={cn(
-                                                          "text-[10px] font-bold transition-colors",
-                                                          isSelected ? "text-sky-700" : "text-muted-foreground group-hover:text-foreground"
-                                                        )}>{opt}</span>
-                                                        {isSelected && <Check className="h-3 w-3 ml-auto text-sky-500" />}
-                                                      </button>
-                                                    );
-                                                  })}
-                                                </div>
-                                              </DropdownMenuContent>
-                                            </DropdownMenu>
-                                          </div>
-                                          <Input
-                                            placeholder="Ex: HAS, DM, Asma..."
-                                            className="h-[60px] rounded-2xl border-none bg-muted/40 font-bold px-5"
-                                            value={clinicalData.comorbidities}
-                                            onChange={(e) => setClinicalData(prev => ({ ...prev, comorbidities: formatMedicalText(e.target.value) }))}
-                                          />
-                                        </div>
-                                      </div>
-                                      <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] p-8 border border-border shadow-soft">
-                                        <div className="space-y-3">
-                                          <div className="flex items-center justify-between px-1">
-                                            <div className="flex items-center gap-2.5">
-                                              <div className="h-7 w-7 rounded-xl bg-red-500/10 flex items-center justify-center text-red-600">
-                                                <ShieldAlert className="h-4 w-4" />
-                                              </div>
-                                              <Label className="text-[10px] font-black uppercase text-red-500 tracking-widest">Alergias Relatadas</Label>
-                                            </div>
-                                            <DropdownMenu>
-                                              <DropdownMenuTrigger asChild>
-                                                <button className="text-[9px] font-black uppercase tracking-widest text-red-400 hover:opacity-70 transition-opacity flex items-center gap-1">
-                                                  <Plus className="h-3 w-3" /> Sugestões
-                                                </button>
-                                              </DropdownMenuTrigger>
-                                              <DropdownMenuContent align="end" className="w-[200px] p-2 rounded-2xl bg-white shadow-2xl border-border/50">
-                                                <div className="grid grid-cols-1 gap-1">
-                                                  {ALLERGY_OPTIONS.map(opt => {
-                                                    const isSelected = clinicalData.allergies.split(",").map(i => i.trim()).includes(opt);
-                                                    return (
-                                                      <button
-                                                        key={opt}
-                                                        onClick={() => {
-                                                          const currentItems = clinicalData.allergies.split(",").map(i => i.trim()).filter(i => i !== "");
-                                                          let newItems;
-                                                          if (isSelected) {
-                                                            newItems = currentItems.filter(i => i !== opt);
-                                                          } else {
-                                                            newItems = [...currentItems, opt];
-                                                          }
-                                                          setClinicalData(prev => ({ ...prev, allergies: newItems.join(", ") }));
-                                                        }}
-                                                        className={cn(
-                                                          "flex items-center gap-2 p-2 rounded-xl transition-all group text-left",
-                                                          isSelected ? "bg-red-50 border-red-200" : "hover:bg-muted border-transparent"
-                                                        )}
-                                                      >
-                                                        <div className={cn(
-                                                          "h-1.5 w-1.5 rounded-full transition-colors",
-                                                          isSelected ? "bg-red-500" : "bg-red-200 group-hover:bg-red-500"
-                                                        )} />
-                                                        <span className={cn(
-                                                          "text-[10px] font-bold transition-colors",
-                                                          isSelected ? "text-red-700" : "text-muted-foreground group-hover:text-red-700"
-                                                        )}>{opt}</span>
-                                                        {isSelected && <Check className="h-3 w-3 ml-auto text-red-500" />}
-                                                      </button>
-                                                    );
-                                                  })}
-                                                </div>
-                                              </DropdownMenuContent>
-                                            </DropdownMenu>
-                                          </div>
-                                          <Input
-                                            placeholder="Ex: Alimentos, Medicamentos..."
-                                            className="h-[60px] rounded-2xl border-none bg-red-500/5 font-bold px-5 focus-visible:bg-white text-red-700 placeholder:text-red-200"
-                                            value={clinicalData.allergies}
-                                            onChange={(e) => setClinicalData(prev => ({ ...prev, allergies: formatMedicalText(e.target.value) }))}
-                                          />
-                                        </div>
-                                      </div>
-                                    </div>
+                                {/* Card Glasgow Premium */}
+                                <div
+                                  onClick={() => setOpenGlasgowCalc(true)}
+                                  className="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-border shadow-soft relative overflow-hidden group cursor-pointer hover:border-[#006699]/30 transition-all active:scale-[0.98] flex flex-col justify-center h-[300px]"
+                                >
+                                  <div className="absolute top-0 right-0 p-4 opacity-[0.03] group-hover:opacity-[0.05] transition-opacity">
+                                    <Brain className="h-24 w-24 -mr-8 -mt-8" />
                                   </div>
-
-                                  {/* Weight & Medications Row */}
-                                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <div className="bg-white dark:bg-slate-900 rounded-[2rem] p-6 border border-border shadow-soft flex items-center gap-6">
-                                      <div className="h-12 w-12 rounded-2xl bg-indigo-500/10 flex items-center justify-center text-indigo-500 shrink-0">
-                                        <Scale className="h-6 w-6" />
+                                  <div className="flex items-center gap-4 relative z-10">
+                                    <div className="h-14 w-14 rounded-2xl bg-[#006699]/10 flex items-center justify-center text-[#006699] shadow-inner group-hover:scale-110 transition-transform">
+                                      <Brain className="h-7 w-7" />
+                                    </div>
+                                    <div className="flex flex-col grow">
+                                      <div className="flex items-center justify-between">
+                                        <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-[#006699]">
+                                          Neurologia
+                                        </Label>
+                                        <div
+                                          className={cn(
+                                            "h-2 w-2 rounded-full animate-pulse",
+                                            (() => {
+                                              const score =
+                                                parseInt(
+                                                  clinicalData.glasgow.split(
+                                                    "/",
+                                                  )[0],
+                                                ) || 15;
+                                              if (!clinicalData.glasgow)
+                                                return "bg-slate-300";
+                                              if (score <= 8)
+                                                return "bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.5)]";
+                                              if (score <= 12)
+                                                return "bg-orange-500 shadow-[0_0_8px_rgba(249,115,22,0.5)]";
+                                              if (score <= 14)
+                                                return "bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.5)]";
+                                              return "bg-emerald-500";
+                                            })(),
+                                          )}
+                                        />
                                       </div>
-                                      <div className="grow space-y-2">
-                                        <div className="flex items-center justify-between px-1">
-                                          <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">Peso (kg)</Label>
-                                          <div className="flex items-center gap-2">
-                                            <span className="text-[9px] font-mono opacity-40 uppercase">Aferição Infantil/Geral</span>
-                                          </div>
-                                        </div>
-                                        <div className="relative group">
-                                          <Input 
-                                            placeholder="Ex: 12.500 ou 75.0"
-                                            className="h-12 rounded-[1.25rem] border-none bg-muted/30 font-bold px-4"
-                                            value={clinicalData.weight}
-                                            onChange={(e) => {
-                                              const val = e.target.value.replace(/[^0-9.]/g, '');
-                                              setClinicalData(prev => ({ ...prev, weight: val }));
-                                            }}
-                                          />
-                                          <div className="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-black text-muted-foreground/40 pointer-events-none">
-                                            KG
-                                          </div>
-                                        </div>
+                                      <h4 className="text-lg font-black uppercase tracking-tight text-foreground mt-0.5">
+                                        Escala de Glasgow
+                                      </h4>
+                                      <div className="flex items-center gap-2 mt-2">
+                                        <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/60 bg-muted/20 px-2 py-1 rounded-md">
+                                          Status:
+                                        </span>
+                                        <span
+                                          className={cn(
+                                            "text-[9px] font-black uppercase tracking-widest px-2 py-1 rounded-md",
+                                            (() => {
+                                              const score =
+                                                parseInt(
+                                                  clinicalData.glasgow.split(
+                                                    "/",
+                                                  )[0],
+                                                ) || 15;
+                                              if (!clinicalData.glasgow)
+                                                return "text-[#006699] bg-sky-500/5";
+                                              if (score <= 8)
+                                                return "text-red-600 bg-red-500/10";
+                                              if (score <= 12)
+                                                return "text-orange-600 bg-orange-500/10";
+                                              if (score <= 14)
+                                                return "text-amber-600 bg-amber-500/10";
+                                              return "text-emerald-600 bg-emerald-500/10";
+                                            })(),
+                                          )}
+                                        >
+                                          {clinicalData.glasgow
+                                            ? (() => {
+                                                const score =
+                                                  parseInt(
+                                                    clinicalData.glasgow.split(
+                                                      "/",
+                                                    )[0],
+                                                  ) || 15;
+                                                let label = "Normal";
+                                                if (score <= 8)
+                                                  label = "Grave / Emergência";
+                                                else if (score <= 12)
+                                                  label =
+                                                    "Moderado / Muito Urgente";
+                                                else if (score <= 14)
+                                                  label = "Leve / Urgente";
+                                                return `${label} (${score} pts)`;
+                                              })()
+                                            : "Aguardando Avaliação"}
+                                        </span>
                                       </div>
                                     </div>
+                                    <ChevronRight className="h-5 w-5 text-[#006699]/40 group-hover:translate-x-1 transition-transform" />
+                                  </div>
+                                </div>
+                              </div>
 
-                                    <div className="bg-white dark:bg-slate-900 rounded-[2rem] p-6 border border-border shadow-soft flex items-center gap-6">
+                              {/* Bento Lado Direito: Anamnese e Avaliação */}
+                              <div className="lg:col-span-8 space-y-4">
+                                {/* Queixa e Perfil Clínico */}
+                                <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
+                                  {/* Medicamentos */}
+                                  <div className="md:col-span-12 lg:col-span-7 bg-white dark:bg-slate-900 rounded-2xl p-6 border border-border shadow-soft flex flex-col justify-center gap-4 grow">
+                                    <div className="flex items-center gap-4">
                                       <div className="h-12 w-12 rounded-2xl bg-sky-500/10 flex items-center justify-center text-sky-500 shrink-0">
                                         <Pill className="h-6 w-6" />
                                       </div>
                                       <div className="grow min-w-0 space-y-2">
                                         <div className="flex items-center justify-between gap-4 px-1">
-                                          <Label className="text-[10px] font-black uppercase tracking-widest text-[#006699]/60 truncate">Medicamentos Contínuos</Label>
+                                          <Label className="text-[10px] font-black uppercase tracking-widest text-[#006699]/60 truncate">
+                                            Medicamentos
+                                          </Label>
                                           <div className="flex items-center gap-3 shrink-0">
                                             <DropdownMenu>
                                               <DropdownMenuTrigger asChild>
                                                 <button className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/60 hover:text-[#006699] transition-colors flex items-center gap-1">
-                                                  <Plus className="h-3 w-3" /> Sugestões
+                                                  <Plus className="h-3 w-3" />{" "}
+                                                  Sugestões
                                                 </button>
                                               </DropdownMenuTrigger>
-                                              <DropdownMenuContent align="end" className="w-[200px] p-2 rounded-xl bg-white shadow-xl border-border/50">
-                                                {["Losartana", "Metformina", "Atenolol", "Anlodipino", "Enalapril", "Hidroclorotiazida", "Dipirona", "Paracetamol", "Aspirina", "Nega"].map(opt => {
-                                                  const isSelected = clinicalData.currentMedications.split(",").map(i => i.trim()).includes(opt);
+                                              <DropdownMenuContent
+                                                align="end"
+                                                className="w-[200px] p-2 rounded-xl bg-white shadow-xl border-border/50"
+                                              >
+                                                {[
+                                                  "Losartana",
+                                                  "Metformina",
+                                                  "Atenolol",
+                                                  "Anlodipino",
+                                                  "Enalapril",
+                                                  "Hidroclorotiazida",
+                                                  "Dipirona",
+                                                  "Paracetamol",
+                                                  "Aspirina",
+                                                  "Nega",
+                                                ].map((opt) => {
+                                                  const isSelected =
+                                                    clinicalData.currentMedications
+                                                      .split(",")
+                                                      .map((i) => i.trim())
+                                                      .includes(opt);
                                                   return (
                                                     <button
                                                       key={opt}
                                                       onClick={() => {
-                                                        const currentItems = clinicalData.currentMedications.split(",").map(i => i.trim()).filter(i => i !== "");
+                                                        const currentItems =
+                                                          clinicalData.currentMedications
+                                                            .split(",")
+                                                            .map((i) =>
+                                                              i.trim(),
+                                                            )
+                                                            .filter(
+                                                              (i) => i !== "",
+                                                            );
                                                         let newItems;
                                                         if (isSelected) {
-                                                          newItems = currentItems.filter(i => i !== opt);
+                                                          newItems =
+                                                            currentItems.filter(
+                                                              (i) => i !== opt,
+                                                            );
                                                         } else {
-                                                          newItems = [...currentItems, opt];
+                                                          newItems = [
+                                                            ...currentItems,
+                                                            opt,
+                                                          ];
                                                         }
-                                                        setClinicalData(prev => ({ ...prev, currentMedications: newItems.join(", ") }));
+                                                        setClinicalData(
+                                                          (prev) => ({
+                                                            ...prev,
+                                                            currentMedications:
+                                                              newItems.join(
+                                                                ", ",
+                                                              ),
+                                                          }),
+                                                        );
                                                       }}
                                                       className={cn(
                                                         "w-full text-left p-2 rounded-lg transition-all text-[10px] font-bold flex items-center justify-between",
-                                                        isSelected ? "bg-sky-50 text-sky-700" : "hover:bg-muted text-muted-foreground"
+                                                        isSelected
+                                                          ? "bg-sky-50 text-sky-700"
+                                                          : "hover:bg-muted text-muted-foreground",
                                                       )}
                                                     >
                                                       {opt}
-                                                      {isSelected && <Check className="h-3 w-3 text-sky-500" />}
+                                                      {isSelected && (
+                                                        <Check className="h-3 w-3 text-sky-500" />
+                                                      )}
                                                     </button>
                                                   );
                                                 })}
                                               </DropdownMenuContent>
                                             </DropdownMenu>
-                                            <button 
-                                              onClick={() => setOpenMedicationSelector(true)}
+                                            <button
+                                              onClick={() =>
+                                                setOpenMedicationSelector(true)
+                                              }
                                               className="text-[9px] font-black uppercase tracking-widest text-[#006699] hover:opacity-70 transition-opacity flex items-center gap-1.5"
                                             >
-                                              <Sparkles className="h-3 w-3" /> Biblioteca
+                                              <Sparkles className="h-3 w-3" />{" "}
+                                              Biblioteca
                                             </button>
                                           </div>
                                         </div>
-                                        <Input placeholder="Em uso..." className="h-12 rounded-[1.25rem] border-none bg-sky-500/5 font-bold px-4 focus-visible:bg-white transition-all shadow-inner" value={clinicalData.currentMedications} onChange={(e) => setClinicalData(prev => ({ ...prev, currentMedications: formatMedicalText(e.target.value)}))} />
+                                      </div>
+                                    </div>
+                                    <Input
+                                      placeholder="Em uso..."
+                                      className="h-12 rounded-[1.25rem] border-none bg-sky-500/5 font-bold px-4 focus-visible:bg-white transition-all shadow-inner w-full"
+                                      value={clinicalData.currentMedications}
+                                      onChange={(e) =>
+                                        setClinicalData((prev) => ({
+                                          ...prev,
+                                          currentMedications: formatMedicalText(
+                                            e.target.value,
+                                          ),
+                                        }))
+                                      }
+                                    />
+                                  </div>
+
+                                  <div className="md:col-span-12 lg:col-span-5 flex flex-col gap-4">
+                                    <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-border shadow-soft grow flex flex-col justify-center">
+                                      <div className="space-y-3">
+                                        <div className="flex items-center justify-between px-1">
+                                          <div className="flex items-center gap-2.5">
+                                            <div className="h-7 w-7 rounded-xl bg-amber-500/10 flex items-center justify-center text-amber-600">
+                                              <Stethoscope className="h-4 w-4" />
+                                            </div>
+                                            <Label className="text-[10px] font-black uppercase text-muted-foreground/60 tracking-widest">
+                                              Comorbidades
+                                            </Label>
+                                          </div>
+                                          <DropdownMenu>
+                                            <DropdownMenuTrigger asChild>
+                                              <button className="text-[9px] font-black uppercase tracking-widest text-[#006699] hover:opacity-70 transition-opacity flex items-center gap-1">
+                                                <Plus className="h-3 w-3" />{" "}
+                                                Sugestões
+                                              </button>
+                                            </DropdownMenuTrigger>
+                                            <DropdownMenuContent
+                                              align="end"
+                                              className="w-[300px] p-2 rounded-2xl bg-white shadow-2xl border-border/50"
+                                            >
+                                              <div className="grid grid-cols-2 gap-1">
+                                                {HISTORY_OPTIONS.map((opt) => {
+                                                  const isSelected =
+                                                    clinicalData.comorbidities
+                                                      .split(",")
+                                                      .map((i) => i.trim())
+                                                      .includes(opt);
+                                                  return (
+                                                    <button
+                                                      key={opt}
+                                                      onClick={() => {
+                                                        const currentItems =
+                                                          clinicalData.comorbidities
+                                                            .split(",")
+                                                            .map((i) =>
+                                                              i.trim(),
+                                                            )
+                                                            .filter(
+                                                              (i) => i !== "",
+                                                            );
+                                                        let newItems;
+                                                        if (isSelected) {
+                                                          newItems =
+                                                            currentItems.filter(
+                                                              (i) => i !== opt,
+                                                            );
+                                                        } else {
+                                                          newItems = [
+                                                            ...currentItems,
+                                                            opt,
+                                                          ];
+                                                        }
+                                                        setClinicalData(
+                                                          (prev) => ({
+                                                            ...prev,
+                                                            comorbidities:
+                                                              newItems.join(
+                                                                ", ",
+                                                              ),
+                                                          }),
+                                                        );
+                                                      }}
+                                                      className={cn(
+                                                        "flex items-center gap-2 p-2 rounded-xl transition-all group text-left",
+                                                        isSelected
+                                                          ? "bg-sky-50 border-sky-100"
+                                                          : "hover:bg-muted border-transparent",
+                                                      )}
+                                                    >
+                                                      <div
+                                                        className={cn(
+                                                          "h-1.5 w-1.5 rounded-full transition-colors",
+                                                          isSelected
+                                                            ? "bg-sky-500"
+                                                            : "bg-border group-hover:bg-[#006699]",
+                                                        )}
+                                                      />
+                                                      <span
+                                                        className={cn(
+                                                          "text-[10px] font-bold transition-colors",
+                                                          isSelected
+                                                            ? "text-sky-700"
+                                                            : "text-muted-foreground group-hover:text-foreground",
+                                                        )}
+                                                      >
+                                                        {opt}
+                                                      </span>
+                                                      {isSelected && (
+                                                        <Check className="h-3 w-3 ml-auto text-sky-500" />
+                                                      )}
+                                                    </button>
+                                                  );
+                                                })}
+                                              </div>
+                                            </DropdownMenuContent>
+                                          </DropdownMenu>
+                                        </div>
+                                        <Input
+                                          placeholder="Ex: HAS, DM, Asma..."
+                                          className="h-[60px] rounded-2xl border-none bg-muted/40 font-bold px-5"
+                                          value={clinicalData.comorbidities}
+                                          onChange={(e) =>
+                                            setClinicalData((prev) => ({
+                                              ...prev,
+                                              comorbidities: formatMedicalText(
+                                                e.target.value,
+                                              ),
+                                            }))
+                                          }
+                                        />
+                                      </div>
+                                    </div>
+                                    <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-border shadow-soft grow flex flex-col justify-center">
+                                      <div className="space-y-3">
+                                        <div className="flex items-center justify-between px-1">
+                                          <div className="flex items-center gap-2.5">
+                                            <div className="h-7 w-7 rounded-xl bg-red-500/10 flex items-center justify-center text-red-600">
+                                              <ShieldAlert className="h-4 w-4" />
+                                            </div>
+                                            <Label className="text-[10px] font-black uppercase text-red-500 tracking-widest">
+                                              Alergias Relatadas
+                                            </Label>
+                                          </div>
+                                          <DropdownMenu>
+                                            <DropdownMenuTrigger asChild>
+                                              <button className="text-[9px] font-black uppercase tracking-widest text-red-400 hover:opacity-70 transition-opacity flex items-center gap-1">
+                                                <Plus className="h-3 w-3" />{" "}
+                                                Sugestões
+                                              </button>
+                                            </DropdownMenuTrigger>
+                                            <DropdownMenuContent
+                                              align="end"
+                                              className="w-[200px] p-2 rounded-2xl bg-white shadow-2xl border-border/50"
+                                            >
+                                              <div className="grid grid-cols-1 gap-1">
+                                                {ALLERGY_OPTIONS.map((opt) => {
+                                                  const isSelected =
+                                                    clinicalData.allergies
+                                                      .split(",")
+                                                      .map((i) => i.trim())
+                                                      .includes(opt);
+                                                  return (
+                                                    <button
+                                                      key={opt}
+                                                      onClick={() => {
+                                                        const currentItems =
+                                                          clinicalData.allergies
+                                                            .split(",")
+                                                            .map((i) =>
+                                                              i.trim(),
+                                                            )
+                                                            .filter(
+                                                              (i) => i !== "",
+                                                            );
+                                                        let newItems;
+                                                        if (isSelected) {
+                                                          newItems =
+                                                            currentItems.filter(
+                                                              (i) => i !== opt,
+                                                            );
+                                                        } else {
+                                                          newItems = [
+                                                            ...currentItems,
+                                                            opt,
+                                                          ];
+                                                        }
+                                                        setClinicalData(
+                                                          (prev) => ({
+                                                            ...prev,
+                                                            allergies:
+                                                              newItems.join(
+                                                                ", ",
+                                                              ),
+                                                          }),
+                                                        );
+                                                      }}
+                                                      className={cn(
+                                                        "flex items-center gap-2 p-2 rounded-xl transition-all group text-left",
+                                                        isSelected
+                                                          ? "bg-red-50 border-red-200"
+                                                          : "hover:bg-muted border-transparent",
+                                                      )}
+                                                    >
+                                                      <div
+                                                        className={cn(
+                                                          "h-1.5 w-1.5 rounded-full transition-colors",
+                                                          isSelected
+                                                            ? "bg-red-500"
+                                                            : "bg-red-200 group-hover:bg-red-500",
+                                                        )}
+                                                      />
+                                                      <span
+                                                        className={cn(
+                                                          "text-[10px] font-bold transition-colors",
+                                                          isSelected
+                                                            ? "text-red-700"
+                                                            : "text-muted-foreground group-hover:text-red-700",
+                                                        )}
+                                                      >
+                                                        {opt}
+                                                      </span>
+                                                      {isSelected && (
+                                                        <Check className="h-3 w-3 ml-auto text-red-500" />
+                                                      )}
+                                                    </button>
+                                                  );
+                                                })}
+                                              </div>
+                                            </DropdownMenuContent>
+                                          </DropdownMenu>
+                                        </div>
+                                        <Input
+                                          placeholder="Ex: Alimentos, Medicamentos..."
+                                          className="h-[60px] rounded-2xl border-none bg-red-500/5 font-bold px-5 focus-visible:bg-white text-red-700 placeholder:text-red-200"
+                                          value={clinicalData.allergies}
+                                          onChange={(e) =>
+                                            setClinicalData((prev) => ({
+                                              ...prev,
+                                              allergies: formatMedicalText(
+                                                e.target.value,
+                                              ),
+                                            }))
+                                          }
+                                        />
                                       </div>
                                     </div>
                                   </div>
+                                </div>
 
                                   {/* Classificação Final */}
-                                  <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] p-8 border border-border shadow-soft space-y-8">
+                                  <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-border shadow-soft space-y-6">
                                     <div className="flex items-center justify-between">
                                       <div className="flex items-center gap-3">
                                         <div className="h-10 w-10 rounded-[1.25rem] bg-rose-500/10 flex items-center justify-center text-rose-500">
@@ -1990,7 +2354,7 @@ export default function TriageRoom() {
                                       )}
                                     </div>
 
-                                    <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+                                    <div className="grid grid-cols-6 gap-3">
                                       {[
                                         { id: 'emergency', label: 'Emergência', color: 'bg-red-500', icon: AlertCircle, shadow: 'shadow-red-500/30' },
                                         { id: 'very-urgent', label: 'Muito Urgente', color: 'bg-orange-500', icon: Clock, shadow: 'shadow-orange-500/30' },
@@ -2003,7 +2367,7 @@ export default function TriageRoom() {
                                           key={risk.id}
                                           onClick={() => setSelectedRisk(risk.id as 'emergency' | 'very-urgent' | 'urgent' | 'less-urgent' | 'not-urgent')}
                                           className={cn(
-                                            "flex flex-col items-center gap-4 p-6 rounded-[2.5rem] border-2 transition-all group relative overflow-hidden",
+                                            "flex flex-col items-center gap-2 p-3 rounded-2xl border-2 transition-all group relative overflow-hidden",
                                             selectedRisk === risk.id 
                                               ? `${risk.color} border-transparent ${risk.iconColor || 'text-white'} ${risk.shadow} scale-[1.04] z-10 shadow-2xl` 
                                               : lastCalculatedRisk === risk.id
@@ -2022,7 +2386,7 @@ export default function TriageRoom() {
                                             <motion.div 
                                               initial={{ y: -20 }}
                                               animate={{ y: 0 }}
-                                              className="absolute top-2 left-1/2 -translate-x-1/2 bg-white px-2 py-0.5 rounded-full shadow-sm border border-current flex items-center gap-1"
+                                              className="absolute top-1 left-1/2 -translate-x-1/2 bg-white px-2 py-0.5 rounded-full shadow-sm border border-current flex items-center gap-1"
                                               style={{ color: risk.id === 'emergency' ? '#ef4444' : 
                                                               risk.id === 'very-urgent' ? '#f97316' :
                                                               risk.id === 'urgent' ? '#facc15' :
@@ -2033,12 +2397,12 @@ export default function TriageRoom() {
                                             </motion.div>
                                           )}
                                           <div className={cn(
-                                            "h-14 w-14 rounded-2xl flex items-center justify-center transition-all",
+                                            "h-10 w-10 rounded-xl flex items-center justify-center transition-all",
                                             selectedRisk === risk.id ? "bg-white/20 scale-110" : "bg-muted/30 group-hover:bg-muted/50"
                                           )}>
-                                            <risk.icon className={cn("h-8 w-8 transition-transform group-hover:scale-110", selectedRisk === risk.id ? (risk.iconColor || "text-white") : "text-muted-foreground/20")} />
+                                            <risk.icon className={cn("h-5 w-5 transition-transform group-hover:scale-110", selectedRisk === risk.id ? (risk.iconColor || "text-white") : "text-muted-foreground/20")} />
                                           </div>
-                                          <span className="text-[10px] font-black uppercase tracking-[0.2em] text-center leading-tight">{risk.label}</span>
+                                          <span className="text-[9px] font-black uppercase tracking-[0.15em] text-center leading-tight">{risk.label}</span>
                                           {selectedRisk === risk.id && (
                                             <div className="absolute top-4 right-4">
                                               <CheckCircle2 className="h-5 w-5 text-white/50" />
@@ -2079,14 +2443,7 @@ export default function TriageRoom() {
                                     <ArrowLeft className="h-4 w-4 mr-3 group-hover:-translate-x-1 transition-transform" />
                                     Dados do Paciente
                                   </Button>
-                                  <Button
-                                    variant="outline"
-                                    onClick={() => setIsExamsModalOpen(true)}
-                                    className="h-16 px-8 rounded-2xl font-black text-xs uppercase tracking-widest text-purple-600 border-purple-200 hover:bg-purple-50 transition-all dark:text-purple-400 dark:border-purple-900/50 dark:hover:bg-purple-900/20"
-                                  >
-                                    <FlaskConical className="h-5 w-5 mr-3" />
-                                    Solicitar Exames
-                                  </Button>
+                                  
                                 </div>
 
                                 <div className="flex items-center gap-4 w-full sm:w-auto">
