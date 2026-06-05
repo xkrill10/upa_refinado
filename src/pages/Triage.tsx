@@ -1391,10 +1391,10 @@ export default function Triage() {
                               initial={{ opacity: 0, scale: 0.98, y: 10 }}
                               animate={{ opacity: 1, scale: 1, y: 0 }}
                               exit={{ opacity: 0, scale: 0.98, y: -10 }}
-                              className="space-y-10"
+                              className="space-y-4"
                             >
                               {/* Header Card Premium */}
-                              <div className="bg-gradient-to-r from-[#006699] to-[#004466] rounded-[2.5rem] p-8 md:p-10 text-white shadow-2xl shadow-[#006699]/20 relative overflow-hidden group">
+                              <div className="bg-gradient-to-r from-[#006699] to-[#004466] rounded-2xl p-6 md:p-8 text-white shadow-2xl shadow-[#006699]/20 relative overflow-hidden group">
                                 <div className="absolute top-0 right-0 p-12 bg-white/5 rounded-full blur-3xl -translate-y-12 translate-x-12" />
                                 <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
                                   <div className="flex items-center gap-5">
@@ -1439,12 +1439,12 @@ export default function Triage() {
                                 </div>
                               </div>
 
-                              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-                                {/* Bento Lado Esquerdo: Neurologia e Sinais Vitais */}
-                                <div className="lg:col-span-4 space-y-8">
+                              <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
+                                {/* Sinais Vitais em toda a largura */}
+                                <div className="lg:col-span-12">
                                   {/* Sinais Vitais */}
-                                  <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] p-8 md:p-10 border border-border shadow-soft relative overflow-hidden flex flex-col">
-                                    <div className="flex items-center justify-between mb-10 shrink-0">
+                                  <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-border shadow-soft relative overflow-hidden flex flex-col">
+                                    <div className="flex items-center justify-between mb-6 shrink-0">
                                       <div className="flex items-center gap-3">
                                         <div className="h-10 w-10 rounded-[1.25rem] bg-[#006699]/10 flex items-center justify-center text-[#006699]">
                                           <Activity className="h-5 w-5" />
@@ -1470,14 +1470,14 @@ export default function Triage() {
                                       )}
                                     </div>
 
-                                    <div className="grid grid-cols-12 gap-4 grow content-start">
+                                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 grow content-start">
                                         {[
-                                          { label: "PA (mmHg)", key: "pa", icon: Droplets, placeholder: "120/80", color: "text-sky-500", bgColor: "bg-sky-500/10", borderColor: "border-sky-500/20", mask: maskPA, span: "col-span-6" },
-                                          { label: "FC (BPM)", key: "fc", icon: Heart, placeholder: "000", color: "text-red-500", bgColor: "bg-red-500/10", borderColor: "border-red-500/20", mask: maskFC, span: "col-span-6" },
-                                          { label: "SpO2 (%)", key: "spo2", icon: Zap, placeholder: "90", color: "text-amber-500", bgColor: "bg-amber-500/10", borderColor: "border-amber-500/20", mask: maskSPO2, span: "col-span-6" },
-                                          { label: "Temp (°C)", key: "temperature", icon: Thermometer, placeholder: "36.5", color: "text-orange-500", bgColor: "bg-orange-500/10", borderColor: "border-orange-500/20", mask: maskTemp, span: "col-span-6" },
-                                          { label: "Glicemia", key: "glicemia", icon: Syringe, placeholder: "100", color: "text-emerald-500", bgColor: "bg-emerald-500/10", borderColor: "border-emerald-500/20", mask: maskGlicemia, span: "col-span-6" },
-                                          { label: "FR (irpm)", key: "fr", icon: Wind, placeholder: "18", color: "text-indigo-500", bgColor: "bg-indigo-500/10", borderColor: "border-indigo-500/20", mask: maskFR, span: "col-span-6" },
+                                          { label: "PA (mmHg)", key: "pa", icon: Droplets, placeholder: "120/80", color: "text-sky-500", bgColor: "bg-sky-500/10", borderColor: "border-sky-500/20", mask: maskPA, span: "col-span-1" },
+                                          { label: "FC (BPM)", key: "fc", icon: Heart, placeholder: "000", color: "text-red-500", bgColor: "bg-red-500/10", borderColor: "border-red-500/20", mask: maskFC, span: "col-span-1" },
+                                          { label: "SpO2 (%)", key: "spo2", icon: Zap, placeholder: "90", color: "text-amber-500", bgColor: "bg-amber-500/10", borderColor: "border-amber-500/20", mask: maskSPO2, span: "col-span-1" },
+                                          { label: "Temp (°C)", key: "temperature", icon: Thermometer, placeholder: "36.5", color: "text-orange-500", bgColor: "bg-orange-500/10", borderColor: "border-orange-500/20", mask: maskTemp, span: "col-span-1" },
+                                          { label: "Glicemia", key: "glicemia", icon: Syringe, placeholder: "100", color: "text-emerald-500", bgColor: "bg-emerald-500/10", borderColor: "border-emerald-500/20", mask: maskGlicemia, span: "col-span-1" },
+                                          { label: "FR (irpm)", key: "fr", icon: Wind, placeholder: "18", color: "text-indigo-500", bgColor: "bg-indigo-500/10", borderColor: "border-indigo-500/20", mask: maskFR, span: "col-span-1" },
                                         ].map((vit) => {
                                           const value = clinicalData[vit.key as keyof typeof clinicalData] as string;
                                           const hasValue = value && value.trim() !== "";
@@ -1522,7 +1522,7 @@ export default function Triage() {
                                                   }}
                                                   placeholder={vit.placeholder}
                                                   className={cn(
-                                                    "h-16 rounded-2xl border-2 font-black text-xl text-center transition-all shadow-inner placeholder:text-muted-foreground/40 pr-4 pl-4",
+                                                    "h-12 rounded-xl border-2 font-black text-lg text-center transition-all shadow-inner placeholder:text-muted-foreground/40 pr-4 pl-4",
                                                     hasValue 
                                                       ? (severity === 'emergency' ? "bg-red-50 border-red-200 text-red-900 focus-visible:ring-red-200" : severity === 'caution' ? "bg-orange-50 border-orange-200 text-orange-900 focus-visible:ring-orange-200" : `bg-white dark:bg-slate-900 ${vit.borderColor} border-opacity-70 text-foreground ring-1 ring-offset-0 ${vit.borderColor.replace('border-', 'ring-')}/20`)
                                                       : "bg-muted/10 border-transparent hover:bg-muted/20 focus-visible:bg-white focus-visible:ring-2 focus-visible:ring-[#006699]/10 focus-visible:border-[#006699]/30"
@@ -1534,11 +1534,71 @@ export default function Triage() {
                                         })}
                                     </div>
                                   </div>
+                                </div>
 
-                                  {/* Novo Card Glasgow Premium */}
+                                {/* Coluna Esquerda: Glasgow e outros */}
+                                <div className="lg:col-span-4 space-y-4 flex flex-col">
+                                  {/* Medicamentos */}
+                                  <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-border shadow-soft flex flex-col justify-center gap-4 grow">
+                                    <div className="flex items-center gap-4">
+                                      <div className="h-12 w-12 rounded-2xl bg-sky-500/10 flex items-center justify-center text-sky-500 shrink-0">
+                                        <Pill className="h-6 w-6" />
+                                      </div>
+                                      <div className="grow min-w-0 space-y-2">
+                                        <div className="flex items-center justify-between gap-4 px-1">
+                                          <Label className="text-[10px] font-black uppercase tracking-widest text-[#006699]/60 truncate">Medicamentos</Label>
+                                          <div className="flex items-center gap-3 shrink-0">
+                                            <DropdownMenu>
+                                              <DropdownMenuTrigger asChild>
+                                                <button className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/60 hover:text-[#006699] transition-colors flex items-center gap-1">
+                                                  <Plus className="h-3 w-3" /> Sugestões
+                                                </button>
+                                              </DropdownMenuTrigger>
+                                              <DropdownMenuContent align="end" className="w-[200px] p-2 rounded-xl bg-white shadow-xl border-border/50">
+                                                {["Losartana", "Metformina", "Atenolol", "Anlodipino", "Enalapril", "Hidroclorotiazida", "Dipirona", "Paracetamol", "Aspirina", "Nega"].map(opt => {
+                                                  const isSelected = clinicalData.currentMedications.split(",").map(i => i.trim()).includes(opt);
+                                                  return (
+                                                    <button
+                                                      key={opt}
+                                                      onClick={() => {
+                                                        const currentItems = clinicalData.currentMedications.split(",").map(i => i.trim()).filter(i => i !== "");
+                                                        let newItems;
+                                                        if (isSelected) {
+                                                          newItems = currentItems.filter(i => i !== opt);
+                                                        } else {
+                                                          newItems = [...currentItems, opt];
+                                                        }
+                                                        setClinicalData(prev => ({ ...prev, currentMedications: newItems.join(", ") }));
+                                                      }}
+                                                      className={cn(
+                                                        "w-full text-left p-2 rounded-lg transition-all text-[10px] font-bold flex items-center justify-between",
+                                                        isSelected ? "bg-sky-50 text-sky-700" : "hover:bg-muted text-muted-foreground"
+                                                      )}
+                                                    >
+                                                      {opt}
+                                                      {isSelected && <Check className="h-3 w-3 text-sky-500" />}
+                                                    </button>
+                                                  );
+                                                })}
+                                              </DropdownMenuContent>
+                                            </DropdownMenu>
+                                            <button 
+                                              onClick={() => setOpenMedicationSelector(true)}
+                                              className="text-[9px] font-black uppercase tracking-widest text-[#006699] hover:opacity-70 transition-opacity flex items-center gap-1.5"
+                                            >
+                                              <Sparkles className="h-3 w-3" /> Biblioteca
+                                            </button>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </div>
+                                    <Input placeholder="Em uso..." className="h-12 rounded-[1.25rem] border-none bg-sky-500/5 font-bold px-4 focus-visible:bg-white transition-all shadow-inner w-full" value={clinicalData.currentMedications} onChange={(e) => setClinicalData(prev => ({ ...prev, currentMedications: formatMedicalText(e.target.value)}))} />
+                                  </div>
+
+                                  {/* Card Glasgow Premium */}
                                   <div 
                                     onClick={() => setOpenGlasgowCalc(true)}
-                                    className="bg-white dark:bg-slate-900 rounded-[2rem] p-6 border border-border shadow-soft relative overflow-hidden group cursor-pointer hover:border-[#006699]/30 transition-all active:scale-[0.98]"
+                                    className="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-border shadow-soft relative overflow-hidden group cursor-pointer hover:border-[#006699]/30 transition-all active:scale-[0.98]"
                                   >
                                     <div className="absolute top-0 right-0 p-4 opacity-[0.03] group-hover:opacity-[0.05] transition-opacity">
                                       <Brain className="h-24 w-24 -mr-8 -mt-8" />
@@ -1595,11 +1655,11 @@ export default function Triage() {
                                 </div>
 
                                 {/* Bento Lado Direito: Anamnese e Avaliação */}
-                                <div className="lg:col-span-8 space-y-8">
+                                <div className="lg:col-span-8 space-y-4">
                                   {/* Queixa e Perfil Clínico */}
-                                  <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
-                                    <div className="md:col-span-12 lg:col-span-7 bg-white dark:bg-slate-900 rounded-[2.5rem] p-8 md:p-10 border border-border shadow-soft">
-                                      <div className="flex items-center justify-between mb-8">
+                                  <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
+                                    <div className="md:col-span-12 lg:col-span-7 bg-white dark:bg-slate-900 rounded-2xl p-6 border border-border shadow-soft">
+                                      <div className="flex items-center justify-between mb-4">
                                         <div className="flex items-center gap-3">
                                           <div className="h-10 w-10 rounded-[1.25rem] bg-indigo-500/10 flex items-center justify-center text-indigo-500">
                                             <MessageSquare className="h-5 w-5" />
@@ -1615,7 +1675,7 @@ export default function Triage() {
                                         <div className="relative group">
                                           <Textarea
                                             placeholder="Descreva detalhadamente os sintomas que trouxeram o paciente..."
-                                            className="min-h-[220px] rounded-[2rem] border-none bg-muted/30 focus:bg-white focus:ring-4 focus:ring-indigo-500/5 transition-all text-sm font-medium tracking-tight p-6 resize-none shadow-inner leading-relaxed"
+                                            className="min-h-[140px] rounded-2xl border-none bg-muted/30 focus:bg-white focus:ring-4 focus:ring-indigo-500/5 transition-all text-sm font-medium tracking-tight p-5 resize-none shadow-inner leading-relaxed"
                                             value={clinicalData.mainComplaint}
                                             onChange={(e) => setClinicalData(prev => ({ ...prev, mainComplaint: formatMedicalText(e.target.value) }))}
                                           />
@@ -1672,7 +1732,7 @@ export default function Triage() {
                                     </div>
 
                                     <div className="md:col-span-12 lg:col-span-5 space-y-6">
-                                      <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] p-8 border border-border shadow-soft">
+                                      <div className="bg-white dark:bg-slate-900 rounded-2xl p-8 border border-border shadow-soft">
                                         <div className="space-y-3">
                                           <div className="flex items-center justify-between px-1">
                                             <div className="flex items-center gap-2.5">
@@ -1733,7 +1793,7 @@ export default function Triage() {
                                           />
                                         </div>
                                       </div>
-                                      <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] p-8 border border-border shadow-soft">
+                                      <div className="bg-white dark:bg-slate-900 rounded-2xl p-8 border border-border shadow-soft">
                                         <div className="space-y-3">
                                           <div className="flex items-center justify-between px-1">
                                             <div className="flex items-center gap-2.5">
@@ -1797,93 +1857,10 @@ export default function Triage() {
                                     </div>
                                   </div>
 
-                                  {/* Weight & Medications Row */}
-                                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <div className="bg-white dark:bg-slate-900 rounded-[2rem] p-6 border border-border shadow-soft flex items-center gap-6">
-                                      <div className="h-12 w-12 rounded-2xl bg-indigo-500/10 flex items-center justify-center text-indigo-500 shrink-0">
-                                        <Scale className="h-6 w-6" />
-                                      </div>
-                                      <div className="grow space-y-2">
-                                        <div className="flex items-center justify-between px-1">
-                                          <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">Peso (kg)</Label>
-                                          <div className="flex items-center gap-2">
-                                            <span className="text-[9px] font-mono opacity-40 uppercase">Aferição Infantil/Geral</span>
-                                          </div>
-                                        </div>
-                                        <div className="relative group">
-                                          <Input 
-                                            placeholder="Ex: 12.500 ou 75.0"
-                                            className="h-12 rounded-[1.25rem] border-none bg-muted/30 font-bold px-4"
-                                            value={clinicalData.weight}
-                                            onChange={(e) => {
-                                              const val = e.target.value.replace(/[^0-9.]/g, '');
-                                              setClinicalData(prev => ({ ...prev, weight: val }));
-                                            }}
-                                          />
-                                          <div className="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-black text-muted-foreground/40 pointer-events-none">
-                                            KG
-                                          </div>
-                                        </div>
-                                      </div>
-                                    </div>
 
-                                    <div className="bg-white dark:bg-slate-900 rounded-[2rem] p-6 border border-border shadow-soft flex items-center gap-6">
-                                      <div className="h-12 w-12 rounded-2xl bg-sky-500/10 flex items-center justify-center text-sky-500 shrink-0">
-                                        <Pill className="h-6 w-6" />
-                                      </div>
-                                      <div className="grow min-w-0 space-y-2">
-                                        <div className="flex items-center justify-between gap-4 px-1">
-                                          <Label className="text-[10px] font-black uppercase tracking-widest text-[#006699]/60 truncate">Medicamentos Contínuos</Label>
-                                          <div className="flex items-center gap-3 shrink-0">
-                                            <DropdownMenu>
-                                              <DropdownMenuTrigger asChild>
-                                                <button className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/60 hover:text-[#006699] transition-colors flex items-center gap-1">
-                                                  <Plus className="h-3 w-3" /> Sugestões
-                                                </button>
-                                              </DropdownMenuTrigger>
-                                              <DropdownMenuContent align="end" className="w-[200px] p-2 rounded-xl bg-white shadow-xl border-border/50">
-                                                {["Losartana", "Metformina", "Atenolol", "Anlodipino", "Enalapril", "Hidroclorotiazida", "Dipirona", "Paracetamol", "Aspirina", "Nega"].map(opt => {
-                                                  const isSelected = clinicalData.currentMedications.split(",").map(i => i.trim()).includes(opt);
-                                                  return (
-                                                    <button
-                                                      key={opt}
-                                                      onClick={() => {
-                                                        const currentItems = clinicalData.currentMedications.split(",").map(i => i.trim()).filter(i => i !== "");
-                                                        let newItems;
-                                                        if (isSelected) {
-                                                          newItems = currentItems.filter(i => i !== opt);
-                                                        } else {
-                                                          newItems = [...currentItems, opt];
-                                                        }
-                                                        setClinicalData(prev => ({ ...prev, currentMedications: newItems.join(", ") }));
-                                                      }}
-                                                      className={cn(
-                                                        "w-full text-left p-2 rounded-lg transition-all text-[10px] font-bold flex items-center justify-between",
-                                                        isSelected ? "bg-sky-50 text-sky-700" : "hover:bg-muted text-muted-foreground"
-                                                      )}
-                                                    >
-                                                      {opt}
-                                                      {isSelected && <Check className="h-3 w-3 text-sky-500" />}
-                                                    </button>
-                                                  );
-                                                })}
-                                              </DropdownMenuContent>
-                                            </DropdownMenu>
-                                            <button 
-                                              onClick={() => setOpenMedicationSelector(true)}
-                                              className="text-[9px] font-black uppercase tracking-widest text-[#006699] hover:opacity-70 transition-opacity flex items-center gap-1.5"
-                                            >
-                                              <Sparkles className="h-3 w-3" /> Biblioteca
-                                            </button>
-                                          </div>
-                                        </div>
-                                        <Input placeholder="Em uso..." className="h-12 rounded-[1.25rem] border-none bg-sky-500/5 font-bold px-4 focus-visible:bg-white transition-all shadow-inner" value={clinicalData.currentMedications} onChange={(e) => setClinicalData(prev => ({ ...prev, currentMedications: formatMedicalText(e.target.value)}))} />
-                                      </div>
-                                    </div>
-                                  </div>
 
                                   {/* Classificação Final */}
-                                  <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] p-8 border border-border shadow-soft space-y-8">
+                                  <div className="bg-white dark:bg-slate-900 rounded-2xl p-8 border border-border shadow-soft space-y-8">
                                     <div className="flex items-center justify-between">
                                       <div className="flex items-center gap-3">
                                         <div className="h-10 w-10 rounded-[1.25rem] bg-rose-500/10 flex items-center justify-center text-rose-500">
@@ -1977,7 +1954,7 @@ export default function Triage() {
                                       )}
                                     </div>
 
-                                    <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+                                    <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
                                       {[
                                         { id: 'emergency', label: 'Emergência', color: 'bg-red-500', icon: AlertCircle, shadow: 'shadow-red-500/30' },
                                         { id: 'very-urgent', label: 'Muito Urgente', color: 'bg-orange-500', icon: Clock, shadow: 'shadow-orange-500/30' },
@@ -1990,7 +1967,7 @@ export default function Triage() {
                                           key={risk.id}
                                           onClick={() => setSelectedRisk(risk.id as 'emergency' | 'very-urgent' | 'urgent' | 'less-urgent' | 'not-urgent')}
                                           className={cn(
-                                            "flex flex-col items-center gap-4 p-6 rounded-[2.5rem] border-2 transition-all group relative overflow-hidden",
+                                            "flex flex-col items-center gap-4 p-6 rounded-2xl border-2 transition-all group relative overflow-hidden",
                                             selectedRisk === risk.id 
                                               ? `${risk.color} border-transparent ${risk.iconColor || 'text-white'} ${risk.shadow} scale-[1.04] z-10 shadow-2xl` 
                                               : lastCalculatedRisk === risk.id
@@ -2044,7 +2021,7 @@ export default function Triage() {
                                         <div className="col-span-full">
                                           <Textarea
                                             placeholder="Descreva fundamentadamente os critérios que definiram esta classificação..."
-                                            className="min-h-[140px] rounded-[1.5rem] border-none bg-muted/30 focus:bg-white focus:ring-4 focus:ring-[#006699]/5 transition-all text-sm font-medium p-5 shadow-inner"
+                                            className="min-h-[80px] rounded-[1.5rem] border-none bg-muted/30 focus:bg-white focus:ring-4 focus:ring-[#006699]/5 transition-all text-sm font-medium p-5 shadow-inner"
                                             value={clinicalData.justification}
                                             onChange={(e) => setClinicalData(prev => ({ ...prev, justification: formatMedicalText(e.target.value) }))}
                                           />
@@ -2066,14 +2043,7 @@ export default function Triage() {
                                     <ArrowLeft className="h-4 w-4 mr-3 group-hover:-translate-x-1 transition-transform" />
                                     Dados do Paciente
                                   </Button>
-                                  <Button
-                                    variant="outline"
-                                    onClick={() => setIsExamsModalOpen(true)}
-                                    className="h-16 px-8 rounded-2xl font-black text-xs uppercase tracking-widest text-purple-600 border-purple-200 hover:bg-purple-50 transition-all dark:text-purple-400 dark:border-purple-900/50 dark:hover:bg-purple-900/20"
-                                  >
-                                    <FlaskConical className="h-5 w-5 mr-3" />
-                                    Solicitar Exames
-                                  </Button>
+
                                 </div>
 
                                 <div className="flex items-center gap-4 w-full sm:w-auto">
@@ -2127,7 +2097,7 @@ export default function Triage() {
 
           <form onSubmit={handleNewPatientSubmit} className="space-y-6 p-8">
             {/* DADOS PESSOAIS */}
-            <Card className="glass-card border-0 shadow-xl rounded-[2rem] overflow-hidden">
+            <Card className="glass-card border-0 shadow-xl rounded-2xl overflow-hidden">
               <CardHeader className="bg-primary/5 border-b border-primary/10 p-8">
                 <CardTitle className="text-xl mission-control-title flex items-center gap-3">
                   <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center border border-primary/20">
@@ -2236,7 +2206,7 @@ export default function Triage() {
             </Card>
 
             {/* ENDERE\xC7O */}
-            <Card className="glass-card border-0 shadow-xl rounded-[2rem] overflow-hidden">
+            <Card className="glass-card border-0 shadow-xl rounded-2xl overflow-hidden">
               <CardHeader className="bg-muted/30 border-b border-border p-8">
                 <CardTitle className="text-xl mission-control-title flex items-center gap-3">
                   <div className="h-10 w-10 rounded-xl bg-muted flex items-center justify-center border border-border">
@@ -2630,7 +2600,7 @@ export default function Triage() {
       </Dialog>
       {/* Call Control Dialog */}
       <Dialog open={showCallControl} onOpenChange={setShowCallControl}>
-        <DialogContent className="max-w-md p-0 overflow-hidden rounded-[2rem] border-none shadow-2xl [&>button]:hidden">
+        <DialogContent className="max-w-md p-0 overflow-hidden rounded-2xl border-none shadow-2xl [&>button]:hidden">
           <DialogHeader className={cn(
             "p-6 text-white transition-colors duration-500",
             callingTicket?.risk === 'emergency' ? 'bg-red-600' :
