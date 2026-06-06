@@ -123,22 +123,24 @@ export function ExamsModal({ patient, onClose }: ExamsModalProps) {
   };
 
   return (
-    <div className="flex flex-col gap-4">
-      <div className="flex flex-col gap-3">
+    <div className="flex flex-col h-full overflow-hidden gap-2">
+      <div className="flex flex-col gap-2 shrink-0">
         <div className="flex bg-slate-100 dark:bg-slate-800/50 p-1 rounded-xl">
           <Button
             variant={priority === 'normal' ? 'default' : 'outline'}
-            className={cn("flex-1", priority === 'normal' && "bg-blue-600 hover:bg-blue-700")}
+            size="sm"
+            className={cn("flex-1 h-8", priority === 'normal' && "bg-blue-600 hover:bg-blue-700")}
             onClick={() => setPriority('normal')}
           >
             Rotina
           </Button>
           <Button
             variant={priority === 'urgent' ? 'default' : 'outline'}
-            className={cn("flex-1", priority === 'urgent' && "bg-red-600 hover:bg-red-700")}
+            size="sm"
+            className={cn("flex-1 h-8", priority === 'urgent' && "bg-red-600 hover:bg-red-700")}
             onClick={() => setPriority('urgent')}
           >
-            <AlertCircle className="w-4 h-4 mr-2" /> Urgente (SLA 1h)
+            <AlertCircle className="w-3 h-3 mr-2" /> Urgente (1h)
           </Button>
         </div>
         
@@ -159,16 +161,16 @@ export function ExamsModal({ patient, onClose }: ExamsModalProps) {
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input 
-            placeholder="Buscar exame (ex: Hemograma, Raio-X)..." 
-            className="pl-9 h-12 rounded-xl bg-white dark:bg-slate-950"
+            placeholder="Buscar exame..." 
+            className="pl-9 h-10 rounded-xl bg-white dark:bg-slate-950"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
       </div>
 
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-2 mb-4 bg-muted/50 rounded-xl p-1 h-12">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col overflow-hidden min-h-[150px]">
+        <TabsList className="grid w-full grid-cols-2 mb-2 bg-muted/50 rounded-xl p-1 h-10 shrink-0">
           <TabsTrigger value="lab" className="rounded-lg gap-2 text-xs font-bold uppercase tracking-widest data-[state=active]:bg-white data-[state=active]:text-blue-600 data-[state=active]:shadow-sm">
             <FlaskConical className="h-4 w-4" /> Laboratório
           </TabsTrigger>
@@ -177,9 +179,8 @@ export function ExamsModal({ patient, onClose }: ExamsModalProps) {
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="lab" className="mt-0">
-          <div className="max-h-[250px] overflow-y-auto pr-2 custom-scrollbar" ref={scrollRefLab}>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <TabsContent value="lab" className="flex-1 overflow-y-auto pr-2 custom-scrollbar mt-0 outline-none" ref={scrollRefLab}>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2 pb-2">
               {filteredExams.filter(ex => ex.type === 'lab').map(ex => {
                 const isSelected = selectedExams.some(e => e.name === ex.name);
                 return (
@@ -205,12 +206,10 @@ export function ExamsModal({ patient, onClose }: ExamsModalProps) {
                 );
               })}
             </div>
-          </div>
         </TabsContent>
 
-        <TabsContent value="image" className="mt-0">
-          <div className="max-h-[250px] overflow-y-auto pr-2 custom-scrollbar" ref={scrollRefImg}>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <TabsContent value="image" className="flex-1 overflow-y-auto pr-2 custom-scrollbar mt-0 outline-none" ref={scrollRefImg}>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2 pb-2">
               {filteredExams.filter(ex => ex.type === 'image').map(ex => {
                 const isSelected = selectedExams.some(e => e.name === ex.name);
                 const needsDetails = ex.name.includes('Extremidades') || ex.name.includes('Bacia/Pelve');
@@ -246,28 +245,50 @@ export function ExamsModal({ patient, onClose }: ExamsModalProps) {
                 );
               })}
             </div>
-          </div>
         </TabsContent>
       </Tabs>
 
-      <div className="space-y-2 mt-2">
-        <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Justificativa Clínica / Observações</Label>
-        <Textarea 
-          placeholder="Descreva brevemente o motivo do pedido, histórico relevante ou suspeita diagnóstica..." 
-          className="resize-none h-16 text-xs bg-slate-50 dark:bg-slate-900/50 rounded-xl"
-          value={justification}
-          onChange={(e) => setJustification(e.target.value)}
-        />
-      </div>
+      <div className="shrink-0 space-y-2 mt-2 pt-2 border-t border-slate-200 dark:border-slate-800">
+        <div className="space-y-1">
+          <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Justificativa / Observações</Label>
+          <Textarea 
+            placeholder="Descreva o motivo do pedido..." 
+            className="resize-none h-10 min-h-[40px] text-xs bg-slate-50 dark:bg-slate-900/50 rounded-xl"
+            value={justification}
+            onChange={(e) => setJustification(e.target.value)}
+          />
+        </div>
 
-      <Button 
-        className="w-full h-12 font-bold text-sm bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700" 
-        onClick={handleSave}
-        disabled={selectedExams.length === 0}
-      >
-        <FlaskConical className="w-4 h-4 mr-2" />
-        Solicitar {selectedExams.length > 0 ? `${selectedExams.length} Exames` : "Exames"}
-      </Button>
+        <div className="flex gap-2">
+          <Button 
+            variant="outline"
+            className="flex-1 h-10 font-bold text-sm text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
+            onClick={onClose}
+          >
+            Cancelar
+          </Button>
+          <Button 
+            variant="outline"
+            className="flex-1 h-10 font-bold text-sm text-amber-600 border-amber-200 hover:bg-amber-50 dark:hover:bg-amber-900/20"
+            onClick={() => {
+              setSelectedExams([]);
+              setJustification("");
+              setLateralityDetails({});
+            }}
+            disabled={selectedExams.length === 0 && !justification}
+          >
+            Limpar
+          </Button>
+          <Button 
+            className="flex-[2] h-10 font-bold text-sm bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 shadow-lg shadow-blue-500/20" 
+            onClick={handleSave}
+            disabled={selectedExams.length === 0}
+          >
+            <FlaskConical className="w-4 h-4 mr-2" />
+            Confirmar {selectedExams.length > 0 ? `(${selectedExams.length})` : ""}
+          </Button>
+        </div>
+      </div>
     </div>
   );
 }

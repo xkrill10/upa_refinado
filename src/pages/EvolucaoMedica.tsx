@@ -899,13 +899,7 @@ export default function EvolucaoMedica() {
             ⏱️ Jornada
           </Button>
 
-          <Button
-            onClick={() => setIsExamsModalOpen(true)}
-            className="rounded-xl gap-2 font-black bg-purple-600 hover:bg-purple-700 text-white shadow-lg shadow-purple-500/20 uppercase tracking-widest text-[10px] h-10 px-4"
-          >
-            <FlaskConical className="h-4 w-4" />
-            Apoio Diagnóstico
-          </Button>
+
         </div>
       </div>
 
@@ -2198,10 +2192,39 @@ export default function EvolucaoMedica() {
                       </div>
                     </div>
 
-                    {/* Escores e Calculadoras Rápidas */}
-                    <div className="space-y-3 pt-2">
+                    {/* 4. Apoio Diagnóstico */}
+                    <div className="space-y-3 pt-4 border-t border-slate-500/10">
                       <div className="flex items-center justify-between">
-                        <span className="text-[9px] font-black uppercase text-muted-foreground">4. Escores e Calculadoras Rápidas</span>
+                        <span className="text-[9px] font-black uppercase text-muted-foreground">4. Apoio Diagnóstico (Exames Laboratoriais e Imagem)</span>
+                        <Badge variant="outline" className="text-[8px] uppercase tracking-wider bg-purple-500/5 text-purple-600 border-purple-500/20">Solicitações</Badge>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setIsExamsModalOpen(true)}
+                        className="w-full flex items-center justify-between p-4 rounded-xl border bg-white/45 dark:bg-slate-900/45 hover:bg-white/60 dark:hover:bg-slate-900/60 border-purple-500/30 hover:border-purple-500/50 backdrop-blur-sm shadow-sm transition-all group"
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className="h-10 w-10 rounded-lg flex items-center justify-center bg-purple-500/10 text-purple-600 transition-colors group-hover:bg-purple-500 group-hover:text-white">
+                            <FlaskConical className="h-5 w-5" />
+                          </div>
+                          <div className="text-left">
+                            <p className="text-xs font-bold text-foreground">Apoio Diagnóstico e Exames</p>
+                            <p className="text-[10px] font-semibold text-muted-foreground mt-0.5">Acessar painéis laboratoriais e protocolos de imagem para a UPA 24h</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Badge className="bg-purple-600 hover:bg-purple-700 text-white border-none text-[9px] uppercase tracking-wider font-bold">
+                            Abrir Menu
+                          </Badge>
+                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-muted-foreground/40 group-hover:text-purple-500 transition-colors"><path d="m9 18 6-6-6-6"/></svg>
+                        </div>
+                      </button>
+                    </div>
+
+                    {/* Escores e Calculadoras Rápidas */}
+                    <div className="space-y-3 pt-4 border-t border-slate-500/10">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[9px] font-black uppercase text-muted-foreground">5. Escores e Calculadoras Rápidas</span>
                         <Badge variant="outline" className="text-[8px] uppercase tracking-wider bg-primary/5 text-primary border-primary/20">Fast-Track</Badge>
                       </div>
 
@@ -2490,10 +2513,39 @@ export default function EvolucaoMedica() {
                       </div>
                     </div>
 
-                    {/* Escores e Calculadoras Rápidas (Pediatria) */}
-                    <div className="space-y-3 pt-2">
+                    {/* 4. Apoio Diagnóstico */}
+                    <div className="space-y-3 pt-4 border-t border-slate-500/10">
                       <div className="flex items-center justify-between">
-                        <span className="text-[9px] font-black uppercase text-muted-foreground">4. Escores Pediátricos (Fast-Track)</span>
+                        <span className="text-[9px] font-black uppercase text-muted-foreground">4. Apoio Diagnóstico (Exames Laboratoriais e Imagem)</span>
+                        <Badge variant="outline" className="text-[8px] uppercase tracking-wider bg-purple-500/5 text-purple-600 border-purple-500/20">Solicitações</Badge>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setIsExamsModalOpen(true)}
+                        className="w-full flex items-center justify-between p-4 rounded-xl border bg-white/45 dark:bg-slate-900/45 hover:bg-white/60 dark:hover:bg-slate-900/60 border-purple-500/30 hover:border-purple-500/50 backdrop-blur-sm shadow-sm transition-all group"
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className="h-10 w-10 rounded-lg flex items-center justify-center bg-purple-500/10 text-purple-600 transition-colors group-hover:bg-purple-500 group-hover:text-white">
+                            <FlaskConical className="h-5 w-5" />
+                          </div>
+                          <div className="text-left">
+                            <p className="text-xs font-bold text-foreground">Apoio Diagnóstico e Exames</p>
+                            <p className="text-[10px] font-semibold text-muted-foreground mt-0.5">Acessar painéis laboratoriais e protocolos de imagem para a UPA 24h</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Badge className="bg-purple-600 hover:bg-purple-700 text-white border-none text-[9px] uppercase tracking-wider font-bold">
+                            Abrir Menu
+                          </Badge>
+                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-muted-foreground/40 group-hover:text-purple-500 transition-colors"><path d="m9 18 6-6-6-6"/></svg>
+                        </div>
+                      </button>
+                    </div>
+
+                    {/* Escores e Calculadoras Rápidas (Pediatria) */}
+                    <div className="space-y-3 pt-4 border-t border-slate-500/10">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[9px] font-black uppercase text-muted-foreground">5. Escores Pediátricos (Fast-Track)</span>
                         <Badge variant="outline" className="text-[8px] uppercase tracking-wider bg-primary/5 text-primary border-primary/20">Pediatria</Badge>
                       </div>
 
@@ -3906,14 +3958,15 @@ export default function EvolucaoMedica() {
       </Dialog>
 
       <Dialog open={isExamsModalOpen} onOpenChange={setIsExamsModalOpen}>
-        <DialogContent className="sm:max-w-[600px] rounded-[2rem] p-6 overflow-hidden glass-card-premium bg-white/70 dark:bg-slate-900/80 backdrop-blur-xl border border-white/40 dark:border-white/10 shadow-[0_25px_50px_-12px_rgba(0,0,0,0.25)]">
-          <DialogHeader>
-            <DialogTitle className="text-xl font-black uppercase tracking-tight text-purple-600 dark:text-purple-400">Apoio Diagnóstico</DialogTitle>
-            <DialogDescription className="font-bold uppercase text-[10px] tracking-widest text-slate-500 dark:text-slate-400 mt-1">
-              Solicitação de Exames Laboratoriais e de Imagem
-            </DialogDescription>
-          </DialogHeader>
-          <ExamsModal patient={patient} onClose={() => setIsExamsModalOpen(false)} />
+        <DialogContent className="sm:max-w-[650px] rounded-[1.5rem] p-0 overflow-hidden glass-card-premium bg-white/70 dark:bg-slate-900/80 backdrop-blur-xl border border-white/40 dark:border-white/10 shadow-[0_25px_50px_-12px_rgba(0,0,0,0.25)] flex flex-col max-h-[95vh]">
+          <div className="px-5 py-3 border-b border-slate-500/10 shrink-0">
+            <DialogHeader>
+              <DialogTitle className="text-lg font-black uppercase tracking-tight text-purple-600 dark:text-purple-400">Apoio Diagnóstico</DialogTitle>
+            </DialogHeader>
+          </div>
+          <div className="px-5 py-3 flex-1 overflow-hidden flex flex-col">
+            <ExamsModal patient={patient} onClose={() => setIsExamsModalOpen(false)} />
+          </div>
         </DialogContent>
       </Dialog>
 
