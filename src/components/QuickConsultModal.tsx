@@ -482,14 +482,14 @@ export function QuickConsultModal({ patient, isOpen, onClose, onComplete, isPedi
     {/* MODAL DE EXAMES (FAST-TRACK) */}
     <Dialog open={isExamsModalOpen} onOpenChange={setIsExamsModalOpen}>
       <DialogContent className="sm:max-w-[700px] rounded-[1.5rem] p-0 overflow-hidden glass-card-premium bg-white/70 dark:bg-slate-900/80 backdrop-blur-xl border border-white/40 dark:border-white/10 shadow-[0_25px_50px_-12px_rgba(0,0,0,0.25)] flex flex-col max-h-[95vh] z-[100]">
-        <div className="px-5 py-4 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 shrink-0">
+        <div className="px-5 py-4 border-b border-white/30 dark:border-slate-700/50 bg-transparent shrink-0">
           <DialogHeader>
             <DialogTitle className="text-xl font-black uppercase tracking-tight text-slate-800 dark:text-slate-200 flex items-center gap-2">
-              <FlaskConical className="h-5 w-5 text-purple-500" /> Exames Clínicos e de Imagem
+              <FlaskConical className="h-5 w-5 text-purple-600 dark:text-purple-400" /> Exames Clínicos e de Imagem
             </DialogTitle>
           </DialogHeader>
         </div>
-        <div className="flex-1 overflow-hidden flex flex-col bg-slate-50 dark:bg-slate-900">
+        <div className="flex-1 overflow-hidden flex flex-col bg-transparent">
           <FastTrackExamsModal patient={patient} onClose={() => setIsExamsModalOpen(false)} />
         </div>
       </DialogContent>

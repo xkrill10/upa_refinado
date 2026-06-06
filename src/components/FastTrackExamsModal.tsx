@@ -123,7 +123,7 @@ export function FastTrackExamsModal({ patient, onClose }: FastTrackExamsModalPro
   };
 
   return (
-    <div className="flex flex-col h-[650px] max-h-[85vh] gap-4 bg-slate-50 dark:bg-slate-900 rounded-b-2xl">
+    <div className="flex flex-col h-[650px] max-h-[85vh] gap-4 bg-transparent rounded-b-2xl">
       {/* Abas e Busca */}
       <div className="flex flex-col gap-3 shrink-0 p-4 pb-0">
         <div className="flex gap-2 p-1 bg-slate-200 dark:bg-slate-800 rounded-lg">
@@ -175,8 +175,8 @@ export function FastTrackExamsModal({ patient, onClose }: FastTrackExamsModalPro
                         ? "bg-blue-50 border-blue-400 dark:bg-blue-900/30 dark:border-blue-500 shadow-sm" 
                         : "bg-purple-50 border-purple-400 dark:bg-purple-900/30 dark:border-purple-500 shadow-sm"
                       : isLab
-                        ? "bg-white border-slate-100 hover:border-blue-200 hover:bg-blue-50/30 dark:bg-slate-800 dark:border-slate-700/50 dark:hover:border-blue-800 dark:hover:bg-blue-900/10"
-                        : "bg-white border-slate-100 hover:border-purple-200 hover:bg-purple-50/30 dark:bg-slate-800 dark:border-slate-700/50 dark:hover:border-purple-800 dark:hover:bg-purple-900/10"
+                        ? "bg-white/60 border-white/40 hover:border-blue-200 hover:bg-blue-50/50 dark:bg-slate-800/40 dark:border-slate-700/50 dark:hover:border-blue-800 dark:hover:bg-blue-900/30 backdrop-blur-sm"
+                        : "bg-white/60 border-white/40 hover:border-purple-200 hover:bg-purple-50/50 dark:bg-slate-800/40 dark:border-slate-700/50 dark:hover:border-purple-800 dark:hover:bg-purple-900/30 backdrop-blur-sm"
                   )}
                 >
                   <div className={cn("w-6 h-6 rounded-md border flex items-center justify-center mr-3 shrink-0 transition-colors",
@@ -212,7 +212,7 @@ export function FastTrackExamsModal({ patient, onClose }: FastTrackExamsModalPro
       </div>
 
       {/* Exame Manual e Rodapé */}
-      <div className="shrink-0 bg-white dark:bg-slate-950 border-t border-slate-200 dark:border-slate-800 p-4">
+      <div className="shrink-0 bg-white/40 dark:bg-slate-950/40 backdrop-blur-md border-t border-white/50 dark:border-slate-800 p-4">
         <div className="flex flex-col gap-4">
           
           <div className="flex items-end gap-2">
