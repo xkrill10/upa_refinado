@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+﻿import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -105,11 +105,11 @@ export function QuickConsultModal({ patient, isOpen, onClose, onComplete, isPedi
   };
 
   const riskLabels: Record<string, string> = {
-    'emergency': 'Emergência',
+    'emergency': 'Emerg├¬ncia',
     'very-urgent': 'Muito Urgente',
     'urgent': 'Urgente',
     'less-urgent': 'Pouco Urgente',
-    'not-urgent': 'Não Urgente',
+    'not-urgent': 'N├úo Urgente',
   };
 
   const themeColor = isPediatric ? 'orange' : '[#006699]';
@@ -119,7 +119,7 @@ export function QuickConsultModal({ patient, isOpen, onClose, onComplete, isPedi
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent onOpenAutoFocus={(e) => e.preventDefault()} className="max-w-[1200px] w-[95vw] max-h-[95vh] p-0 overflow-hidden flex flex-col bg-slate-50 dark:bg-slate-950 border-0 shadow-2xl rounded-2xl">
+      <DialogContent onOpenAutoFocus={(e) => e.preventDefault()} className="max-w-[1200px] w-[95vw] p-0 overflow-hidden flex flex-col bg-slate-50 dark:bg-slate-950 border-0 shadow-2xl rounded-2xl">
         <DialogHeader className={cn("p-4 sm:p-6 text-white shrink-0 border-b border-white/20", btnColor)}>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
@@ -128,14 +128,14 @@ export function QuickConsultModal({ patient, isOpen, onClose, onComplete, isPedi
               </div>
               <div>
                 <DialogTitle className="text-2xl font-black uppercase tracking-tight text-white flex items-center gap-3">
-                  Atendimento {isPediatric ? 'Pediátrico' : 'Clínico'}
+                  Atendimento {isPediatric ? 'Pedi├ítrico' : 'Cl├¡nico'}
                   <Badge className="bg-white/20 hover:bg-white/30 text-white border-0 font-bold tracking-widest text-[10px]">FAST-TRACK</Badge>
                 </DialogTitle>
                 <div className="flex items-center gap-2 mt-1">
                   <span className="text-white/80 font-bold uppercase text-sm">{patient.name}</span>
-                  <span className="text-white/60">•</span>
+                  <span className="text-white/60">ÔÇó</span>
                   <span className="text-white/80 font-medium text-xs">{patient.age} ANOS</span>
-                  <span className="text-white/60">•</span>
+                  <span className="text-white/60">ÔÇó</span>
                   <span className="text-white/80 font-medium text-xs uppercase">ID: {patient.id}</span>
                 </div>
               </div>
@@ -156,7 +156,7 @@ export function QuickConsultModal({ patient, isOpen, onClose, onComplete, isPedi
               
               <div className="space-y-2">
                 <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground flex items-center gap-2">
-                  <AlertTriangle className="h-3.5 w-3.5" /> Classificação
+                  <AlertTriangle className="h-3.5 w-3.5" /> Classifica├º├úo
                 </Label>
                 <div className="flex items-center justify-between p-3 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800">
                   <Badge className={cn("px-3 py-1 font-black uppercase text-[10px]", riskColors[patient.risk || 'not-urgent'])}>
@@ -172,7 +172,7 @@ export function QuickConsultModal({ patient, isOpen, onClose, onComplete, isPedi
                 </Label>
                 <div className="grid grid-cols-2 gap-2">
                   <div className="p-3 bg-red-500/5 border border-red-500/10 rounded-xl text-center">
-                    <p className="text-[10px] font-bold text-red-600/70 uppercase">Pressão</p>
+                    <p className="text-[10px] font-bold text-red-600/70 uppercase">Press├úo</p>
                     <p className="font-black text-red-600 dark:text-red-400">{patient.pa || '--'}</p>
                   </div>
                   <div className="p-3 bg-orange-500/5 border border-orange-500/10 rounded-xl text-center">
@@ -185,7 +185,7 @@ export function QuickConsultModal({ patient, isOpen, onClose, onComplete, isPedi
                   </div>
                   <div className="p-3 bg-amber-500/5 border border-amber-500/10 rounded-xl text-center">
                     <p className="text-[10px] font-bold text-amber-600/70 uppercase">Temp</p>
-                    <p className="font-black text-amber-600 dark:text-amber-400">{patient.temperature ? `${patient.temperature}°` : '--'}</p>
+                    <p className="font-black text-amber-600 dark:text-amber-400">{patient.temperature ? `${patient.temperature}┬░` : '--'}</p>
                   </div>
                 </div>
                 {isPediatric && (
@@ -202,7 +202,7 @@ export function QuickConsultModal({ patient, isOpen, onClose, onComplete, isPedi
                 </Label>
                 <div className="p-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl">
                   <p className="text-sm font-medium leading-relaxed text-foreground">
-                    {patient.mainComplaint || <span className="text-muted-foreground italic">Não informada</span>}
+                    {patient.mainComplaint || <span className="text-muted-foreground italic">N├úo informada</span>}
                   </p>
                 </div>
               </div>
@@ -223,7 +223,7 @@ export function QuickConsultModal({ patient, isOpen, onClose, onComplete, isPedi
             </div>
           </div>
 
-          {/* Coluna Direita: Ação (Vapt-Vupt) */}
+          {/* Coluna Direita: A├º├úo (Vapt-Vupt) */}
           <div className="flex-1 bg-slate-50 dark:bg-slate-950 flex flex-col relative overflow-hidden">
             <div className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 flex flex-col gap-4">
               
@@ -232,13 +232,13 @@ export function QuickConsultModal({ patient, isOpen, onClose, onComplete, isPedi
                 <div className="space-y-1">
                   <Label className="text-[10px] font-black uppercase tracking-wider text-muted-foreground">Tipo de Registro *</Label>
                   <Input 
-                    value={isPediatric ? "Atendimento Médico (Pediátrico)" : "Atendimento Médico"} 
+                    value={isPediatric ? "Atendimento M├®dico (Pedi├ítrico)" : "Atendimento M├®dico"} 
                     disabled 
                     className="h-9 bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-xs rounded-xl shadow-sm opacity-100 text-foreground disabled:opacity-100 disabled:bg-slate-50 dark:disabled:bg-slate-900" 
                   />
                 </div>
                 <div className="space-y-1">
-                  <Label className="text-[10px] font-black uppercase tracking-wider text-muted-foreground">Profissional Responsável *</Label>
+                  <Label className="text-[10px] font-black uppercase tracking-wider text-muted-foreground">Profissional Respons├ível *</Label>
                   <Input
                     className="h-9 bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-xs rounded-xl shadow-sm"
                     value={professional}
@@ -247,15 +247,15 @@ export function QuickConsultModal({ patient, isOpen, onClose, onComplete, isPedi
                 </div>
               </div>
 
-              {/* ANAMNESE E DIAGNÓSTICO */}
+              {/* ANAMNESE E DIAGN├ôSTICO */}
               <div className="space-y-4">
                 <div className="space-y-2">
                   <Label className="text-[10px] font-black uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
-                    <FileText className={cn("h-4 w-4", iconColor)} /> Evolução / Anamnese
+                    <FileText className={cn("h-4 w-4", iconColor)} /> Evolu├º├úo / Anamnese
                   </Label>
                   <Textarea 
                     className="min-h-[80px] resize-none rounded-xl border-slate-200 dark:border-slate-800 focus:ring-2 shadow-sm bg-white dark:bg-slate-950" 
-                    placeholder="Relato clínico..."
+                    placeholder="Relato cl├¡nico..."
                     value={anamnesis}
                     onChange={(e) => setAnamnesis(e.target.value)}
                   />
@@ -263,7 +263,7 @@ export function QuickConsultModal({ patient, isOpen, onClose, onComplete, isPedi
 
                 <div className="space-y-2">
                   <Label className="text-[10px] font-black uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
-                    Diagnóstico / CID-10 <span className="text-[9px] text-muted-foreground font-medium lowercase italic">(opcional)</span>
+                    Diagn├│stico / CID-10 <span className="text-[9px] text-muted-foreground font-medium lowercase italic">(opcional)</span>
                   </Label>
                   <SmartCidSelector 
                     selectedCid={diagnosis}
@@ -272,19 +272,19 @@ export function QuickConsultModal({ patient, isOpen, onClose, onComplete, isPedi
                 </div>
               </div>
 
-              {/* PAINEL DE PRESCRIÇÃO */}
+              {/* PAINEL DE PRESCRI├ç├âO */}
               <div className="p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-blue-50/30 dark:bg-slate-900/50 shadow-sm space-y-4 mt-2">
                 <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-2">
                   <span className={cn("font-extrabold uppercase tracking-wider text-[11px] flex items-center gap-1.5", isPediatric ? "text-orange-600" : "text-[#006699]")}>
-                    Painel de Prescrição Médica
+                    Painel de Prescri├º├úo M├®dica
                   </span>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {/* Form Inserção */}
+                  {/* Form Inser├º├úo */}
                   <div className="space-y-3">
                     <span className="text-[9px] font-black uppercase text-muted-foreground block">
-                      1. Adicionar Item (Fila da Farmácia & Enfermagem)
+                      1. Adicionar Item (Fila da Farm├ícia & Enfermagem)
                     </span>
                     <div className="grid grid-cols-2 gap-2">
                       <div className="space-y-1">
@@ -318,28 +318,28 @@ export function QuickConsultModal({ patient, isOpen, onClose, onComplete, isPedi
                             <SelectItem value="EV">EV (Endovenosa)</SelectItem>
                             <SelectItem value="IM">IM (Intramuscular)</SelectItem>
                             <SelectItem value="VO">VO (Oral)</SelectItem>
-                            <SelectItem value="SC">SC (Subcutânea)</SelectItem>
-                            <SelectItem value="Inalatória">Inalatória</SelectItem>
-                            <SelectItem value="Tópica">Tópica</SelectItem>
+                            <SelectItem value="SC">SC (Subcut├ónea)</SelectItem>
+                            <SelectItem value="Inalat├│ria">Inalat├│ria</SelectItem>
+                            <SelectItem value="T├│pica">T├│pica</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
                       <div className="space-y-1">
-                        <Label className="text-[10px] font-bold">Frequência</Label>
+                        <Label className="text-[10px] font-bold">Frequ├¬ncia</Label>
                         <Select value={prescWizard.frequency} onValueChange={(v) => setPrescWizard({ ...prescWizard, frequency: v })}>
                           <SelectTrigger className="h-8 text-xs bg-white dark:bg-slate-950">
                             <SelectValue placeholder="Selecione" />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="Dose única">Dose única</SelectItem>
-                            <SelectItem value="Contínuo">Contínuo</SelectItem>
+                            <SelectItem value="Dose ├║nica">Dose ├║nica</SelectItem>
+                            <SelectItem value="Cont├¡nuo">Cont├¡nuo</SelectItem>
                             <SelectItem value="4/4h">4/4h</SelectItem>
                             <SelectItem value="6/6h">6/6h</SelectItem>
                             <SelectItem value="8/8h">8/8h</SelectItem>
                             <SelectItem value="12/12h">12/12h</SelectItem>
                             <SelectItem value="24/24h">24/24h</SelectItem>
-                            <SelectItem value="ACM">ACM (A critério médico)</SelectItem>
-                            <SelectItem value="SOS">SOS (Se necessário)</SelectItem>
+                            <SelectItem value="ACM">ACM (A crit├®rio m├®dico)</SelectItem>
+                            <SelectItem value="SOS">SOS (Se necess├írio)</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
@@ -352,7 +352,7 @@ export function QuickConsultModal({ patient, isOpen, onClose, onComplete, isPedi
                         isPediatric ? "bg-orange-500/10 hover:bg-orange-500/20 text-orange-600 border-orange-500/30" : "bg-[#006699]/10 hover:bg-[#006699]/20 text-[#006699] border-[#006699]/30"
                       )}
                     >
-                      <Plus className="h-3 w-3 mr-1" /> Adicionar à Prescrição
+                      <Plus className="h-3 w-3 mr-1" /> Adicionar ├á Prescri├º├úo
                     </Button>
                   </div>
 
@@ -377,7 +377,7 @@ export function QuickConsultModal({ patient, isOpen, onClose, onComplete, isPedi
                               <X className="h-3 w-3" />
                             </button>
                             <span className="font-bold pr-6">{med.medication} <span className="text-muted-foreground font-normal">({med.dosage})</span></span>
-                            <span className="text-[10px] text-muted-foreground">Via: {med.route} • Freq: {med.frequency}</span>
+                            <span className="text-[10px] text-muted-foreground">Via: {med.route} ÔÇó Freq: {med.frequency}</span>
                           </div>
                         ))
                       )}
@@ -412,21 +412,21 @@ export function QuickConsultModal({ patient, isOpen, onClose, onComplete, isPedi
                     </SelectTrigger>
                     <SelectContent className="rounded-xl font-bold">
                       <SelectGroup>
-                        <SelectLabel className="text-[10px] uppercase tracking-widest text-slate-500">Altas e Liberações</SelectLabel>
-                        <SelectItem value="alta">Alta Médica (Melhora)</SelectItem>
+                        <SelectLabel className="text-[10px] uppercase tracking-widest text-slate-500">Altas e Libera├º├Áes</SelectLabel>
+                        <SelectItem value="alta">Alta M├®dica (Melhora)</SelectItem>
                         <SelectItem value="encaminhamento">Alta com Encaminhamento (UBS/Especialista)</SelectItem>
-                        <SelectItem value="alta_pedido">Alta a Pedido (Recusa/Evasão)</SelectItem>
+                        <SelectItem value="alta_pedido">Alta a Pedido (Recusa/Evas├úo)</SelectItem>
                       </SelectGroup>
                       <SelectGroup>
-                        <SelectLabel className="text-[10px] uppercase tracking-widest text-slate-500 mt-2">Retenção na Unidade</SelectLabel>
-                        <SelectItem value="observacao">Sala de Medicação / Observação</SelectItem>
+                        <SelectLabel className="text-[10px] uppercase tracking-widest text-slate-500 mt-2">Reten├º├úo na Unidade</SelectLabel>
+                        <SelectItem value="observacao">Sala de Medica├º├úo / Observa├º├úo</SelectItem>
                         <SelectItem value="exames">Aguardar Exames (Retorno)</SelectItem>
                       </SelectGroup>
                       <SelectGroup>
-                        <SelectLabel className="text-[10px] uppercase tracking-widest text-slate-500 mt-2">Desfechos Críticos</SelectLabel>
-                        <SelectItem value="internacao">Internação (Leito UPA)</SelectItem>
-                        <SelectItem value="transferencia">Transferência Hospitalar (Regulação/SAMU)</SelectItem>
-                        <SelectItem value="obito">Óbito</SelectItem>
+                        <SelectLabel className="text-[10px] uppercase tracking-widest text-slate-500 mt-2">Desfechos Cr├¡ticos</SelectLabel>
+                        <SelectItem value="internacao">Interna├º├úo (Leito UPA)</SelectItem>
+                        <SelectItem value="transferencia">Transfer├¬ncia Hospitalar (Regula├º├úo/SAMU)</SelectItem>
+                        <SelectItem value="obito">├ôbito</SelectItem>
                       </SelectGroup>
                     </SelectContent>
                   </Select>
@@ -440,7 +440,7 @@ export function QuickConsultModal({ patient, isOpen, onClose, onComplete, isPedi
                     className="h-12 px-5 rounded-xl font-bold uppercase tracking-wider gap-2 border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all text-slate-600 dark:text-slate-300 w-full sm:w-auto"
                   >
                     <ExternalLink className="h-4 w-4 text-blue-500" />
-                    SIRESP (Regulação)
+                    SIRESP (Regula├º├úo)
                   </Button>
                   <Button 
                     onClick={handleFinish}

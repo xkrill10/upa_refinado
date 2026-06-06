@@ -174,10 +174,19 @@ export function DocumentGenerator({ patient, medications, doctorName, crmNumber,
                  </select>
               )}
             </div>
-            <Button onClick={generatePDF} disabled={isGenerating} className="bg-emerald-600 hover:bg-emerald-700 text-white gap-2 font-black uppercase mr-8">
-              <Printer className="h-4 w-4" />
-              {isGenerating ? "Gerando PDF..." : "Imprimir / PDF"}
-            </Button>
+            <div className="flex items-center gap-4">
+              <Button onClick={generatePDF} disabled={isGenerating} className="bg-emerald-600 hover:bg-emerald-700 text-white gap-2 font-black uppercase">
+                <Printer className="h-4 w-4" />
+                {isGenerating ? "Gerando PDF..." : "Imprimir / PDF"}
+              </Button>
+              <Button 
+                onClick={() => setPreviewOpen(false)} 
+                variant="outline" 
+                className="border-slate-300 text-slate-700 hover:bg-slate-100 hover:text-red-600 font-bold uppercase transition-colors"
+              >
+                Fechar
+              </Button>
+            </div>
           </DialogHeader>
           
           <div className="flex-1 overflow-y-auto p-8 flex justify-center bg-slate-200 dark:bg-slate-800">

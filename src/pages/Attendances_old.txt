@@ -1,4 +1,4 @@
-import { useState } from "react";
+﻿import { useState } from "react";
 import { usePatients, Patient } from "@/hooks/use-patients";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -33,7 +33,7 @@ export default function Attendances() {
   const [activeDoctor, setActiveDoctor] = useState<string | null>(null);
   
   const [selectedRoom, setSelectedRoom] = useState<string>(() => {
-    return localStorage.getItem('upa_active_room') || localStorage.getItem('selectedClinicalRoom') || "CONSULTÓRIO MÉDICO 1";
+    return localStorage.getItem('upa_active_room') || localStorage.getItem('selectedClinicalRoom') || "CONSULT├ôRIO M├ëDICO 1";
   });
 
   useEffect(() => {
@@ -72,12 +72,12 @@ export default function Attendances() {
 
   const getRiskDetails = (risk: string) => {
     switch(risk) {
-      case 'emergency': return { label: 'Emergência', color: 'bg-red-600 hover:bg-red-700 text-white' };
+      case 'emergency': return { label: 'Emerg├¬ncia', color: 'bg-red-600 hover:bg-red-700 text-white' };
       case 'very-urgent': return { label: 'Muito Urgente', color: 'bg-orange-500 hover:bg-orange-600 text-white' };
       case 'urgent': return { label: 'Urgente', color: 'bg-[#FFDE21] hover:bg-[#FFDE21]/90 text-black' };
       case 'less-urgent': return { label: 'Pouco Urgente', color: 'bg-green-500 hover:bg-green-600 text-white' };
-      case 'not-urgent': return { label: 'Não Urgente', color: 'bg-blue-500 hover:bg-blue-600 text-white' };
-      case 'evasion': return { label: 'Evasão', color: 'bg-slate-400 hover:bg-slate-500 text-white' };
+      case 'not-urgent': return { label: 'N├úo Urgente', color: 'bg-blue-500 hover:bg-blue-600 text-white' };
+      case 'evasion': return { label: 'Evas├úo', color: 'bg-slate-400 hover:bg-slate-500 text-white' };
       default: return { label: risk, color: 'bg-slate-500 text-white' };
     }
   };
@@ -140,7 +140,7 @@ export default function Attendances() {
   useEffect(() => {
     if (gravePatients.length > prevGraveCount.current) {
       toast.error('NOVO PACIENTE GRAVE AGUARDANDO!', {
-        description: 'Um novo paciente foi classificado com risco Emergência ou Muito Urgente.',
+        description: 'Um novo paciente foi classificado com risco Emerg├¬ncia ou Muito Urgente.',
         icon: <AlertTriangle className="h-5 w-5 text-red-500 animate-pulse" />,
         duration: 8000,
       });
@@ -163,10 +163,10 @@ export default function Attendances() {
           </div>
           <div>
               <h1 className="text-4xl font-black tracking-tight text-[#006699] dark:text-sky-400 uppercase leading-none">
-                Atendimentos Clínicos
+                Atendimentos Cl├¡nicos
               </h1>
               <p className="text-slate-500 dark:text-slate-400 mt-2 font-medium">
-                Gerenciamento de consultas e procedimentos médicos
+                Gerenciamento de consultas e procedimentos m├®dicos
               </p>
           </div>
           
@@ -177,7 +177,7 @@ export default function Attendances() {
               className="border-sky-200 dark:border-sky-900/50 hover:bg-sky-50 dark:hover:bg-sky-900/30 text-sky-700 dark:text-sky-400 font-black uppercase tracking-wider rounded-xl gap-2 shadow-sm"
             >
               <Stethoscope className="h-4 w-4" />
-              Desempenho Médico
+              Desempenho M├®dico
             </Button>
           </div>
         </div>
@@ -188,15 +188,15 @@ export default function Attendances() {
           </div>
           
           <div className="flex flex-col gap-1 pr-2">
-            <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground">Visão de Gestão</span>
+            <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground">Vis├úo de Gest├úo</span>
             <Select value={selectedRoom} onValueChange={setSelectedRoom}>
               <SelectTrigger className="h-7 w-[220px] border-none bg-transparent shadow-none p-0 focus:ring-0 text-sm font-black text-foreground">
-                <SelectValue placeholder="Filtrar por consultório" />
+                <SelectValue placeholder="Filtrar por consult├│rio" />
               </SelectTrigger>
               <SelectContent className="glass-card-premium rounded-xl border-white/20">
                 {Array.from({ length: 9 }, (_, i) => (
-                  <SelectItem key={i} value={`CONSULTÓRIO CLÍNICO ${i + 1}`} className="font-bold text-xs">
-                    CONSULTÓRIO CLÍNICO {i + 1}
+                  <SelectItem key={i} value={`CONSULT├ôRIO CL├ìNICO ${i + 1}`} className="font-bold text-xs">
+                    CONSULT├ôRIO CL├ìNICO {i + 1}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -205,9 +205,27 @@ export default function Attendances() {
         </div>
       </div>
 
+      {gravePatients.length > 0 && (
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.95, y: -20 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          className="bg-red-600 border-2 border-red-500 rounded-2xl p-6 shadow-[0_0_40px_rgba(220,38,38,0.4)] flex flex-col sm:flex-row items-center justify-between gap-4"
+        >
+          <div className="flex items-center gap-4 text-white">
+            <div className="h-12 w-12 rounded-full bg-white/20 flex items-center justify-center animate-pulse shrink-0">
+              <AlertTriangle className="h-7 w-7 text-white" />
+            </div>
+            <div>
+              <h2 className="text-xl font-black uppercase tracking-tight">­ƒÜ¿ Alerta de Risco Grave!</h2>
+              <p className="text-xs font-bold tracking-widest uppercase opacity-90 mt-1">
+                {gravePatients.length} paciente(s) com classifica├º├úo Vermelha/Laranja aguardando na fila.
+              </p>
+            </div>
+          </div>
+        </motion.div>
+      )}
 
-
-      {/* Stats rápidas */}
+      {/* Stats r├ípidas */}
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
         {[
           { 
@@ -293,17 +311,17 @@ export default function Attendances() {
                         <div className="flex items-center gap-2">
                           <p className="font-black text-sm text-slate-800 dark:text-slate-100 uppercase tracking-tight truncate">{formatWords(patient.name)}</p>
                           <span className="text-[9px] text-slate-500 dark:text-slate-400 font-bold uppercase shrink-0 px-2 py-0.5 bg-slate-100 dark:bg-slate-800 rounded-full">
-                            Iniciado há 15 min
+                            Iniciado h├í 15 min
                           </span>
                         </div>
                         <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-1.5">
                           <div className="flex items-center gap-1.5 text-[9px] text-slate-500 dark:text-slate-400 font-bold uppercase">
                             <User className="h-3 w-3 text-[#006699] dark:text-sky-400" />
-                            Resp: <span className="text-slate-700 dark:text-slate-300 font-black">{patient.responsibleProfessional || 'Não atribuído'}</span>
+                            Resp: <span className="text-slate-700 dark:text-slate-300 font-black">{patient.responsibleProfessional || 'N├úo atribu├¡do'}</span>
                           </div>
                           <div className="flex items-center gap-1.5 text-[9px] text-slate-500 dark:text-slate-400 font-bold uppercase">
                             <Building2 className="h-3 w-3 text-[#006699] dark:text-sky-400" />
-                            Setor: <span className="text-slate-700 dark:text-slate-300 font-black">{patient.sector || 'Não definido'}</span>
+                            Setor: <span className="text-slate-700 dark:text-slate-300 font-black">{patient.sector || 'N├úo definido'}</span>
                           </div>
                           <div className="flex items-center gap-1.5 text-[9px] text-slate-400 dark:text-slate-500 font-bold uppercase">
                             <span>ID: {patient.id}</span>
@@ -343,7 +361,7 @@ export default function Attendances() {
                         onClick={() => setRecordPatientId(patient.id)}
                       >
                         <User className="h-3.5 w-3.5" />
-                        Prontuário
+                        Prontu├írio
                       </Button>
                     </div>
                   </div>
@@ -440,7 +458,7 @@ export default function Attendances() {
                             variant="ghost" 
                             className="h-9 w-9 rounded-xl p-0 text-slate-500 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 cursor-pointer border-0"
                             onClick={() => setEvasaoPatient({ id: patient.id, name: patient.name })}
-                            title="Registrar Evasão"
+                            title="Registrar Evas├úo"
                           >
                             <LogOut className="h-4 w-4" />
                           </Button>
@@ -450,7 +468,7 @@ export default function Attendances() {
                             variant="ghost" 
                             className="h-9 w-9 rounded-xl p-0 text-slate-500 hover:text-[#006699] dark:hover:text-sky-400 hover:bg-slate-50 dark:hover:bg-slate-900 border-0 cursor-pointer"
                             onClick={() => setRecordPatientId(patient.id)}
-                            title="Ver Prontuário"
+                            title="Ver Prontu├írio"
                           >
                             <ExternalLink className="h-4 w-4" />
                           </Button>
@@ -518,7 +536,7 @@ export default function Attendances() {
                  callingTicket?.priority === 'pediatric' ? 'text-orange-500 dark:text-orange-400' : 'text-[#006699] dark:text-sky-400')
               )}>{callingTicket?.ticket}</h2>
               <p className="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase">{formatPatientNameLGPD(callingTicket?.patientName || "")}</p>
-              <p className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase">{callingTicket?.age} ANOS • CPF: {callingTicket?.cpf}</p>
+              <p className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase">{callingTicket?.age} ANOS ÔÇó CPF: {callingTicket?.cpf}</p>
             </div>
 
             <div className="grid grid-cols-1 gap-4">
@@ -552,7 +570,7 @@ export default function Attendances() {
                     {isAudioEnabled ? <Volume2 className="h-5 w-5" /> : <VolumeX className="h-5 w-5" />}
                   </div>
                   <div>
-                    <p className="text-xs font-black uppercase text-slate-800 dark:text-slate-100">Áudio do Painel</p>
+                    <p className="text-xs font-black uppercase text-slate-800 dark:text-slate-100">├üudio do Painel</p>
                     <p className="text-[10px] text-slate-550 dark:text-slate-400 font-bold uppercase">{isAudioEnabled ? 'Ativado (Voz + Chime)' : 'Desativado (Mudo)'}</p>
                   </div>
                 </div>
@@ -584,23 +602,23 @@ export default function Attendances() {
               <LogOut className="h-8 w-8" />
             </div>
             <div className="space-y-2">
-              <DialogTitle className="text-xl font-black uppercase tracking-tight text-slate-800 dark:text-white">Confirmar Evasão?</DialogTitle>
+              <DialogTitle className="text-xl font-black uppercase tracking-tight text-slate-800 dark:text-white">Confirmar Evas├úo?</DialogTitle>
               <DialogDescription className="text-sm font-medium leading-relaxed px-2 text-slate-500 dark:text-slate-400">
-                Você está registrando que o paciente <strong className="text-red-550 dark:text-red-400">{formatWords(evasaoPatient?.name || "")}</strong> se retirou da unidade sem concluir o atendimento clínico.
+                Voc├¬ est├í registrando que o paciente <strong className="text-red-550 dark:text-red-400">{formatWords(evasaoPatient?.name || "")}</strong> se retirou da unidade sem concluir o atendimento cl├¡nico.
               </DialogDescription>
             </div>
             
             <div className="w-full text-left mt-2 mb-2">
               <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 block mb-2">
-                Motivo da Evasão (Opcional)
+                Motivo da Evas├úo (Opcional)
               </label>
               <div className="grid grid-cols-1 gap-2">
                 {[
                   "Demora no atendimento",
                   "Melhora dos sintomas",
-                  "Procurou outro serviço",
-                  "Desistência voluntária",
-                  "Ausente após 3 chamadas"
+                  "Procurou outro servi├ºo",
+                  "Desist├¬ncia volunt├íria",
+                  "Ausente ap├│s 3 chamadas"
                 ].map((reason) => (
                   <button
                     key={reason}
@@ -641,9 +659,9 @@ export default function Attendances() {
                   if (evasaoPatient) {
                     updatePatient(evasaoPatient.id, { 
                       status: 'evasao',
-                      justification: evasaoReason ? `Motivo da evasão: ${evasaoReason}` : undefined
+                      justification: evasaoReason ? `Motivo da evas├úo: ${evasaoReason}` : undefined
                     });
-                    toast.warning(evasaoReason ? `Evasão registrada: ${evasaoReason}` : `Evasão registrada: ${evasaoPatient.name}`);
+                    toast.warning(evasaoReason ? `Evas├úo registrada: ${evasaoReason}` : `Evas├úo registrada: ${evasaoPatient.name}`);
                     setEvasaoPatient(null);
                     setEvasaoReason("");
                   }
@@ -694,7 +712,7 @@ export default function Attendances() {
               <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-[#006699]/20 to-[#006699]/5 dark:from-sky-400/20 dark:to-sky-400/5 flex items-center justify-center border border-[#006699]/20 dark:border-sky-400/20 shadow-[inset_0_1px_1px_rgba(255,255,255,0.4)]">
                 <FileText className="h-5 w-5 text-[#006699] dark:text-sky-400 drop-shadow-[0_0_8px_rgba(0,102,153,0.5)] dark:drop-shadow-[0_0_8px_rgba(56,189,248,0.5)]" />
               </div>
-              Prontuário Completo
+              Prontu├írio Completo
             </h2>
           </div>
           <div className="flex-1 overflow-y-auto p-4 sm:p-8 relative z-10">
