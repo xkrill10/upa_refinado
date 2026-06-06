@@ -111,9 +111,10 @@ export default function EvolucaoEnfermagem() {
   const { id } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
-  const { patients, addEvolution, updatePatient } = usePatients();
+  const { patients, addEvolution, updatePatient, markExamsAsRead } = usePatients();
   const { beds, assignPatient, releaseBed } = useBeds();
   const patient = patients.find(p => p.id === id);
+  const unreadExamsCount = patient?.exams?.filter(e => e.status === 'completed' && !e.readAt).length || 0;
 
   const isChild = (() => {
     if (patient?.age === undefined) return false;
@@ -1052,6 +1053,7 @@ export default function EvolucaoEnfermagem() {
                     } else if (tab.id === "discharge") {
                       handleEvolutionTypeChange("Alta");
                     } else if (tab.id === "exams") {
+                      if (unreadExamsCount > 0 && id) markExamsAsRead(id);
                       handleEvolutionTypeChange("Procedimento");
                     } else if (tab.id === "evolutions") {
                       handleEvolutionTypeChange("Evolução Enfermagem");
@@ -1067,6 +1069,7 @@ export default function EvolucaoEnfermagem() {
               >
                 {tab.icon}
                 {tab.label}
+                {tab.badge ? <Badge className="ml-1 bg-red-500 text-white border-none px-1.5 py-0.5 text-[10px] font-black h-4 min-w-[18px] flex items-center justify-center animate-pulse shadow-sm">{tab.badge}</Badge> : null}
                 {isActive && (
                   <motion.div
                     layoutId="activeTabIndicator"

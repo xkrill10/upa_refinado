@@ -107,6 +107,7 @@ export interface ExamRequest {
   isCritical?: boolean;
   attachmentUrl?: string;
   observations?: string;
+  readAt?: string;
 }
 
 export interface EvolutionRecord {
@@ -300,6 +301,7 @@ interface PatientsContextType {
   recollectExam: (patientId: string, examId: string, reason: string) => void;
   requestTransfer: (patientId: string, priority: 'normal' | 'urgent' | 'emergency', reason: string) => void;
   updateTransferStatus: (patientId: string, status: 'accepted' | 'denied' | 'transporting' | 'completed', hospitalName?: string, crossCode?: string, ambulanceType?: string) => void;
+  markExamsAsRead: (patientId: string) => void;
 }
 
 const PatientsContext = createContext<PatientsContextType | undefined>(undefined);
@@ -462,6 +464,68 @@ export function PatientsProvider({ children }: { children: ReactNode }) {
       window.removeEventListener('focus', syncAll);
       clearInterval(interval);
     };
+  }, []);
+
+  // Escuta alertas de exames globais
+  useEffect(() => {
+    const alertChannel = new BroadcastChannel('upa_exam_alerts');
+    alertChannel.onmessage = (event) => {
+      try {
+        const data = JSON.parse(event.data);
+        const { patientId, examName, isCritical } = data;
+        
+        // Verifica se a aba atual está na tela deste paciente específico
+        const match = window.location.pathname.match(/^\/paciente\/([^/]+)/);
+        const currentPatientId = match ? match[1] : null;
+        
+        if (currentPatientId === patientId) {
+          // Play beep
+          try {
+            const AudioContext = window.AudioContext || (window as any).webkitAudioContext;
+            if (AudioContext) {
+              const ctx = new AudioContext();
+              const osc = ctx.createOscillator();
+              const gain = ctx.createGain();
+              osc.connect(gain);
+              gain.connect(ctx.destination);
+              osc.type = 'sine';
+              osc.frequency.setValueAtTime(isCritical ? 880 : 660, ctx.currentTime);
+              gain.gain.setValueAtTime(0.1, ctx.currentTime);
+              osc.start(ctx.currentTime);
+              osc.stop(ctx.currentTime + 0.2);
+              
+              if (isCritical) {
+                setTimeout(() => {
+                  const osc2 = ctx.createOscillator();
+                  const gain2 = ctx.createGain();
+                  osc2.connect(gain2);
+                  gain2.connect(ctx.destination);
+                  osc2.type = 'sine';
+                  osc2.frequency.setValueAtTime(1046, ctx.currentTime);
+                  gain2.gain.setValueAtTime(0.1, ctx.currentTime);
+                  osc2.start(ctx.currentTime);
+                  osc2.stop(ctx.currentTime + 0.3);
+                }, 250);
+              }
+            }
+          } catch (e) {
+            console.error("Audio playback failed", e);
+          }
+          
+          if (isCritical) {
+            toast.error(`🚨 ALERTA CRÍTICO: Laudo de ${examName} liberado!`, {
+              description: "Verifique a aba de Exames & Procedimentos imediatamente.",
+              duration: 10000,
+            });
+          } else {
+            toast.info(`🔔 Novo Laudo: ${examName} liberado.`, {
+              description: "O resultado já está disponível na aba de Exames."
+            });
+          }
+        }
+      } catch (err) {}
+    };
+    return () => alertChannel.close();
   }, []);
   
   // Persistence and Daily Rotation logic
@@ -770,6 +834,11 @@ export function PatientsProvider({ children }: { children: ReactNode }) {
             // Remove deadline when completed
             if (status === 'completed') {
               delete updated.deadline;
+              new BroadcastChannel('upa_exam_alerts').postMessage(JSON.stringify({
+                patientId,
+                examName: updated.name,
+                isCritical: updated.isCritical
+              }));
             }
             return updated;
           }
@@ -845,6 +914,26 @@ export function PatientsProvider({ children }: { children: ReactNode }) {
     new BroadcastChannel('upa_sync_channel').postMessage('sync_all');
   };
 
+  const markExamsAsRead = (patientId: string) => {
+    setPatients(prev => prev.map(p => {
+      if (p.id === patientId && p.exams) {
+        let changed = false;
+        const updatedExams = p.exams.map(e => {
+          if (e.status === 'completed' && !e.readAt) {
+            changed = true;
+            return { ...e, readAt: new Date().toISOString() };
+          }
+          return e;
+        });
+        if (changed) {
+          new BroadcastChannel('upa_sync_channel').postMessage('sync_all');
+          return { ...p, exams: updatedExams };
+        }
+      }
+      return p;
+    }));
+  };
+
   return (
     <PatientsContext.Provider value={{ 
       patients, 
@@ -869,6 +958,7 @@ export function PatientsProvider({ children }: { children: ReactNode }) {
       recollectExam,
       requestTransfer,
       updateTransferStatus,
+      markExamsAsRead,
     }}>
       {children}
     </PatientsContext.Provider>
