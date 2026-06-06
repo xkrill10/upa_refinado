@@ -8,10 +8,11 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, SelectGroup, SelectLabel } from "@/components/ui/select";
 import { Patient } from "@/hooks/use-patients";
 import { toast } from "sonner";
-import { Stethoscope, ClipboardCheck, Activity, AlertTriangle, FileText, Pill, Baby, User, CheckCircle2, Plus, X, Brain, ShieldAlert, ExternalLink } from "lucide-react";
+import { Stethoscope, ClipboardCheck, Activity, AlertTriangle, FileText, Pill, Baby, User, CheckCircle2, Plus, X, Brain, ShieldAlert, ExternalLink, FlaskConical } from "lucide-react";
 import { SmartCidSelector } from "@/components/SmartCidSelector";
 import { SmartMedicationSelector } from "@/components/SmartMedicationSelector";
 import { DocumentGenerator } from "@/components/DocumentGenerator";
+import { FastTrackExamsModal } from "@/components/FastTrackExamsModal";
 import { usePrescriptions } from "@/context/PrescriptionsContext";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/context/AuthContext";
@@ -29,6 +30,7 @@ export function QuickConsultModal({ patient, isOpen, onClose, onComplete, isPedi
   const [anamnesis, setAnamnesis] = useState("");
   const [diagnosis, setDiagnosis] = useState("");
   const [outcome, setOutcome] = useState<string>("");
+  const [isExamsModalOpen, setIsExamsModalOpen] = useState(false);
   
   // Super Painel State
   const [prescWizard, setPrescWizard] = useState({
@@ -118,6 +120,7 @@ export function QuickConsultModal({ patient, isOpen, onClose, onComplete, isPedi
   const btnColor = isPediatric ? 'bg-orange-500 hover:bg-orange-600' : 'bg-[#006699] hover:bg-[#005580]';
 
   return (
+    <>
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent onOpenAutoFocus={(e) => e.preventDefault()} className="max-w-[1200px] w-[95vw] max-h-[95vh] p-0 overflow-hidden flex flex-col bg-slate-50 dark:bg-slate-950 border-0 shadow-2xl rounded-2xl">
         <DialogHeader className={cn("p-4 sm:p-6 text-white shrink-0 border-b border-white/20", btnColor)}>
@@ -269,6 +272,25 @@ export function QuickConsultModal({ patient, isOpen, onClose, onComplete, isPedi
                     selectedCid={diagnosis}
                     onSelectCid={(cid) => setDiagnosis(cid)}
                   />
+                </div>
+              </div>
+
+              {/* EXAMES CLÍNICOS E DE IMAGEM */}
+              <div className="p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-purple-50/30 dark:bg-purple-900/10 shadow-sm space-y-3 mt-2">
+                <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-2">
+                  <span className="font-extrabold uppercase tracking-wider text-[11px] flex items-center gap-1.5 text-purple-600 dark:text-purple-400">
+                    Exames Clínicos e de Imagem
+                  </span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] sm:text-xs text-muted-foreground font-medium">Solicitação de Exames Laboratoriais e de Imagem</span>
+                  <Button
+                    variant="outline"
+                    className="h-10 text-[10px] font-black uppercase tracking-wider border-purple-200 text-purple-600 hover:bg-purple-50 dark:border-purple-900/40 dark:text-purple-400 dark:hover:bg-purple-900/20 shadow-sm"
+                    onClick={() => setIsExamsModalOpen(true)}
+                  >
+                    <FlaskConical className="h-4 w-4 mr-1.5" /> Pedir Exames
+                  </Button>
                 </div>
               </div>
 
@@ -456,5 +478,22 @@ export function QuickConsultModal({ patient, isOpen, onClose, onComplete, isPedi
         </div>
       </DialogContent>
     </Dialog>
+
+    {/* MODAL DE EXAMES (FAST-TRACK) */}
+    <Dialog open={isExamsModalOpen} onOpenChange={setIsExamsModalOpen}>
+      <DialogContent className="sm:max-w-[700px] rounded-[1.5rem] p-0 overflow-hidden glass-card-premium bg-white/70 dark:bg-slate-900/80 backdrop-blur-xl border border-white/40 dark:border-white/10 shadow-[0_25px_50px_-12px_rgba(0,0,0,0.25)] flex flex-col max-h-[95vh] z-[100]">
+        <div className="px-5 py-4 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 shrink-0">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-black uppercase tracking-tight text-slate-800 dark:text-slate-200 flex items-center gap-2">
+              <FlaskConical className="h-5 w-5 text-purple-500" /> Exames Clínicos e de Imagem
+            </DialogTitle>
+          </DialogHeader>
+        </div>
+        <div className="flex-1 overflow-hidden flex flex-col bg-slate-50 dark:bg-slate-900">
+          <FastTrackExamsModal patient={patient} onClose={() => setIsExamsModalOpen(false)} />
+        </div>
+      </DialogContent>
+    </Dialog>
+    </>
   );
 }

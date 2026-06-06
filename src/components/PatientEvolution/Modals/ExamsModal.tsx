@@ -124,7 +124,7 @@ export function ExamsModal({ patient, onClose }: ExamsModalProps) {
 
   return (
     <div className="flex flex-col h-full overflow-hidden gap-2">
-      <div className="flex flex-col gap-2 shrink-0">
+      <div className="flex flex-col gap-2 shrink-0 pr-1 pb-1">
         <div className="flex bg-slate-100 dark:bg-slate-800/50 p-1 rounded-xl">
           <Button
             variant={priority === 'normal' ? 'default' : 'outline'}
@@ -162,7 +162,7 @@ export function ExamsModal({ patient, onClose }: ExamsModalProps) {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input 
             placeholder="Buscar exame..." 
-            className="pl-9 h-10 rounded-xl bg-white dark:bg-slate-950"
+            className="pl-9 h-10 rounded-xl bg-white dark:bg-slate-950 w-full"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
