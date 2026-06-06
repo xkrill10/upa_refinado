@@ -63,6 +63,27 @@ export default function MyWorkspace() {
 
   const prevPatientsRef = useRef<Patient[]>([]);
 
+  const playDing = () => {
+    try {
+      const AudioContext = window.AudioContext || (window as any).webkitAudioContext;
+      if (!AudioContext) return;
+      const ctx = new AudioContext();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(880, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(440, ctx.currentTime + 0.5);
+      gain.gain.setValueAtTime(0.5, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.5);
+      osc.start(ctx.currentTime);
+      osc.stop(ctx.currentTime + 0.5);
+    } catch (e) {
+      console.error("Audio playback failed", e);
+    }
+  };
+
   useEffect(() => {
     if (prevPatientsRef.current.length > 0) {
       patients.forEach(newPatient => {
@@ -73,6 +94,7 @@ export default function MyWorkspace() {
             if (oldExam && oldExam.status !== 'completed' && newExam.status === 'completed') {
               // Verifica se o paciente está associado a este médico
               if (newPatient.sector === activeRoom || newPatient.subStatus === 'reaval') {
+                playDing();
                 toast.success(`Exame Pronto: ${newExam.name}`, {
                   description: `O resultado de ${formatWords(newPatient.name)} já está disponível no prontuário!`,
                   duration: 8000,
@@ -356,7 +378,9 @@ export default function MyWorkspace() {
                   </div>
                 </motion.div>
               ) : (
-                myAttendingPatients.map(patient => (
+                myAttendingPatients.map(patient => {
+                  const allExamsCompleted = patient.exams && patient.exams.length > 0 && patient.exams.filter(e => e.status === 'completed').length === patient.exams.length;
+                  return (
                   <motion.div 
                     key={patient.id}
                     initial={{ opacity: 0, scale: 0.95, y: 10 }}
@@ -364,9 +388,18 @@ export default function MyWorkspace() {
                     exit={{ opacity: 0, scale: 0.95, y: -10 }}
                   >
                     <Card className={cn(
-                      "overflow-hidden transition-all duration-300 backdrop-blur-xl bg-white/60 dark:bg-slate-900/40 border border-white/50 dark:border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.1)] hover:shadow-[0_8px_32px_0_rgba(0,102,153,0.15)] dark:shadow-[0_8px_32px_0_rgba(0,0,0,0.3)]",
-                      isBlueTheme ? "" : "hover:shadow-[0_8px_32px_0_rgba(249,115,22,0.15)] dark:hover:shadow-[0_8px_32px_0_rgba(249,115,22,0.2)]"
+                      "overflow-hidden transition-all duration-300 backdrop-blur-xl bg-white/60 dark:bg-slate-900/40 shadow-[0_8px_32px_0_rgba(0,0,0,0.1)] dark:shadow-[0_8px_32px_0_rgba(0,0,0,0.3)]",
+                      allExamsCompleted 
+                        ? "border-2 border-emerald-500 shadow-[0_0_30px_rgba(16,185,129,0.3)] dark:shadow-[0_0_30px_rgba(16,185,129,0.2)] scale-[1.01]" 
+                        : (isBlueTheme ? "border border-white/50 dark:border-white/10 hover:shadow-[0_8px_32px_0_rgba(0,102,153,0.15)]" : "border border-white/50 dark:border-white/10 hover:shadow-[0_8px_32px_0_rgba(249,115,22,0.15)] dark:hover:shadow-[0_8px_32px_0_rgba(249,115,22,0.2)]")
                     )}>
+                      {allExamsCompleted && (
+                        <div className="w-full bg-emerald-500 text-white text-center py-2 text-[12px] font-black uppercase tracking-widest animate-[pulse_2s_ease-in-out_infinite] shadow-sm flex items-center justify-center gap-2">
+                          <AlertTriangle className="h-4 w-4" />
+                          EXAMES CONCLUÍDOS - REAVALIAÇÃO PRONTA
+                          <AlertTriangle className="h-4 w-4" />
+                        </div>
+                      )}
                       <div className={cn(
                         "h-1.5 w-full",
                         patient.risk === 'emergency' ? "bg-red-500" : 
@@ -451,7 +484,8 @@ export default function MyWorkspace() {
                       </CardContent>
                     </Card>
                   </motion.div>
-                ))
+                  );
+                })
               )}
             </AnimatePresence>
           </div>
@@ -487,11 +521,21 @@ export default function MyWorkspace() {
               <div className="divide-y divide-slate-100 dark:divide-slate-800">
                 {waitingPatients.map(patient => {
                   const isReaval = patient.subStatus === 'reaval' && patient.sector === activeRoom;
+                  const allExamsCompleted = patient.exams && patient.exams.length > 0 && patient.exams.filter(e => e.status === 'completed').length === patient.exams.length;
                   return (
                     <div key={patient.id} className={cn(
-                      "p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 transition-colors hover:bg-white/80 dark:hover:bg-slate-800/60",
-                      isReaval && "bg-amber-50/50 dark:bg-amber-950/20"
+                      "relative flex flex-col transition-colors hover:bg-white/80 dark:hover:bg-slate-800/60 overflow-hidden",
+                      isReaval && "bg-amber-50/50 dark:bg-amber-950/20",
+                      allExamsCompleted ? "border-l-4 border-l-emerald-500 bg-emerald-50/50 dark:bg-emerald-950/20" : ""
                     )}>
+                      {allExamsCompleted && (
+                        <div className="w-full bg-emerald-500 text-white text-center py-1 text-[10px] font-black uppercase tracking-widest animate-[pulse_2s_ease-in-out_infinite] flex items-center justify-center gap-2">
+                          <AlertTriangle className="h-3 w-3" />
+                          EXAMES CONCLUÍDOS - PRONTO PARA REAVALIAÇÃO
+                          <AlertTriangle className="h-3 w-3" />
+                        </div>
+                      )}
+                      <div className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                       <div className="flex items-center gap-4">
                         <div className={cn(
                           "px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest text-center min-w-[120px] shadow-sm",
@@ -541,6 +585,7 @@ export default function MyWorkspace() {
                       >
                         <Megaphone className="h-3.5 w-3.5 mr-2" /> Chamar Próximo
                       </Button>
+                      </div>
                     </div>
                   );
                 })}
