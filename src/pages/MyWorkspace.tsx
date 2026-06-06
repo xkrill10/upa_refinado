@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { usePatients, Patient } from "@/hooks/use-patients";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -60,6 +60,32 @@ export default function MyWorkspace() {
     setCrmNumber(localStorage.getItem("upa_stamp_number") || "");
     setCrmState(localStorage.getItem("upa_stamp_state") || "");
   }, [navigate]);
+
+  const prevPatientsRef = useRef<Patient[]>([]);
+
+  useEffect(() => {
+    if (prevPatientsRef.current.length > 0) {
+      patients.forEach(newPatient => {
+        const oldPatient = prevPatientsRef.current.find(p => p.id === newPatient.id);
+        if (oldPatient) {
+          newPatient.exams?.forEach(newExam => {
+            const oldExam = oldPatient.exams?.find(e => e.id === newExam.id);
+            if (oldExam && oldExam.status !== 'completed' && newExam.status === 'completed') {
+              // Verifica se o paciente está associado a este médico
+              if (newPatient.sector === activeRoom || newPatient.subStatus === 'reaval') {
+                toast.success(`Exame Pronto: ${newExam.name}`, {
+                  description: `O resultado de ${formatWords(newPatient.name)} já está disponível no prontuário!`,
+                  duration: 8000,
+                  icon: <FlaskConical className="h-4 w-4 text-emerald-500 animate-pulse" />
+                });
+              }
+            }
+          });
+        }
+      });
+    }
+    prevPatientsRef.current = patients;
+  }, [patients, activeRoom]);
 
   const isEmergencyRoom = activeRoom.toUpperCase().includes("VERMELHA");
   const isPediatric = activeRoom.toUpperCase().includes("PEDIÁTRICO") || activeRoom.toUpperCase().includes("PEDIATRIA");
@@ -358,14 +384,27 @@ export default function MyWorkspace() {
                               {formatPatientAge(patient.age, patient.birthDate)} • Ticket: {patient.ticket}
                             </p>
                           </div>
-                          <div className="flex items-center gap-2 mt-4">
-                            <Clock className="h-4 w-4 text-slate-400" />
-                            <span className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">
-                              Tempo em sala: {(() => {
-                                const diff = Math.floor((new Date().getTime() - new Date(patient.arrivalTime).getTime()) / 60000);
-                                return diff > 60 ? `${Math.floor(diff/60)}h ${diff%60}m` : `${diff} min`;
-                              })()}
-                            </span>
+                          <div className="flex flex-wrap items-center gap-2 mt-4">
+                            <div className="flex items-center gap-1.5">
+                              <Clock className="h-4 w-4 text-slate-400" />
+                              <span className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">
+                                Tempo em sala: {(() => {
+                                  const diff = Math.floor((new Date().getTime() - new Date(patient.arrivalTime).getTime()) / 60000);
+                                  return diff > 60 ? `${Math.floor(diff/60)}h ${diff%60}m` : `${diff} min`;
+                                })()}
+                              </span>
+                            </div>
+                            {patient.exams && patient.exams.length > 0 && (
+                              <div className={cn(
+                                "flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[10px] font-black uppercase tracking-widest border",
+                                patient.exams.filter(e => e.status === 'completed').length === patient.exams.length
+                                  ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20"
+                                  : "bg-blue-500/10 text-blue-600 border-blue-500/20"
+                              )}>
+                                <FlaskConical className={cn("h-3 w-3", patient.exams.filter(e => e.status === 'completed').length === patient.exams.length ? "animate-pulse" : "")} />
+                                {patient.exams.filter(e => e.status === 'completed').length}/{patient.exams.length} Exames
+                              </div>
+                            )}
                           </div>
                         </div>
 
@@ -473,6 +512,17 @@ export default function MyWorkspace() {
                             {isReaval && (
                               <span className="px-2 py-0.5 bg-amber-100 dark:bg-amber-900/40 text-amber-600 dark:text-amber-400 rounded-md text-[9px] font-black uppercase tracking-widest border border-amber-200 dark:border-amber-800">
                                 Retorno Exame
+                              </span>
+                            )}
+                            {patient.exams && patient.exams.length > 0 && (
+                              <span className={cn(
+                                "px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-widest border flex items-center gap-1",
+                                patient.exams.filter(e => e.status === 'completed').length === patient.exams.length
+                                  ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20"
+                                  : "bg-blue-500/10 text-blue-600 border-blue-500/20"
+                              )}>
+                                <FlaskConical className={cn("h-2.5 w-2.5", patient.exams.filter(e => e.status === 'completed').length === patient.exams.length ? "animate-pulse" : "")} />
+                                {patient.exams.filter(e => e.status === 'completed').length}/{patient.exams.length}
                               </span>
                             )}
                           </div>

@@ -115,6 +115,18 @@ export default function Laboratory() {
     }
   };
 
+  const getTubeColor = (examName: string) => {
+    const name = examName.toLowerCase();
+    if (name.includes('hemograma') || name.includes('tipagem')) return { color: 'bg-purple-500', label: 'Tubo Roxo (EDTA)' };
+    if (name.includes('coagulograma') || name.includes('dímero')) return { color: 'bg-blue-400', label: 'Tubo Azul (Citrato)' };
+    if (name.includes('glicemia') || name.includes('ureia') || name.includes('creatinina') || name.includes('sódio') || name.includes('potássio') || name.includes('cálcio') || name.includes('magnésio') || name.includes('pcr') || name.includes('troponina') || name.includes('ck-mb') || name.includes('cpk') || name.includes('tgo') || name.includes('tgp') || name.includes('amilase') || name.includes('lipase') || name.includes('bilirrubina')) return { color: 'bg-yellow-500', label: 'Tubo Amarelo (Gel)' };
+    if (name.includes('urina') || name.includes('eas') || name.includes('urocultura')) return { color: 'bg-amber-700', label: 'Pote Estéril (Urina)' };
+    if (name.includes('fezes') || name.includes('copro')) return { color: 'bg-amber-900', label: 'Pote Coletor (Fezes)' };
+    if (name.includes('teste rápido') || name.includes('sorologia')) return { color: 'bg-red-500', label: 'Tubo Vermelho (Soro)' };
+    if (name.includes('cultura')) return { color: 'bg-emerald-600', label: 'Frasco Hemocultura' };
+    return null;
+  };
+
   const renderExamCard = (item: {patient: Patient, exam: ExamRequest}) => {
     const overdue = (item.exam.status !== 'completed') && isOverdue(item.exam.deadline);
     
@@ -129,6 +141,16 @@ export default function Laboratory() {
             {item.exam.type === 'lab' ? 'Laboratório' : 'Imagem'}
           </Badge>
           <h4 className="font-bold text-sm mt-1">{item.exam.name}</h4>
+          {item.exam.type === 'lab' && item.exam.status === 'pending_collection' && (() => {
+            const tube = getTubeColor(item.exam.name);
+            if (!tube) return null;
+            return (
+              <div className="flex items-center gap-1.5 mt-1.5">
+                <div className={`w-2.5 h-2.5 rounded-full ${tube.color} shadow-sm border border-black/10`} />
+                <span className="text-[9px] font-bold text-slate-500 uppercase tracking-widest">{tube.label}</span>
+              </div>
+            );
+          })()}
         </div>
         {item.exam.priority === 'urgent' && (
           <Badge className="bg-red-500 text-white border-none shadow-sm text-[9px] animate-pulse">
