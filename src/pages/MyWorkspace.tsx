@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { usePatients, Patient } from "@/hooks/use-patients";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Stethoscope, Clock, Users, ArrowRight, User, Baby, Activity, LogOut, CheckCircle2, PauseCircle, Megaphone, AlertTriangle, X, Volume2, VolumeX, FileText, Info, Coffee } from "lucide-react";
+import { Stethoscope, Clock, Users, ArrowRight, User, Baby, Activity, LogOut, CheckCircle2, PauseCircle, Megaphone, AlertTriangle, X, Volume2, VolumeX, FileText, Info, Coffee, FlaskConical } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
