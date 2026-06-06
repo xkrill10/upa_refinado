@@ -28,7 +28,7 @@ interface QuickConsultModalProps {
 
 export function QuickConsultModal({ patient, isOpen, onClose, onComplete, isPediatric, hidePediatricOptions }: QuickConsultModalProps) {
   const [anamnesis, setAnamnesis] = useState("");
-  const [diagnosis, setDiagnosis] = useState("");
+  const [diagnosis, setDiagnosis] = useState<any>(null);
   const [outcome, setOutcome] = useState<string>("");
   const [isExamsModalOpen, setIsExamsModalOpen] = useState(false);
   
@@ -415,7 +415,7 @@ export function QuickConsultModal({ patient, isOpen, onClose, onComplete, isPedi
                   crmState={crmState}
                   hidePediatricOptions={hidePediatricOptions}
                   anamnesis={anamnesis}
-                  diagnosis={diagnosis}
+                  diagnosis={diagnosis?.code ? `${diagnosis.code} - ${diagnosis.name}` : ""}
                   outcome={outcome}
                 />
               </div>

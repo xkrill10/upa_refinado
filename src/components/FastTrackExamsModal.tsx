@@ -115,7 +115,13 @@ export function FastTrackExamsModal({ patient, onClose }: FastTrackExamsModalPro
     if (patient) {
       // Registrar cada exame selecionado
       selectedExams.forEach(ex => {
-        requestExam(patient.id, ex.name, ex.type, "Solicitado via Fast-Track", "normal");
+        requestExam(patient.id, {
+          name: ex.name,
+          type: ex.type as "lab" | "image",
+          priority: "normal",
+          doctor: "Fast-Track",
+          observations: "Solicitado via Fast-Track"
+        });
       });
       toast.success(`${selectedExams.length} exame(s) solicitado(s) com sucesso!`);
     }
