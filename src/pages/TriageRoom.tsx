@@ -676,6 +676,7 @@ export default function TriageRoom() {
       (nTemp >= 39) ||
       (nFc > 120) ||
       (nFr > 24) ||
+      (nSpo2 >= 90 && nSpo2 < 94) ||
       mainComplaint.toUpperCase().includes("DOR TOR\xC1CICA") ||
       mainComplaint.toUpperCase().includes("AVC") ||
       mainComplaint.toUpperCase().includes("HEMORRAGIA") ||
@@ -700,11 +701,14 @@ export default function TriageRoom() {
 
     // Pouco Urgente (Verde)
     if (
-      mainComplaint.length > 0 || 
       (nTemp >= 37 && nTemp < 38) || 
       (nGlicemia > 140 && nGlicemia < 250)
     ) {
       return 'less-urgent';
+    }
+    const hasVitals = Boolean(fc || pa || fr || spo2 || temperature || glicemia);
+    if (!hasVitals) {
+      return null;
     }
 
     return 'not-urgent';
@@ -1500,7 +1504,10 @@ export default function TriageRoom() {
                                             )}
                                           />
                                           <span className="text-[9px] font-black uppercase tracking-widest">
-                                            Risco Detectado
+                                            {lastCalculatedRisk === 'emergency' ? 'Risco: Emergência' :
+                                             lastCalculatedRisk === 'very-urgent' ? 'Risco: Muito Urgente' :
+                                             lastCalculatedRisk === 'urgent' ? 'Risco: Urgente' :
+                                             'Risco: Pouco Urgente'}
                                           </span>
                                         </motion.div>
                                       )}
