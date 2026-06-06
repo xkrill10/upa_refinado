@@ -9,7 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 
 interface DocumentGeneratorProps {
   patient: Patient;
-  medications: { medication: string; dosage: string; route: string; frequency: string }[];
+  medications: { medication: string; dosage: string; route: string; frequency: string; duration?: string; recommendations?: string }[];
   doctorName: string;
   crmNumber: string;
   crmState: string;
@@ -23,8 +23,16 @@ export function DocumentGenerator({ patient, medications, doctorName, crmNumber,
   const [isGenerating, setIsGenerating] = useState(false);
   const [previewOpen, setPreviewOpen] = useState(false);
   const [docType, setDocType] = useState<"receita" | "atestado" | "resumo_alta">("receita");
-  const [atestadoTemplate, setAtestadoTemplate] = useState<"padrao" | "comparecimento" | "acompanhante" | "fasttrack" | "isolamento" | "encaminhamento" | "transferencia" | "recusa">("padrao");
-  const [receitaTemplate, setReceitaTemplate] = useState<"padrao" | "pediatrico" | "uso_continuo" | "antimicrobiano" | "controle_especial" | "orientacoes">("padrao");
+  const [atestadoTemplate, setAtestadoTemplate] = useState<string>("padrao");
+  const [receitaTemplate, setReceitaTemplate] = useState<string>("padrao");
+  const [atestadoDays, setAtestadoDays] = useState<string>("1");
+  const [printCid, setPrintCid] = useState<boolean>(true);
+  const [savedAtestadoModels, setSavedAtestadoModels] = useState<{id: string, name: string, content: string}[]>([]);
+  const [customAtestadoText, setCustomAtestadoText] = useState("");
+  const [newAtestadoModelName, setNewAtestadoModelName] = useState("");
+  const [savedReceitaModels, setSavedReceitaModels] = useState<{id: string, name: string, content: string}[]>([]);
+  const [customReceitaText, setCustomReceitaText] = useState("");
+  const [newReceitaModelName, setNewReceitaModelName] = useState("");
   const printRef = useRef<HTMLDivElement>(null);
 
   // Auto-select pediatric templates if the patient is a child
@@ -37,6 +45,45 @@ export function DocumentGenerator({ patient, medications, doctorName, crmNumber,
       setAtestadoTemplate("padrao");
     }
   }, [patient]);
+
+  React.useEffect(() => {
+    try {
+      const savedAtestados = localStorage.getItem('upa_doctor_atestado_models');
+      if (savedAtestados) setSavedAtestadoModels(JSON.parse(savedAtestados));
+      const savedReceitas = localStorage.getItem('upa_doctor_receita_models');
+      if (savedReceitas) setSavedReceitaModels(JSON.parse(savedReceitas));
+    } catch(e) {}
+  }, []);
+
+  const handleSaveAtestadoModel = () => {
+    if (!newAtestadoModelName || !customAtestadoText) return;
+    const newModel = {
+      id: Math.random().toString(36).substr(2, 9),
+      name: newAtestadoModelName,
+      content: customAtestadoText
+    };
+    const updated = [...savedAtestadoModels, newModel];
+    setSavedAtestadoModels(updated);
+    localStorage.setItem('upa_doctor_atestado_models', JSON.stringify(updated));
+    setNewAtestadoModelName("");
+    toast.success("Modelo salvo com sucesso!");
+    setAtestadoTemplate(newModel.id);
+  };
+
+  const handleSaveReceitaModel = () => {
+    if (!newReceitaModelName || !customReceitaText) return;
+    const newModel = {
+      id: Math.random().toString(36).substr(2, 9),
+      name: newReceitaModelName,
+      content: customReceitaText
+    };
+    const updated = [...savedReceitaModels, newModel];
+    setSavedReceitaModels(updated);
+    localStorage.setItem('upa_doctor_receita_models', JSON.stringify(updated));
+    setNewReceitaModelName("");
+    toast.success("Modelo salvo com sucesso!");
+    setReceitaTemplate(newModel.id);
+  };
 
   const generatePDF = async () => {
     if (!printRef.current) return;
@@ -104,7 +151,7 @@ export function DocumentGenerator({ patient, medications, doctorName, crmNumber,
           onClick={() => { setDocType("receita"); setPreviewOpen(true); }}
         >
           <FileText className="h-4 w-4 mr-2 text-emerald-600" /> 
-          Imprimir Receita
+          Gerar Receita
         </Button>
         <Button 
           type="button"
@@ -127,64 +174,128 @@ export function DocumentGenerator({ patient, medications, doctorName, crmNumber,
       </div>
 
       <Dialog open={previewOpen} onOpenChange={setPreviewOpen}>
-        <DialogContent className="max-w-4xl w-[90vw] bg-slate-100 dark:bg-slate-900 p-0 border-0 overflow-hidden flex flex-col max-h-[90vh]">
-          <DialogHeader className="p-4 bg-white dark:bg-slate-950 border-b flex flex-row items-center justify-between shrink-0">
-            <div className="flex items-center gap-4">
-              <DialogTitle className="text-lg font-black uppercase tracking-widest text-slate-800 dark:text-slate-200">
+        <DialogContent className="max-w-5xl w-[95vw] bg-slate-100 dark:bg-slate-900 p-0 border-0 overflow-hidden flex flex-col max-h-[90vh]">
+          <DialogHeader className="p-4 bg-white dark:bg-slate-950 border-b flex flex-col xl:flex-row items-start xl:items-center justify-between shrink-0 gap-4">
+            <div className="flex flex-col md:flex-row items-start md:items-center flex-wrap gap-4 w-full xl:w-auto pb-2 xl:pb-0">
+              <DialogTitle className="text-lg font-black uppercase tracking-widest text-slate-800 dark:text-slate-200 whitespace-nowrap">
                 Visualização de Impressão: {docType === "receita" ? "Receituário" : docType === "atestado" ? "Atestado Médico" : "Resumo de Alta"}
               </DialogTitle>
               {docType === "atestado" && (
-                 <select 
-                   className="text-xs p-2 border rounded-xl border-slate-300 font-bold bg-slate-50 text-slate-700 outline-none focus:border-emerald-500 transition-colors"
-                   value={atestadoTemplate}
-                   onChange={(e) => setAtestadoTemplate(e.target.value as any)}
-                 >
-                   <optgroup label="Atestados e Declarações">
-                     <option value="padrao">Modelo Padrão (Repouso)</option>
-                     <option value="comparecimento">Declaração de Comparecimento</option>
-                     {!hidePediatricOptions && <option value="acompanhante">Atestado para Acompanhante / Pediátrico</option>}
-                     <option value="fasttrack">Atestado Fast Track (Sintomáticos)</option>
-                     <option value="isolamento">Isolamento Sanitário (Infectocontagiosas)</option>
-                   </optgroup>
-                   <optgroup label="Relatórios e Encaminhamentos">
-                     <option value="encaminhamento">Encaminhamento Médico (UBS/Especialista)</option>
-                     <option value="transferencia">Relatório de Transferência (Sala Vermelha)</option>
-                     <option value="recusa">Termo de Alta a Pedido / Recusa Médica</option>
-                   </optgroup>
-                 </select>
+                 <div className="flex flex-wrap items-center gap-2">
+                   <select 
+                     className="text-xs p-2 border rounded-xl border-slate-300 font-bold bg-slate-50 text-slate-700 outline-none focus:border-emerald-500 transition-colors"
+                     value={atestadoTemplate}
+                     onChange={(e) => setAtestadoTemplate(e.target.value as any)}
+                   >
+                     <optgroup label="Atestados e Declarações">
+                       <option value="padrao">Modelo Padrão (Repouso)</option>
+                       <option value="comparecimento">Declaração de Comparecimento</option>
+                       {!hidePediatricOptions && <option value="acompanhante">Atestado para Acompanhante / Pediátrico</option>}
+                       <option value="fasttrack">Atestado Fast Track (Sintomáticos)</option>
+                       <option value="isolamento">Isolamento Sanitário (Infectocontagiosas)</option>
+                     </optgroup>
+                     <optgroup label="Relatórios e Encaminhamentos">
+                       <option value="encaminhamento">Encaminhamento Médico (UBS/Especialista)</option>
+                       <option value="transferencia">Relatório de Transferência (Sala Vermelha)</option>
+                       <option value="recusa">Termo de Alta a Pedido / Recusa Médica</option>
+                     </optgroup>
+                     {savedAtestadoModels.length > 0 && (
+                       <optgroup label="Meus Modelos Salvos">
+                         {savedAtestadoModels.map(model => (
+                           <option key={model.id} value={model.id}>{model.name}</option>
+                         ))}
+                       </optgroup>
+                     )}
+                     <optgroup label="Personalizado">
+                       <option value="custom">➕ Criar Novo Modelo...</option>
+                     </optgroup>
+                   </select>
+                   {atestadoTemplate === "custom" && (
+                      <div className="flex items-center gap-2 ml-2">
+                        <input 
+                          type="text" 
+                          placeholder="Nome do Modelo..." 
+                          value={newAtestadoModelName} 
+                          onChange={e => setNewAtestadoModelName(e.target.value)} 
+                          className="h-8 text-xs font-bold border rounded-lg border-slate-300 outline-none px-2 w-32" 
+                        />
+                        <Button size="sm" className="h-8 text-[10px] px-2 py-0" onClick={handleSaveAtestadoModel}>Salvar</Button>
+                      </div>
+                   )}
+                   {(atestadoTemplate === "padrao" || atestadoTemplate === "acompanhante" || atestadoTemplate === "fasttrack" || atestadoTemplate === "isolamento" || savedAtestadoModels.some(m => m.id === atestadoTemplate)) && (
+                     <>
+                       <div className="flex items-center gap-2 ml-2">
+                         <span className="text-xs font-bold text-slate-500 uppercase">Dias:</span>
+                         <input 
+                           type="number" 
+                           min="1" 
+                           value={atestadoDays} 
+                           onChange={(e) => setAtestadoDays(e.target.value)} 
+                           className="w-16 h-8 text-xs font-bold text-center border rounded-lg border-slate-300 outline-none" 
+                         />
+                       </div>
+                       <label className="flex items-center gap-2 ml-2 cursor-pointer">
+                         <input 
+                           type="checkbox" 
+                           checked={printCid} 
+                           onChange={(e) => setPrintCid(e.target.checked)} 
+                           className="rounded border-slate-300 text-emerald-600 w-4 h-4"
+                         />
+                         <span className="text-xs font-bold text-slate-500 uppercase whitespace-nowrap">Imprimir CID</span>
+                       </label>
+                     </>
+                   )}
+                 </div>
               )}
               {docType === "receita" && (
-                 <select 
-                   className="text-xs p-2 border rounded-xl border-slate-300 font-bold bg-slate-50 text-slate-700 outline-none focus:border-emerald-500 transition-colors"
-                   value={receitaTemplate}
-                   onChange={(e) => setReceitaTemplate(e.target.value as any)}
-                 >
-                   <optgroup label="Receituários">
-                     <option value="padrao">Receituário Padrão (Branca)</option>
-                     {!hidePediatricOptions && <option value="pediatrico">Receituário Pediátrico</option>}
-                     <option value="uso_continuo">Receituário de Uso Contínuo</option>
-                   </optgroup>
-                   <optgroup label="Retenção de Receita (2 Vias)">
-                     <option value="antimicrobiano">Receita de Antimicrobianos</option>
-                     <option value="controle_especial">Controle Especial</option>
-                   </optgroup>
-                   <optgroup label="Instruções">
-                     <option value="orientacoes">Orientações de Alta / Sinais de Alarme</option>
-                   </optgroup>
-                 </select>
+                 <div className="flex flex-wrap items-center gap-2">
+                   <select 
+                     className="text-xs p-2 border rounded-xl border-slate-300 font-bold bg-slate-50 text-slate-700 outline-none focus:border-emerald-500 transition-colors"
+                     value={receitaTemplate}
+                     onChange={(e) => setReceitaTemplate(e.target.value)}
+                   >
+                     <optgroup label="Receituários">
+                       <option value="padrao">Receituário Padrão (Branca)</option>
+                       {!hidePediatricOptions && <option value="pediatrico">Receituário Pediátrico</option>}
+                       <option value="uso_continuo">Receituário de Uso Contínuo</option>
+                     </optgroup>
+                     <optgroup label="Retenção de Receita (2 Vias)">
+                       <option value="antimicrobiano">Receita de Antimicrobianos</option>
+                       <option value="controle_especial">Controle Especial</option>
+                     </optgroup>
+                     <optgroup label="Instruções">
+                       <option value="orientacoes">Orientações de Alta / Sinais de Alarme</option>
+                     </optgroup>
+                     {savedReceitaModels.length > 0 && (
+                       <optgroup label="Meus Modelos Salvos">
+                         {savedReceitaModels.map(model => (
+                           <option key={model.id} value={model.id}>{model.name}</option>
+                         ))}
+                       </optgroup>
+                     )}
+                     <optgroup label="Personalizado">
+                       <option value="custom">➕ Criar Novo Modelo...</option>
+                     </optgroup>
+                   </select>
+                   {receitaTemplate === "custom" && (
+                      <div className="flex items-center gap-2 ml-2">
+                        <input 
+                          type="text" 
+                          placeholder="Nome do Modelo..." 
+                          value={newReceitaModelName} 
+                          onChange={e => setNewReceitaModelName(e.target.value)} 
+                          className="h-8 text-xs font-bold border rounded-lg border-slate-300 outline-none px-2 w-32" 
+                        />
+                        <Button size="sm" className="h-8 text-[10px] px-2 py-0" onClick={handleSaveReceitaModel}>Salvar</Button>
+                      </div>
+                   )}
+                 </div>
               )}
             </div>
-            <div className="flex items-center gap-4">
+            <div className="flex flex-wrap items-center gap-4 w-full xl:w-auto justify-end xl:mr-10">
               <Button onClick={generatePDF} disabled={isGenerating} className="bg-emerald-600 hover:bg-emerald-700 text-white gap-2 font-black uppercase">
                 <Printer className="h-4 w-4" />
                 {isGenerating ? "Gerando PDF..." : "Imprimir / PDF"}
-              </Button>
-              <Button 
-                onClick={() => setPreviewOpen(false)} 
-                variant="outline" 
-                className="border-slate-300 text-slate-700 hover:bg-slate-100 hover:text-red-600 font-bold uppercase transition-colors"
-              >
-                Fechar
               </Button>
             </div>
           </DialogHeader>
@@ -239,6 +350,8 @@ export function DocumentGenerator({ patient, medications, doctorName, crmNumber,
                           {receitaTemplate === "antimicrobiano" && "Receituário de Antimicrobianos"}
                           {receitaTemplate === "controle_especial" && "Receituário de Controle Especial"}
                           {receitaTemplate === "orientacoes" && "Orientações de Alta Médica"}
+                          {receitaTemplate === "custom" && "Receituário Médico"}
+                          {savedReceitaModels.find(m => m.id === receitaTemplate) && "Receituário Médico"}
                         </h3>
                         {(receitaTemplate === "antimicrobiano" || receitaTemplate === "controle_especial") && (
                           <p className="text-xs font-bold text-slate-500 mt-2 tracking-widest uppercase">
@@ -257,41 +370,60 @@ export function DocumentGenerator({ patient, medications, doctorName, crmNumber,
                         )}
                       </div>
                       
-                      <div className="space-y-6">
-                        {medications.length === 0 ? (
-                          <p className="text-center text-slate-400 font-medium italic">Nenhum medicamento prescrito para uso externo.</p>
-                        ) : (
-                          medications.map((med, idx) => (
-                            <div key={idx} className={`flex gap-4 p-4 hover:bg-slate-50 rounded-lg transition-colors border-l-4 ${
-                              receitaTemplate === "pediatrico" ? "border-purple-500" :
-                              receitaTemplate === "antimicrobiano" ? "border-red-500" :
-                              receitaTemplate === "controle_especial" ? "border-blue-500" :
-                              receitaTemplate === "uso_continuo" ? "border-teal-500" :
-                              receitaTemplate === "orientacoes" ? "border-orange-500" :
-                              "border-emerald-500"
-                            }`}>
-                              <div className={`font-black text-lg w-6 ${
-                                receitaTemplate === "pediatrico" ? "text-purple-700" :
-                                receitaTemplate === "antimicrobiano" ? "text-red-700" :
-                                receitaTemplate === "controle_especial" ? "text-blue-700" :
-                                receitaTemplate === "uso_continuo" ? "text-teal-700" :
-                                receitaTemplate === "orientacoes" ? "text-orange-700" :
-                                "text-emerald-700"
+                      {receitaTemplate === "custom" || savedReceitaModels.find(m => m.id === receitaTemplate) ? (
+                        <div className="w-full mt-8">
+                          {receitaTemplate === "custom" ? (
+                            <textarea 
+                              className="w-full min-h-[400px] text-lg leading-relaxed text-slate-800 font-medium bg-transparent border-none resize-none focus:outline-none placeholder:text-slate-300 overflow-hidden"
+                              placeholder="Digite a sua receita livremente aqui.&#10;Este texto será impresso exatamente como você digitar, sem formatação da lista estruturada."
+                              value={customReceitaText}
+                              onChange={(e) => setCustomReceitaText(e.target.value)}
+                            />
+                          ) : (
+                            <div className="text-lg leading-relaxed text-slate-800 font-medium whitespace-pre-wrap">
+                              {savedReceitaModels.find(m => m.id === receitaTemplate)?.content}
+                            </div>
+                          )}
+                        </div>
+                      ) : (
+                        <div className="space-y-6">
+                          {medications.length === 0 ? (
+                            <p className="text-center text-slate-400 font-medium italic">Nenhum medicamento prescrito para uso externo.</p>
+                          ) : (
+                            medications.map((med, idx) => (
+                              <div key={idx} className={`flex gap-4 p-4 hover:bg-slate-50 rounded-lg transition-colors border-l-4 ${
+                                receitaTemplate === "pediatrico" ? "border-purple-500" :
+                                receitaTemplate === "antimicrobiano" ? "border-red-500" :
+                                receitaTemplate === "controle_especial" ? "border-blue-500" :
+                                receitaTemplate === "uso_continuo" ? "border-teal-500" :
+                                receitaTemplate === "orientacoes" ? "border-orange-500" :
+                                "border-emerald-500"
                               }`}>
-                                {idx + 1}.
-                              </div>
-                              <div>
-                                <p className="font-black text-lg uppercase text-slate-900 mb-1">{med.medication}</p>
-                                <div className="text-sm font-medium text-slate-700 space-y-1">
-                                  <p><strong>Dose:</strong> {med.dosage}</p>
-                                  <p><strong>Via de Administração:</strong> {med.route}</p>
-                                  <p><strong>Frequência / Duração:</strong> {med.frequency}</p>
+                                <div className={`font-black text-lg w-6 ${
+                                  receitaTemplate === "pediatrico" ? "text-purple-700" :
+                                  receitaTemplate === "antimicrobiano" ? "text-red-700" :
+                                  receitaTemplate === "controle_especial" ? "text-blue-700" :
+                                  receitaTemplate === "uso_continuo" ? "text-teal-700" :
+                                  receitaTemplate === "orientacoes" ? "text-orange-700" :
+                                  "text-emerald-700"
+                                }`}>
+                                  {idx + 1}.
+                                </div>
+                                <div>
+                                  <p className="font-black text-lg uppercase text-slate-900 mb-1">{med.medication}</p>
+                                  <div className="text-sm font-medium text-slate-700 space-y-1">
+                                    <p><strong>Dose:</strong> {med.dosage}</p>
+                                    <p><strong>Via de Administração:</strong> {med.route}</p>
+                                    <p><strong>Frequência:</strong> {med.frequency}</p>
+                                    {med.duration && <p><strong>Duração:</strong> {med.duration}</p>}
+                                    {med.recommendations && <p className="mt-2 text-slate-600 bg-slate-50 p-2 rounded border border-slate-100"><strong>Orientações:</strong> {med.recommendations}</p>}
+                                  </div>
                                 </div>
                               </div>
-                            </div>
-                          ))
-                        )}
-                      </div>
+                            ))
+                          )}
+                        </div>
+                      )}
                     </>
                   )}
 
@@ -311,7 +443,7 @@ export function DocumentGenerator({ patient, medications, doctorName, crmNumber,
                             Atesto para os devidos fins que o(a) paciente <strong>{patient.name}</strong>, inscrito(a) no CPF sob o nº <strong>{patient.cpf || "não informado"}</strong>, esteve sob meus cuidados médicos nesta unidade de pronto atendimento na data de <strong>{currentDate}</strong>.
                           </div>
                           <div className="text-lg leading-relaxed text-slate-800 font-medium mt-4 text-justify indent-8">
-                            Necessita de <strong>[ ___ ] ( ___________________________ ) dias</strong> de repouso absoluto a partir desta data, por motivo de saúde (CID-10: _____), não podendo exercer suas atividades laborais e/ou acadêmicas durante este período.
+                            Necessita de <strong>{atestadoDays} dia(s)</strong> de repouso absoluto a partir desta data, por motivo de saúde{printCid ? (diagnosis ? ` (CID-10: ${diagnosis})` : ` (CID-10: _____)`) : ""}, não podendo exercer suas atividades laborais e/ou acadêmicas durante este período.
                           </div>
                         </>
                       )}
@@ -333,7 +465,7 @@ export function DocumentGenerator({ patient, medications, doctorName, crmNumber,
                             Atesto para os devidos fins que o(a) Sr(a). <strong>___________________________________</strong>, inscrito(a) no CPF/RG sob o nº <strong>__________________</strong>, esteve nesta unidade de pronto atendimento na data de <strong>{currentDate}</strong> acompanhando o(a) paciente menor/incapaz <strong>{patient.name}</strong>.
                           </div>
                           <div className="text-lg leading-relaxed text-slate-800 font-medium mt-4 text-justify indent-8">
-                            O(A) paciente necessita de <strong>[ ___ ] dias</strong> de repouso por motivo de saúde (CID-10: _____), sendo indispensável o acompanhamento do responsável legal durante todo este período.
+                            O(A) paciente necessita de <strong>{atestadoDays} dia(s)</strong> de repouso por motivo de saúde{printCid ? (diagnosis ? ` (CID-10: ${diagnosis})` : ` (CID-10: _____)`) : ""}, sendo indispensável o acompanhamento do responsável legal durante todo este período.
                           </div>
                         </>
                       )}
@@ -344,7 +476,7 @@ export function DocumentGenerator({ patient, medications, doctorName, crmNumber,
                             Atesto para os devidos fins, após avaliação médica simplificada no fluxo Fast Track (Sintomáticos), que o(a) paciente <strong>{patient.name}</strong>, inscrito(a) no CPF sob o nº <strong>{patient.cpf || "não informado"}</strong>, compareceu a esta unidade na data de <strong>{currentDate}</strong>.
                           </div>
                           <div className="text-lg leading-relaxed text-slate-800 font-medium mt-4 text-justify indent-8">
-                            Necessita de <strong>[ ___ ] dias</strong> de repouso domiciliar a partir desta data para tratamento e observação de quadro viral / sintomático leve (CID-10: _____).
+                            Necessita de <strong>{atestadoDays} dia(s)</strong> de repouso domiciliar a partir desta data para tratamento e observação de quadro viral / sintomático leve{printCid ? (diagnosis ? ` (CID-10: ${diagnosis})` : ` (CID-10: _____)`) : ""}.
                           </div>
                         </>
                       )}
@@ -352,10 +484,10 @@ export function DocumentGenerator({ patient, medications, doctorName, crmNumber,
                       {atestadoTemplate === "isolamento" && (
                         <>
                           <div className="text-lg leading-relaxed text-slate-800 font-medium mt-8 text-justify indent-8">
-                            Atesto para os devidos fins que o(a) paciente <strong>{patient.name}</strong>, portador(a) do CPF <strong>{patient.cpf || "não informado"}</strong>, foi avaliado(a) nesta unidade com suspeita clínica ou confirmação de doença infectocontagiosa (CID-10: _____).
+                            Atesto para os devidos fins que o(a) paciente <strong>{patient.name}</strong>, portador(a) do CPF <strong>{patient.cpf || "não informado"}</strong>, foi avaliado(a) nesta unidade com suspeita clínica ou confirmação de doença infectocontagiosa{printCid ? (diagnosis ? ` (CID-10: ${diagnosis})` : ` (CID-10: _____)`) : ""}.
                           </div>
                           <div className="text-lg leading-relaxed text-red-700 font-bold mt-4 text-justify indent-8">
-                            Por determinação sanitária, o paciente necessita de <strong>[ ___ ] dias</strong> de isolamento domiciliar rigoroso a partir de <strong>{currentDate}</strong>, estando expressamente impedido(a) de frequentar ambientes laborais, acadêmicos ou aglomerações.
+                            Por determinação sanitária, o paciente necessita de <strong>{atestadoDays} dia(s)</strong> de isolamento domiciliar rigoroso a partir de <strong>{currentDate}</strong>, estando expressamente impedido(a) de frequentar ambientes laborais, acadêmicos ou aglomerações.
                           </div>
                         </>
                       )}
@@ -396,6 +528,26 @@ export function DocumentGenerator({ patient, medications, doctorName, crmNumber,
                              </div>
                           </div>
                         </>
+                      )}
+
+                      {atestadoTemplate === "custom" && (
+                        <div className="w-full">
+                          <textarea 
+                            className="w-full min-h-[200px] text-lg leading-relaxed text-slate-800 font-medium mt-8 text-justify indent-8 bg-transparent border-none resize-none focus:outline-none placeholder:text-slate-300 overflow-hidden"
+                            placeholder="Digite o texto do seu atestado aqui.&#10;DICA: Você pode usar variáveis como [DIAS] ou [CID].&#10;&#10;Ao imprimir ou salvar, este será o texto exibido no corpo do documento. O cabeçalho (dados do paciente) e o rodapé (sua assinatura) serão inseridos automaticamente pelo sistema."
+                            value={customAtestadoText}
+                            onChange={(e) => setCustomAtestadoText(e.target.value)}
+                          />
+                        </div>
+                      )}
+                      
+                      {savedAtestadoModels.find(m => m.id === atestadoTemplate) && (
+                        <div className="text-lg leading-relaxed text-slate-800 font-medium mt-8 text-justify indent-8 whitespace-pre-wrap">
+                          {savedAtestadoModels.find(m => m.id === atestadoTemplate)?.content
+                            .replace(/\[DIAS\]/g, atestadoDays)
+                            .replace(/\[CID\]/g, diagnosis || "_____")
+                          }
+                        </div>
                       )}
                     </>
                   )}

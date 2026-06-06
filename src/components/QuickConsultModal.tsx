@@ -34,9 +34,12 @@ export function QuickConsultModal({ patient, isOpen, onClose, onComplete, isPedi
   
   // Super Painel State
   const [prescWizard, setPrescWizard] = useState({
-    medication: "", dosage: "", route: "", frequency: ""
+    medication: "", dosage: "", route: "", frequency: "", duration: "", recommendations: ""
   });
-  const [prescribedMedications, setPrescribedMedications] = useState<{medication: string, dosage: string, route: string, frequency: string}[]>([]);
+  const [prescribedMedications, setPrescribedMedications] = useState<{medication: string, dosage: string, route: string, frequency: string, duration?: string, recommendations?: string}[]>([]);
+  const [savedPrescriptionModels, setSavedPrescriptionModels] = useState<{id: string, name: string, medications: typeof prescribedMedications}[]>([]);
+  const [isSavingPrescModel, setIsSavingPrescModel] = useState(false);
+  const [newPrescModelName, setNewPrescModelName] = useState("");
   const { user } = useAuth();
   const { addPrescriptionOrder } = usePrescriptions();
   
@@ -50,12 +53,40 @@ export function QuickConsultModal({ patient, isOpen, onClose, onComplete, isPedi
       setCrmNumber(localStorage.getItem("upa_stamp_number") || "");
       setCrmState(localStorage.getItem("upa_stamp_state") || "SP");
     }
+
+    try {
+      const saved = localStorage.getItem('upa_doctor_prescription_models');
+      if (saved) setSavedPrescriptionModels(JSON.parse(saved));
+    } catch(e) {}
   }, [isOpen, user]);
+
+  const handleSavePrescriptionModel = () => {
+    if (!newPrescModelName || prescribedMedications.length === 0) return;
+    const newModel = {
+      id: Math.random().toString(36).substr(2, 9),
+      name: newPrescModelName,
+      medications: [...prescribedMedications]
+    };
+    const updated = [...savedPrescriptionModels, newModel];
+    setSavedPrescriptionModels(updated);
+    localStorage.setItem('upa_doctor_prescription_models', JSON.stringify(updated));
+    setNewPrescModelName("");
+    setIsSavingPrescModel(false);
+    toast.success("Modelo salvo com sucesso!");
+  };
+
+  const handleLoadPrescriptionModel = (id: string) => {
+    const model = savedPrescriptionModels.find(m => m.id === id);
+    if (model) {
+      setPrescribedMedications(prev => [...prev, ...model.medications]);
+      toast.success(`Modelo "${model.name}" carregado!`);
+    }
+  };
 
   const handleAddPrescriptionItem = () => {
     if (prescWizard.medication && prescWizard.dosage) {
       setPrescribedMedications([...prescribedMedications, prescWizard]);
-      setPrescWizard({ medication: "", dosage: "", route: "", frequency: "" });
+      setPrescWizard({ medication: "", dosage: "", route: "", frequency: "", duration: "", recommendations: "" });
     }
   };
 
@@ -300,6 +331,18 @@ export function QuickConsultModal({ patient, isOpen, onClose, onComplete, isPedi
                   <span className={cn("font-extrabold uppercase tracking-wider text-[11px] flex items-center gap-1.5", isPediatric ? "text-orange-600" : "text-[#006699]")}>
                     Painel de Prescrição Médica
                   </span>
+                  {savedPrescriptionModels.length > 0 && (
+                    <Select onValueChange={handleLoadPrescriptionModel} value="">
+                      <SelectTrigger className="h-7 text-[10px] w-36 bg-white dark:bg-slate-950 font-bold border-slate-300">
+                        <SelectValue placeholder="Carregar Modelo..." />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {savedPrescriptionModels.map(model => (
+                          <SelectItem key={model.id} value={model.id}>{model.name}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -365,6 +408,24 @@ export function QuickConsultModal({ patient, isOpen, onClose, onComplete, isPedi
                           </SelectContent>
                         </Select>
                       </div>
+                      <div className="space-y-1">
+                        <Label className="text-[10px] font-bold">Duração / Qtd</Label>
+                        <Input
+                          placeholder="Ex: 5 dias"
+                          className="h-8 text-xs bg-white dark:bg-slate-950"
+                          value={prescWizard.duration}
+                          onChange={(e) => setPrescWizard({ ...prescWizard, duration: e.target.value })}
+                        />
+                      </div>
+                      <div className="col-span-2 space-y-1">
+                        <Label className="text-[10px] font-bold">Recomendações</Label>
+                        <Input
+                          placeholder="Ex: Tomar após as refeições"
+                          className="h-8 text-xs bg-white dark:bg-slate-950"
+                          value={prescWizard.recommendations}
+                          onChange={(e) => setPrescWizard({ ...prescWizard, recommendations: e.target.value })}
+                        />
+                      </div>
                     </div>
                     <Button
                       type="button"
@@ -380,9 +441,29 @@ export function QuickConsultModal({ patient, isOpen, onClose, onComplete, isPedi
 
                   {/* Lista Estruturada */}
                   <div className="space-y-2">
-                    <span className="text-[9px] font-black uppercase text-muted-foreground block">
-                      2. Lista Estruturada
-                    </span>
+                    <div className="flex items-center justify-between">
+                      <span className="text-[9px] font-black uppercase text-muted-foreground block">
+                        2. Lista Estruturada
+                      </span>
+                      {prescribedMedications.length > 0 && (
+                        isSavingPrescModel ? (
+                          <div className="flex items-center gap-1">
+                            <Input 
+                              value={newPrescModelName} 
+                              onChange={e => setNewPrescModelName(e.target.value)} 
+                              placeholder="Nome do modelo..." 
+                              className="h-6 text-[10px] w-32 px-2"
+                            />
+                            <Button size="sm" className="h-6 text-[10px] px-2 py-0" onClick={handleSavePrescriptionModel}>Salvar</Button>
+                            <Button size="sm" variant="ghost" className="h-6 w-6 p-0" onClick={() => setIsSavingPrescModel(false)}><X className="h-3 w-3"/></Button>
+                          </div>
+                        ) : (
+                          <Button size="sm" variant="ghost" className="h-6 text-[10px] text-emerald-600 hover:text-emerald-700 font-bold uppercase p-0" onClick={() => setIsSavingPrescModel(true)}>
+                            + Salvar Modelo
+                          </Button>
+                        )
+                      )}
+                    </div>
                     <div className="bg-white/80 dark:bg-slate-950 rounded-lg border border-slate-200 dark:border-slate-800 p-2 min-h-[120px] max-h-[160px] overflow-y-auto space-y-1.5">
                       {prescribedMedications.length === 0 ? (
                         <div className="h-full flex flex-col items-center justify-center text-muted-foreground/50 py-4">
@@ -399,7 +480,7 @@ export function QuickConsultModal({ patient, isOpen, onClose, onComplete, isPedi
                               <X className="h-3 w-3" />
                             </button>
                             <span className="font-bold pr-6">{med.medication} <span className="text-muted-foreground font-normal">({med.dosage})</span></span>
-                            <span className="text-[10px] text-muted-foreground">Via: {med.route} • Freq: {med.frequency}</span>
+                            <span className="text-[10px] text-muted-foreground">Via: {med.route} • Freq: {med.frequency}{med.duration ? ` • Dur: ${med.duration}` : ''}</span>
                           </div>
                         ))
                       )}
