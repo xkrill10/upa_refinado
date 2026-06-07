@@ -31,22 +31,22 @@ function SlaTimer({ deadline }: { deadline?: string }) {
 export default function Laboratory() {
   const { patients, updateExamStatus, recollectExam } = usePatientsContext();
   const { decrementStockDirectly } = useInventory();
-  const [selectedExam, setSelectedExam] = useState<{patient: Patient, exam: ExamRequest} | null>(null);
-  const [printExam, setPrintExam] = useState<{patient: Patient, exam: ExamRequest} | null>(null);
+  const [selectedExam, setSelectedExam] = useState<{ patient: Patient, exam: ExamRequest } | null>(null);
+  const [printExam, setPrintExam] = useState<{ patient: Patient, exam: ExamRequest } | null>(null);
   const [showHistory, setShowHistory] = useState(false);
   const [collectorMode, setCollectorMode] = useState(false);
   const [activeTab, setActiveTab] = useState("all");
-  
+
   const [searchQuery, setSearchQuery] = useState("");
   const [filters, setFilters] = useState({ status: "", priority: "" });
 
   const sparklineProd = useMemo(() => [
-    { time: '08:00', val: 5 }, { time: '10:00', val: 12 }, { time: '12:00', val: 8 }, 
+    { time: '08:00', val: 5 }, { time: '10:00', val: 12 }, { time: '12:00', val: 8 },
     { time: '14:00', val: 15 }, { time: '16:00', val: 22 }, { time: '18:00', val: 18 }
   ], []);
-  
+
   const sparklineTAT = useMemo(() => [
-    { time: '08:00', val: 40 }, { time: '10:00', val: 35 }, { time: '12:00', val: 45 }, 
+    { time: '08:00', val: 40 }, { time: '10:00', val: 35 }, { time: '12:00', val: 45 },
     { time: '14:00', val: 30 }, { time: '16:00', val: 20 }, { time: '18:00', val: 25 }
   ], []);
 
@@ -96,7 +96,7 @@ export default function Laboratory() {
     const todayExams = allExams.filter(e => e.exam.status === 'completed' && e.exam.releasedAt?.startsWith(today));
     const labCount = todayExams.filter(e => e.exam.type === 'lab').length;
     const imgCount = todayExams.filter(e => e.exam.type === 'image').length;
-    
+
     return {
       totalToday: todayExams.length,
       pieData: [
@@ -127,100 +127,100 @@ export default function Laboratory() {
     return null;
   };
 
-  const renderExamCard = (item: {patient: Patient, exam: ExamRequest}) => {
+  const renderExamCard = (item: { patient: Patient, exam: ExamRequest }) => {
     const overdue = (item.exam.status !== 'completed') && isOverdue(item.exam.deadline);
-    
+
     return (
       <Card key={item.exam.id} className={cn("p-4 glass-card border transition-all shadow-sm group relative overflow-hidden", item.exam.isCritical ? "border-red-500/50" : overdue ? "border-red-500 animate-pulse shadow-[0_0_15px_rgba(239,68,68,0.2)] bg-red-500/5" : "border-white/20 dark:border-white/10 hover:border-purple-500/30")}>
         {overdue && (
           <div className="absolute top-0 right-0 w-full h-1 bg-red-500 animate-pulse" />
         )}
         <div className="flex justify-between items-start mb-2">
-        <div>
-          <Badge className={`border-none text-[9px] uppercase font-bold tracking-widest ${item.exam.type === 'lab' ? 'bg-purple-500/10 text-purple-600' : 'bg-teal-500/10 text-teal-600'}`}>
-            {item.exam.type === 'lab' ? 'Laboratório' : 'Imagem'}
-          </Badge>
-          <h4 className="font-bold text-sm mt-1">{item.exam.name}</h4>
-          {item.exam.type === 'lab' && item.exam.status === 'pending_collection' && (() => {
-            const tube = getTubeColor(item.exam.name);
-            if (!tube) return null;
-            return (
-              <div className="flex items-center gap-1.5 mt-1.5">
-                <div className={`w-2.5 h-2.5 rounded-full ${tube.color} shadow-sm border border-black/10`} />
-                <span className="text-[9px] font-bold text-slate-500 uppercase tracking-widest">{tube.label}</span>
-              </div>
-            );
-          })()}
+          <div>
+            <Badge className={`border-none text-[9px] uppercase font-bold tracking-widest ${item.exam.type === 'lab' ? 'bg-purple-500/10 text-purple-600' : 'bg-teal-500/10 text-teal-600'}`}>
+              {item.exam.type === 'lab' ? 'Laboratório' : 'Imagem'}
+            </Badge>
+            <h4 className="font-bold text-sm mt-1">{item.exam.name}</h4>
+            {item.exam.type === 'lab' && item.exam.status === 'pending_collection' && (() => {
+              const tube = getTubeColor(item.exam.name);
+              if (!tube) return null;
+              return (
+                <div className="flex items-center gap-1.5 mt-1.5">
+                  <div className={`w-2.5 h-2.5 rounded-full ${tube.color} shadow-sm border border-black/10`} />
+                  <span className="text-[9px] font-bold text-slate-500 uppercase tracking-widest">{tube.label}</span>
+                </div>
+              );
+            })()}
+          </div>
+          {item.exam.priority === 'urgent' && (
+            <Badge className="bg-red-500 text-white border-none shadow-sm text-[9px] animate-pulse">
+              URGENTE
+            </Badge>
+          )}
         </div>
-        {item.exam.priority === 'urgent' && (
-          <Badge className="bg-red-500 text-white border-none shadow-sm text-[9px] animate-pulse">
-            URGENTE
-          </Badge>
-        )}
-      </div>
-      <p className="text-xs text-muted-foreground font-semibold mb-1 uppercase tracking-wider">{item.patient.name}</p>
-      <div className="flex items-center gap-2 text-[10px] text-muted-foreground font-bold">
-        <Clock className="w-3 h-3" />
-        {new Date(item.exam.requestedAt).toLocaleTimeString('pt-BR', {hour: '2-digit', minute: '2-digit'})}
-        <SlaTimer deadline={item.exam.deadline} />
-      </div>
+        <p className="text-xs text-muted-foreground font-semibold mb-1 uppercase tracking-wider">{item.patient.name}</p>
+        <div className="flex items-center gap-2 text-[10px] text-muted-foreground font-bold">
+          <Clock className="w-3 h-3" />
+          {new Date(item.exam.requestedAt).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+          <SlaTimer deadline={item.exam.deadline} />
+        </div>
 
-      <div className="mt-4 flex gap-2">
-        {item.exam.status === 'pending_collection' && (
-          <div className="flex flex-col gap-2 w-full">
-            <div className="flex gap-2">
-              <Button 
-                className="flex-1 h-8 text-[9px] font-black uppercase tracking-widest bg-blue-600 hover:bg-blue-700 text-white" 
-                onClick={() => handleStatusChange(item.patient.id, item.exam.id, 'in_analysis', item.exam.type)}
-              >
-                Análise
-              </Button>
-              <Button 
-                className="flex-1 h-8 text-[9px] font-black uppercase tracking-widest bg-purple-600 hover:bg-purple-700 text-white" 
-                onClick={() => setPrintExam(item)}
-              >
-                <Printer className="w-3 h-3 mr-1" /> Etiqueta
-              </Button>
-            </div>
-            <Button variant="outline" className="w-full h-8 text-[9px] font-black uppercase tracking-widest text-red-500 hover:text-red-600 border-red-500/20 hover:bg-red-500/10" onClick={() => recollectExam(item.patient.id, item.exam.id, "Amostra inviável / Coleta inadequada")}>
-              <XCircle className="w-3 h-3 mr-1" /> Rejeitar
-            </Button>
-          </div>
-        )}
-        {item.exam.status === 'in_analysis' && (
-          <div className="flex flex-col gap-2 w-full">
-            <Button 
-              className="w-full h-8 text-[10px] font-black uppercase tracking-widest bg-emerald-600 hover:bg-emerald-700 text-white" 
-              onClick={() => setSelectedExam(item)}
-            >
-              Concluir & Laudar
-            </Button>
-            <Button variant="outline" className="w-full h-8 text-[9px] font-black uppercase tracking-widest text-red-500 hover:text-red-600 border-red-500/20 hover:bg-red-500/10" onClick={() => recollectExam(item.patient.id, item.exam.id, "Falha na análise / Amostra insuficiente")}>
-              <XCircle className="w-3 h-3 mr-1" /> Rejeitar Amostra
-            </Button>
-          </div>
-        )}
-        {item.exam.status === 'completed' && (
-          <div className="w-full flex flex-col gap-2">
-            <div className="text-[10px] font-bold text-emerald-600 bg-emerald-500/10 rounded-md p-2 border border-emerald-500/20 text-center uppercase tracking-widest">
-              Laudo Enviado
-            </div>
-            {item.exam.isCritical && (
-              <div className="text-[10px] font-black text-red-600 bg-red-500/20 rounded-md p-2 border border-red-500/30 text-center uppercase animate-pulse shadow-[0_0_10px_rgba(239,68,68,0.5)]">
-                VALOR CRÍTICO
+        <div className="mt-4 flex gap-2">
+          {item.exam.status === 'pending_collection' && (
+            <div className="flex flex-col gap-2 w-full">
+              <div className="flex gap-2">
+                <Button
+                  className="flex-1 h-8 text-[9px] font-black uppercase tracking-widest bg-blue-600 hover:bg-blue-700 text-white"
+                  onClick={() => handleStatusChange(item.patient.id, item.exam.id, 'in_analysis', item.exam.type)}
+                >
+                  Análise
+                </Button>
+                <Button
+                  className="flex-1 h-8 text-[9px] font-black uppercase tracking-widest bg-purple-600 hover:bg-purple-700 text-white"
+                  onClick={() => setPrintExam(item)}
+                >
+                  <Printer className="w-3 h-3 mr-1" /> Etiqueta
+                </Button>
               </div>
-            )}
-          </div>
-        )}
-      </div>
-    </Card>
+              <Button variant="outline" className="w-full h-8 text-[9px] font-black uppercase tracking-widest text-red-500 hover:text-red-600 border-red-500/20 hover:bg-red-500/10" onClick={() => recollectExam(item.patient.id, item.exam.id, "Amostra inviável / Coleta inadequada")}>
+                <XCircle className="w-3 h-3 mr-1" /> Rejeitar
+              </Button>
+            </div>
+          )}
+          {item.exam.status === 'in_analysis' && (
+            <div className="flex flex-col gap-2 w-full">
+              <Button
+                className="w-full h-8 text-[10px] font-black uppercase tracking-widest bg-emerald-600 hover:bg-emerald-700 text-white"
+                onClick={() => setSelectedExam(item)}
+              >
+                Concluir & Laudar
+              </Button>
+              <Button variant="outline" className="w-full h-8 text-[9px] font-black uppercase tracking-widest text-red-500 hover:text-red-600 border-red-500/20 hover:bg-red-500/10" onClick={() => recollectExam(item.patient.id, item.exam.id, "Falha na análise / Amostra insuficiente")}>
+                <XCircle className="w-3 h-3 mr-1" /> Rejeitar Amostra
+              </Button>
+            </div>
+          )}
+          {item.exam.status === 'completed' && (
+            <div className="w-full flex flex-col gap-2">
+              <div className="text-[10px] font-bold text-emerald-600 bg-emerald-500/10 rounded-md p-2 border border-emerald-500/20 text-center uppercase tracking-widest">
+                Laudo Enviado
+              </div>
+              {item.exam.isCritical && (
+                <div className="text-[10px] font-black text-red-600 bg-red-500/20 rounded-md p-2 border border-red-500/30 text-center uppercase animate-pulse shadow-[0_0_10px_rgba(239,68,68,0.5)]">
+                  VALOR CRÍTICO
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      </Card>
     );
   };
 
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
       {collectorMode && (
-        <CollectorMode 
+        <CollectorMode
           pendingExams={pendingExams}
           onExit={() => setCollectorMode(false)}
           onConfirmCollection={(pId, eId, type) => handleStatusChange(pId, eId, 'in_analysis', type)}
@@ -235,7 +235,7 @@ export default function Laboratory() {
             Apoio Diagnóstico
           </Badge>
         </div>
-        
+
         <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 mb-6">
           <div>
             <h1 className="text-3xl font-black tracking-tight text-foreground uppercase mt-4">Laboratório & Imagem</h1>
@@ -255,7 +255,7 @@ export default function Laboratory() {
       </header>
 
 
-      
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
         <Card className="p-4 glass-card border-white/20 dark:border-white/5 flex items-center gap-6 overflow-hidden relative min-h-[140px]">
           <div className="flex-1 min-w-0 pl-2 relative z-10">
@@ -265,77 +265,77 @@ export default function Laboratory() {
           </div>
           <div className="h-28 w-28 shrink-0 z-10">
             {dashboardData.totalToday > 0 ? (
-               <div className="relative w-full h-full flex items-center justify-center">
-                  <svg viewBox="0 0 100 100" className="w-full h-full transform -rotate-90">
-                     <circle cx="50" cy="50" r="40" stroke="currentColor" strokeWidth="8" fill="none" className="text-border opacity-20" />
-                     {dashboardData.pieData.map((slice, i) => {
-                        const total = dashboardData.pieData.reduce((acc, curr) => acc + curr.value, 0);
-                        const prevTotal = dashboardData.pieData.slice(0, i).reduce((acc, curr) => acc + curr.value, 0);
-                        const percent = total > 0 ? (slice.value / total) * 100 : 0;
-                        const prevPercent = total > 0 ? (prevTotal / total) * 100 : 0;
-                        const dashArray = `${(percent * 251.2) / 100} 251.2`;
-                        const dashOffset = -((prevPercent * 251.2) / 100);
-                        return (
-                          <circle
-                            key={i}
-                            cx="50"
-                            cy="50"
-                            r="40"
-                            stroke={slice.color}
-                            strokeWidth="8"
-                            fill="none"
-                            strokeDasharray={dashArray}
-                            strokeDashoffset={dashOffset}
-                            className="transition-all duration-1000"
-                          />
-                        );
-                     })}
-                  </svg>
-                  <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
-                      <span className="text-xs font-black">{dashboardData.totalToday}</span>
-                      <span className="text-[8px] font-bold text-muted-foreground uppercase">Total</span>
-                  </div>
-               </div>
+              <div className="relative w-full h-full flex items-center justify-center">
+                <svg viewBox="0 0 100 100" className="w-full h-full transform -rotate-90">
+                  <circle cx="50" cy="50" r="40" stroke="currentColor" strokeWidth="8" fill="none" className="text-border opacity-20" />
+                  {dashboardData.pieData.map((slice, i) => {
+                    const total = dashboardData.pieData.reduce((acc, curr) => acc + curr.value, 0);
+                    const prevTotal = dashboardData.pieData.slice(0, i).reduce((acc, curr) => acc + curr.value, 0);
+                    const percent = total > 0 ? (slice.value / total) * 100 : 0;
+                    const prevPercent = total > 0 ? (prevTotal / total) * 100 : 0;
+                    const dashArray = `${(percent * 251.2) / 100} 251.2`;
+                    const dashOffset = -((prevPercent * 251.2) / 100);
+                    return (
+                      <circle
+                        key={i}
+                        cx="50"
+                        cy="50"
+                        r="40"
+                        stroke={slice.color}
+                        strokeWidth="8"
+                        fill="none"
+                        strokeDasharray={dashArray}
+                        strokeDashoffset={dashOffset}
+                        className="transition-all duration-1000"
+                      />
+                    );
+                  })}
+                </svg>
+                <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
+                  <span className="text-xs font-black">{dashboardData.totalToday}</span>
+                  <span className="text-[8px] font-bold text-muted-foreground uppercase">Total</span>
+                </div>
+              </div>
             ) : (
-              <div className="h-full w-full flex items-center justify-center rounded-full border-4 border-dashed border-border text-muted-foreground text-[10px] font-bold text-center uppercase">Sem<br/>dados</div>
+              <div className="h-full w-full flex items-center justify-center rounded-full border-4 border-dashed border-border text-muted-foreground text-[10px] font-bold text-center uppercase">Sem<br />dados</div>
             )}
           </div>
 
         </Card>
 
-        
+
         <Card className="p-5 glass-card border-white/20 dark:border-white/5 relative overflow-hidden flex flex-col justify-center min-h-[140px]">
-           <div className="absolute top-1/2 -translate-y-1/2 right-0 p-4 opacity-[0.03]">
-             <Clock className="w-32 h-32" />
-           </div>
+          <div className="absolute top-1/2 -translate-y-1/2 right-0 p-4 opacity-[0.03]">
+            <Clock className="w-32 h-32" />
+          </div>
 
 
 
-           <div className="relative z-10 w-full">
-             <h3 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-4">Turnaround Time (TAT)</h3>
-             <div className="grid grid-cols-2 gap-6">
-               <div>
-                 <div className="flex items-center gap-2 mb-1">
-                   <div className="w-2 h-2 rounded-full bg-purple-500" />
-                   <span className="text-[9px] font-black uppercase tracking-widest text-purple-600 dark:text-purple-400">Sangue / Urina</span>
-                 </div>
-                 <div className="text-4xl font-black tracking-tighter text-foreground">45 <span className="text-sm font-bold text-muted-foreground">min</span></div>
-               </div>
-               <div>
-                 <div className="flex items-center gap-2 mb-1">
-                   <div className="w-2 h-2 rounded-full bg-teal-500" />
-                   <span className="text-[9px] font-black uppercase tracking-widest text-teal-600 dark:text-teal-400">Raio-X / Imagem</span>
-                 </div>
-                 <div className="text-4xl font-black tracking-tighter text-foreground">20 <span className="text-sm font-bold text-muted-foreground">min</span></div>
-               </div>
-             </div>
-             <div className="mt-4 pt-3 border-t border-border/50">
-               <p className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
-                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                 SLA dentro da meta institucional
-               </p>
-             </div>
-           </div>
+          <div className="relative z-10 w-full">
+            <h3 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-4">Turnaround Time (TAT)</h3>
+            <div className="grid grid-cols-2 gap-6">
+              <div>
+                <div className="flex items-center gap-2 mb-1">
+                  <div className="w-2 h-2 rounded-full bg-purple-500" />
+                  <span className="text-[9px] font-black uppercase tracking-widest text-purple-600 dark:text-purple-400">Sangue / Urina</span>
+                </div>
+                <div className="text-4xl font-black tracking-tighter text-foreground">45 <span className="text-sm font-bold text-muted-foreground">min</span></div>
+              </div>
+              <div>
+                <div className="flex items-center gap-2 mb-1">
+                  <div className="w-2 h-2 rounded-full bg-teal-500" />
+                  <span className="text-[9px] font-black uppercase tracking-widest text-teal-600 dark:text-teal-400">Raio-X / Imagem</span>
+                </div>
+                <div className="text-4xl font-black tracking-tighter text-foreground">20 <span className="text-sm font-bold text-muted-foreground">min</span></div>
+              </div>
+            </div>
+            <div className="mt-4 pt-3 border-t border-border/50">
+              <p className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                SLA dentro da meta institucional
+              </p>
+            </div>
+          </div>
         </Card>
       </div>
 
@@ -395,7 +395,7 @@ export default function Laboratory() {
           exam={selectedExam.exam}
         />
       )}
-      
+
       {printExam && (
         <PrintLabelModal
           open={true}

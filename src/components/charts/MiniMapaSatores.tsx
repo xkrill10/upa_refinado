@@ -38,7 +38,7 @@ const SECTOR_GROUPS = [
     color: 'text-emerald-500 dark:text-emerald-400',
     progressColor: 'bg-emerald-500',
     max: 1 + 1 + 1 + 6 + 2 + 2 + 6, // 19
-    sectors: ['TRIAGEM 1', 'TRIAGEM 2', 'TRIAGEM 3', 'SALA DE COLETA', 'SALA DE SUTURA', 'SALA DE CURATIVOS', 'CONSULTÓRIO CLÍNICO 1', 'CONSULTÓRIO CLÍNICO 2', 'CONSULTÓRIO CLÍNICO 3', 'CONSULTÓRIO CLÍNICO 4', 'CONSULTÓRIO CLÍNICO 5', 'CONSULTÓRIO CLÍNICO 6']
+    sectors: ['TRIAGEM 1', 'TRIAGEM 2', 'TRIAGEM 3', 'SALA DE COLETA', 'SALA DE SUTURA', 'SALA DE CURATIVOS', 'FAST TRACK', 'CONSULTÓRIO CLÍNICO 1', 'CONSULTÓRIO CLÍNICO 2', 'CONSULTÓRIO CLÍNICO 3', 'CONSULTÓRIO CLÍNICO 4', 'CONSULTÓRIO CLÍNICO 5']
   },
   {
     id: 'support',

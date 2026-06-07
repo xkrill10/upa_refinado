@@ -112,12 +112,18 @@ export default function MyWorkspace() {
   const isEmergencyRoom = activeRoom.toUpperCase().includes("VERMELHA");
   const isPediatric = activeRoom.toUpperCase().includes("PEDIÁTRICO") || activeRoom.toUpperCase().includes("PEDIATRIA");
   const isAdultClinical = !isPediatric && !isEmergencyRoom;
+  const isFastTrack = activeRoom.toUpperCase().includes("FAST TRACK");
 
   // Filter patients for this specific queue
   const relevantPatients = patients.filter(p => {
     if (p.status === 'completed' || p.status === 'evasion') return false;
     const isPatientPediatric = p.priority === "pediatric" || (p.age !== undefined && p.age < 12);
     const isCritical = p.risk === 'emergency';
+
+    if (isFastTrack) {
+      if (p.subStatus === 'reaval') return false;
+      return p.risk === 'less-urgent' || p.risk === 'not-urgent';
+    }
 
     // Se o médico estiver na Sala Vermelha: Só atende os críticos (Vermelho)
     if (isEmergencyRoom) {
@@ -198,10 +204,12 @@ export default function MyWorkspace() {
     updatePatient(patient.id, { 
       status: 'waiting', 
       subStatus: 'reaval',
-      sector: activeRoom // Keep the room so we know it belongs to this doctor
+      sector: isFastTrack ? undefined : activeRoom // Se Fast Track, solta pra fila geral
     });
     toast.info(`Paciente ${formatWords(patient.name)} em reavaliação.`, {
-      description: "Movido de volta para a fila de espera (Aguardando Exames)."
+      description: isFastTrack 
+        ? "Movido para a fila GERAL de espera (Aguardando Exames)."
+        : "Movido de volta para a fila de espera (Aguardando Exames)."
     });
   };
 
@@ -221,7 +229,8 @@ export default function MyWorkspace() {
     
     updatePatient(patientId, { 
       status: finalStatus,
-      subStatus: outcome === 'exames' ? 'reaval' : undefined
+      subStatus: outcome === 'exames' ? 'reaval' : undefined,
+      ...(outcome === 'exames' && isFastTrack ? { sector: undefined } : {})
     });
     
     toast.success(`Atendimento Finalizado!`, {
@@ -520,7 +529,8 @@ export default function MyWorkspace() {
             ) : (
               <div className="divide-y divide-slate-100 dark:divide-slate-800">
                 {waitingPatients.map(patient => {
-                  const isReaval = patient.subStatus === 'reaval' && patient.sector === activeRoom;
+                  const isReaval = patient.subStatus === 'reaval';
+                  const isMyReaval = patient.subStatus === 'reaval' && patient.sector === activeRoom;
                   const allExamsCompleted = patient.exams && patient.exams.length > 0 && patient.exams.filter(e => e.status === 'completed').length === patient.exams.length;
                   return (
                     <div key={patient.id} className={cn(

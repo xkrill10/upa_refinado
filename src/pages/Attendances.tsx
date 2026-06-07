@@ -194,7 +194,10 @@ export default function Attendances() {
                 <SelectValue placeholder="Filtrar por consultório" />
               </SelectTrigger>
               <SelectContent className="glass-card-premium rounded-xl border-white/20">
-                {Array.from({ length: 9 }, (_, i) => (
+                <SelectItem value="FAST TRACK" className="font-bold text-xs">
+                  FAST TRACK
+                </SelectItem>
+                {Array.from({ length: 8 }, (_, i) => (
                   <SelectItem key={i} value={`CONSULTÓRIO CLÍNICO ${i + 1}`} className="font-bold text-xs">
                     CONSULTÓRIO CLÍNICO {i + 1}
                   </SelectItem>

@@ -1,10 +1,13 @@
 import React, { useMemo } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import { Clock, Calendar, Activity, AlertTriangle, FileText, Pill, Stethoscope, Droplet, CheckCircle2, ChevronRight, ActivitySquare, HeartPulse } from "lucide-react";
+import { Clock, Calendar, Activity, AlertTriangle, FileText, Pill, Stethoscope, Droplet, CheckCircle2, ChevronRight, ActivitySquare, HeartPulse, FlaskConical, Trash2 } from "lucide-react";
 import { Patient } from "@/hooks/use-patients";
 import { motion } from "motion/react";
 import { cn } from "@/lib/utils";
+import { usePatients } from "@/hooks/use-patients";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
 interface PatientTimelineModalProps {
   isOpen: boolean;
@@ -13,13 +16,57 @@ interface PatientTimelineModalProps {
 }
 
 export function PatientTimelineModal({ isOpen, onClose, patient }: PatientTimelineModalProps) {
+  const { updatePatient } = usePatients();
   
   // Generating a contextual timeline based on the patient's data
   const timelineEvents = useMemo(() => {
-    const events = [];
     const arrival = new Date(patient.arrivalTime);
     
-    // 1. Arrival
+    // IF REAL TIMELINE EXISTS (New feature)
+    if (patient.timeline && patient.timeline.length > 0) {
+      const mappedEvents = [];
+      mappedEvents.push({
+        id: "arrival",
+        title: "Recepção e Abertura de Ficha",
+        time: arrival.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
+        date: arrival.toLocaleDateString('pt-BR'),
+        description: `Paciente deu entrada na unidade.`,
+        icon: <Calendar className="h-4 w-4" />,
+        color: "bg-blue-500",
+        iconBg: "bg-blue-500/10 text-blue-600 dark:text-blue-400",
+        badge: "Recepção",
+      });
+
+      patient.timeline.forEach(t => {
+        const tDate = new Date(t.timestamp);
+        let icon = <Activity className="h-4 w-4" />;
+        let color = "bg-amber-500";
+        let iconBg = "bg-amber-500/10 text-amber-600 dark:text-amber-400";
+        
+        if (t.iconType === 'calendar') { icon = <Calendar className="h-4 w-4" />; color = "bg-blue-500"; iconBg = "bg-blue-500/10 text-blue-600 dark:text-blue-400"; }
+        if (t.iconType === 'alert') { icon = <AlertTriangle className="h-4 w-4" />; color = "bg-red-500"; iconBg = "bg-red-500/10 text-red-600 dark:text-red-400"; }
+        if (t.iconType === 'stethoscope') { icon = <Stethoscope className="h-4 w-4" />; color = "bg-[#006699]"; iconBg = "bg-[#006699]/10 text-[#006699] dark:text-sky-400"; }
+        if (t.iconType === 'pill') { icon = <Pill className="h-4 w-4" />; color = "bg-emerald-500"; iconBg = "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"; }
+        if (t.iconType === 'droplet') { icon = <Droplet className="h-4 w-4" />; color = "bg-indigo-500"; iconBg = "bg-indigo-500/10 text-indigo-600 dark:text-indigo-400"; }
+        if (t.iconType === 'check') { icon = <CheckCircle2 className="h-4 w-4" />; color = "bg-green-600"; iconBg = "bg-green-600/10 text-green-600 dark:text-green-400"; }
+        if (t.iconType === 'flask') { icon = <FlaskConical className="h-4 w-4" />; color = "bg-purple-500"; iconBg = "bg-purple-500/10 text-purple-600 dark:text-purple-400"; }
+
+        mappedEvents.push({
+          id: t.id,
+          title: t.title,
+          time: tDate.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
+          date: tDate.toLocaleDateString('pt-BR'),
+          description: t.description,
+          icon, color, iconBg,
+          badge: t.badge,
+        });
+      });
+
+      return mappedEvents.reverse();
+    }
+
+    // LEGACY FALLBACK
+    const events = [];
     events.push({
       id: "arrival",
       title: "Recepção e Abertura de Ficha",
@@ -151,11 +198,27 @@ export function PatientTimelineModal({ isOpen, onClose, patient }: PatientTimeli
                 </DialogDescription>
               </div>
             </div>
-            {patient.triaged && (
-              <Badge variant="outline" className="bg-emerald-500/10 text-emerald-600 border-emerald-500/20 font-black uppercase tracking-widest text-[9px]">
-                Em Acompanhamento
-              </Badge>
-            )}
+            <div className="flex flex-col items-end gap-2">
+              {patient.triaged && (
+                <Badge variant="outline" className="bg-emerald-500/10 text-emerald-600 border-emerald-500/20 font-black uppercase tracking-widest text-[9px]">
+                  Em Acompanhamento
+                </Badge>
+              )}
+              {patient.timeline && patient.timeline.length > 0 && (
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="h-7 text-[9px] font-black uppercase tracking-widest text-red-500 border-red-200 hover:bg-red-50 dark:border-red-900/40 dark:hover:bg-red-950/30 shadow-sm"
+                  onClick={() => {
+                    updatePatient(patient.id, { timeline: [] });
+                    toast.success("Histórico limpo com sucesso!");
+                  }}
+                >
+                  <Trash2 className="h-3 w-3 mr-1.5" />
+                  Limpar Sujeira (Teste)
+                </Button>
+              )}
+            </div>
           </div>
         </div>
 

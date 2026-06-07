@@ -784,9 +784,10 @@ export default function Queue() {
               <label className="text-[10px] font-black uppercase tracking-widest text-[#006699] dark:text-sky-450 font-bold block mb-1">Selecione o Novo Setor</label>
               <div className="grid grid-cols-2 gap-2">
                 {[
-                  "Consultório Clínico 1",
-                  "Consultório Clínico 2",
-                  "Consultório Clínico 3",
+                  "Fast Track",
+                  "Consultório 1",
+                  "Consultório 2",
+                  "Consultório 3",
                   "Emergência (Vermelha)",
                   "Sala Laranja",
                   "Medicação",

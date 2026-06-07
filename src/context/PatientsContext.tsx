@@ -1,6 +1,15 @@
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import { toast } from "sonner";
 
+export interface TimelineEvent {
+  id: string;
+  title: string;
+  description: string;
+  timestamp: string;
+  iconType: 'calendar' | 'activity' | 'alert' | 'stethoscope' | 'pill' | 'droplet' | 'check' | 'flask';
+  badge: string;
+}
+
 export interface Patient {
   id: string;
   name: string;
@@ -89,6 +98,7 @@ export interface Patient {
     reason: string;
     priority: 'normal' | 'urgent' | 'emergency';
   };
+  timeline?: TimelineEvent[];
 }
 
 export type ExamStatus = 'pending_collection' | 'in_analysis' | 'completed';
@@ -276,6 +286,8 @@ const mockPatients: Patient[] = [
   { id: '5', name: 'Ana Oliveira', age: 67, cpf: '345.678.901-22', susCard: '700000000000005', status: 'waiting', risk: 'urgent', arrivalTime: getPastTime(20), sector: 'Consultório Clínico 1', mainComplaint: 'Dor abdominal aguda', ticket: 'N001', priority: 'normal' },
   { id: '6', name: 'Lucia Ferreira', age: 38, cpf: '222.333.444-55', status: 'completed', risk: 'urgent', arrivalTime: getPastTime(120), sector: 'Consultório Clínico 1', mainComplaint: 'Crise asmática', ticket: 'N002', priority: 'normal' },
   { id: '12', name: 'Juliana Mendes', age: 29, cpf: '111.222.333-44', status: 'waiting', risk: 'less-urgent', arrivalTime: getPastTime(15), ticket: 'P003', priority: 'preferential', triaged: false },
+  { id: 'blue-1', name: 'Carlos Eduardo', age: 34, cpf: '444.555.666-77', susCard: '700000000000006', status: 'waiting', risk: 'not-urgent', arrivalTime: getPastTime(5), sector: 'Consultório Clínico 2', mainComplaint: 'Dor de cabeça leve e coriza', ticket: 'N020', priority: 'normal', triaged: true },
+  { id: 'blue-2', name: 'Beatriz Lima', age: 22, cpf: '888.999.000-11', susCard: '700000000000007', status: 'waiting', risk: 'not-urgent', arrivalTime: getPastTime(2), sector: 'Consultório Clínico 2', mainComplaint: 'Renovação de receita médica', ticket: 'N021', priority: 'normal', triaged: true },
 ];
 
 interface PatientsContextType {
@@ -575,7 +587,84 @@ export function PatientsProvider({ children }: { children: ReactNode }) {
   };
 
   const updatePatient = (id: string, updates: Partial<Patient>) => {
-    setPatients(prev => prev.map(p => p.id === id ? { ...p, ...updates } : p));
+    setPatients(prev => prev.map(p => {
+      if (p.id === id) {
+        const updated = { ...p, ...updates };
+        
+        // --- TIMELINE LOGIC ---
+        const newTimeline = [...(p.timeline || [])];
+        let timelineChanged = false;
+
+        // Sector change
+        if (updates.sector !== undefined && updates.sector !== p.sector) {
+          if (updates.sector === undefined || updates.sector === '') {
+             newTimeline.push({
+               id: Math.random().toString(36).substring(2, 11),
+               title: "Transferência para Fila Geral",
+               description: `Paciente liberado para a fila geral de atendimento.`,
+               timestamp: new Date().toISOString(),
+               iconType: 'droplet',
+               badge: 'Fluxo de Leitos'
+             });
+          } else {
+             newTimeline.push({
+               id: Math.random().toString(36).substring(2, 11),
+               title: "Transferência de Setor",
+               description: `Paciente encaminhado para: ${updates.sector}`,
+               timestamp: new Date().toISOString(),
+               iconType: 'droplet',
+               badge: 'Fluxo de Leitos'
+             });
+          }
+          timelineChanged = true;
+        }
+
+        // Status change
+        if (updates.status === 'attending' && p.status !== 'attending') {
+          newTimeline.push({
+            id: Math.random().toString(36).substring(2, 11),
+            title: "Início do Atendimento",
+            description: `Atendimento médico iniciado no setor: ${updated.sector || 'Consultório'}`,
+            timestamp: new Date().toISOString(),
+            iconType: 'stethoscope',
+            badge: 'Consultório'
+          });
+          timelineChanged = true;
+        }
+
+        if (updates.subStatus === 'reaval' && p.subStatus !== 'reaval') {
+          newTimeline.push({
+            id: Math.random().toString(36).substring(2, 11),
+            title: "Aguardando Exames / Reavaliação",
+            description: `Atendimento pausado. Paciente aguarda resultados de exames.`,
+            timestamp: new Date().toISOString(),
+            iconType: 'flask',
+            badge: 'Reavaliação'
+          });
+          timelineChanged = true;
+        }
+
+        if (updates.status === 'completed' && p.status !== 'completed') {
+          newTimeline.push({
+            id: Math.random().toString(36).substring(2, 11),
+            title: "Atendimento Finalizado",
+            description: `Paciente finalizado no sistema.`,
+            timestamp: new Date().toISOString(),
+            iconType: 'check',
+            badge: 'Alta'
+          });
+          timelineChanged = true;
+        }
+
+        if (timelineChanged) {
+          updated.timeline = newTimeline;
+        }
+        // ----------------------
+
+        return updated;
+      }
+      return p;
+    }));
   };
 
   const addPatient = (patient: Omit<Patient, "id">) => {

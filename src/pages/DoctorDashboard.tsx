@@ -16,12 +16,12 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const ROOMS = [
+  { id: "FAST TRACK", name: "Fast Track", type: "adult", icon: Stethoscope, color: "blue" },
   { id: "CONSULTÓRIO CLÍNICO 1", name: "Consultório Clínico 1", type: "adult", icon: Stethoscope, color: "blue" },
   { id: "CONSULTÓRIO CLÍNICO 2", name: "Consultório Clínico 2", type: "adult", icon: Stethoscope, color: "blue" },
   { id: "CONSULTÓRIO CLÍNICO 3", name: "Consultório Clínico 3", type: "adult", icon: Stethoscope, color: "blue" },
   { id: "CONSULTÓRIO CLÍNICO 4", name: "Consultório Clínico 4", type: "adult", icon: Stethoscope, color: "blue" },
   { id: "CONSULTÓRIO CLÍNICO 5", name: "Consultório Clínico 5", type: "adult", icon: Stethoscope, color: "blue" },
-  { id: "CONSULTÓRIO CLÍNICO 6", name: "Consultório Clínico 6", type: "adult", icon: Stethoscope, color: "blue" },
 
   { id: "CONSULTÓRIO PEDIÁTRICO 1", name: "Consultório Pediátrico 1", type: "pediatric", icon: Baby, color: "orange" },
   { id: "CONSULTÓRIO PEDIÁTRICO 2", name: "Consultório Pediátrico 2", type: "pediatric", icon: Baby, color: "orange" },

@@ -10,6 +10,7 @@ import { motion } from "motion/react";
 import { Link } from "react-router-dom";
 import { useState } from "react";
 import { PatientTimelineModal } from "@/components/PatientEvolution/Modals/PatientTimelineModal";
+import { cn } from "@/lib/utils";
 
 export default function PatientRecord({ patientId }: { patientId?: string }) {
   const { id: paramId } = useParams();
@@ -376,6 +377,53 @@ export default function PatientRecord({ patientId }: { patientId?: string }) {
         </TabsContent>
 
         <TabsContent value="exams" className="space-y-6">
+          <Card className="glass-card">
+            <CardHeader className="border-b bg-[#006699]/10 dark:bg-sky-500/10">
+              <CardTitle className="text-lg flex items-center gap-2 text-[#006699] dark:text-sky-400">
+                <FlaskConical className="h-5 w-5" />
+                Exames Solicitados pelo Médico
+              </CardTitle>
+              <CardDescription>Acompanhamento dos exames laboratoriais e de imagem em andamento.</CardDescription>
+            </CardHeader>
+            <CardContent className="pt-6">
+              {!patient.exams || patient.exams.length === 0 ? (
+                <p className="text-sm italic text-muted-foreground">Nenhum exame solicitado para este paciente até o momento.</p>
+              ) : (
+                <div className="space-y-4">
+                  {patient.exams.map((exam, i) => (
+                    <div key={i} className="flex flex-col sm:flex-row sm:items-center justify-between p-4 rounded-xl border border-[#006699]/20 dark:border-sky-500/20 bg-white dark:bg-slate-900 shadow-sm gap-4">
+                      <div className="flex items-center gap-3">
+                        <div className="h-10 w-10 rounded-lg bg-[#006699]/10 dark:bg-sky-500/10 flex items-center justify-center">
+                          <FlaskConical className="h-5 w-5 text-[#006699] dark:text-sky-400" />
+                        </div>
+                        <div>
+                          <h4 className="text-sm font-black uppercase text-foreground">{exam.name}</h4>
+                          <p className="text-xs font-medium text-muted-foreground mt-0.5">
+                            {exam.type === 'blood' ? 'Exame de Sangue' : 
+                             exam.type === 'urine' ? 'Exame de Urina' : 
+                             exam.type === 'imaging' ? 'Exame de Imagem' : 'Outros'}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <Badge className={cn(
+                          "text-[10px] font-black uppercase tracking-widest px-3 py-1",
+                          exam.status === 'completed' ? "bg-emerald-500 hover:bg-emerald-600 text-white" :
+                          exam.status === 'analyzing' ? "bg-amber-500 hover:bg-amber-600 text-white animate-pulse" :
+                          "bg-[#006699]/10 text-[#006699] dark:bg-sky-500/10 dark:text-sky-400 border border-[#006699]/20 dark:border-sky-500/20"
+                        )}>
+                          {exam.status === 'completed' ? 'Resultado Disponível' :
+                           exam.status === 'analyzing' ? 'Em Análise' :
+                           'Aguardando Coleta'}
+                        </Badge>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
           <Card className="glass-card">
             <CardHeader className="border-b bg-muted/20">
               <CardTitle className="text-lg flex items-center gap-2">
