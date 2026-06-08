@@ -900,13 +900,7 @@ export default function PatientEvolution() {
             ⏱️ Jornada
           </Button>
 
-          <Button
-            onClick={() => setIsExamsModalOpen(true)}
-            className="rounded-xl gap-2 font-black bg-purple-600 hover:bg-purple-700 text-white shadow-lg shadow-purple-500/20 uppercase tracking-widest text-[10px] h-10 px-4"
-          >
-            <FlaskConical className="h-4 w-4" />
-            Apoio Diagnóstico
-          </Button>
+
         </div>
       </div>
 
