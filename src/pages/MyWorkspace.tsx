@@ -474,21 +474,23 @@ export default function MyWorkspace() {
                           >
                             <Stethoscope className="h-4 w-4 mr-2" /> Iniciar Atendimento
                           </Button>
-                          <div className="grid grid-cols-2 gap-3 w-full">
-                            <Button 
-                              variant="outline"
-                              className="h-10 text-[10px] font-black uppercase border-amber-200 dark:border-amber-900/40 text-amber-600 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-900/20"
-                              onClick={() => handlePause(patient)}
-                            >
-                              <PauseCircle className="h-3.5 w-3.5 mr-1.5" /> Pausar (Exame)
-                            </Button>
-                            <Button 
-                              className="h-10 text-[10px] font-black uppercase bg-emerald-500 hover:bg-emerald-600 text-white shadow-md border-0"
-                              onClick={() => setFinishingPatient(patient)}
-                            >
-                              <CheckCircle2 className="h-3.5 w-3.5 mr-1.5" /> Dar Alta
-                            </Button>
-                          </div>
+                          {!isFastTrack && (
+                            <div className="grid grid-cols-2 gap-3 w-full">
+                              <Button 
+                                variant="outline"
+                                className="h-10 text-[10px] font-black uppercase border-amber-200 dark:border-amber-900/40 text-amber-600 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-900/20"
+                                onClick={() => handlePause(patient)}
+                              >
+                                <PauseCircle className="h-3.5 w-3.5 mr-1.5" /> Pausar (Exame)
+                              </Button>
+                              <Button 
+                                className="h-10 text-[10px] font-black uppercase bg-emerald-500 hover:bg-emerald-600 text-white shadow-md border-0"
+                                onClick={() => setFinishingPatient(patient)}
+                              >
+                                <CheckCircle2 className="h-3.5 w-3.5 mr-1.5" /> Dar Alta
+                              </Button>
+                            </div>
+                          )}
                         </div>
                       </CardContent>
                     </Card>

@@ -9,10 +9,10 @@ import { usePatients } from "@/hooks/use-patients";
 import { toast } from "sonner";
 
 const UI_COLORS = {
-  primary: "bg-gradient-to-br from-[#002B52] via-[#00427A] to-[#005BAB]", 
-  secondary: "bg-slate-800",
-  accent: "text-white",
-  muted: "text-slate-400"
+  primary: "bg-white", 
+  secondary: "bg-slate-50",
+  accent: "text-slate-900",
+  muted: "text-slate-500"
 };
 
 export default function CallPanel() {
@@ -192,7 +192,7 @@ export default function CallPanel() {
   return (
     <div className={cn(
       "flex-1 flex flex-col gap-4 relative min-h-0 overflow-hidden transition-all duration-500",
-      isFullscreen ? "bg-[#00A859] p-8" : "p-6"
+      isFullscreen ? "bg-slate-100 p-8" : "p-6"
     )}>
       {/* Audio Interaction Overlay */}
       <AnimatePresence>
@@ -228,37 +228,16 @@ export default function CallPanel() {
       </AnimatePresence>
 
       <div className={cn(
-        "bg-white p-5 rounded-[2rem] border-2 border-slate-300 shadow-xl mb-2 relative overflow-hidden shrink-0 transition-transform",
-        isFullscreen && "scale-95"
+        "bg-white p-5 rounded-2xl border border-slate-200 shadow-xl mb-2 relative overflow-hidden shrink-0 transition-all",
+        isFullscreen && "shadow-2xl"
       )}>
         {/* Top accent line */}
         <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-[#00A859] via-[#005BAB] to-[#E30613]" />
         <div className="flex flex-col items-center gap-4">
           {/* Top Branding Bar: Logos side by side */}
           <div className="w-full flex items-center justify-between px-6">
-            {/* Left: Embu das Artes Branding */}
-            <div className="flex items-center gap-5 shrink-0">
-              <div className="flex flex-col items-start leading-[0.7] select-none scale-90 origin-left">
-                <span className="text-[#E30613] font-black text-[12px] uppercase">Cidade de</span>
-                <span className="text-[#E30613] text-5xl font-black tracking-tighter">Embu</span>
-                <span className="text-[#E30613] font-black text-[12px] uppercase text-right w-full">das Artes</span>
-              </div>
-              <div className="h-16 w-20 relative flex items-center justify-center scale-90">
-                {/* Unified Embu Symbol with correct colors */}
-                <div className="w-full h-full flex flex-col rounded-md overflow-hidden border border-slate-100 shadow-sm">
-                  <div className="h-1/2 w-full bg-[#00A859]" />
-                  <div className="h-1/2 w-full bg-[#E30613]" />
-                </div>
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="w-10 h-10 bg-white border-4 border-white transform rotate-45 flex items-center justify-center overflow-hidden shadow-sm">
-                    <div className="w-full h-full bg-[#FFED00]" />
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Right: UPA 24h Branding */}
-            <div className="flex flex-col items-center shrink-0 select-none scale-90 origin-right">
+            {/* Left: UPA 24h Branding */}
+            <div className="flex flex-col items-center shrink-0 select-none scale-90 origin-left">
               <div className="flex items-baseline italic">
                 <span className="text-[#00A859] text-[58px] font-black tracking-tighter leading-none">U</span>
                 <div className="relative inline-block mx-[-2px]">
@@ -278,11 +257,32 @@ export default function CallPanel() {
               </div>
               <span className="text-[11px] font-black text-slate-900 tracking-[0.2em] uppercase mt-[-4px]">Unidade de Pronto Atendimento</span>
             </div>
+
+            {/* Right: Embu das Artes Branding */}
+            <div className="flex items-center gap-5 shrink-0 origin-right">
+              <div className="flex flex-col items-start leading-[0.7] select-none scale-90">
+                <span className="text-[#E30613] font-black text-[12px] uppercase">Cidade de</span>
+                <span className="text-[#E30613] text-5xl font-black tracking-tighter">Embu</span>
+                <span className="text-[#E30613] font-black text-[12px] uppercase text-right w-full">das Artes</span>
+              </div>
+              <div className="h-16 w-20 relative flex items-center justify-center scale-90">
+                {/* Unified Embu Symbol with correct colors */}
+                <div className="w-full h-full flex flex-col rounded-md overflow-hidden border border-slate-100 shadow-sm">
+                  <div className="h-1/2 w-full bg-[#00A859]" />
+                  <div className="h-1/2 w-full bg-[#E30613]" />
+                </div>
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="w-10 h-10 bg-white border-4 border-white transform rotate-45 flex items-center justify-center overflow-hidden shadow-sm">
+                    <div className="w-full h-full bg-[#FFED00]" />
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
 
           {/* Bottom Branding Bar: Unit Name */}
-          <div className="w-full border-t border-slate-100 pt-3 flex items-center justify-between px-4">
-            <h1 className="text-2xl lg:text-3xl font-black text-[#00A859] tracking-tight truncate max-w-[80%]">
+          <div className="w-full border-t border-slate-200 pt-3 flex items-center justify-between px-4">
+            <h1 className="text-2xl lg:text-3xl font-black text-[#002B52] tracking-tight truncate max-w-[80%] drop-shadow-sm">
               UPA – Unidade de Pronto Atendimento Dra. Zilda Arns
             </h1>
 
@@ -373,11 +373,11 @@ export default function CallPanel() {
                     <p className="text-blue-400 font-bold text-[10px] tracking-[0.5em] uppercase mt-2">Unidade de Pronto Atendimento - Embu das Artes</p>
                   </motion.div>
 
-                  <div className="flex flex-col items-center space-y-2">
-                    <p className="text-slate-500 font-bold text-[11px] tracking-[0.4em] uppercase">Status do Sistema</p>
-                    <div className="flex items-center gap-3">
-                      <span className="flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-                      <span className="text-white font-black text-xl tracking-widest uppercase">Operação Normal</span>
+                  <div className="flex flex-col items-center space-y-3">
+                    <p className="text-slate-500 font-black text-sm tracking-[0.4em] uppercase">Status do Sistema</p>
+                    <div className="flex items-center gap-3 bg-white px-6 py-2 rounded-full shadow-sm border border-slate-200">
+                      <span className="flex h-3 w-3 rounded-full bg-emerald-500 animate-pulse" />
+                      <span className="text-[#002B52] font-black text-xl tracking-widest uppercase">Operação Normal</span>
                     </div>
                   </div>
 
@@ -407,9 +407,9 @@ export default function CallPanel() {
                 className="h-full flex flex-col"
               >
                 <Card className={cn(
-                  "flex-1 flex flex-col justify-center items-center text-center p-16 border-8 border-white/20 transition-all duration-700 rounded-[3.5rem] shadow-[0_40px_100px_-20px_rgba(0,43,82,0.5)] overflow-hidden relative",
+                  "flex-1 flex flex-col justify-center items-center text-center p-8 border-2 border-slate-200 transition-all duration-700 rounded-3xl shadow-[0_20px_60px_-15px_rgba(0,0,0,0.1)] overflow-hidden relative",
                   UI_COLORS.primary,
-                  isCalling && "ring-[20px] ring-blue-400/20 ring-offset-0"
+                  isCalling && "ring-4 ring-emerald-500/50 shadow-[0_0_120px_rgba(52,211,153,0.3)]"
                 )}>
                   {/* Dramatic Call Animation */}
                   <AnimatePresence>
@@ -422,9 +422,9 @@ export default function CallPanel() {
                           className="absolute inset-0 bg-white rounded-full z-0"
                         />
                         <motion.div 
-                          animate={{ opacity: [0.1, 0.3, 0.1] }}
+                          animate={{ opacity: [0.05, 0.15, 0.05] }}
                           transition={{ duration: 1.5, repeat: Infinity }}
-                          className="absolute inset-0 bg-gradient-to-t from-blue-400/20 to-transparent z-0"
+                          className="absolute inset-0 bg-gradient-to-t from-emerald-500/20 to-transparent z-0"
                         />
                       </>
                     )}
@@ -435,35 +435,36 @@ export default function CallPanel() {
                     <div className="absolute inset-0" style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, white 1px, transparent 0)', backgroundSize: '60px 60px' }} />
                   </div>
                   
-                  {/* Outer border glow effect */}
-                  <div className="absolute inset-0 border-[16px] border-white/5 pointer-events-none rounded-[3.5rem]" />
+                  {/* Outer border effect */}
+                  <div className="absolute inset-0 border-[16px] border-slate-50 pointer-events-none rounded-3xl" />
 
-                  <div className="space-y-6 w-full relative z-10">
-                    <div className="inline-flex items-center gap-4 px-6 py-2 bg-white/10 rounded-full border border-white/10 backdrop-blur-md mb-4">
-                      <span className="text-[10px] font-black uppercase tracking-[0.5em] text-white/60">Senha de Atendimento</span>
+                  <div className="space-y-1 w-full relative z-10 flex flex-col items-center">
+                    <div className="inline-flex items-center gap-3 px-6 py-2 bg-[#002B52] rounded-full shadow-lg mb-2">
+                      <div className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
+                      <span className="text-xs font-black uppercase tracking-[0.4em] text-white">Senha de Atendimento</span>
                     </div>
                     
-                    <h2 className="text-[14rem] mission-control-title leading-none text-white drop-shadow-2xl mb-8 tracking-tighter">
+                    <h2 className="text-[14rem] xl:text-[15rem] font-black leading-none text-[#001A33] tracking-tighter mb-2 drop-shadow-md">
                       {currentCall.ticket}
                     </h2>
                     
-                    <div className="space-y-2">
-                      <p className="text-6xl font-black uppercase text-white tracking-tight">
+                    <div className="space-y-4">
+                      <p className="text-5xl xl:text-6xl font-black uppercase text-[#002B52] tracking-tight drop-shadow-sm">
                         {formatPatientNameLGPD(currentCall.patientName)}
                       </p>
-                      <div className="h-1 w-24 bg-white/20 mx-auto rounded-full" />
+                      <div className="h-1.5 w-32 bg-slate-200 mx-auto rounded-full" />
                     </div>
                   </div>
 
-                  <div className="mt-16 w-full flex flex-col md:flex-row items-center justify-center gap-12 relative z-10">
+                  <div className="mt-8 w-full flex flex-col md:flex-row items-center justify-center gap-12 relative z-10">
                     <div className="flex flex-col items-center group">
-                      <span className="text-xs font-black uppercase tracking-[0.3em] mb-4 text-white/40">Local de Atendimento</span>
-                      <div className="flex items-center gap-6 px-12 py-8 bg-white/5 backdrop-blur-xl rounded-[2.5rem] border border-white/10 shadow-2xl group-hover:bg-white/10 transition-colors">
+                      <span className="text-xs font-black uppercase tracking-[0.4em] mb-3 text-slate-500">Local de Atendimento</span>
+                      <div className="flex items-center gap-5 px-10 py-6 bg-[#00A859] rounded-2xl shadow-2xl transition-all hover:scale-105">
                         {(() => {
                           const Icon = getRoomIcon(currentCall.room);
-                          return <Icon className="h-14 w-14 text-blue-400" />;
+                          return <Icon className="h-10 w-10 text-white" />;
                         })()}
-                        <span className="text-6xl font-black tracking-tight text-white uppercase">{currentCall.room}</span>
+                        <span className="text-5xl font-black tracking-tight text-white uppercase">{currentCall.room}</span>
                       </div>
                     </div>
                   </div>
@@ -478,8 +479,8 @@ export default function CallPanel() {
         {/* Recent History Sidebar - Simplified & Professional */}
         <div className="space-y-4">
           <div className="flex items-center justify-between px-4 mb-4">
-            <h3 className="text-[12px] font-black uppercase tracking-[0.3em] text-white">CHAMADAS RECENTES</h3>
-            <History className={cn("transition-all duration-300", isFullscreen ? "h-8 w-8 text-white" : "h-4 w-4 text-white/50")} />
+            <h3 className="text-sm font-black uppercase tracking-[0.3em] text-[#002B52]">Chamadas Recentes</h3>
+            <History className={cn("transition-all duration-300", isFullscreen ? "h-8 w-8 text-slate-400" : "h-5 w-5 text-slate-500")} />
           </div>
           
           <div className="space-y-4 overflow-y-auto max-h-[calc(100vh-320px)] pr-2 scrollbar-hide px-2">
@@ -493,36 +494,36 @@ export default function CallPanel() {
                   initial={{ opacity: 0, x: 20 }}
                   animate={{ opacity: 1, x: 0 }}
                   key={call.id} 
-                  className="bg-gradient-to-br from-[#002B52] to-[#005BAB] p-5 rounded-[2rem] border-[3px] border-white/10 shadow-lg hover:shadow-2xl hover:border-white/30 transition-all duration-300 relative overflow-hidden flex flex-col gap-4"
+                  className="bg-white p-5 rounded-2xl border-2 border-slate-200 shadow-md hover:shadow-xl transition-all duration-300 relative overflow-hidden flex flex-col gap-4"
                 >
-                  {/* Left accent bar in bright blue/cyan highlight */}
-                  <div className="absolute left-0 top-0 bottom-0 w-2.5 bg-blue-400" />
+                  {/* Left accent bar in sleek emerald */}
+                  <div className="absolute left-0 top-0 bottom-0 w-2.5 bg-[#00A859]" />
                   
                   {/* Header Row: Time and Sector Badge */}
-                  <div className="flex items-center justify-between pl-2">
-                    <span className="text-[11px] font-black text-white bg-white/10 border border-white/10 px-3 py-1 rounded-full flex items-center gap-1.5">
-                      <Clock className="h-3.5 w-3.5 text-blue-200" />
+                  <div className="flex items-center justify-between pl-4">
+                    <span className="text-xs font-black text-slate-500 flex items-center gap-2">
+                      <Clock className="h-4 w-4 text-slate-400" />
                       {call.time}
                     </span>
-                    <span className="text-[10px] font-black uppercase tracking-wider text-white bg-white/15 border border-white/10 px-3 py-1 rounded-full flex items-center gap-1.5 shadow-sm">
+                    <span className="text-xs font-black uppercase tracking-widest text-white bg-[#005BAB] px-4 py-1.5 rounded-full flex items-center gap-2 shadow-sm">
                       {(() => {
                         const Icon = getRoomIcon(call.room);
-                        return <Icon className="h-3.5 w-3.5 text-blue-200" />;
+                        return <Icon className="h-4 w-4 text-white" />;
                       })()}
                       {call.room}
                     </span>
                   </div>
                   
                   {/* Content Row: Large Ticket and Large Patient Name */}
-                  <div className="flex items-center gap-4 pl-2">
-                    {/* Big Ticket Badge */}
-                    <div className="h-16 w-16 bg-white/10 rounded-2xl flex items-center justify-center text-white font-black text-2xl mission-control-title shrink-0 shadow-md border border-white/20">
+                  <div className="flex items-center gap-5 pl-4">
+                    {/* Minimalist Ticket Badge */}
+                    <div className="h-20 w-24 bg-[#002B52] rounded-xl flex items-center justify-center text-white font-black text-3xl shrink-0 shadow-inner">
                       {call.ticket}
                     </div>
-                    {/* Large Legible Patient Name */}
+                    {/* Sleek Patient Name */}
                     <div className="min-w-0 flex-1">
-                      <p className="text-[11px] font-bold text-white/60 uppercase tracking-widest leading-none mb-1">Paciente</p>
-                      <p className="text-xl font-black text-white uppercase tracking-tight truncate leading-none drop-shadow-sm">
+                      <p className="text-xs font-black text-slate-400 uppercase tracking-widest leading-none mb-2">Paciente</p>
+                      <p className="text-2xl font-black text-[#001A33] uppercase tracking-tight truncate leading-none">
                         {call.patientName ? formatPatientNameLGPD(call.patientName) : "PACIENTE"}
                       </p>
                     </div>

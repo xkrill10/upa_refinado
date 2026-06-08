@@ -8,6 +8,7 @@ import { AppSidebar } from "@/components/AppSidebar";
 import { GlobalClock } from "@/components/GlobalClock";
 import UserManagement from "./pages/Admin/UserManagement";
 import { useAuth } from "./context/AuthContext";
+import { RoleProvider, useRole, Role } from "./context/RoleContext";
 const Dashboard = React.lazy(() => import("./pages/Dashboard"));
 const Pharmacy = React.lazy(() => import("./pages/Pharmacy"));
 const SatellitePharmacy = React.lazy(() => import("./pages/SatellitePharmacy"));
@@ -80,6 +81,7 @@ const AppContent = () => {
   const isLogin = location.pathname === "/login";
   
   const { user } = useAuth();
+  const { role, setRole } = useRole();
   const localDoctor = typeof window !== 'undefined' ? localStorage.getItem("upa_active_doctor") : null;
   const displayName = user?.user_metadata?.full_name || user?.user_metadata?.name || user?.email?.split('@')[0] || localDoctor || "OPERADOR DO SISTEMA";
 
@@ -91,7 +93,7 @@ const AppContent = () => {
     return () => document.removeEventListener("fullscreenchange", handleFullscreenChange);
   }, []);
 
-  const showSidebar = !isFullscreen && !isCallPanel && !isLogin && !isCleaning;
+  const showSidebar = !isFullscreen && !isCallPanel && !isLogin && !isCleaning && role !== 'medico';
 
   return (
     <SidebarProvider defaultOpen={true}>
@@ -112,6 +114,18 @@ const AppContent = () => {
                 </div>
               </div>
               <div className="flex items-center gap-6">
+                <div className="flex items-center gap-2 bg-white/50 dark:bg-slate-900/50 p-1.5 pr-3 rounded-xl border border-white/20 dark:border-slate-800 backdrop-blur-md shadow-sm transition-all hover:bg-white/80 dark:hover:bg-slate-900/80">
+                  <span className="text-[10px] font-black uppercase text-muted-foreground ml-2 tracking-widest">Perfil:</span>
+                  <select 
+                    value={role} 
+                    onChange={(e) => setRole(e.target.value as Role)}
+                    className="bg-transparent text-xs font-black border-none outline-none cursor-pointer focus:ring-0 text-foreground"
+                  >
+                    <option value="diretoria">👔 DIRETORIA</option>
+                    <option value="enfermeiro">👩‍⚕️ ENFERMAGEM</option>
+                    <option value="medico">👨‍⚕️ MÉDICO</option>
+                  </select>
+                </div>
                 <GlobalClock />
                 {(user || localDoctor) && (
                   <div className="hidden md:flex flex-col items-end px-5 border-r border-border/30">
@@ -192,9 +206,10 @@ const App = () => (
     <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
       <BrowserRouter>
         <AuthProvider>
-          <PatientsProvider>
-            <BedsProvider>
-              <PrescriptionsProvider>
+          <RoleProvider>
+            <PatientsProvider>
+              <BedsProvider>
+                <PrescriptionsProvider>
                 <SameProvider>
                   <InventoryProvider>
                     <HRProvider>
@@ -208,6 +223,7 @@ const App = () => (
               </PrescriptionsProvider>
             </BedsProvider>
           </PatientsProvider>
+          </RoleProvider>
         </AuthProvider>
       </BrowserRouter>
     </ThemeProvider>

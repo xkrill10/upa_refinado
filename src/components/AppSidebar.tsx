@@ -1,5 +1,6 @@
 import { Shield, LayoutDashboard, Users, UserPlus, Activity, ClipboardList, Building2, BedDouble, Stethoscope, HeartPulse, FileText, Pill, UserCog, Globe, Megaphone, LogIn, Archive, Baby, FlaskConical, PackageOpen, Syringe, DollarSign, Sparkles, UserSquare2, MessageSquare, ArchiveRestore, Ambulance, Droplets, RotateCcw } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
+import { useRole } from "@/context/RoleContext";
 import { usePatients } from "@/hooks/use-patients";
 import { Button } from "@/components/ui/button";
 import { useLocation } from "react-router-dom";
@@ -23,6 +24,7 @@ import { ThemeToggle } from "./ThemeToggle";
 
 export function AppSidebar() {
   const { state } = useSidebar();
+  const { role } = useRole();
   const { resetSystem, patients } = usePatients();
   const collapsed = state === "collapsed";
   const location = useLocation();
@@ -40,7 +42,7 @@ export function AppSidebar() {
   const match = location.pathname.match(/^\/paciente\/([^/]+)/);
   const currentPatientId = match ? match[1] : (patients?.find(p => p.status === 'attending')?.id || '3');
 
-  const menuGroups = [
+  const menuGroupsRaw = [
     {
       label: "Operacional",
       items: [
@@ -107,6 +109,20 @@ export function AppSidebar() {
       ]
     }
   ];
+
+  let menuGroups = menuGroupsRaw;
+  if (role === 'enfermeiro') {
+    menuGroups = [
+      {
+        label: "Operacional",
+        items: menuGroupsRaw[0].items.filter(item => ["Triagem"].includes(item.title))
+      },
+      {
+        label: "Atendimento Clínico",
+        items: menuGroupsRaw[1].items.filter(item => ["Painel Enfermagem", "Evoluções", "Checagem Leito"].includes(item.title))
+      }
+    ];
+  }
 
   return (
     <Sidebar variant="floating" collapsible="icon" className="border-none shadow-[0_20px_60px_-15px_rgba(0,0,0,0.5)] z-30 [&>div[data-sidebar=sidebar]]:bg-gradient-to-b [&>div[data-sidebar=sidebar]]:from-[#004466]/95 [&>div[data-sidebar=sidebar]]:to-[#001a33]/95 [&>div[data-sidebar=sidebar]]:backdrop-blur-xl [&>div[data-sidebar=sidebar]]:border [&>div[data-sidebar=sidebar]]:border-blue-700/30">
