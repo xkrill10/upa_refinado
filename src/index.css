@@ -347,22 +347,34 @@
   }
 }
 
+/* Regras de PDF da Escala */
+.generating-pdf .colaborador-cell div,
+.generating-pdf .colaborador-header div {
+  justify-content: center !important;
+  text-align: center !important;
+  vertical-align: middle !important;
+  padding-left: 0 !important;
+}
+.generating-pdf .colaborador-cell span,
+.generating-pdf .coren-cell {
+  position: relative !important;
+  top: -6px !important;
+}
+
 @media print {
-  /* Hide everything by default */
-  body * {
-    visibility: hidden !important;
+  /* Base Print Isolation */
+  body > *:not(.print-only):not(#print-area-container):not(:has(#print-area-container)) {
+    display: none !important;
   }
 
-  /* Show only the print-only container and its children */
-  .print-only, .print-only * {
-    visibility: visible !important;
-  }
-
+  /* ========================================= */
+  /* THERMAL ROLL PRINTER SETTINGS             */
+  /* ========================================= */
   .print-only {
     position: absolute !important;
     left: 0 !important;
     top: 0 !important;
-    width: 80mm !important; /* Standard thermal roll width */
+    width: 80mm !important;
     display: block !important;
     background: white !important;
     padding: 10mm !important;
@@ -372,14 +384,94 @@
     border: none !important;
     z-index: 9999 !important;
   }
-
-  /* Force display: none for elements that might interfere with layout/page breaks */
-  header, nav, aside, footer, button, .print\:hidden {
-    display: none !important;
+  .print-only * {
+    visibility: visible !important;
   }
 
+  /* ========================================= */
+  /* A4 LANDSCAPE PRINTER SETTINGS (ESCALA)    */
+  /* ========================================= */
   @page {
-    margin: 0;
-    size: auto;
+    size: A4 landscape;
+    margin: 5mm;
+  }
+
+  body, html, #root, :has(#print-area-container) {
+    position: static !important;
+    overflow: visible !important;
+    height: auto !important;
+    max-height: none !important;
+    transform: none !important;
+    background: transparent !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  #print-area-container {
+    width: 100% !important;
+    max-width: none !important;
+  }
+
+  #print-area-container table td,
+  #print-area-container table th {
+    height: 22px !important;
+    padding: 0 !important;
+    vertical-align: middle !important;
+    line-height: 22px !important;
+  }
+
+  #print-area-container table th:last-child,
+  #print-area-container table td:last-child {
+    border-right: 1.5px solid #94a3b8 !important;
+  }
+
+  #print-area-container .group-header-cell {
+    height: 18px !important;
+  }
+
+  #print-area-container table td span.inline-flex {
+    height: 16px !important;
+    width: 16px !important;
+    font-size: 8px !important;
+  }
+
+  #print-area-container .categoria-cell span.inline-flex {
+    padding: 0px 4px !important;
+    font-size: 8px !important;
+    height: 14px !important;
+    width: auto !important;
+  }
+
+  #print-area-container table td,
+  #print-area-container table th,
+  #print-area-container table span, 
+  #print-area-container table div {
+    font-size: 9px !important;
+  }
+
+  .pdf-print-header {
+    padding-bottom: 4px !important;
+    margin-bottom: 4px !important;
+  }
+  .pdf-print-header img {
+    height: 40px !important;
+  }
+  .pdf-print-footer {
+    margin-top: 8px !important;
+    display: block !important;
+  }
+  .pdf-print-footer .print-legend {
+    padding: 6px 12px !important;
+  }
+
+  #print-area-container, table, tr, td, th {
+    page-break-inside: avoid !important;
+  }
+
+  .force-print-flex { display: flex !important; }
+  .no-print { display: none !important; }
+
+  header, nav, aside, footer, button, .print\:hidden {
+    display: none !important;
   }
 }

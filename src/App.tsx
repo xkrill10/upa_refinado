@@ -46,6 +46,7 @@ const NurseDashboard = React.lazy(() => import("./pages/NurseDashboard"));
 const MyWorkspace = React.lazy(() => import("./pages/MyWorkspace"));
 
 // Novas Telas
+const EscalaAppRouting = React.lazy(() => import("./pages/EscalaApp/EscalaAppRouting"));
 const Laboratory = React.lazy(() => import("./pages/Laboratory"));
 const Inventory = React.lazy(() => import("./pages/Inventory"));
 const NursingCheck = React.lazy(() => import("./pages/NursingCheck"));
@@ -156,6 +157,7 @@ const AppContent = () => {
                 <Route path="/farmacia-satelite" element={<SatellitePharmacy />} />
                 <Route path="/rh" element={<HR />} />
                 <Route path="/meu-rh" element={<MyHR />} />
+                <Route path="/escala/*" element={<EscalaAppRouting />} />
                 <Route path="/sus" element={<SUSIntegration />} />
                 <Route path="/relatorios" element={<Reports />} />
                 <Route path="/same" element={<Same />} />

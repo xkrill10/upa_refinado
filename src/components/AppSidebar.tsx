@@ -1,4 +1,4 @@
-import { Shield, LayoutDashboard, Users, UserPlus, Activity, ClipboardList, Building2, BedDouble, Stethoscope, HeartPulse, FileText, Pill, UserCog, Globe, Megaphone, LogIn, Archive, Baby, FlaskConical, PackageOpen, Syringe, DollarSign, Sparkles, UserSquare2, MessageSquare, ArchiveRestore, Ambulance, Droplets, RotateCcw } from "lucide-react";
+import { Shield, LayoutDashboard, Users, UserPlus, Activity, ClipboardList, Building2, BedDouble, Stethoscope, HeartPulse, FileText, Pill, UserCog, Globe, Megaphone, LogIn, Archive, Baby, FlaskConical, PackageOpen, Syringe, DollarSign, Sparkles, UserSquare2, MessageSquare, ArchiveRestore, Ambulance, Droplets, RotateCcw, CalendarDays } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useRole } from "@/context/RoleContext";
 import { usePatients } from "@/hooks/use-patients";
@@ -91,6 +91,19 @@ export function AppSidebar() {
         { title: "Setores", url: "/setores", icon: Building2 },
         { title: "SAME", url: "/same", icon: Archive },
         { title: "Recursos Humanos", url: "/rh", icon: UserCog },
+        { 
+          title: "Escala de Plantão", 
+          icon: CalendarDays,
+          subItems: [
+            { title: "Dashboard", url: "/escala/dashboard" },
+            { title: "Escala Control", url: "/escala" },
+            { title: "Novo Colaborador", url: "/escala/novo" },
+            { title: "Pesquisar", url: "/escala/pesquisar" },
+            { title: "Gerenciamento", url: "/escala/gerenciamento" },
+            { title: "Atestados", url: "/escala/atestados" },
+            { title: "Relatórios", url: "/escala/relatorios" },
+          ]
+        },
         { title: "Meu RH", url: "/meu-rh", icon: UserSquare2 },
         { title: "Faturamento", url: "/faturamento", icon: DollarSign },
         { title: "Relatórios", url: "/relatorios", icon: FileText },
