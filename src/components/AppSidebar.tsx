@@ -256,6 +256,7 @@ export function AppSidebar() {
                                      <NavLink
                                        key={subItem.title}
                                        to={subItem.url}
+                                       end
                                        className={({ isActive: subActive }) => cn(
                                          "px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200",
                                          subActive 
