@@ -745,7 +745,7 @@ export default function AnotacaoEnfermagem() {
     
     // Voltar automaticamente para a sala / consultório
     setTimeout(() => {
-      navigate(location.state?.from || '/meu-consultorio');
+      navigate(location.state?.from || `/paciente/${id}/evolucao`);
     }, 600);
   };
 

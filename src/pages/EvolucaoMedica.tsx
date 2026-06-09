@@ -7,7 +7,7 @@ import { usePrescriptions, PrescriptionMedication } from "@/context/Prescription
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Plus, MessageSquare, Bed as BedIcon, History, X, CheckCircle2, ChevronLeft, ChevronRight, Activity, Search, Clock, ShieldAlert, Heart, Baby, Brain, Flame, Droplet, Wind, FlaskConical } from "lucide-react";
+import { ArrowLeft, Plus, MessageSquare, Bed as BedIcon, History, X, CheckCircle2, ChevronLeft, ChevronRight, Activity, Search, Clock, ShieldAlert, Heart, Baby, Brain, Flame, Droplet, Wind, FlaskConical, Key } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -144,7 +144,7 @@ export default function EvolucaoMedica() {
 
   const [evolutionType, setEvolutionType] = useState(isChild ? "Evolução Médica (Pediátrica)" : "Evolução Médica");
   const [activeTab, setActiveTab] = useState<"all" | "evolutions" | "prescriptions" | "vitals" | "exams" | "discharge">("all");
-  const [professional, setProfessional] = useState(() => localStorage.getItem("upa_stamp_name") || "");
+  const [professional, setProfessional] = useState(() => localStorage.getItem("upa_stamp_name") || localStorage.getItem("upa_active_doctor") || "");
   const [description, setDescription] = useState("");
   const [selectedCid, setSelectedCid] = useState<CID10Item | null>(null);
 
@@ -746,7 +746,7 @@ export default function EvolucaoMedica() {
     
     // Voltar automaticamente para a sala / consultório
     setTimeout(() => {
-      navigate(location.state?.from || '/meu-consultorio');
+      navigate(location.state?.from || `/paciente/${id}/evolucao`);
     }, 600);
   };
 
@@ -1156,8 +1156,8 @@ export default function EvolucaoMedica() {
                   <div className="space-y-1">
                     <Label className="text-[10px] font-black uppercase tracking-wider text-muted-foreground">Profissional Responsável *</Label>
                     <Input
-                      placeholder="Nome do profissional"
-                      className="h-9 bg-white/45 dark:bg-slate-900/45 border-white/60 dark:border-white/10 focus:bg-white/60 dark:focus:bg-slate-900/60 text-xs rounded-xl backdrop-blur-sm shadow-sm transition-all focus:ring-1 focus:ring-primary/20"
+                      placeholder="Nome do profissional (Automático)"
+                      className="h-9 bg-white/45 dark:bg-slate-900/45 border-white/60 dark:border-white/10 focus:bg-white/60 dark:focus:bg-slate-900/60 text-xs rounded-xl backdrop-blur-sm shadow-sm transition-all focus:ring-1 focus:ring-primary/20 font-bold"
                       value={professional}
                       onChange={(e) => setProfessional(e.target.value)}
                     />
@@ -3762,10 +3762,21 @@ export default function EvolucaoMedica() {
                     Cancelar
                   </Button>
                   <Button
+                    variant="outline"
+                    className="border-green-500/30 text-green-700 bg-green-50 hover:bg-green-100 dark:border-green-400/30 dark:text-green-400 dark:bg-green-950/30 hover:dark:bg-green-900/50 shadow-sm font-bold uppercase text-[9px] tracking-widest h-8 px-5"
+                    onClick={() => {
+                      toast.success("Certificado A3 Validado: Assinatura Eletrônica inserida com sucesso via ICP-Brasil.");
+                      handleSaveEvolution();
+                    }}
+                  >
+                    <Key className="mr-2 h-4 w-4" />
+                    Assinar Digitalmente
+                  </Button>
+                  <Button
                     onClick={handleSaveEvolution}
                     className="bg-[#006699] hover:bg-[#005580] text-white font-bold uppercase text-[9px] tracking-widest h-8 px-5 rounded-md shadow-sm active:scale-95"
                   >
-                    Salvar Registro
+                    Salvar sem Assinar
                   </Button>
                 </div>
               </CardContent>

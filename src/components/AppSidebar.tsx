@@ -1,4 +1,4 @@
-import { Shield, LayoutDashboard, Users, UserPlus, Activity, ClipboardList, Building2, BedDouble, Stethoscope, HeartPulse, FileText, Pill, UserCog, Globe, Megaphone, LogIn, Archive, Baby, FlaskConical, PackageOpen, Syringe, DollarSign, Sparkles, UserSquare2, MessageSquare, ArchiveRestore, Ambulance, Droplets, RotateCcw, CalendarDays } from "lucide-react";
+import { Shield, LayoutDashboard, Users, UserPlus, Activity, ClipboardList, Building2, BedDouble, Stethoscope, HeartPulse, FileText, Pill, UserCog, Globe, Megaphone, LogIn, Archive, Baby, FlaskConical, PackageOpen, Syringe, DollarSign, Sparkles, UserSquare2, MessageSquare, ArchiveRestore, Ambulance, Droplets, RotateCcw, CalendarDays, Server } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useRole } from "@/context/RoleContext";
 import { usePatients } from "@/hooks/use-patients";
@@ -88,11 +88,22 @@ export function AppSidebar() {
       label: "Gestão e Administração",
       items: [
         { title: "Pacientes", url: "/pacientes", icon: Users },
+        { title: "Central de Integrações", url: "/admin/integracoes", icon: Server },
         { title: "Setores", url: "/setores", icon: Building2 },
         { title: "SAME", url: "/same", icon: Archive },
         { title: "Recursos Humanos", url: "/rh", icon: UserCog },
-        { title: "Segurança e LGPD", url: "/admin/auditoria", icon: Shield },
         { 
+          title: "Segurança e LGPD", 
+          icon: Shield,
+          subItems: [
+            { title: "Auditoria de Acessos", url: "/admin/auditoria" },
+            { title: "Backups Automáticos", url: "/admin/backups" },
+            { title: "Termos e Consentimento", url: "/admin/consentimentos" },
+            { title: "Retenção de Dados", url: "/admin/retencao" },
+            { title: "Anonimização de Dados", url: "/admin/anonimizacao" },
+          ]
+        }, 
+        {
           title: "Escala de Plantão", 
           icon: CalendarDays,
           subItems: [

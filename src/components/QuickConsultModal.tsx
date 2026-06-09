@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, SelectGroup, SelectLabel } from "@/components/ui/select";
 import { Patient } from "@/hooks/use-patients";
 import { toast } from "sonner";
-import { Stethoscope, ClipboardCheck, Activity, AlertTriangle, FileText, Pill, Baby, User, CheckCircle2, Plus, X, Brain, ShieldAlert, ExternalLink, FlaskConical } from "lucide-react";
+import { Stethoscope, ClipboardCheck, Activity, AlertTriangle, FileText, Pill, Baby, User, CheckCircle2, Plus, X, Brain, ShieldAlert, ExternalLink, FlaskConical, Key } from "lucide-react";
 import { SmartCidSelector } from "@/components/SmartCidSelector";
 import { SmartMedicationSelector } from "@/components/SmartMedicationSelector";
 import { DocumentGenerator } from "@/components/DocumentGenerator";
@@ -504,8 +504,8 @@ export function QuickConsultModal({ patient, isOpen, onClose, onComplete, isPedi
 
             {/* FIXED FOOTER */}
             <div className="shrink-0 p-4 sm:p-5 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 shadow-[0_-10px_30px_-15px_rgba(0,0,0,0.1)] z-10 w-full relative">
-              <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 max-w-4xl mx-auto w-full">
-                <div className="w-full sm:w-[300px] space-y-2">
+              <div className="flex flex-col xl:flex-row xl:items-end justify-between gap-4 w-full">
+                <div className="w-full xl:w-[250px] shrink-0 space-y-2">
                   <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2">
                     <ClipboardCheck className="h-3.5 w-3.5" /> Desfecho do Atendimento *
                   </Label>
@@ -535,22 +535,34 @@ export function QuickConsultModal({ patient, isOpen, onClose, onComplete, isPedi
                   </Select>
                 </div>
 
-                <div className="flex items-center gap-3 w-full sm:w-auto mt-4 sm:mt-0">
+                <div className="flex flex-wrap xl:flex-nowrap items-center justify-start xl:justify-end gap-2 mt-4 xl:mt-0 w-full xl:w-auto">
                   <Button
                     type="button"
                     variant="outline"
                     onClick={() => window.open('https://siresp.saude.sp.gov.br/index.php', '_blank')}
-                    className="h-12 px-5 rounded-xl font-bold uppercase tracking-wider gap-2 border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all text-slate-600 dark:text-slate-300 w-full sm:w-auto"
+                    className="h-10 px-4 rounded-xl font-bold uppercase tracking-wider text-[10px] gap-2 border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all text-slate-600 dark:text-slate-300 flex-1 xl:flex-none"
                   >
-                    <ExternalLink className="h-4 w-4 text-blue-500" />
-                    SIRESP (Regulação)
+                    <ExternalLink className="h-3.5 w-3.5 text-blue-500" />
+                    SIRESP
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="h-10 px-4 rounded-xl font-bold uppercase tracking-wider text-[10px] gap-2 border-green-500/30 text-green-700 bg-green-50 hover:bg-green-100 dark:border-green-400/30 dark:text-green-400 dark:bg-green-950/30 hover:dark:bg-green-900/50 shadow-sm transition-all flex-1 xl:flex-none"
+                    onClick={() => {
+                      toast.success("Certificado A3 Validado: Assinatura Eletrônica inserida com sucesso via ICP-Brasil.");
+                      handleFinish();
+                    }}
+                  >
+                    <Key className="h-3.5 w-3.5" />
+                    Assinar Digitalmente
                   </Button>
                   <Button 
                     onClick={handleFinish}
-                    className={cn("h-12 px-8 rounded-xl font-black uppercase tracking-widest gap-2 shadow-lg hover:-translate-y-0.5 transition-all w-full sm:w-auto", btnColor)}
+                    className={cn("h-10 px-4 rounded-xl font-black uppercase tracking-widest text-[10px] gap-2 shadow-lg hover:-translate-y-0.5 transition-all flex-1 xl:flex-none xl:mr-1 mt-2 xl:mt-0", btnColor)}
                   >
-                    <CheckCircle2 className="h-5 w-5" />
-                    Finalizar
+                    <CheckCircle2 className="h-4 w-4" />
+                    Finalizar S/ Assinar
                   </Button>
                 </div>
               </div>

@@ -6,7 +6,6 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 import { GlobalClock } from "@/components/GlobalClock";
-import UserManagement from "./pages/Admin/UserManagement";
 import { useAuth } from "./context/AuthContext";
 import { RoleProvider, useRole, Role } from "./context/RoleContext";
 const Dashboard = React.lazy(() => import("./pages/Dashboard"));
@@ -36,6 +35,11 @@ const EvolucaoFonoaudiologia = React.lazy(() => import("./pages/EvolucaoFonoaudi
 const EvolucaoFarmaciaClinica = React.lazy(() => import("./pages/EvolucaoFarmaciaClinica"));
 const UserManagement = React.lazy(() => import("./pages/Admin/UserManagement"));
 const AuditLogs = React.lazy(() => import("./pages/Admin/AuditLogs"));
+const BackupAdmin = React.lazy(() => import("./pages/Admin/BackupAdmin"));
+const Consentimentos = React.lazy(() => import("./pages/Admin/Consentimentos"));
+const RetencaoDados = React.lazy(() => import("./pages/Admin/RetencaoDados"));
+const Anonimizacao = React.lazy(() => import("./pages/Admin/Anonimizacao"));
+const CentralIntegracoes = React.lazy(() => import("./pages/Admin/CentralIntegracoes"));
 const Reports = React.lazy(() => import("./pages/Reports"));
 const HR = React.lazy(() => import("./pages/HR"));
 const Same = React.lazy(() => import("./pages/Same"));
@@ -177,6 +181,11 @@ const AppContent = () => {
                 <Route path="/paciente/:id/evolucao/farmacia-clinica" element={<EvolucaoFarmaciaClinica />} />
                 <Route path="/admin/usuarios" element={<UserManagement />} />
                 <Route path="/admin/auditoria" element={<AuditLogs />} />
+                <Route path="/admin/backups" element={<BackupAdmin />} />
+                <Route path="/admin/consentimentos" element={<Consentimentos />} />
+                <Route path="/admin/retencao" element={<RetencaoDados />} />
+                <Route path="/admin/anonimizacao" element={<Anonimizacao />} />
+                <Route path="/admin/integracoes" element={<CentralIntegracoes />} />
                 <Route path="/pediatria" element={<Pediatria />} />
                 <Route path="/sala/triagem" element={<TriageRoom />} />
                 <Route path="/sala/pediatria" element={<PediatriaRoom />} />
