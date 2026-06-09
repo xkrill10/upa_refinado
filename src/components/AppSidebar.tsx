@@ -91,6 +91,7 @@ export function AppSidebar() {
         { title: "Setores", url: "/setores", icon: Building2 },
         { title: "SAME", url: "/same", icon: Archive },
         { title: "Recursos Humanos", url: "/rh", icon: UserCog },
+        { title: "Segurança e LGPD", url: "/admin/auditoria", icon: Shield },
         { 
           title: "Escala de Plantão", 
           icon: CalendarDays,

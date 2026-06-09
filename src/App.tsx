@@ -34,6 +34,8 @@ const EvolucaoServicoSocial = React.lazy(() => import("./pages/EvolucaoServicoSo
 const EvolucaoTerapiaOcupacional = React.lazy(() => import("./pages/EvolucaoTerapiaOcupacional"));
 const EvolucaoFonoaudiologia = React.lazy(() => import("./pages/EvolucaoFonoaudiologia"));
 const EvolucaoFarmaciaClinica = React.lazy(() => import("./pages/EvolucaoFarmaciaClinica"));
+const UserManagement = React.lazy(() => import("./pages/Admin/UserManagement"));
+const AuditLogs = React.lazy(() => import("./pages/Admin/AuditLogs"));
 const Reports = React.lazy(() => import("./pages/Reports"));
 const HR = React.lazy(() => import("./pages/HR"));
 const Same = React.lazy(() => import("./pages/Same"));
@@ -174,6 +176,7 @@ const AppContent = () => {
                 <Route path="/paciente/:id/evolucao/fonoaudiologia" element={<EvolucaoFonoaudiologia />} />
                 <Route path="/paciente/:id/evolucao/farmacia-clinica" element={<EvolucaoFarmaciaClinica />} />
                 <Route path="/admin/usuarios" element={<UserManagement />} />
+                <Route path="/admin/auditoria" element={<AuditLogs />} />
                 <Route path="/pediatria" element={<Pediatria />} />
                 <Route path="/sala/triagem" element={<TriageRoom />} />
                 <Route path="/sala/pediatria" element={<PediatriaRoom />} />
