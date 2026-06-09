@@ -1,6 +1,7 @@
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import AppLayout from '@/components/layout/AppLayout';
+import '@/api/dbClient';
 
 import Dashboard from './pages/Dashboard';
 import NewEmployee from './pages/NewEmployee';

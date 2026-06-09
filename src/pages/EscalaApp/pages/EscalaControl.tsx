@@ -2464,7 +2464,7 @@ function EscalaControl() {
                   <div className="flex items-center gap-4">
                     <div className="flex items-center gap-2">
                       <Select value={String(selectedMonth)} onValueChange={(val) => setSelectedMonth(Number(val))}>
-                        <SelectTrigger className="w-[120px] h-7 text-xs font-bold border-none bg-muted/50">
+                        <SelectTrigger className="w-[120px] h-9 px-4 text-[11px] font-bold rounded-full transition-all duration-300 ease-in-out border border-blue-200/50 bg-blue-50 text-blue-600 hover:bg-blue-500 hover:text-white hover:border-blue-500 hover:shadow-md hover:scale-[1.02] data-[state=open]:bg-blue-500 data-[state=open]:text-white data-[state=open]:border-blue-500 data-[state=open]:shadow-md data-[state=open]:scale-[1.02] dark:bg-blue-500/10 dark:text-blue-400 focus:ring-0 [&>span]:line-clamp-1">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent className="z-[200]">
@@ -2474,7 +2474,7 @@ function EscalaControl() {
                         </SelectContent>
                       </Select>
                       <Select value={String(selectedYear)} onValueChange={(val) => setSelectedYear(Number(val))}>
-                        <SelectTrigger className="w-[80px] h-7 text-xs font-bold border-none bg-muted/50">
+                        <SelectTrigger className="w-[90px] h-9 px-4 text-[11px] font-bold rounded-full transition-all duration-300 ease-in-out border border-purple-200/50 bg-purple-50 text-purple-600 hover:bg-purple-600 hover:text-white hover:border-purple-600 hover:shadow-md hover:scale-[1.02] data-[state=open]:bg-purple-600 data-[state=open]:text-white data-[state=open]:border-purple-600 data-[state=open]:shadow-md data-[state=open]:scale-[1.02] dark:bg-purple-500/10 dark:text-purple-400 focus:ring-0 [&>span]:line-clamp-1">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent className="z-[200]">
@@ -2483,30 +2483,30 @@ function EscalaControl() {
                           ))}
                         </SelectContent>
                       </Select>
-                    </div>
-                    
-                    {/* Shift Tabs */}
-                    <div className="hidden sm:flex bg-slate-100 dark:bg-slate-800/50 rounded-lg p-1 h-9 shadow-inner border border-slate-200 dark:border-slate-700/50">
-                      <button 
-                        onClick={() => setGlobalShiftFilter("all")} 
-                        className={cn("text-[11px] px-3 h-full rounded-md transition-all", globalShiftFilter === "all" ? "font-bold bg-slate-800 text-white shadow-md dark:bg-slate-200 dark:text-slate-900" : "font-semibold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-200/50 dark:hover:bg-slate-700/50")}
-                      >Todos os Turnos</button>
-                      <button 
-                        onClick={() => setGlobalShiftFilter("impar_diurno")} 
-                        className={cn("text-[11px] px-3 h-full rounded-md transition-all", globalShiftFilter === "impar_diurno" ? "font-bold bg-amber-500 text-white shadow-md" : "font-semibold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-200/50 dark:hover:bg-slate-700/50")}
-                      >Diurno A</button>
-                      <button 
-                        onClick={() => setGlobalShiftFilter("impar_noturno")} 
-                        className={cn("text-[11px] px-3 h-full rounded-md transition-all", globalShiftFilter === "impar_noturno" ? "font-bold bg-purple-600 text-white shadow-md" : "font-semibold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-200/50 dark:hover:bg-slate-700/50")}
-                      >Noturno A</button>
-                      <button 
-                        onClick={() => setGlobalShiftFilter("par_diurno")} 
-                        className={cn("text-[11px] px-3 h-full rounded-md transition-all", globalShiftFilter === "par_diurno" ? "font-bold bg-blue-500 text-white shadow-md" : "font-semibold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-200/50 dark:hover:bg-slate-700/50")}
-                      >Diurno B</button>
-                      <button 
-                        onClick={() => setGlobalShiftFilter("par_noturno")} 
-                        className={cn("text-[11px] px-3 h-full rounded-md transition-all", globalShiftFilter === "par_noturno" ? "font-bold bg-indigo-700 text-white shadow-md" : "font-semibold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-200/50 dark:hover:bg-slate-700/50")}
-                      >Noturno B</button>
+                      
+                      {/* Shift Tabs */}
+                      <div className="hidden sm:flex gap-2 items-center h-9">
+                        <button 
+                          onClick={() => setGlobalShiftFilter("all")} 
+                          className={cn("text-[11px] px-4 h-full rounded-full transition-all duration-300 ease-in-out border", globalShiftFilter === "all" ? "font-bold bg-blue-500 text-white shadow-md border-blue-500 scale-[1.02]" : "font-semibold bg-blue-50 text-blue-600 border-blue-200/50 hover:bg-blue-100 hover:border-blue-300 dark:bg-blue-500/10 dark:text-blue-400 dark:border-blue-500/20")}
+                        >Todos os Turnos</button>
+                        <button 
+                          onClick={() => setGlobalShiftFilter("impar_diurno")} 
+                          className={cn("text-[11px] px-4 h-full rounded-full transition-all duration-300 ease-in-out border", globalShiftFilter === "impar_diurno" ? "font-bold bg-amber-500 text-white shadow-md border-amber-500 scale-[1.02]" : "font-semibold bg-amber-50 text-amber-600 border-amber-200/50 hover:bg-amber-100 hover:border-amber-300 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20")}
+                        >Diurno A</button>
+                        <button 
+                          onClick={() => setGlobalShiftFilter("impar_noturno")} 
+                          className={cn("text-[11px] px-4 h-full rounded-full transition-all duration-300 ease-in-out border", globalShiftFilter === "impar_noturno" ? "font-bold bg-purple-600 text-white shadow-md border-purple-600 scale-[1.02]" : "font-semibold bg-purple-50 text-purple-600 border-purple-200/50 hover:bg-purple-100 hover:border-purple-300 dark:bg-purple-600/10 dark:text-purple-400 dark:border-purple-500/20")}
+                        >Noturno A</button>
+                        <button 
+                          onClick={() => setGlobalShiftFilter("par_diurno")} 
+                          className={cn("text-[11px] px-4 h-full rounded-full transition-all duration-300 ease-in-out border", globalShiftFilter === "par_diurno" ? "font-bold bg-emerald-500 text-white shadow-md border-emerald-500 scale-[1.02]" : "font-semibold bg-emerald-50 text-emerald-600 border-emerald-200/50 hover:bg-emerald-100 hover:border-emerald-300 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20")}
+                        >Diurno B</button>
+                        <button 
+                          onClick={() => setGlobalShiftFilter("par_noturno")} 
+                          className={cn("text-[11px] px-4 h-full rounded-full transition-all duration-300 ease-in-out border", globalShiftFilter === "par_noturno" ? "font-bold bg-rose-500 text-white shadow-md border-rose-500 scale-[1.02]" : "font-semibold bg-rose-50 text-rose-600 border-rose-200/50 hover:bg-rose-100 hover:border-rose-300 dark:bg-rose-500/10 dark:text-rose-400 dark:border-rose-500/20")}
+                        >Noturno B</button>
+                      </div>
                     </div>
                   </div>
                   
@@ -2515,7 +2515,7 @@ function EscalaControl() {
                       variant="default"
                       size="sm"
                       onClick={() => setIsGlobalScaleOpen(false)}
-                      className="gap-1.5 h-8 px-4 text-xs bg-slate-700 hover:bg-slate-800 text-white dark:bg-slate-600 dark:hover:bg-slate-500 shadow-md transition-all mr-2 font-bold rounded-lg"
+                      className="gap-1.5 h-8 px-4 text-xs bg-blue-50 text-blue-700 hover:bg-blue-600 hover:text-white dark:bg-blue-500/10 dark:text-blue-400 dark:hover:bg-blue-500 shadow-sm hover:shadow-md transition-all duration-300 mr-2 font-bold rounded-lg"
                     >
                       <Undo2 className="h-3.5 w-3.5" /> Voltar
                     </Button>
@@ -2524,7 +2524,7 @@ function EscalaControl() {
                       variant="default"
                       size="sm"
                       onClick={() => setIsAuthModalOpen(true)}
-                      className="gap-1.5 h-8 px-4 text-xs bg-indigo-600 hover:bg-indigo-700 text-white shadow-md transition-all hidden md:flex font-bold rounded-lg"
+                      className="gap-1.5 h-8 px-4 text-xs bg-indigo-50 text-indigo-700 hover:bg-indigo-600 hover:text-white dark:bg-indigo-500/10 dark:text-indigo-400 dark:hover:bg-indigo-500 shadow-sm hover:shadow-md transition-all duration-300 hidden md:flex font-bold rounded-lg"
                       title="Folgas extras bloqueadas — clique para liberar"
                     >
                       <ShieldOff className="h-3.5 w-3.5" /> Destravar Escala
@@ -2535,7 +2535,7 @@ function EscalaControl() {
                       variant="default" 
                       size="sm" 
                       onClick={() => window.print()} 
-                      className="gap-1.5 h-8 px-4 text-xs bg-emerald-600 hover:bg-emerald-700 text-white shadow-md transition-all hidden lg:flex font-bold rounded-lg"
+                      className="gap-1.5 h-8 px-4 text-xs bg-emerald-50 text-emerald-700 hover:bg-emerald-600 hover:text-white dark:bg-emerald-500/10 dark:text-emerald-400 dark:hover:bg-emerald-500 shadow-sm hover:shadow-md transition-all duration-300 hidden lg:flex font-bold rounded-lg"
                     >
                       <Printer className="h-3.5 w-3.5" /> Imprimir Escala
                     </Button>
@@ -2544,13 +2544,13 @@ function EscalaControl() {
                       size="sm" 
                       onClick={handleGeneratePDF}
                       disabled={isGeneratingPDF}
-                      className="gap-1.5 h-8 px-4 text-xs bg-blue-600 hover:bg-blue-700 text-white shadow-md transition-all hidden lg:flex font-bold rounded-lg"
+                      className="gap-1.5 h-8 px-4 text-xs bg-blue-50 text-blue-700 hover:bg-blue-600 hover:text-white dark:bg-blue-500/10 dark:text-blue-400 dark:hover:bg-blue-500 shadow-sm hover:shadow-md transition-all duration-300 hidden lg:flex font-bold rounded-lg"
                     >
                       <Download className={`h-3.5 w-3.5 ${isGeneratingPDF ? "animate-pulse" : ""}`} /> 
                       {isGeneratingPDF ? "Gerando..." : "Salvar em PDF"}
                     </Button>
 
-                    <Button variant="default" size="sm" className="gap-1.5 h-8 px-4 text-xs bg-red-600 hover:bg-red-700 text-white shadow-md transition-all hidden xl:flex font-bold rounded-lg">
+                    <Button variant="default" size="sm" className="gap-1.5 h-8 px-4 text-xs bg-red-50 text-red-700 hover:bg-red-600 hover:text-white dark:bg-red-500/10 dark:text-red-400 dark:hover:bg-red-500 shadow-sm hover:shadow-md transition-all duration-300 hidden xl:flex font-bold rounded-lg">
                       <Lock className="h-3.5 w-3.5" /> Bloquear Mês
                     </Button>
 
@@ -2633,14 +2633,14 @@ function EscalaControl() {
                     className={cn(
                       "sm:col-span-1 rounded-xl p-3 border shadow flex flex-col items-center justify-center gap-0.5 cursor-pointer transition-all hover:scale-[1.03]",
                       globalShiftFilter === "all" 
-                        ? "bg-slate-900 border-black shadow-slate-300 dark:shadow-slate-800" 
-                        : "bg-gradient-to-br from-slate-700 to-slate-800 dark:from-slate-800 dark:to-slate-900 border-slate-600 dark:border-slate-700"
+                        ? "bg-blue-600 border-blue-700 shadow-blue-200 dark:shadow-blue-900" 
+                        : "bg-gradient-to-br from-blue-400 to-blue-500 dark:from-blue-800 dark:to-blue-900 border-blue-300 dark:border-blue-700"
                     )}
                     onClick={() => setGlobalShiftFilter("all")}
                   >
-                    <span className={cn("text-[10px] uppercase font-bold tracking-widest", globalShiftFilter === "all" ? "text-white" : "text-slate-300")}>Total Geral</span>
+                    <span className={cn("text-[10px] uppercase font-bold tracking-widest", globalShiftFilter === "all" ? "text-white" : "text-blue-50")}>Total Geral</span>
                     <span className="text-3xl font-black text-white leading-none">{allProfessionals.length}</span>
-                    <span className="text-[10px] text-slate-400 font-medium">profissionais</span>
+                    <span className="text-[10px] text-blue-100 font-medium">profissionais</span>
                   </div>
 
                   {/* Diurno A */}
@@ -2661,19 +2661,19 @@ function EscalaControl() {
                   </div>
                   {/* Diurno B */}
                   <div className={cn("rounded-xl p-3 border shadow flex flex-col items-center justify-center gap-0.5 cursor-pointer transition-all hover:scale-[1.03]",
-                    globalShiftFilter === "par_diurno" ? "bg-blue-500 border-blue-600 shadow-blue-200 dark:shadow-blue-900" : "bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800"
+                    globalShiftFilter === "par_diurno" ? "bg-emerald-500 border-emerald-600 shadow-emerald-200 dark:shadow-emerald-900" : "bg-emerald-50 dark:bg-emerald-900/20 border-emerald-200 dark:border-emerald-800"
                   )} onClick={() => setGlobalShiftFilter(globalShiftFilter === "par_diurno" ? "all" : "par_diurno")}>
-                    <span className={cn("text-[10px] uppercase font-bold tracking-widest", globalShiftFilter === "par_diurno" ? "text-white" : "text-blue-700 dark:text-blue-400")}>Diurno B</span>
-                    <span className={cn("text-3xl font-black leading-none", globalShiftFilter === "par_diurno" ? "text-white" : "text-blue-600 dark:text-blue-300")}>{shiftCounts.par_diurno}</span>
-                    <span className={cn("text-[10px] font-medium", globalShiftFilter === "par_diurno" ? "text-blue-100" : "text-blue-500 dark:text-blue-500")}>colaboradores</span>
+                    <span className={cn("text-[10px] uppercase font-bold tracking-widest", globalShiftFilter === "par_diurno" ? "text-white" : "text-emerald-700 dark:text-emerald-400")}>Diurno B</span>
+                    <span className={cn("text-3xl font-black leading-none", globalShiftFilter === "par_diurno" ? "text-white" : "text-emerald-600 dark:text-emerald-300")}>{shiftCounts.par_diurno}</span>
+                    <span className={cn("text-[10px] font-medium", globalShiftFilter === "par_diurno" ? "text-emerald-100" : "text-emerald-500 dark:text-emerald-500")}>colaboradores</span>
                   </div>
                   {/* Noturno B */}
                   <div className={cn("rounded-xl p-3 border shadow flex flex-col items-center justify-center gap-0.5 cursor-pointer transition-all hover:scale-[1.03]",
-                    globalShiftFilter === "par_noturno" ? "bg-indigo-600 border-indigo-700 shadow-indigo-200 dark:shadow-indigo-900" : "bg-indigo-50 dark:bg-indigo-900/20 border-indigo-200 dark:border-indigo-800"
+                    globalShiftFilter === "par_noturno" ? "bg-rose-500 border-rose-600 shadow-rose-200 dark:shadow-rose-900" : "bg-rose-50 dark:bg-rose-900/20 border-rose-200 dark:border-rose-800"
                   )} onClick={() => setGlobalShiftFilter(globalShiftFilter === "par_noturno" ? "all" : "par_noturno")}>
-                    <span className={cn("text-[10px] uppercase font-bold tracking-widest", globalShiftFilter === "par_noturno" ? "text-white" : "text-indigo-700 dark:text-indigo-400")}>Noturno B</span>
-                    <span className={cn("text-3xl font-black leading-none", globalShiftFilter === "par_noturno" ? "text-white" : "text-indigo-600 dark:text-indigo-300")}>{shiftCounts.par_noturno}</span>
-                    <span className={cn("text-[10px] font-medium", globalShiftFilter === "par_noturno" ? "text-indigo-100" : "text-indigo-500 dark:text-indigo-500")}>colaboradores</span>
+                    <span className={cn("text-[10px] uppercase font-bold tracking-widest", globalShiftFilter === "par_noturno" ? "text-white" : "text-rose-700 dark:text-rose-400")}>Noturno B</span>
+                    <span className={cn("text-3xl font-black leading-none", globalShiftFilter === "par_noturno" ? "text-white" : "text-rose-600 dark:text-rose-300")}>{shiftCounts.par_noturno}</span>
+                    <span className={cn("text-[10px] font-medium", globalShiftFilter === "par_noturno" ? "text-rose-100" : "text-rose-500 dark:text-rose-500")}>colaboradores</span>
                   </div>
                 </div>
 
@@ -3117,15 +3117,7 @@ function EscalaControl() {
               </div>
             </div>
 
-              {/* Bottom bar */}
-              <div className="border-t bg-card px-6 py-4 flex items-center justify-end shrink-0 shadow-[0_-2px_5px_rgba(0,0,0,0.02)]">
-                <Button
-                  onClick={() => setIsGlobalScaleOpen(false)}
-                  className="px-6 h-10 text-xs bg-slate-900 hover:bg-slate-800 dark:bg-slate-800 text-white font-black rounded-lg shadow-sm"
-                >
-                  Fechar Painel de Escala
-                </Button>
-              </div>
+
 
               {/* Auth Modal for Unlocking Schedule */}
               <AnimatePresence>

@@ -99,6 +99,13 @@ const getCollection = (name) => {
           if (missingAnyShift) {
             needsReset = true;
           }
+
+          // Force reset if old cached data doesn't have the 'days' object populated
+          const hasDaysData = parsedSch.some(s => s.days && Object.keys(s.days).length > 0);
+          if (!hasDaysData) {
+            console.log("Forcing DB reset: cached schedules are missing 'days' projection.");
+            needsReset = true;
+          }
         } catch (e) { needsReset = true; }
       } else { needsReset = true; }
       
