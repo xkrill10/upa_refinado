@@ -162,10 +162,10 @@ export default function Beds() {
     } 
     // NÃO URGENTE (Azul) - Sinais perfeitamente normais e excelentes
     else if (
-      (hr >= 60 && hr <= 80) && 
-      (temp >= 36 && temp <= 37) && 
-      (sat >= 98) && 
-      (sys >= 110 && sys <= 120) && (dia >= 70 && dia <= 80)
+      (hr >= 60 && hr <= 100) && 
+      (temp >= 36 && temp <= 37.5) && 
+      (sat >= 95) && 
+      (sys >= 100 && sys <= 130) && (dia >= 60 && dia <= 85)
     ) {
       calculatedRisk = 'not-urgent';
     }
@@ -529,6 +529,75 @@ export default function Beds() {
       })}
     </div>
   );
+
+  const getParameterRisk = (type: 'hr' | 'bp' | 'sat' | 'temp', value: string) => {
+    if (!value) return null;
+    
+    if (type === 'hr') {
+      const hr = parseInt(value);
+      if (isNaN(hr)) return null;
+      if (hr > 130 || hr < 40) return 'emergency';
+      if ((hr >= 120 && hr <= 130) || (hr >= 40 && hr <= 50)) return 'very-urgent';
+      if (hr >= 100 && hr < 120) return 'urgent';
+      if (hr >= 60 && hr <= 100) return 'not-urgent';
+      return 'less-urgent';
+    }
+    
+    if (type === 'temp') {
+      const temp = parseFloat(value);
+      if (isNaN(temp)) return null;
+      if (temp > 40 || temp < 35) return 'emergency';
+      if (temp >= 39 && temp <= 40) return 'very-urgent';
+      if (temp >= 37.5 && temp < 39) return 'urgent';
+      if (temp >= 36 && temp <= 37.5) return 'not-urgent';
+      return 'less-urgent';
+    }
+    
+    if (type === 'sat') {
+      const sat = parseFloat(value);
+      if (isNaN(sat)) return null;
+      if (sat < 90) return 'emergency';
+      if (sat >= 90 && sat <= 94) return 'very-urgent';
+      if (sat >= 95 && sat <= 97) return 'urgent';
+      if (sat > 97) return 'not-urgent';
+      return 'less-urgent';
+    }
+    
+    if (type === 'bp') {
+      if (!value.includes('/')) return null;
+      const parts = value.split('/');
+      let sys = parseInt(parts[0]);
+      let dia = parseInt(parts[1]);
+      if (isNaN(sys) || isNaN(dia)) return null;
+      if (sys < 30) sys = sys * 10;
+      if (dia < 15 && dia > 0) dia = dia * 10;
+      
+      if (sys >= 180 || dia >= 120 || sys < 80) return 'emergency';
+      if ((sys >= 160 && sys < 180) || (dia >= 100 && dia < 120) || (sys >= 80 && sys < 90)) return 'very-urgent';
+      if ((sys >= 140 && sys < 160) || (dia >= 90 && dia < 100)) return 'urgent';
+      if ((sys >= 100 && sys <= 130) && (dia >= 60 && dia <= 85)) return 'not-urgent';
+      return 'less-urgent';
+    }
+    return null;
+  };
+
+  const getStylesForRisk = (risk: string | null) => {
+    const iconColor = risk === 'emergency' ? 'text-red-500 drop-shadow-[0_0_5px_rgba(239,68,68,0.5)]' :
+                      risk === 'very-urgent' ? 'text-orange-500 drop-shadow-[0_0_5px_rgba(249,115,22,0.5)]' :
+                      risk === 'urgent' ? 'text-[#FFDE21] drop-shadow-[0_0_5px_rgba(255,222,33,0.5)]' :
+                      risk === 'less-urgent' ? 'text-emerald-500 drop-shadow-[0_0_5px_rgba(16,185,129,0.5)]' :
+                      risk === 'not-urgent' ? 'text-blue-600 drop-shadow-[0_0_5px_rgba(37,99,235,0.5)]' :
+                      'text-muted-foreground/50';
+
+    const borderColor = risk === 'emergency' ? 'focus:ring-red-500/20 border-red-500/50 bg-red-500/5' :
+                        risk === 'very-urgent' ? 'focus:ring-orange-500/20 border-orange-500/50 bg-orange-500/5' :
+                        risk === 'urgent' ? 'focus:ring-[#FFDE21]/20 border-[#FFDE21]/50 bg-[#FFDE21]/5' :
+                        risk === 'less-urgent' ? 'focus:ring-emerald-500/20 border-emerald-500/50 bg-emerald-500/5' :
+                        risk === 'not-urgent' ? 'focus:ring-blue-600/20 border-blue-600/50 bg-blue-600/5' :
+                        'border-slate-200/60 dark:border-slate-800/60 focus:ring-[#006699]/20 dark:focus:ring-sky-500/20 bg-slate-50/50 dark:bg-slate-900/40';
+                        
+    return { iconColor, borderColor };
+  };
 
   return (
     <motion.div 
@@ -1268,11 +1337,11 @@ export default function Beds() {
                   <div className="space-y-2">
                     <label className="text-[10px] font-black uppercase tracking-widest text-[#006699] dark:text-sky-450 ml-1">Frequência Card. (BPM)</label>
                     <div className="relative">
-                      <HeartPulse className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-red-500/50" />
+                      <HeartPulse className={cn("absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 transition-colors", getStylesForRisk(getParameterRisk('hr', vitalsForm.heartRate)).iconColor)} />
                       <input 
                         type="text" 
                         placeholder="Ex: 88"
-                        className="w-full h-12 bg-slate-50/50 dark:bg-slate-900/40 border border-slate-200/60 dark:border-slate-800/60 rounded-xl pl-10 pr-4 text-sm font-black text-foreground placeholder:text-muted-foreground/50 focus:ring-2 focus:ring-[#006699]/20 dark:focus:ring-sky-55/20 transition-all outline-none"
+                        className={cn("w-full h-12 border rounded-xl pl-10 pr-4 text-sm font-black text-foreground placeholder:text-muted-foreground/50 focus:ring-2 transition-all outline-none", getStylesForRisk(getParameterRisk('hr', vitalsForm.heartRate)).borderColor)}
                         value={vitalsForm.heartRate}
                         onChange={(e) => setVitalsForm({...vitalsForm, heartRate: e.target.value})}
                       />
@@ -1281,11 +1350,11 @@ export default function Beds() {
                   <div className="space-y-2">
                     <label className="text-[10px] font-black uppercase tracking-widest text-[#006699] dark:text-sky-450 ml-1">Pressão Art. (PA)</label>
                     <div className="relative">
-                      <Activity className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-blue-500/50" />
+                      <Activity className={cn("absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 transition-colors", getStylesForRisk(getParameterRisk('bp', vitalsForm.bloodPressure)).iconColor)} />
                       <input 
                         type="text" 
                         placeholder="Ex: 120/80"
-                        className="w-full h-12 bg-slate-50/50 dark:bg-slate-900/40 border border-slate-200/60 dark:border-slate-800/60 rounded-xl pl-10 pr-4 text-sm font-black text-foreground placeholder:text-muted-foreground/50 focus:ring-2 focus:ring-[#006699]/20 dark:focus:ring-sky-55/20 transition-all outline-none"
+                        className={cn("w-full h-12 border rounded-xl pl-10 pr-4 text-sm font-black text-foreground placeholder:text-muted-foreground/50 focus:ring-2 transition-all outline-none", getStylesForRisk(getParameterRisk('bp', vitalsForm.bloodPressure)).borderColor)}
                         value={vitalsForm.bloodPressure}
                         onChange={(e) => {
                           const val = e.target.value;
@@ -1321,11 +1390,11 @@ export default function Beds() {
                   <div className="space-y-2">
                     <label className="text-[10px] font-black uppercase tracking-widest text-[#006699] dark:text-sky-450 ml-1">Saturação (SpO2 %)</label>
                     <div className="relative">
-                      <Droplets className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-emerald-500/50" />
+                      <Droplets className={cn("absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 transition-colors", getStylesForRisk(getParameterRisk('sat', vitalsForm.saturation)).iconColor)} />
                       <input 
                         type="text" 
                         placeholder="Ex: 98"
-                        className="w-full h-12 bg-slate-50/50 dark:bg-slate-900/40 border border-slate-200/60 dark:border-slate-800/60 rounded-xl pl-10 pr-4 text-sm font-black text-foreground placeholder:text-muted-foreground/50 focus:ring-2 focus:ring-[#006699]/20 dark:focus:ring-sky-55/20 transition-all outline-none"
+                        className={cn("w-full h-12 border rounded-xl pl-10 pr-4 text-sm font-black text-foreground placeholder:text-muted-foreground/50 focus:ring-2 transition-all outline-none", getStylesForRisk(getParameterRisk('sat', vitalsForm.saturation)).borderColor)}
                         value={vitalsForm.saturation}
                         onChange={(e) => setVitalsForm({...vitalsForm, saturation: e.target.value})}
                       />
@@ -1334,11 +1403,11 @@ export default function Beds() {
                   <div className="space-y-2">
                     <label className="text-[10px] font-black uppercase tracking-widest text-[#006699] dark:text-sky-450 ml-1">Temperatura (°C)</label>
                     <div className="relative">
-                      <Thermometer className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-orange-500/50" />
+                      <Thermometer className={cn("absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 transition-colors", getStylesForRisk(getParameterRisk('temp', vitalsForm.temperature)).iconColor)} />
                       <input 
                         type="text" 
                         placeholder="Ex: 36.5"
-                        className="w-full h-12 bg-slate-50/50 dark:bg-slate-900/40 border border-slate-200/60 dark:border-slate-800/60 rounded-xl pl-10 pr-4 text-sm font-black text-foreground placeholder:text-muted-foreground/50 focus:ring-2 focus:ring-[#006699]/20 dark:focus:ring-sky-55/20 transition-all outline-none"
+                        className={cn("w-full h-12 border rounded-xl pl-10 pr-4 text-sm font-black text-foreground placeholder:text-muted-foreground/50 focus:ring-2 transition-all outline-none", getStylesForRisk(getParameterRisk('temp', vitalsForm.temperature)).borderColor)}
                         value={vitalsForm.temperature}
                         onChange={(e) => setVitalsForm({...vitalsForm, temperature: e.target.value})}
                       />
