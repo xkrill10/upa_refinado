@@ -60,7 +60,8 @@ import {
   MoreHorizontal,
   Edit2,
   ArrowRightLeft,
-  Stethoscope
+  Stethoscope,
+  RotateCcw
 } from "lucide-react";
 import { 
   Dialog, 
@@ -384,6 +385,25 @@ function EscalaControl() {
   const [selectedExcelCell, setSelectedExcelCell] = useState<{ memberName: string; day: number; colLetter: string; rowNum: number; status: string } | null>(null);
   const [globalSortField, setGlobalSortField] = useState<"name" | "group" | null>(null);
   const [globalSortDirection, setGlobalSortDirection] = useState<"asc" | "desc">("asc");
+  const [isMonthLocked, setIsMonthLocked] = useState(false);
+  const [isMonthLockModalOpen, setIsMonthLockModalOpen] = useState(false);
+  const [isRestoreMonthOpen, setIsRestoreMonthOpen] = useState(false);
+  
+  const handleRestoreMonth = () => {
+    db.entities.ScheduleEntry.filter({ month: selectedMonth, year: selectedYear }).then(schedules => {
+      Promise.all(schedules.map(sched => {
+        return db.entities.ScheduleEntry.update(sched.id, { days: {} });
+      })).then(() => {
+        queryClient.invalidateQueries({ queryKey: ['schedules'] });
+        window.dispatchEvent(new Event('escala-db-updated'));
+        
+        setDayOverrides([]);
+        
+        toast.success("Mês restaurado para o padrão 12x36 original com sucesso!");
+        setIsRestoreMonthOpen(false);
+      });
+    });
+  };
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -961,7 +981,7 @@ function EscalaControl() {
           text: "text-indigo-650 dark:text-indigo-400 font-extrabold",
           label: "Par Noturno",
           iconNode: <MoonStar className="w-3.5 h-3.5 inline-block mr-1 text-indigo-600 fill-indigo-600" />,
-          badge: "bg-indigo-650/10 text-indigo-650 dark:text-indigo-400 border-indigo-600/20"
+          badge: "bg-indigo-650/10 text-indigo-650 dark:text-indigo-400 border-indigo-500/20"
         };
       case "rt_lideranca":
         return {
@@ -2460,11 +2480,11 @@ function EscalaControl() {
                 `}</style>
 
                 {/* Top sticky bar */}
-                <div className="border-b bg-card px-4 py-2 flex items-center justify-between shadow-sm shrink-0 no-print flex-wrap gap-2">
+                <div className="border-b bg-card px-4 py-2 flex items-center justify-between shadow-sm shrink-0 no-print overflow-x-auto flex-nowrap gap-4 whitespace-nowrap hide-scrollbar">
                   <div className="flex items-center gap-4">
                     <div className="flex items-center gap-2">
                       <Select value={String(selectedMonth)} onValueChange={(val) => setSelectedMonth(Number(val))}>
-                        <SelectTrigger className="w-[120px] h-7 text-xs font-bold border-none bg-muted/50">
+                        <SelectTrigger className="w-[100px] h-9 px-3 text-[11px] font-bold rounded-full transition-all duration-300 ease-in-out border border-blue-200/50 bg-blue-50 text-blue-600 hover:bg-blue-500 hover:text-white hover:border-blue-500 hover:shadow-md hover:scale-[1.02] data-[state=open]:bg-blue-500 data-[state=open]:text-white data-[state=open]:border-blue-500 data-[state=open]:shadow-md data-[state=open]:scale-[1.02] dark:bg-blue-500/10 dark:text-blue-400 focus:ring-0 [&>span]:line-clamp-1">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent className="z-[200]">
@@ -2474,7 +2494,7 @@ function EscalaControl() {
                         </SelectContent>
                       </Select>
                       <Select value={String(selectedYear)} onValueChange={(val) => setSelectedYear(Number(val))}>
-                        <SelectTrigger className="w-[80px] h-7 text-xs font-bold border-none bg-muted/50">
+                        <SelectTrigger className="w-[80px] h-9 px-3 text-[11px] font-bold rounded-full transition-all duration-300 ease-in-out border border-purple-200/50 bg-purple-50 text-purple-600 hover:bg-purple-600 hover:text-white hover:border-purple-600 hover:shadow-md hover:scale-[1.02] data-[state=open]:bg-purple-600 data-[state=open]:text-white data-[state=open]:border-purple-600 data-[state=open]:shadow-md data-[state=open]:scale-[1.02] dark:bg-purple-500/10 dark:text-purple-400 focus:ring-0 [&>span]:line-clamp-1">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent className="z-[200]">
@@ -2510,34 +2530,33 @@ function EscalaControl() {
                     </div>
                   </div>
                   
-                  <div className="flex items-center gap-2 flex-wrap">                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setIsAuthModalOpen(true)}
-                      className="gap-1.5 h-7 text-xs hidden md:flex"
-                      title="Folgas extras bloqueadas — clique para liberar"
-                    >
-                      <ShieldOff className="h-3 w-3" /> Destravar Escala
-                    </Button>
-                    
-
-                    <Button 
-                      variant="outline" 
+                  <div className="flex items-center gap-2 flex-nowrap">
+                    <Button
+                        variant="default"
+                        size="sm"
+                        onClick={() => setIsAuthModalOpen(true)}
+                        className="gap-1.5 h-8 px-3 text-xs bg-indigo-50 text-indigo-700 hover:bg-indigo-600 hover:text-white dark:bg-indigo-500/10 dark:text-indigo-400 dark:hover:bg-indigo-500 shadow-sm hover:shadow-md transition-all duration-300 hidden md:flex font-bold rounded-lg"
+                        title="Folgas extras bloqueadas — clique para liberar"
+                      >
+                        <ShieldOff className="h-3.5 w-3.5" /> Destravar
+                      </Button>
+                      <Button 
+                      variant="default" 
                       size="sm" 
                       onClick={() => window.print()} 
-                      className="gap-1.5 h-7 text-xs no-print border-emerald-200 hover:bg-emerald-50/50 dark:border-emerald-900/50 dark:hover:bg-emerald-950/20 text-emerald-600 dark:text-emerald-400 font-semibold hidden lg:flex"
+                      className="gap-1.5 h-8 px-3 text-xs bg-emerald-50 text-emerald-700 hover:bg-emerald-600 hover:text-white dark:bg-emerald-500/10 dark:text-emerald-400 dark:hover:bg-emerald-500 shadow-sm hover:shadow-md transition-all duration-300 hidden lg:flex font-bold rounded-lg"
                     >
-                      <Printer className="h-3.5 w-3.5 text-emerald-500" /> Imprimir Escala
-                    </Button>
+                      <Printer className="h-3.5 w-3.5" /> Imprimir
+                    </Button> 
                     <Button 
-                      variant="outline" 
+                      variant="default" 
                       size="sm" 
                       onClick={handleGeneratePDF}
                       disabled={isGeneratingPDF}
-                      className="gap-1.5 h-7 text-xs no-print border-blue-200 hover:bg-blue-50/50 dark:border-blue-900/50 dark:hover:bg-blue-950/20 text-blue-600 dark:text-blue-400 font-semibold hidden lg:flex"
+                      className="gap-1.5 h-8 px-3 text-xs bg-blue-50 text-blue-700 hover:bg-blue-600 hover:text-white dark:bg-blue-500/10 dark:text-blue-400 dark:hover:bg-blue-500 shadow-sm hover:shadow-md transition-all duration-300 hidden lg:flex font-bold rounded-lg"
                     >
-                      <Download className={`h-3.5 w-3.5 text-blue-500 ${isGeneratingPDF ? "animate-pulse" : ""}`} /> 
-                      {isGeneratingPDF ? "Gerando..." : "Salvar em PDF"}
+                      <Download className={`h-3.5 w-3.5 ${isGeneratingPDF ? "animate-pulse" : ""}`} /> 
+                      {isGeneratingPDF ? "Gerando..." : "Salvar PDF"}
                     </Button>
 
                     <Button variant="outline" size="sm" className="gap-1.5 h-7 text-xs no-print hidden xl:flex">
@@ -2545,14 +2564,7 @@ function EscalaControl() {
                     </Button>
 
                     
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => setIsGlobalScaleOpen(false)}
-                      className="rounded-full hover:bg-slate-150 dark:hover:bg-slate-800 shrink-0 h-7 w-7"
-                    >
-                      <X className="h-4 w-4 text-muted-foreground" />
-                    </Button>
+
                   </div>
                 </div>
 

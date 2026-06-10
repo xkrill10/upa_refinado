@@ -60,7 +60,8 @@ import {
   MoreHorizontal,
   Edit2,
   ArrowRightLeft,
-  Stethoscope
+  Stethoscope,
+  RotateCcw
 } from "lucide-react";
 import { 
   Dialog, 
@@ -385,6 +386,26 @@ function EscalaControl() {
   const [globalSortField, setGlobalSortField] = useState<"name" | "group" | null>(null);
   const [globalSortDirection, setGlobalSortDirection] = useState<"asc" | "desc">("asc");
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [isUnlocked, setIsUnlocked] = useState(false);
+  const [isMonthLocked, setIsMonthLocked] = useState(false);
+  const [isMonthLockModalOpen, setIsMonthLockModalOpen] = useState(false);
+  const [isRestoreMonthOpen, setIsRestoreMonthOpen] = useState(false);
+  
+  const handleRestoreMonth = () => {
+    db.entities.ScheduleEntry.filter({ month: selectedMonth, year: selectedYear }).then(schedules => {
+      Promise.all(schedules.map(sched => {
+        return db.entities.ScheduleEntry.update(sched.id, { days: {} });
+      })).then(() => {
+        queryClient.invalidateQueries({ queryKey: ['schedules'] });
+        window.dispatchEvent(new Event('escala-db-updated'));
+        
+        setDayOverrides([]);
+        
+        toast.success("Mês restaurado para o padrão 12x36 original com sucesso!");
+        setIsRestoreMonthOpen(false);
+      });
+    });
+  };
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [authError, setAuthError] = useState('');
@@ -400,6 +421,7 @@ function EscalaControl() {
     
     if (userLower === 'admin' && (pass === 'upa123' || pass === 'admin')) {
       toast.success("Escala destravada com sucesso!");
+      setIsUnlocked(true);
       setIsAuthModalOpen(false);
     } else {
       setAuthError('Usuário ou senha incorretos!');
@@ -893,7 +915,9 @@ function EscalaControl() {
       const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
       isScheduledWorkDay = !isWeekend;
     } else {
-      const isOddDay = d % 2 !== 0;
+      // Cálculo contínuo baseado em data âncora (01/06/2026) para preservar o ciclo 12x36
+      const daysSinceAnchor = Math.floor((Date.UTC(selectedYear, selectedMonth - 1, d) - Date.UTC(2026, 5, 1)) / 86400000);
+      const isOddDay = Math.abs(daysSinceAnchor) % 2 === 0;
       const isShiftOdd = p.shiftId === "impar_diurno" || p.shiftId === "diurno_a" || p.shiftId === "impar_noturno" || p.shiftId === "noturno_a";
       const isShiftEven = p.shiftId === "par_diurno" || p.shiftId === "diurno_b" || p.shiftId === "par_noturno" || p.shiftId === "noturno_b";
       isScheduledWorkDay = (isShiftOdd && isOddDay) || (isShiftEven && !isOddDay);
@@ -1183,6 +1207,10 @@ function EscalaControl() {
 
   // Handle cell selection and buffering in Global Scale View
   const handleCellClick = (p: { id: string; name: string; role: "nurse" | "technician"; shiftId: string }, dayNum: number, currentStatus: string) => {
+    if (isMonthLocked) {
+      toast.error("Mês bloqueado! Destrave o mês para fazer alterações na escala.");
+      return;
+    }
     setEditingCell({
       memberId: p.id,
       memberName: p.name,
@@ -1239,7 +1267,9 @@ function EscalaControl() {
     // Só valida ausências pesadas se não for, verifica se é um plantão extra de aviso
     if (!ABSENCE_STATUSES.includes(newStatus)) {
       if (newStatus === 'duty') {
-        const isOddDay = day % 2 !== 0;
+        // Cálculo contínuo baseado em data âncora (01/06/2026)
+        const daysSinceAnchor = Math.floor((Date.UTC(selectedYear, selectedMonth - 1, day) - Date.UTC(2026, 5, 1)) / 86400000);
+        const isOddDay = Math.abs(daysSinceAnchor) % 2 === 0;
         const isImparShift = shiftId.startsWith('impar');
         const isParShift = shiftId.startsWith('par');
 
@@ -2460,11 +2490,11 @@ function EscalaControl() {
                 `}</style>
 
                 {/* Top sticky bar */}
-                <div className="border-b bg-card px-4 py-2 flex items-center justify-between shadow-sm shrink-0 no-print flex-wrap gap-2">
+                <div className="border-b bg-card px-4 py-2 flex items-center justify-between shadow-sm shrink-0 no-print overflow-x-auto flex-nowrap gap-4 whitespace-nowrap hide-scrollbar">
                   <div className="flex items-center gap-4">
                     <div className="flex items-center gap-2">
                       <Select value={String(selectedMonth)} onValueChange={(val) => setSelectedMonth(Number(val))}>
-                        <SelectTrigger className="w-[120px] h-9 px-4 text-[11px] font-bold rounded-full transition-all duration-300 ease-in-out border border-blue-200/50 bg-blue-50 text-blue-600 hover:bg-blue-500 hover:text-white hover:border-blue-500 hover:shadow-md hover:scale-[1.02] data-[state=open]:bg-blue-500 data-[state=open]:text-white data-[state=open]:border-blue-500 data-[state=open]:shadow-md data-[state=open]:scale-[1.02] dark:bg-blue-500/10 dark:text-blue-400 focus:ring-0 [&>span]:line-clamp-1">
+                        <SelectTrigger className="w-[100px] h-9 px-3 text-[11px] font-bold rounded-full transition-all duration-300 ease-in-out border border-blue-200/50 bg-blue-50 text-blue-600 hover:bg-blue-500 hover:text-white hover:border-blue-500 hover:shadow-md hover:scale-[1.02] data-[state=open]:bg-blue-500 data-[state=open]:text-white data-[state=open]:border-blue-500 data-[state=open]:shadow-md data-[state=open]:scale-[1.02] dark:bg-blue-500/10 dark:text-blue-400 focus:ring-0 [&>span]:line-clamp-1">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent className="z-[200]">
@@ -2474,11 +2504,11 @@ function EscalaControl() {
                         </SelectContent>
                       </Select>
                       <Select value={String(selectedYear)} onValueChange={(val) => setSelectedYear(Number(val))}>
-                        <SelectTrigger className="w-[90px] h-9 px-4 text-[11px] font-bold rounded-full transition-all duration-300 ease-in-out border border-purple-200/50 bg-purple-50 text-purple-600 hover:bg-purple-600 hover:text-white hover:border-purple-600 hover:shadow-md hover:scale-[1.02] data-[state=open]:bg-purple-600 data-[state=open]:text-white data-[state=open]:border-purple-600 data-[state=open]:shadow-md data-[state=open]:scale-[1.02] dark:bg-purple-500/10 dark:text-purple-400 focus:ring-0 [&>span]:line-clamp-1">
+                        <SelectTrigger className="w-[80px] h-9 px-3 text-[11px] font-bold rounded-full transition-all duration-300 ease-in-out border border-purple-200/50 bg-purple-50 text-purple-600 hover:bg-purple-600 hover:text-white hover:border-purple-600 hover:shadow-md hover:scale-[1.02] data-[state=open]:bg-purple-600 data-[state=open]:text-white data-[state=open]:border-purple-600 data-[state=open]:shadow-md data-[state=open]:scale-[1.02] dark:bg-purple-500/10 dark:text-purple-400 focus:ring-0 [&>span]:line-clamp-1">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent className="z-[200]">
-                          {[2026, 2027, 2028, 2029, 2030].map(y => (
+                          {[2026, 2027, 2028, 2029, 2030, 2031, 2032].map(y => (
                             <SelectItem key={y} value={String(y)} className="text-xs">{y}</SelectItem>
                           ))}
                         </SelectContent>
@@ -2510,59 +2540,108 @@ function EscalaControl() {
                     </div>
                   </div>
                   
-                  <div className="flex items-center gap-2 flex-wrap">
+                  <div className="flex items-center gap-2 flex-nowrap">
                     <Button
                       variant="default"
                       size="sm"
                       onClick={() => setIsGlobalScaleOpen(false)}
-                      className="gap-1.5 h-8 px-4 text-xs bg-blue-50 text-blue-700 hover:bg-blue-600 hover:text-white dark:bg-blue-500/10 dark:text-blue-400 dark:hover:bg-blue-500 shadow-sm hover:shadow-md transition-all duration-300 mr-2 font-bold rounded-lg"
+                      className="gap-1.5 h-8 px-3 text-xs bg-blue-50 text-blue-700 hover:bg-blue-600 hover:text-white dark:bg-blue-500/10 dark:text-blue-400 dark:hover:bg-blue-500 shadow-sm hover:shadow-md transition-all duration-300 mr-2 font-bold rounded-lg"
                     >
                       <Undo2 className="h-3.5 w-3.5" /> Voltar
                     </Button>
 
-                    <Button
-                      variant="default"
-                      size="sm"
-                      onClick={() => setIsAuthModalOpen(true)}
-                      className="gap-1.5 h-8 px-4 text-xs bg-indigo-50 text-indigo-700 hover:bg-indigo-600 hover:text-white dark:bg-indigo-500/10 dark:text-indigo-400 dark:hover:bg-indigo-500 shadow-sm hover:shadow-md transition-all duration-300 hidden md:flex font-bold rounded-lg"
-                      title="Folgas extras bloqueadas — clique para liberar"
-                    >
-                      <ShieldOff className="h-3.5 w-3.5" /> Destravar Escala
-                    </Button>
+                    <Dialog open={isRestoreMonthOpen} onOpenChange={setIsRestoreMonthOpen}>
+                      <DialogTrigger asChild>
+                        <Button
+                          variant="default"
+                          size="sm"
+                          className="gap-1.5 h-8 px-3 text-xs bg-orange-50 text-orange-700 hover:bg-orange-600 hover:text-white dark:bg-orange-500/10 dark:text-orange-400 dark:hover:bg-orange-500 shadow-sm hover:shadow-md transition-all duration-300 font-bold rounded-lg mr-2"
+                        >
+                          <RotateCcw className="h-3.5 w-3.5" /> Restaurar Mês
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent>
+                        <DialogHeader>
+                          <DialogTitle>Reiniciar o Mês</DialogTitle>
+                          <DialogDescription>
+                            Atenção! Esta ação irá limpar todas as edições manuais e folgas adicionadas neste mês, buscando o código da planilha original 12x36 implantado.
+                            Deseja confirmar?
+                          </DialogDescription>
+                        </DialogHeader>
+                        <DialogFooter>
+                          <Button variant="outline" onClick={() => setIsRestoreMonthOpen(false)}>Cancelar</Button>
+                          <Button variant="destructive" onClick={handleRestoreMonth}>Sim</Button>
+                        </DialogFooter>
+                      </DialogContent>
+                    </Dialog>
+
+                    {isUnlocked ? (
+                      <Button
+                        variant="default"
+                        size="sm"
+                        onClick={() => {
+                          setIsUnlocked(false);
+                          toast.info("Escala bloqueada novamente.");
+                        }}
+                        className="gap-1.5 h-8 px-3 text-xs bg-emerald-50 text-emerald-700 hover:bg-emerald-600 hover:text-white dark:bg-emerald-500/10 dark:text-emerald-400 dark:hover:bg-emerald-500 shadow-sm hover:shadow-md transition-all duration-300 hidden md:flex font-bold rounded-lg"
+                        title="Escala destravada — clique para bloquear novamente"
+                      >
+                        <Lock className="h-3.5 w-3.5" /> Travar
+                      </Button>
+                    ) : (
+                      <Button
+                        variant="default"
+                        size="sm"
+                        onClick={() => setIsAuthModalOpen(true)}
+                        className="gap-1.5 h-8 px-3 text-xs bg-indigo-50 text-indigo-700 hover:bg-indigo-600 hover:text-white dark:bg-indigo-500/10 dark:text-indigo-400 dark:hover:bg-indigo-500 shadow-sm hover:shadow-md transition-all duration-300 hidden md:flex font-bold rounded-lg"
+                        title="Folgas extras bloqueadas — clique para liberar"
+                      >
+                        <ShieldOff className="h-3.5 w-3.5" /> Destravar
+                      </Button>
+                    )}
                     
 
                     <Button 
                       variant="default" 
                       size="sm" 
                       onClick={() => window.print()} 
-                      className="gap-1.5 h-8 px-4 text-xs bg-emerald-50 text-emerald-700 hover:bg-emerald-600 hover:text-white dark:bg-emerald-500/10 dark:text-emerald-400 dark:hover:bg-emerald-500 shadow-sm hover:shadow-md transition-all duration-300 hidden lg:flex font-bold rounded-lg"
+                      className="gap-1.5 h-8 px-3 text-xs bg-emerald-50 text-emerald-700 hover:bg-emerald-600 hover:text-white dark:bg-emerald-500/10 dark:text-emerald-400 dark:hover:bg-emerald-500 shadow-sm hover:shadow-md transition-all duration-300 hidden lg:flex font-bold rounded-lg"
                     >
-                      <Printer className="h-3.5 w-3.5" /> Imprimir Escala
+                      <Printer className="h-3.5 w-3.5" /> Imprimir
                     </Button>
                     <Button 
                       variant="default" 
                       size="sm" 
                       onClick={handleGeneratePDF}
                       disabled={isGeneratingPDF}
-                      className="gap-1.5 h-8 px-4 text-xs bg-blue-50 text-blue-700 hover:bg-blue-600 hover:text-white dark:bg-blue-500/10 dark:text-blue-400 dark:hover:bg-blue-500 shadow-sm hover:shadow-md transition-all duration-300 hidden lg:flex font-bold rounded-lg"
+                      className="gap-1.5 h-8 px-3 text-xs bg-blue-50 text-blue-700 hover:bg-blue-600 hover:text-white dark:bg-blue-500/10 dark:text-blue-400 dark:hover:bg-blue-500 shadow-sm hover:shadow-md transition-all duration-300 hidden lg:flex font-bold rounded-lg"
                     >
                       <Download className={`h-3.5 w-3.5 ${isGeneratingPDF ? "animate-pulse" : ""}`} /> 
-                      {isGeneratingPDF ? "Gerando..." : "Salvar em PDF"}
+                      {isGeneratingPDF ? "Gerando..." : "Salvar PDF"}
                     </Button>
 
-                    <Button variant="default" size="sm" className="gap-1.5 h-8 px-4 text-xs bg-red-50 text-red-700 hover:bg-red-600 hover:text-white dark:bg-red-500/10 dark:text-red-400 dark:hover:bg-red-500 shadow-sm hover:shadow-md transition-all duration-300 hidden xl:flex font-bold rounded-lg">
-                      <Lock className="h-3.5 w-3.5" /> Bloquear Mês
-                    </Button>
+                    {isMonthLocked ? (
+                      <Button 
+                        variant="default" 
+                        size="sm" 
+                        onClick={() => setIsMonthLockModalOpen(true)}
+                        className="gap-1.5 h-8 px-3 text-xs bg-emerald-50 text-emerald-700 hover:bg-emerald-600 hover:text-white dark:bg-emerald-500/10 dark:text-emerald-400 dark:hover:bg-emerald-500 shadow-sm hover:shadow-md transition-all duration-300 hidden xl:flex font-bold rounded-lg"
+                      >
+                        <Lock className="h-3.5 w-3.5" /> Desbloquear
+                      </Button>
+                    ) : (
+                      <Button 
+                        variant="default" 
+                        size="sm" 
+                        onClick={() => setIsMonthLockModalOpen(true)}
+                        className="gap-1.5 h-8 px-3 text-xs bg-red-50 text-red-700 hover:bg-red-600 hover:text-white dark:bg-red-500/10 dark:text-red-400 dark:hover:bg-red-500 shadow-sm hover:shadow-md transition-all duration-300 hidden xl:flex font-bold rounded-lg"
+                      >
+                        <Lock className="h-3.5 w-3.5" /> Bloquear
+                      </Button>
+                    )}
 
                     
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => setIsGlobalScaleOpen(false)}
-                      className="rounded-full hover:bg-slate-150 dark:hover:bg-slate-800 shrink-0 h-7 w-7"
-                    >
-                      <X className="h-4 w-4 text-muted-foreground" />
-                    </Button>
+
                   </div>
                 </div>
 
@@ -4895,6 +4974,62 @@ function EscalaControl() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* POPUP DE BLOQUEIO MENSAL */}
+      <AnimatePresence>
+        {isMonthLockModalOpen && (
+          <div className="fixed inset-0 z-[250] flex items-center justify-center p-4">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsMonthLockModalOpen(false)}
+              className="absolute inset-0 bg-black/50"
+            />
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0, y: 15 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.95, opacity: 0, y: 15 }}
+              className="relative w-full max-w-sm bg-card border border-border rounded-xl shadow-2xl p-6 z-10 flex flex-col items-center gap-4"
+            >
+              <div className="mx-auto h-12 w-12 rounded-full flex items-center justify-center bg-primary/10">
+                <Lock className="h-6 w-6 text-primary" />
+              </div>
+              <div className="space-y-2 w-full">
+                <h3 className="text-sm font-black text-center text-card-foreground">
+                  {isMonthLocked ? "Deseja destravar a escala mensal?" : "Deseja travar a escala mensal?"}
+                </h3>
+                <p className="text-[11px] text-muted-foreground text-center leading-relaxed px-2">
+                  {isMonthLocked 
+                    ? "Ao destravar a escala, as edições de células voltarão a ser permitidas." 
+                    : "Ao travar a escala, nenhuma célula poderá ser clicada ou editada até ser destravada novamente."}
+                </p>
+                <div className="flex gap-3 pt-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setIsMonthLockModalOpen(false)}
+                    className="flex-1 text-xs h-9"
+                  >
+                    Cancelar
+                  </Button>
+                  <Button
+                    type="button"
+                    onClick={() => {
+                      setIsMonthLocked(!isMonthLocked);
+                      setIsMonthLockModalOpen(false);
+                      toast.success(isMonthLocked ? "Escala mensal destravada." : "Escala mensal travada.");
+                    }}
+                    className="flex-1 text-xs h-9 bg-primary text-primary-foreground hover:bg-primary/95 shadow"
+                  >
+                    Confirmar
+                  </Button>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
