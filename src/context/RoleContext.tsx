@@ -1,6 +1,6 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect } from "react";
 
-export type Role = 'diretoria' | 'medico' | 'enfermeiro';
+export type Role = "diretoria" | "medico" | "enfermeiro";
 
 interface RoleContextType {
   role: Role;
@@ -9,23 +9,25 @@ interface RoleContextType {
 
 const RoleContext = createContext<RoleContextType | undefined>(undefined);
 
-export const RoleProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const RoleProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const [role, setRoleState] = useState<Role>(() => {
-    const savedRole = localStorage.getItem('simulated_role');
-    return (savedRole as Role) || 'diretoria';
+    const savedRole = localStorage.getItem("simulated_role");
+    return (savedRole as Role) || "diretoria";
   });
 
   const setRole = (newRole: Role) => {
     setRoleState(newRole);
-    localStorage.setItem('simulated_role', newRole);
-    
+    localStorage.setItem("simulated_role", newRole);
+
     // Automatically redirect based on role
-    if (newRole === 'medico') {
-      window.location.href = '/painel-medico';
-    } else if (newRole === 'enfermeiro') {
-      window.location.href = '/triagem';
+    if (newRole === "medico") {
+      window.location.href = "/painel-medico";
+    } else if (newRole === "enfermeiro") {
+      window.location.href = "/triagem";
     } else {
-      window.location.href = '/';
+      window.location.href = "/";
     }
   };
 
@@ -39,7 +41,7 @@ export const RoleProvider: React.FC<{ children: React.ReactNode }> = ({ children
 export const useRole = () => {
   const context = useContext(RoleContext);
   if (context === undefined) {
-    throw new Error('useRole must be used within a RoleProvider');
+    throw new Error("useRole must be used within a RoleProvider");
   }
   return context;
 };

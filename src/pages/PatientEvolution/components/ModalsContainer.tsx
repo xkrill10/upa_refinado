@@ -1,5 +1,5 @@
-import React from 'react';
-import { ModalsState } from '../hooks/useModalsState';
+import React from "react";
+import { ModalsState } from "../hooks/useModalsState";
 import { Patient } from "@/context/PatientsContext";
 
 import { MorseModal } from "@/components/PatientEvolution/Modals/MorseModal";
@@ -35,7 +35,12 @@ interface ModalsContainerProps {
   appendDescription: (desc: string) => void;
 }
 
-export function ModalsContainer({ modalsState: m, patient, updatePatient, appendDescription }: ModalsContainerProps) {
+export function ModalsContainer({
+  modalsState: m,
+  patient,
+  updatePatient,
+  appendDescription,
+}: ModalsContainerProps) {
   return (
     <>
       {/* DIÁLOGOS DE ESCALAS CLÍNICAS E AVALIAÇÕES */}
@@ -127,10 +132,10 @@ export function ModalsContainer({ modalsState: m, patient, updatePatient, append
       />
 
       {/* Outros Modais Isolados e Painéis Extras */}
-      <PatientTimelineModal 
-        isOpen={m.isTimelineOpen} 
-        onClose={m.setIsTimelineOpen} 
-        patient={patient} 
+      <PatientTimelineModal
+        isOpen={m.isTimelineOpen}
+        onClose={m.setIsTimelineOpen}
+        patient={patient}
       />
       <BedRequestModal
         patient={patient}
@@ -163,7 +168,7 @@ export function ModalsContainer({ modalsState: m, patient, updatePatient, append
           m.setActiveNandaPlan(sum);
         }}
       />
-      
+
       <HeartScoreModal
         isOpen={m.openHeartCalc}
         onClose={m.setOpenHeartCalc}

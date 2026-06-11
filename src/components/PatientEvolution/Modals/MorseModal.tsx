@@ -1,7 +1,19 @@
 import React, { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ShieldAlert } from "lucide-react";
@@ -42,7 +54,14 @@ export function MorseModal({ isOpen, onClose, onApply }: MorseModalProps) {
     riskColor = "bg-red-500 text-white";
   }
 
-  const isComplete = !!(morseHistory && morseDiagnosis && morseAmbulation && morseIv && morseGait && morseMental);
+  const isComplete = !!(
+    morseHistory &&
+    morseDiagnosis &&
+    morseAmbulation &&
+    morseIv &&
+    morseGait &&
+    morseMental
+  );
 
   const handleClear = () => {
     setMorseHistory("no");
@@ -56,13 +75,16 @@ export function MorseModal({ isOpen, onClose, onApply }: MorseModalProps) {
 
   const handleConfirm = () => {
     const descText = `- ESCALA DE MORSE (QUEDAS): ${score} pontos (${riskClass.toUpperCase()}).\n  Conduta: ${
-      score >= 45 
-        ? "Grades do leito elevadas, campainha de fácil acesso, pulseira de risco de queda, acompanhante orientado." 
-        : score >= 25 
-        ? "Grades elevadas, auxílio na deambulação e supervisão periódica." 
-        : "Manter grades elevadas de rotina e orientações gerais."
+      score >= 45
+        ? "Grades do leito elevadas, campainha de fácil acesso, pulseira de risco de queda, acompanhante orientado."
+        : score >= 25
+          ? "Grades elevadas, auxílio na deambulação e supervisão periódica."
+          : "Manter grades elevadas de rotina e orientações gerais."
     }`;
-    onApply(descText, `${score} pts (${riskClass === "Risco Alto" ? "Alto" : riskClass === "Risco Moderado" ? "Mod" : "Baixo"})`);
+    onApply(
+      descText,
+      `${score} pts (${riskClass === "Risco Alto" ? "Alto" : riskClass === "Risco Moderado" ? "Mod" : "Baixo"})`,
+    );
     onClose(false);
     toast.success("Resultado da Escala de Morse inserido no prontuário!");
   };
@@ -83,7 +105,9 @@ export function MorseModal({ isOpen, onClose, onApply }: MorseModalProps) {
         <div className="space-y-4 py-3">
           {/* 1. Histórico de Quedas */}
           <div className="space-y-1">
-            <Label className="text-xs font-black uppercase text-foreground/80">1. Histórico de Quedas nos últimos 3 meses</Label>
+            <Label className="text-xs font-black uppercase text-foreground/80">
+              1. Histórico de Quedas nos últimos 3 meses
+            </Label>
             <Select value={morseHistory} onValueChange={setMorseHistory}>
               <SelectTrigger className="h-10 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
                 <SelectValue placeholder="Selecione..." />
@@ -97,7 +121,9 @@ export function MorseModal({ isOpen, onClose, onApply }: MorseModalProps) {
 
           {/* 2. Diagnóstico Secundário */}
           <div className="space-y-1">
-            <Label className="text-xs font-black uppercase text-foreground/80">2. Diagnóstico Secundário no prontuário</Label>
+            <Label className="text-xs font-black uppercase text-foreground/80">
+              2. Diagnóstico Secundário no prontuário
+            </Label>
             <Select value={morseDiagnosis} onValueChange={setMorseDiagnosis}>
               <SelectTrigger className="h-10 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
                 <SelectValue placeholder="Selecione..." />
@@ -111,22 +137,32 @@ export function MorseModal({ isOpen, onClose, onApply }: MorseModalProps) {
 
           {/* 3. Auxílio na Deambulação */}
           <div className="space-y-1">
-            <Label className="text-xs font-black uppercase text-foreground/80">3. Auxílio na Deambulação</Label>
+            <Label className="text-xs font-black uppercase text-foreground/80">
+              3. Auxílio na Deambulação
+            </Label>
             <Select value={morseAmbulation} onValueChange={setMorseAmbulation}>
               <SelectTrigger className="h-10 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
                 <SelectValue placeholder="Selecione o auxílio..." />
               </SelectTrigger>
               <SelectContent className="rounded-xl">
-                <SelectItem value="none">Nenhum / Acamado / Cadeira de Rodas (0 pts)</SelectItem>
-                <SelectItem value="crutches">Muletas / Bengala / Andador (15 pts)</SelectItem>
-                <SelectItem value="furniture">Apoia-se em móveis ou paredes (30 pts)</SelectItem>
+                <SelectItem value="none">
+                  Nenhum / Acamado / Cadeira de Rodas (0 pts)
+                </SelectItem>
+                <SelectItem value="crutches">
+                  Muletas / Bengala / Andador (15 pts)
+                </SelectItem>
+                <SelectItem value="furniture">
+                  Apoia-se em móveis ou paredes (30 pts)
+                </SelectItem>
               </SelectContent>
             </Select>
           </div>
 
           {/* 4. Terapia Intravenosa */}
           <div className="space-y-1">
-            <Label className="text-xs font-black uppercase text-foreground/80">4. Terapia Intravenosa / Dispositivo Endovenoso (Soro, Acesso)</Label>
+            <Label className="text-xs font-black uppercase text-foreground/80">
+              4. Terapia Intravenosa / Dispositivo Endovenoso (Soro, Acesso)
+            </Label>
             <Select value={morseIv} onValueChange={setMorseIv}>
               <SelectTrigger className="h-10 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
                 <SelectValue placeholder="Selecione..." />
@@ -140,29 +176,43 @@ export function MorseModal({ isOpen, onClose, onApply }: MorseModalProps) {
 
           {/* 5. Marcha */}
           <div className="space-y-1">
-            <Label className="text-xs font-black uppercase text-foreground/80">5. Marcha / Transferência</Label>
+            <Label className="text-xs font-black uppercase text-foreground/80">
+              5. Marcha / Transferência
+            </Label>
             <Select value={morseGait} onValueChange={setMorseGait}>
               <SelectTrigger className="h-10 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
                 <SelectValue placeholder="Selecione o padrão de marcha..." />
               </SelectTrigger>
               <SelectContent className="rounded-xl">
-                <SelectItem value="normal">Normal / Acamado / Cadeira de Rodas (0 pts)</SelectItem>
-                <SelectItem value="weak">Fraca / Ligeiramente alterada (10 pts)</SelectItem>
-                <SelectItem value="impaired">Limitada / Com esforço ou passos curtos (20 pts)</SelectItem>
+                <SelectItem value="normal">
+                  Normal / Acamado / Cadeira de Rodas (0 pts)
+                </SelectItem>
+                <SelectItem value="weak">
+                  Fraca / Ligeiramente alterada (10 pts)
+                </SelectItem>
+                <SelectItem value="impaired">
+                  Limitada / Com esforço ou passos curtos (20 pts)
+                </SelectItem>
               </SelectContent>
             </Select>
           </div>
 
           {/* 6. Estado Mental */}
           <div className="space-y-1">
-            <Label className="text-xs font-black uppercase text-foreground/80">6. Estado Mental</Label>
+            <Label className="text-xs font-black uppercase text-foreground/80">
+              6. Estado Mental
+            </Label>
             <Select value={morseMental} onValueChange={setMorseMental}>
               <SelectTrigger className="h-10 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
                 <SelectValue placeholder="Selecione o estado mental..." />
               </SelectTrigger>
               <SelectContent className="rounded-xl">
-                <SelectItem value="oriented">Orientado / Limites próprios (0 pts)</SelectItem>
-                <SelectItem value="forgetful">Superestima limites / Esquecido (15 pts)</SelectItem>
+                <SelectItem value="oriented">
+                  Orientado / Limites próprios (0 pts)
+                </SelectItem>
+                <SelectItem value="forgetful">
+                  Superestima limites / Esquecido (15 pts)
+                </SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -171,15 +221,30 @@ export function MorseModal({ isOpen, onClose, onApply }: MorseModalProps) {
           <div className="mt-6 p-4 rounded-xl bg-slate-50/70 dark:bg-slate-900/40 backdrop-blur-md border border-slate-200/60 dark:border-slate-800/50 space-y-3">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-[10px] font-black uppercase text-muted-foreground tracking-wider">Pontuação Calculada</p>
-                <p className="text-3xl font-black text-foreground">{score} <span className="text-sm font-bold text-muted-foreground">pts</span></p>
+                <p className="text-[10px] font-black uppercase text-muted-foreground tracking-wider">
+                  Pontuação Calculada
+                </p>
+                <p className="text-3xl font-black text-foreground">
+                  {score}{" "}
+                  <span className="text-sm font-bold text-muted-foreground">
+                    pts
+                  </span>
+                </p>
               </div>
               {isComplete ? (
-                <Badge className={cn("h-7 rounded-lg text-xs font-black uppercase tracking-wider", riskColor)}>
+                <Badge
+                  className={cn(
+                    "h-7 rounded-lg text-xs font-black uppercase tracking-wider",
+                    riskColor,
+                  )}
+                >
                   {riskClass}
                 </Badge>
               ) : (
-                <Badge variant="secondary" className="h-7 rounded-lg text-xs font-black uppercase tracking-wider">
+                <Badge
+                  variant="secondary"
+                  className="h-7 rounded-lg text-xs font-black uppercase tracking-wider"
+                >
                   Incompleto
                 </Badge>
               )}

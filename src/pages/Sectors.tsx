@@ -2,142 +2,294 @@ import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { usePatients, Patient } from "@/hooks/use-patients";
-import { Building2, Users, AlertCircle, Clock, Stethoscope, Pill, ShieldCheck, HeartPulse, Baby, Globe, UserCheck, FileText } from "lucide-react";
+import {
+  Building2,
+  Users,
+  AlertCircle,
+  Clock,
+  Stethoscope,
+  Pill,
+  ShieldCheck,
+  HeartPulse,
+  Baby,
+  Globe,
+  UserCheck,
+  FileText,
+} from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { motion, AnimatePresence } from "motion/react";
 import { cn, formatWords } from "@/lib/utils";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 import PatientRecord from "@/pages/PatientRecord";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { ChevronRight, Search, Megaphone, X, Volume2, VolumeX } from "lucide-react";
+import {
+  ChevronRight,
+  Search,
+  Megaphone,
+  X,
+  Volume2,
+  VolumeX,
+} from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { formatPatientNameLGPD } from "@/lib/utils";
 
 const sectorGroups = [
   {
-    id: 'emergency',
-    label: 'Emergência',
+    id: "emergency",
+    label: "Emergência",
     icon: AlertCircle,
-    color: 'text-red-500 dark:text-red-400',
-    borderColor: 'border-red-500/40 dark:border-red-500/30',
-    bgColor: 'bg-red-500/10 dark:bg-red-500/15',
-    progressBarColor: 'bg-gradient-to-r from-red-500 to-red-600 dark:from-red-600/90 dark:to-red-500/90',
-    activeTab: 'data-[state=active]:text-red-650 dark:data-[state=active]:text-red-400 data-[state=active]:border-red-500 dark:data-[state=active]:border-red-500/50 data-[state=active]:bg-red-500/10 dark:data-[state=active]:bg-red-500/15 shadow-[0_0_15px_rgba(239,68,68,0.12)]',
+    color: "text-red-500 dark:text-red-400",
+    borderColor: "border-red-500/40 dark:border-red-500/30",
+    bgColor: "bg-red-500/10 dark:bg-red-500/15",
+    progressBarColor:
+      "bg-gradient-to-r from-red-500 to-red-600 dark:from-red-600/90 dark:to-red-500/90",
+    activeTab:
+      "data-[state=active]:text-red-650 dark:data-[state=active]:text-red-400 data-[state=active]:border-red-500 dark:data-[state=active]:border-red-500/50 data-[state=active]:bg-red-500/10 dark:data-[state=active]:bg-red-500/15 shadow-[0_0_15px_rgba(239,68,68,0.12)]",
     sectors: [
-      { 
-        name: 'SALA VERMELHA', 
-        max: 6, 
-        description: 'SALA DE RESSUSCITAÇÃO - CUIDADOS CRÍTICOS',
-        structure: 'Equipada com respiradores, monitores multiparâmetros, desfibrilador e carrinho de emergência.'
+      {
+        name: "SALA VERMELHA",
+        max: 6,
+        description: "SALA DE RESSUSCITAÇÃO - CUIDADOS CRÍTICOS",
+        structure:
+          "Equipada com respiradores, monitores multiparâmetros, desfibrilador e carrinho de emergência.",
       },
-      { name: 'SALA DE EMERGÊNCIA 1', max: 1, description: 'SUPORTE AVANÇADO (RESPIRADORES)', structure: 'Monitorização constante e ventilação mecânica.' },
-      { name: 'SALA DE EMERGÊNCIA 2', max: 1, description: 'SUPORTE AVANÇADO (RESPIRADORES)', structure: 'Monitorização constante e ventilação mecânica.' },
-      { name: 'SALA DE EMERGÊNCIA 3', max: 1, description: 'SUPORTE AVANÇADO (RESPIRADORES)', structure: 'Monitorização constante e ventilação mecânica.' },
-      { name: 'RECON 1', max: 1, description: 'ESTABILIZAÇÃO IMEDIATA', structure: 'Área de manobras rápidas e ressuscitação.' },
-      { name: 'RECON 2', max: 1, description: 'ESTABILIZAÇÃO IMEDIATA', structure: 'Área de manobras rápidas e ressuscitação.' }
-    ]
+      {
+        name: "SALA DE EMERGÊNCIA 1",
+        max: 1,
+        description: "SUPORTE AVANÇADO (RESPIRADORES)",
+        structure: "Monitorização constante e ventilação mecânica.",
+      },
+      {
+        name: "SALA DE EMERGÊNCIA 2",
+        max: 1,
+        description: "SUPORTE AVANÇADO (RESPIRADORES)",
+        structure: "Monitorização constante e ventilação mecânica.",
+      },
+      {
+        name: "SALA DE EMERGÊNCIA 3",
+        max: 1,
+        description: "SUPORTE AVANÇADO (RESPIRADORES)",
+        structure: "Monitorização constante e ventilação mecânica.",
+      },
+      {
+        name: "RECON 1",
+        max: 1,
+        description: "ESTABILIZAÇÃO IMEDIATA",
+        structure: "Área de manobras rápidas e ressuscitação.",
+      },
+      {
+        name: "RECON 2",
+        max: 1,
+        description: "ESTABILIZAÇÃO IMEDIATA",
+        structure: "Área de manobras rápidas e ressuscitação.",
+      },
+    ],
   },
   {
-    id: 'observation',
-    label: 'Observação',
+    id: "observation",
+    label: "Observação",
     icon: Clock,
-    color: 'text-amber-500 dark:text-amber-400',
-    borderColor: 'border-amber-400/40 dark:border-amber-500/30',
-    bgColor: 'bg-amber-500/10 dark:bg-amber-500/15',
-    progressBarColor: 'bg-gradient-to-r from-amber-400 to-amber-500 dark:from-amber-400/80 dark:to-amber-500/80',
-    activeTab: 'data-[state=active]:text-amber-600 dark:data-[state=active]:text-amber-400 data-[state=active]:border-amber-400 dark:data-[state=active]:border-amber-500/50 data-[state=active]:bg-amber-500/10 dark:data-[state=active]:bg-amber-500/15 shadow-[0_0_15px_rgba(245,158,11,0.12)]',
+    color: "text-amber-500 dark:text-amber-400",
+    borderColor: "border-amber-400/40 dark:border-amber-500/30",
+    bgColor: "bg-amber-500/10 dark:bg-amber-500/15",
+    progressBarColor:
+      "bg-gradient-to-r from-amber-400 to-amber-500 dark:from-amber-400/80 dark:to-amber-500/80",
+    activeTab:
+      "data-[state=active]:text-amber-600 dark:data-[state=active]:text-amber-400 data-[state=active]:border-amber-400 dark:data-[state=active]:border-amber-500/50 data-[state=active]:bg-amber-500/10 dark:data-[state=active]:bg-amber-500/15 shadow-[0_0_15px_rgba(245,158,11,0.12)]",
     sectors: [
-      { 
-        name: 'SALA AMARELA', 
-        max: 15, 
-        description: 'URGÊNCIA / ÁREA DE MEDICAÇÃO ADULTO',
-        structure: 'Posto de enfermagem próximo, equipamentos de monitorização básica e medicação intravenosa.'
+      {
+        name: "SALA AMARELA",
+        max: 15,
+        description: "URGÊNCIA / ÁREA DE MEDICAÇÃO ADULTO",
+        structure:
+          "Posto de enfermagem próximo, equipamentos de monitorização básica e medicação intravenosa.",
       },
-      { name: 'SALA MASCULINA', max: 10, description: 'OBSERVAÇÃO COLETIVA', structure: 'Banheiro (BWC) exclusivo para pacientes masculinos.' },
-      { name: 'SALA FEMININA', max: 10, description: 'OBSERVAÇÃO COLETIVA', structure: 'Banheiro (BWC) exclusivo para pacientes femininas.' },
-      { name: 'QUARTO DE ATENÇÃO 1', max: 1, description: 'INTERNAÇÃO CURTA / ISOLAMENTO', structure: 'Acomodação privada para casos de observação prolongada ou isolamento.' },
-      { name: 'QUARTO DE ATENÇÃO 2', max: 1, description: 'INTERNAÇÃO CURTA / ISOLAMENTO', structure: 'Acomodação privada para casos de observação prolongada ou isolamento.' },
-      ...Array.from({ length: 5 }, (_, i) => ({ 
-        name: `LEITO DE OBSERVAÇÃO ${i + 1}`, 
-        max: 1, 
-        description: 'MONITORAMENTO BÁSICO',
-        structure: 'Leito individual com ponto de oxigênio e vácuo.'
-      }))
-    ]
+      {
+        name: "SALA MASCULINA",
+        max: 10,
+        description: "OBSERVAÇÃO COLETIVA",
+        structure: "Banheiro (BWC) exclusivo para pacientes masculinos.",
+      },
+      {
+        name: "SALA FEMININA",
+        max: 10,
+        description: "OBSERVAÇÃO COLETIVA",
+        structure: "Banheiro (BWC) exclusivo para pacientes femininas.",
+      },
+      {
+        name: "QUARTO DE ATENÇÃO 1",
+        max: 1,
+        description: "INTERNAÇÃO CURTA / ISOLAMENTO",
+        structure:
+          "Acomodação privada para casos de observação prolongada ou isolamento.",
+      },
+      {
+        name: "QUARTO DE ATENÇÃO 2",
+        max: 1,
+        description: "INTERNAÇÃO CURTA / ISOLAMENTO",
+        structure:
+          "Acomodação privada para casos de observação prolongada ou isolamento.",
+      },
+      ...Array.from({ length: 5 }, (_, i) => ({
+        name: `LEITO DE OBSERVAÇÃO ${i + 1}`,
+        max: 1,
+        description: "MONITORAMENTO BÁSICO",
+        structure: "Leito individual com ponto de oxigênio e vácuo.",
+      })),
+    ],
   },
   {
-    id: 'pediatric',
-    label: 'Pediatria',
+    id: "pediatric",
+    label: "Pediatria",
     icon: Baby,
-    color: 'text-blue-500 dark:text-blue-400',
-    borderColor: 'border-blue-500/40 dark:border-blue-400/30',
-    bgColor: 'bg-blue-500/10 dark:bg-blue-450/15',
-    progressBarColor: 'bg-gradient-to-r from-blue-500 to-blue-600',
-    activeTab: 'data-[state=active]:text-blue-600 dark:data-[state=active]:text-blue-400 data-[state=active]:border-blue-500 dark:data-[state=active]:border-blue-500/50 data-[state=active]:bg-blue-500/10 dark:data-[state=active]:bg-blue-500/15 shadow-[0_0_15px_rgba(59,130,246,0.12)]',
+    color: "text-blue-500 dark:text-blue-400",
+    borderColor: "border-blue-500/40 dark:border-blue-400/30",
+    bgColor: "bg-blue-500/10 dark:bg-blue-450/15",
+    progressBarColor: "bg-gradient-to-r from-blue-500 to-blue-600",
+    activeTab:
+      "data-[state=active]:text-blue-600 dark:data-[state=active]:text-blue-400 data-[state=active]:border-blue-500 dark:data-[state=active]:border-blue-500/50 data-[state=active]:bg-blue-500/10 dark:data-[state=active]:bg-blue-500/15 shadow-[0_0_15px_rgba(59,130,246,0.12)]",
     sectors: [
-      { 
-        name: 'OBSERVAÇÃO PEDIÁTRICA', 
-        max: 8, 
-        description: 'SALA PEDIÁTRICA',
-        structure: 'Leitos adequados, poltronas para acompanhantes e banheiro exclusivo para pediatria.'
+      {
+        name: "OBSERVAÇÃO PEDIÁTRICA",
+        max: 8,
+        description: "SALA PEDIÁTRICA",
+        structure:
+          "Leitos adequados, poltronas para acompanhantes e banheiro exclusivo para pediatria.",
       },
-      { name: 'TRIAGEM INFANTIL 1', max: 4, description: 'AMBIENTE HUMANIZADO', structure: 'Área lúdica e acolhedora para triagem pediátrica.' },
-      { name: 'TRIAGEM INFANTIL 2', max: 4, description: 'AMBIENTE HUMANIZADO', structure: 'Área lúdica e acolhedora para triagem pediátrica.' },
-      { name: 'MEDICAÇÃO INFANTIL', max: 6, description: 'SALA DE PROCEDIMENTOS', structure: 'Equipamentos pediátricos para administração segura de medicamentos.' },
-      ...Array.from({ length: 3 }, (_, i) => ({ 
-        name: `CONSULTÓRIO PEDIÁTRICO ${i + 1}`, 
-        max: 1, 
-        description: 'ATENDIMENTO CLÍNICO INFANTIL',
-        structure: 'Maca de exame, equipamentos infantis e decoração lúdica.'
-      }))
-    ]
+      {
+        name: "TRIAGEM INFANTIL 1",
+        max: 4,
+        description: "AMBIENTE HUMANIZADO",
+        structure: "Área lúdica e acolhedora para triagem pediátrica.",
+      },
+      {
+        name: "TRIAGEM INFANTIL 2",
+        max: 4,
+        description: "AMBIENTE HUMANIZADO",
+        structure: "Área lúdica e acolhedora para triagem pediátrica.",
+      },
+      {
+        name: "MEDICAÇÃO INFANTIL",
+        max: 6,
+        description: "SALA DE PROCEDIMENTOS",
+        structure:
+          "Equipamentos pediátricos para administração segura de medicamentos.",
+      },
+      ...Array.from({ length: 3 }, (_, i) => ({
+        name: `CONSULTÓRIO PEDIÁTRICO ${i + 1}`,
+        max: 1,
+        description: "ATENDIMENTO CLÍNICO INFANTIL",
+        structure: "Maca de exame, equipamentos infantis e decoração lúdica.",
+      })),
+    ],
   },
   {
-    id: 'services',
-    label: 'Atendimento',
+    id: "services",
+    label: "Atendimento",
     icon: Stethoscope,
-    color: 'text-emerald-500 dark:text-emerald-400',
-    borderColor: 'border-emerald-500/40 dark:border-emerald-400/30',
-    bgColor: 'bg-emerald-500/10 dark:bg-emerald-450/15',
-    progressBarColor: 'bg-gradient-to-r from-emerald-500 to-emerald-600',
-    activeTab: 'data-[state=active]:text-emerald-600 dark:data-[state=active]:text-emerald-400 data-[state=active]:border-emerald-500 dark:data-[state=active]:border-emerald-500/50 data-[state=active]:bg-emerald-500/10 dark:data-[state=active]:bg-emerald-500/15 shadow-[0_0_15px_rgba(16,185,129,0.12)]',
+    color: "text-emerald-500 dark:text-emerald-400",
+    borderColor: "border-emerald-500/40 dark:border-emerald-400/30",
+    bgColor: "bg-emerald-500/10 dark:bg-emerald-450/15",
+    progressBarColor: "bg-gradient-to-r from-emerald-500 to-emerald-600",
+    activeTab:
+      "data-[state=active]:text-emerald-600 dark:data-[state=active]:text-emerald-400 data-[state=active]:border-emerald-500 dark:data-[state=active]:border-emerald-500/50 data-[state=active]:bg-emerald-500/10 dark:data-[state=active]:bg-emerald-500/15 shadow-[0_0_15px_rgba(16,185,129,0.12)]",
     sectors: [
-      { name: 'TRIAGEM 1', max: 1, description: 'TRIAGEM INICIAL', structure: 'Equipamentos de aferição de sinais vitais e sistema de senhas.' },
-      { name: 'TRIAGEM 2', max: 1, description: 'TRIAGEM INICIAL', structure: 'Equipamentos de aferição de sinais vitais e sistema de senhas.' },
-      { name: 'TRIAGEM 3', max: 1, description: 'TRIAGEM INICIAL', structure: 'Equipamentos de aferição de sinais vitais e sistema de senhas.' },
-      { name: 'SALA DE COLETA', max: 6, description: 'EXAMES LABORATORIAIS', structure: 'Box de coleta individualizado e área de processamento rápido.' },
-      { name: 'SALA DE SUTURA', max: 2, description: 'PROCEDIMENTOS RÁPIDOS', structure: 'Macas de procedimento e foco cirúrgico.' },
-      { name: 'SALA DE CURATIVOS', max: 2, description: 'PROCEDIMENTOS RÁPIDOS', structure: 'Materiais esterilizados e pia cirúrgica.' },
-      { name: 'FAST TRACK', max: 1, description: 'ATENDIMENTO RÁPIDO', structure: 'Maca de exame, mesa administrativa e equipamentos básicos de diagnóstico.' },
-      ...Array.from({ length: 5 }, (_, i) => ({ 
-        name: `CONSULTÓRIO CLÍNICO ${i + 1}`, 
-        max: 1, 
-        description: 'ATENDIMENTO CLÍNICO',
-        structure: 'Maca de exame, mesa administrativa e equipamentos básicos de diagnóstico.'
-      }))
-    ]
+      {
+        name: "TRIAGEM 1",
+        max: 1,
+        description: "TRIAGEM INICIAL",
+        structure:
+          "Equipamentos de aferição de sinais vitais e sistema de senhas.",
+      },
+      {
+        name: "TRIAGEM 2",
+        max: 1,
+        description: "TRIAGEM INICIAL",
+        structure:
+          "Equipamentos de aferição de sinais vitais e sistema de senhas.",
+      },
+      {
+        name: "TRIAGEM 3",
+        max: 1,
+        description: "TRIAGEM INICIAL",
+        structure:
+          "Equipamentos de aferição de sinais vitais e sistema de senhas.",
+      },
+      {
+        name: "SALA DE COLETA",
+        max: 6,
+        description: "EXAMES LABORATORIAIS",
+        structure:
+          "Box de coleta individualizado e área de processamento rápido.",
+      },
+      {
+        name: "SALA DE SUTURA",
+        max: 2,
+        description: "PROCEDIMENTOS RÁPIDOS",
+        structure: "Macas de procedimento e foco cirúrgico.",
+      },
+      {
+        name: "SALA DE CURATIVOS",
+        max: 2,
+        description: "PROCEDIMENTOS RÁPIDOS",
+        structure: "Materiais esterilizados e pia cirúrgica.",
+      },
+      {
+        name: "FAST TRACK",
+        max: 1,
+        description: "ATENDIMENTO RÁPIDO",
+        structure:
+          "Maca de exame, mesa administrativa e equipamentos básicos de diagnóstico.",
+      },
+      ...Array.from({ length: 5 }, (_, i) => ({
+        name: `CONSULTÓRIO CLÍNICO ${i + 1}`,
+        max: 1,
+        description: "ATENDIMENTO CLÍNICO",
+        structure:
+          "Maca de exame, mesa administrativa e equipamentos básicos de diagnóstico.",
+      })),
+    ],
   },
   {
-    id: 'support',
-    label: 'Apoio / NIR',
+    id: "support",
+    label: "Apoio / NIR",
     icon: ShieldCheck,
-    color: 'text-purple-500 dark:text-purple-400',
-    borderColor: 'border-purple-500/40 dark:border-purple-400/30',
-    bgColor: 'bg-purple-500/10 dark:bg-purple-450/15',
-    progressBarColor: 'bg-gradient-to-r from-purple-500 to-purple-600',
-    activeTab: 'data-[state=active]:text-purple-600 dark:data-[state=active]:text-purple-400 data-[state=active]:border-purple-500 dark:data-[state=active]:border-purple-500/50 data-[state=active]:bg-purple-500/10 dark:data-[state=active]:bg-purple-500/15 shadow-[0_0_15px_rgba(168,85,247,0.12)]',
+    color: "text-purple-500 dark:text-purple-400",
+    borderColor: "border-purple-500/40 dark:border-purple-400/30",
+    bgColor: "bg-purple-500/10 dark:bg-purple-450/15",
+    progressBarColor: "bg-gradient-to-r from-purple-500 to-purple-600",
+    activeTab:
+      "data-[state=active]:text-purple-600 dark:data-[state=active]:text-purple-400 data-[state=active]:border-purple-500 dark:data-[state=active]:border-purple-500/50 data-[state=active]:bg-purple-500/10 dark:data-[state=active]:bg-purple-500/15 shadow-[0_0_15px_rgba(168,85,247,0.12)]",
     sectors: [
-      { name: 'FARMÁCIA', max: 50, description: 'DISPENSAÇÃO DE MEDICAMENTOS' },
-      { name: 'ASSISTÊNCIA SOCIAL', max: 2, description: 'ACOLHIMENTO AO FAMILIAR' },
-      { name: 'SALA DE NIR', max: 4, description: 'REGULAÇÃO DE VAGAS EXTERNAS' },
-      { name: 'RADIOLOGIA / RAIO-X', max: 2, description: 'IMAGEM E DIAGNÓSTICO' }
-    ]
-  }
+      { name: "FARMÁCIA", max: 50, description: "DISPENSAÇÃO DE MEDICAMENTOS" },
+      {
+        name: "ASSISTÊNCIA SOCIAL",
+        max: 2,
+        description: "ACOLHIMENTO AO FAMILIAR",
+      },
+      {
+        name: "SALA DE NIR",
+        max: 4,
+        description: "REGULAÇÃO DE VAGAS EXTERNAS",
+      },
+      {
+        name: "RADIOLOGIA / RAIO-X",
+        max: 2,
+        description: "IMAGEM E DIAGNÓSTICO",
+      },
+    ],
+  },
 ];
 
 interface Sector {
@@ -145,30 +297,37 @@ interface Sector {
   max: number;
   description: string;
   structure?: string;
-  group: typeof sectorGroups[number];
+  group: (typeof sectorGroups)[number];
 }
 
-const RISK_ORDER: Record<string, number> = { 
-  'emergency': 0, 
-  'very-urgent': 1, 
-  'urgent': 2, 
-  'less-urgent': 3, 
-  'not-urgent': 4 
+const RISK_ORDER: Record<string, number> = {
+  emergency: 0,
+  "very-urgent": 1,
+  urgent: 2,
+  "less-urgent": 3,
+  "not-urgent": 4,
 };
 
 // Mock de profissionais em cada sala para o Mapa de Setores
 const DEFAULT_PROFESSIONALS: Record<string, string> = {
-  'TRIAGEM 1': 'ENF. MARINA COSTA',
-  'TRIAGEM 2': 'ENF. PAULO SOUZA',
-  'SALA VERMELHA': 'DR. CARLOS ANDRÉ',
-  'SALA AMARELA': 'ENF. JULIANA LIMA',
-  'SALA MASCULINA': 'TEC. ROBERTO ALVES',
-  'SALA FEMININA': 'TEC. ANA PAULA',
-  'OBSERVAÇÃO PEDIÁTRICA': 'ENF. CLARA NEVES',
+  "TRIAGEM 1": "ENF. MARINA COSTA",
+  "TRIAGEM 2": "ENF. PAULO SOUZA",
+  "SALA VERMELHA": "DR. CARLOS ANDRÉ",
+  "SALA AMARELA": "ENF. JULIANA LIMA",
+  "SALA MASCULINA": "TEC. ROBERTO ALVES",
+  "SALA FEMININA": "TEC. ANA PAULA",
+  "OBSERVAÇÃO PEDIÁTRICA": "ENF. CLARA NEVES",
 };
 
 export default function Sectors() {
-  const { patients: allPatients, callPatient, updatePatient, isAudioEnabled, setIsAudioEnabled, callTicket } = usePatients();
+  const {
+    patients: allPatients,
+    callPatient,
+    updatePatient,
+    isAudioEnabled,
+    setIsAudioEnabled,
+    callTicket,
+  } = usePatients();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -176,34 +335,38 @@ export default function Sectors() {
     if (location.state?.reopenSector) {
       const sectorName = location.state.reopenSector;
       for (const group of sectorGroups) {
-        const sector = group.sectors.find(s => s.name === sectorName);
+        const sector = group.sectors.find((s) => s.name === sectorName);
         if (sector) {
           setSelectedSector({ ...sector, group });
           setShowSectorDialog(true);
           break;
         }
       }
-      window.history.replaceState({}, '');
+      window.history.replaceState({}, "");
     }
   }, [location]);
 
   const [activeTab, setActiveTab] = useState("census");
   const [selectedSector, setSelectedSector] = useState<Sector | null>(null);
   const [showSectorDialog, setShowSectorDialog] = useState(false);
-  const [transferringPatientId, setTransferringPatientId] = useState<string | null>(null);
+  const [transferringPatientId, setTransferringPatientId] = useState<
+    string | null
+  >(null);
   const [recordPatientId, setRecordPatientId] = useState<string | null>(null);
   const [showCallControl, setShowCallControl] = useState(false);
-  const [callingTicket, setCallingTicket] = useState<{ 
-    ticket: string; 
-    patientName: string; 
-    risk: Patient['risk'];
-    priority: Patient['priority'];
+  const [callingTicket, setCallingTicket] = useState<{
+    ticket: string;
+    patientName: string;
+    risk: Patient["risk"];
+    priority: Patient["priority"];
     room: string;
     age?: number;
     cpf?: string;
   } | null>(null);
   const [searchSector, setSearchSector] = useState("");
-  const [selectedRisk, setSelectedRisk] = useState<Patient['risk'] | null>(null);
+  const [selectedRisk, setSelectedRisk] = useState<Patient["risk"] | null>(
+    null,
+  );
   const [now, setNow] = useState(new Date());
 
   // Atualiza o relógio para os alertas de tempo real
@@ -213,7 +376,7 @@ export default function Sectors() {
   }, []);
 
   const getProfessionalInRoom = (roomName: string) => {
-    const activeFromTriage = localStorage.getItem('selectedTriageRoom');
+    const activeFromTriage = localStorage.getItem("selectedTriageRoom");
     if (roomName === activeFromTriage) {
       return "DR. RICARDO BRAGA"; // Usuário "logado" no sistema
     }
@@ -225,33 +388,98 @@ export default function Sectors() {
     setSelectedRisk(null);
   };
 
-  const allSectors = sectorGroups.flatMap(g => g.sectors.map(s => ({ ...s, groupIcon: g.icon, groupColor: g.color })));
-  const filteredSectors = allSectors.filter(s => 
-    s.name.toLowerCase().includes(searchSector.toLowerCase()) && 
-    s.name !== selectedSector?.name
+  const allSectors = sectorGroups.flatMap((g) =>
+    g.sectors.map((s) => ({ ...s, groupIcon: g.icon, groupColor: g.color })),
+  );
+  const filteredSectors = allSectors.filter(
+    (s) =>
+      s.name.toLowerCase().includes(searchSector.toLowerCase()) &&
+      s.name !== selectedSector?.name,
   );
 
   const getRiskDetails = (risk: string) => {
-    switch(risk) {
-      case 'emergency': return { label: 'Emergência', color: 'bg-red-500 text-white dark:bg-red-650 dark:bg-red-600/90 shadow-[0_0_15px_rgba(239,68,68,0.25)]' };
-      case 'very-urgent': return { label: 'Muito Urgente', color: 'bg-orange-500 text-white dark:bg-orange-600/90 shadow-[0_0_15px_rgba(249,115,22,0.25)]' };
-      case 'urgent': return { label: 'Urgente', color: 'bg-amber-400 text-slate-950 dark:bg-amber-500/90 shadow-[0_0_15px_rgba(251,191,36,0.18)]' };
-      case 'less-urgent': return { label: 'Pouco Urgente', color: 'bg-emerald-500 text-white dark:bg-emerald-600/90 shadow-[0_0_15px_rgba(16,185,129,0.18)]' };
-      case 'not-urgent': return { label: 'Não Urgente', color: 'bg-blue-500 text-white dark:bg-blue-600/90 shadow-[0_0_15px_rgba(59,130,246,0.18)]' };
-      default: return { label: risk, color: 'bg-slate-500 text-white' };
+    switch (risk) {
+      case "emergency":
+        return {
+          label: "Emergência",
+          color:
+            "bg-red-500 text-white dark:bg-red-650 dark:bg-red-600/90 shadow-[0_0_15px_rgba(239,68,68,0.25)]",
+        };
+      case "very-urgent":
+        return {
+          label: "Muito Urgente",
+          color:
+            "bg-orange-500 text-white dark:bg-orange-600/90 shadow-[0_0_15px_rgba(249,115,22,0.25)]",
+        };
+      case "urgent":
+        return {
+          label: "Urgente",
+          color:
+            "bg-amber-400 text-slate-950 dark:bg-amber-500/90 shadow-[0_0_15px_rgba(251,191,36,0.18)]",
+        };
+      case "less-urgent":
+        return {
+          label: "Pouco Urgente",
+          color:
+            "bg-emerald-500 text-white dark:bg-emerald-600/90 shadow-[0_0_15px_rgba(16,185,129,0.18)]",
+        };
+      case "not-urgent":
+        return {
+          label: "Não Urgente",
+          color:
+            "bg-blue-500 text-white dark:bg-blue-600/90 shadow-[0_0_15px_rgba(59,130,246,0.18)]",
+        };
+      default:
+        return { label: risk, color: "bg-slate-500 text-white" };
     }
   };
 
   const riskStats = [
-    { label: 'Emergência', risk: 'emergency' as const, color: 'bg-red-500 dark:bg-red-600/90', activeBorder: 'border-red-500/40 dark:border-red-500/40 ring-1 ring-red-500/10 dark:ring-red-500/10 shadow-[0_0_20px_rgba(239,68,68,0.12)]', icon: AlertCircle },
-    { label: 'Muito Urgente', risk: 'very-urgent' as const, color: 'bg-orange-500 dark:bg-orange-600/90', activeBorder: 'border-orange-500/40 dark:border-orange-600/40 ring-1 ring-orange-500/10 dark:ring-orange-500/10 shadow-[0_0_20px_rgba(249,115,22,0.12)]', icon: Clock },
-    { label: 'Urgente', risk: 'urgent' as const, color: 'bg-amber-400 dark:bg-amber-500/90 text-slate-950', activeBorder: 'border-amber-400/40 dark:border-amber-500/40 ring-1 ring-amber-400/10 dark:ring-amber-500/10 shadow-[0_0_20px_rgba(251,191,36,0.1)]', icon: HeartPulse, iconColor: 'text-slate-950 dark:text-amber-500' },
-    { label: 'Pouco Urgente', risk: 'less-urgent' as const, color: 'bg-emerald-500 dark:bg-emerald-600/90', activeBorder: 'border-emerald-500/40 dark:border-emerald-600/40 ring-1 ring-emerald-500/10 dark:ring-emerald-600/10 shadow-[0_0_20px_rgba(16,185,129,0.1)]', icon: Stethoscope },
-    { label: 'Não Urgente', risk: 'not-urgent' as const, color: 'bg-blue-500 dark:bg-blue-600/90', activeBorder: 'border-blue-500/40 dark:border-blue-600/40 ring-1 ring-blue-500/10 dark:ring-blue-600/10 shadow-[0_0_20px_rgba(59,130,246,0.1)]', icon: Pill },
+    {
+      label: "Emergência",
+      risk: "emergency" as const,
+      color: "bg-red-500 dark:bg-red-600/90",
+      activeBorder:
+        "border-red-500/40 dark:border-red-500/40 ring-1 ring-red-500/10 dark:ring-red-500/10 shadow-[0_0_20px_rgba(239,68,68,0.12)]",
+      icon: AlertCircle,
+    },
+    {
+      label: "Muito Urgente",
+      risk: "very-urgent" as const,
+      color: "bg-orange-500 dark:bg-orange-600/90",
+      activeBorder:
+        "border-orange-500/40 dark:border-orange-600/40 ring-1 ring-orange-500/10 dark:ring-orange-500/10 shadow-[0_0_20px_rgba(249,115,22,0.12)]",
+      icon: Clock,
+    },
+    {
+      label: "Urgente",
+      risk: "urgent" as const,
+      color: "bg-amber-400 dark:bg-amber-500/90 text-slate-950",
+      activeBorder:
+        "border-amber-400/40 dark:border-amber-500/40 ring-1 ring-amber-400/10 dark:ring-amber-500/10 shadow-[0_0_20px_rgba(251,191,36,0.1)]",
+      icon: HeartPulse,
+      iconColor: "text-slate-950 dark:text-amber-500",
+    },
+    {
+      label: "Pouco Urgente",
+      risk: "less-urgent" as const,
+      color: "bg-emerald-500 dark:bg-emerald-600/90",
+      activeBorder:
+        "border-emerald-500/40 dark:border-emerald-600/40 ring-1 ring-emerald-500/10 dark:ring-emerald-600/10 shadow-[0_0_20px_rgba(16,185,129,0.1)]",
+      icon: Stethoscope,
+    },
+    {
+      label: "Não Urgente",
+      risk: "not-urgent" as const,
+      color: "bg-blue-500 dark:bg-blue-600/90",
+      activeBorder:
+        "border-blue-500/40 dark:border-blue-600/40 ring-1 ring-blue-500/10 dark:ring-blue-600/10 shadow-[0_0_20px_rgba(59,130,246,0.1)]",
+      icon: Pill,
+    },
   ];
 
   return (
-    <motion.div 
+    <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       className="space-y-8"
@@ -262,58 +490,69 @@ export default function Sectors() {
             <Building2 className="h-5 w-5" />
           </div>
           <div>
-            <h1 className="text-2xl font-black tracking-tight text-foreground uppercase">Mapa de Setores</h1>
+            <h1 className="text-2xl font-black tracking-tight text-foreground uppercase">
+              Mapa de Setores
+            </h1>
             <p className="text-muted-foreground text-[11px] font-black uppercase tracking-widest mt-0.5">
               Ocupação da Unidade em Tempo Real
             </p>
           </div>
         </div>
-
-
       </div>
 
-      <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-6">
+      <Tabs
+        value={activeTab}
+        onValueChange={handleTabChange}
+        className="space-y-6"
+      >
         <TabsList className="glass-card-premium p-1 h-14 rounded-xl border border-white/40 dark:border-white/10 w-full md:w-auto overflow-x-auto flex-nowrap shadow-[0_8px_30px_rgba(0,0,0,0.12)]">
-          <TabsTrigger 
+          <TabsTrigger
             value="census"
             onClick={() => {
-              if (activeTab === 'census') setSelectedRisk(null);
+              if (activeTab === "census") setSelectedRisk(null);
             }}
             className="px-6 rounded-lg transition-all border-b-2 border-transparent data-[state=active]:bg-white/95 dark:data-[state=active]:bg-slate-900/60 data-[state=active]:shadow-md data-[state=active]:text-[#006699] dark:data-[state=active]:text-sky-400 data-[state=active]:border-[#006699]/30 dark:data-[state=active]:border-sky-500/30"
           >
             <div className="flex items-center gap-2">
               <Globe className="h-4 w-4" />
-              <span className="text-xs font-black uppercase tracking-tight">Censo Global</span>
+              <span className="text-xs font-black uppercase tracking-tight">
+                Censo Global
+              </span>
             </div>
           </TabsTrigger>
-          <TabsTrigger 
+          <TabsTrigger
             value="map"
             className="px-6 rounded-lg transition-all border-b-2 border-transparent data-[state=active]:bg-white/95 dark:data-[state=active]:bg-slate-900/60 data-[state=active]:shadow-md data-[state=active]:text-[#006699] dark:data-[state=active]:text-sky-400 data-[state=active]:border-[#006699]/30 dark:data-[state=active]:border-sky-500/30"
           >
             <div className="flex items-center gap-2">
               <Building2 className="h-4 w-4" />
-              <span className="text-xs font-black uppercase tracking-tight">Mapa da Unidade</span>
+              <span className="text-xs font-black uppercase tracking-tight">
+                Mapa da Unidade
+              </span>
             </div>
           </TabsTrigger>
-          {sectorGroups.map(group => {
-            const criticalCount = allPatients.filter(p => 
-              group.sectors.some(s => s.name === p.sector) && 
-              (p.risk === 'emergency' || p.risk === 'very-urgent') &&
-              p.status !== 'completed'
+          {sectorGroups.map((group) => {
+            const criticalCount = allPatients.filter(
+              (p) =>
+                group.sectors.some((s) => s.name === p.sector) &&
+                (p.risk === "emergency" || p.risk === "very-urgent") &&
+                p.status !== "completed",
             ).length;
 
             return (
-              <TabsTrigger 
-                key={group.id} 
+              <TabsTrigger
+                key={group.id}
                 value={group.id}
                 className={cn(
                   "px-6 rounded-lg transition-all border-b-2 border-transparent data-[state=active]:bg-white/95 dark:data-[state=active]:bg-slate-900/60 data-[state=active]:shadow-md",
-                  group.activeTab
+                  group.activeTab,
                 )}
               >
                 <div className="flex items-center gap-2">
                   <group.icon className={cn("h-4 w-4", group.color)} />
-                  <span className="text-xs font-black uppercase tracking-tight">{group.label}</span>
+                  <span className="text-xs font-black uppercase tracking-tight">
+                    {group.label}
+                  </span>
                   {criticalCount > 0 && (
                     <Badge className="h-4 w-4 p-0 flex items-center justify-center text-[8px] bg-red-500 dark:bg-red-650 animate-pulse border-none text-white">
                       {criticalCount}
@@ -327,12 +566,12 @@ export default function Sectors() {
 
         <TabsContent value="census" className="mt-0">
           <div className="grid grid-cols-2 md:grid-cols-6 gap-3 mb-6">
-            <Card 
+            <Card
               className={cn(
                 "rounded-2xl border cursor-pointer transition-all duration-300 overflow-hidden group select-none",
-                !selectedRisk 
-                  ? "glass-card-premium font-black ring-2 ring-offset-2 ring-slate-400 dark:ring-slate-600 shadow-2xl scale-[1.02] relative z-10 border-[#006699]/50 dark:border-sky-500/50" 
-                  : "border-white/40 dark:border-white/10 glass-card-premium opacity-80 hover:opacity-100 hover:scale-[1.02] shadow-[0_8px_30px_rgba(0,0,0,0.12)] hover:shadow-xl"
+                !selectedRisk
+                  ? "glass-card-premium font-black ring-2 ring-offset-2 ring-slate-400 dark:ring-slate-600 shadow-2xl scale-[1.02] relative z-10 border-[#006699]/50 dark:border-sky-500/50"
+                  : "border-white/40 dark:border-white/10 glass-card-premium opacity-80 hover:opacity-100 hover:scale-[1.02] shadow-[0_8px_30px_rgba(0,0,0,0.12)] hover:shadow-xl",
               )}
               onClick={() => setSelectedRisk(null)}
             >
@@ -341,44 +580,64 @@ export default function Sectors() {
                   <Globe className="h-5 w-5" />
                 </div>
                 <div className="overflow-hidden">
-                  <p className="text-[9px] font-black uppercase text-muted-foreground/80 tracking-tighter truncate">Censo Total</p>
-                  <p className="text-xl font-black">{allPatients.filter(p => p.status !== 'completed').length}</p>
+                  <p className="text-[9px] font-black uppercase text-muted-foreground/80 tracking-tighter truncate">
+                    Censo Total
+                  </p>
+                  <p className="text-xl font-black">
+                    {allPatients.filter((p) => p.status !== "completed").length}
+                  </p>
                 </div>
               </CardContent>
               {!selectedRisk && (
-                <motion.div 
+                <motion.div
                   layoutId="risk-active-indicator"
                   className="h-1 w-full mt-auto bg-slate-800 dark:bg-slate-100"
                 />
               )}
             </Card>
 
-            {riskStats.map(stat => (
-              <Card 
-                key={stat.risk} 
+            {riskStats.map((stat) => (
+              <Card
+                key={stat.risk}
                 className={cn(
                   "rounded-2xl border cursor-pointer transition-all duration-300 overflow-hidden group select-none",
-                  selectedRisk === stat.risk 
-                    ? cn("glass-card-premium font-black ring-2 ring-offset-2 ring-slate-400 dark:ring-slate-600 shadow-2xl scale-[1.02] relative z-10", stat.activeBorder) 
-                    : "border-white/40 dark:border-white/10 glass-card-premium opacity-80 hover:opacity-100 hover:scale-[1.02] shadow-[0_8px_30px_rgba(0,0,0,0.12)] hover:shadow-xl"
+                  selectedRisk === stat.risk
+                    ? cn(
+                        "glass-card-premium font-black ring-2 ring-offset-2 ring-slate-400 dark:ring-slate-600 shadow-2xl scale-[1.02] relative z-10",
+                        stat.activeBorder,
+                      )
+                    : "border-white/40 dark:border-white/10 glass-card-premium opacity-80 hover:opacity-100 hover:scale-[1.02] shadow-[0_8px_30px_rgba(0,0,0,0.12)] hover:shadow-xl",
                 )}
-                onClick={() => setSelectedRisk(selectedRisk === stat.risk ? null : stat.risk)}
+                onClick={() =>
+                  setSelectedRisk(selectedRisk === stat.risk ? null : stat.risk)
+                }
               >
                 <CardContent className="p-4 flex items-center gap-3">
-                  <div className={cn(
-                    "p-2 rounded-xl shadow-lg transition-transform group-hover:rotate-6",
-                    stat.color,
-                    stat.iconColor || "text-white"
-                  )}>
+                  <div
+                    className={cn(
+                      "p-2 rounded-xl shadow-lg transition-transform group-hover:rotate-6",
+                      stat.color,
+                      stat.iconColor || "text-white",
+                    )}
+                  >
                     <stat.icon className="h-5 w-5" />
                   </div>
                   <div className="overflow-hidden">
-                    <p className="text-[9px] font-black uppercase text-muted-foreground/80 tracking-tighter truncate">{stat.label}</p>
-                    <p className="text-xl font-black">{allPatients.filter(p => p.risk === stat.risk && p.status !== 'completed').length}</p>
+                    <p className="text-[9px] font-black uppercase text-muted-foreground/80 tracking-tighter truncate">
+                      {stat.label}
+                    </p>
+                    <p className="text-xl font-black">
+                      {
+                        allPatients.filter(
+                          (p) =>
+                            p.risk === stat.risk && p.status !== "completed",
+                        ).length
+                      }
+                    </p>
                   </div>
                 </CardContent>
                 {selectedRisk === stat.risk && (
-                  <motion.div 
+                  <motion.div
                     layoutId="risk-active-indicator"
                     className={cn("h-1 w-full mt-auto", stat.color)}
                   />
@@ -392,30 +651,48 @@ export default function Sectors() {
               <div className="flex items-center justify-between">
                 <div>
                   <div className="flex items-center gap-3">
-                    <CardTitle className="text-sm font-black uppercase tracking-tight">Censo Atualizado</CardTitle>
+                    <CardTitle className="text-sm font-black uppercase tracking-tight">
+                      Censo Atualizado
+                    </CardTitle>
                     {selectedRisk && (
-                      <Badge className={cn("text-[8px] font-black uppercase px-2 py-0.5 border-none", getRiskDetails(selectedRisk).color)}>
+                      <Badge
+                        className={cn(
+                          "text-[8px] font-black uppercase px-2 py-0.5 border-none",
+                          getRiskDetails(selectedRisk).color,
+                        )}
+                      >
                         Filtrando por: {getRiskDetails(selectedRisk).label}
                       </Badge>
                     )}
                   </div>
-                  <p className="text-[10px] text-muted-foreground font-bold uppercase mt-1">Todos os pacientes ativos na unidade</p>
+                  <p className="text-[10px] text-muted-foreground font-bold uppercase mt-1">
+                    Todos os pacientes ativos na unidade
+                  </p>
                 </div>
                 <div className="flex items-center gap-3">
                   {selectedRisk && (
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
+                    <Button
+                      variant="ghost"
+                      size="sm"
                       className="h-8 text-[9px] font-black uppercase underline decoration-dotted underline-offset-4 text-muted-foreground hover:text-foreground"
                       onClick={() => setSelectedRisk(null)}
                     >
                       Limpar Filtro
                     </Button>
                   )}
-                  <Badge variant="outline" className="font-black border-slate-200/50 dark:border-slate-800/45 text-[9px] tracking-wider uppercase px-3 py-1 bg-white/40 dark:bg-slate-950/20">
-                    {selectedRisk ? 'RESULTADOS' : 'TOTAL'}: {
-                      allPatients.filter(p => p.status !== 'completed' && (!selectedRisk || p.risk === selectedRisk)).length
-                    } PACIENTES
+                  <Badge
+                    variant="outline"
+                    className="font-black border-slate-200/50 dark:border-slate-800/45 text-[9px] tracking-wider uppercase px-3 py-1 bg-white/40 dark:bg-slate-950/20"
+                  >
+                    {selectedRisk ? "RESULTADOS" : "TOTAL"}:{" "}
+                    {
+                      allPatients.filter(
+                        (p) =>
+                          p.status !== "completed" &&
+                          (!selectedRisk || p.risk === selectedRisk),
+                      ).length
+                    }{" "}
+                    PACIENTES
                   </Badge>
                 </div>
               </div>
@@ -423,97 +700,144 @@ export default function Sectors() {
             <CardContent className="p-4 sm:p-6 bg-transparent">
               <div className="grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-4">
                 {allPatients
-                  .filter(p => {
-                    const isNotCompleted = p.status !== 'completed';
-                    const matchesRisk = !selectedRisk || p.risk === selectedRisk;
+                  .filter((p) => {
+                    const isNotCompleted = p.status !== "completed";
+                    const matchesRisk =
+                      !selectedRisk || p.risk === selectedRisk;
                     return isNotCompleted && matchesRisk;
                   })
                   .sort((a, b) => {
                     const orderA = RISK_ORDER[a.risk] ?? 99;
                     const orderB = RISK_ORDER[b.risk] ?? 99;
                     if (orderA !== orderB) return orderA - orderB;
-                    return new Date(a.arrivalTime).getTime() - new Date(b.arrivalTime).getTime();
-                  }).map(patient => {
-                    const pDiff = (now.getTime() - new Date(patient.arrivalTime).getTime()) / 60000;
                     return (
-                      <Card key={patient.id} className={cn(
-                        "group hover:shadow-xl transition-all duration-300 border overflow-hidden rounded-2xl border-l-[4px] h-full flex flex-col glass-card-premium relative z-10 hover:scale-[1.02]",
-                        patient.risk === 'emergency' ? "border-l-red-500 border-white/40 dark:border-white/10" : 
-                        patient.risk === 'very-urgent' ? "border-l-orange-500 border-white/40 dark:border-white/10" :
-                        patient.risk === 'urgent' ? "border-l-[#FFDE21] border-white/40 dark:border-white/10" : 
-                        patient.risk === 'less-urgent' ? "border-l-green-500 border-white/40 dark:border-white/10" : "border-l-blue-600 border-white/40 dark:border-white/10"
-                      )}>
+                      new Date(a.arrivalTime).getTime() -
+                      new Date(b.arrivalTime).getTime()
+                    );
+                  })
+                  .map((patient) => {
+                    const pDiff =
+                      (now.getTime() -
+                        new Date(patient.arrivalTime).getTime()) /
+                      60000;
+                    return (
+                      <Card
+                        key={patient.id}
+                        className={cn(
+                          "group hover:shadow-xl transition-all duration-300 border overflow-hidden rounded-2xl border-l-[4px] h-full flex flex-col glass-card-premium relative z-10 hover:scale-[1.02]",
+                          patient.risk === "emergency"
+                            ? "border-l-red-500 border-white/40 dark:border-white/10"
+                            : patient.risk === "very-urgent"
+                              ? "border-l-orange-500 border-white/40 dark:border-white/10"
+                              : patient.risk === "urgent"
+                                ? "border-l-[#FFDE21] border-white/40 dark:border-white/10"
+                                : patient.risk === "less-urgent"
+                                  ? "border-l-green-500 border-white/40 dark:border-white/10"
+                                  : "border-l-blue-600 border-white/40 dark:border-white/10",
+                        )}
+                      >
                         <CardHeader className="p-4 pb-3 space-y-0 shrink-0">
                           <div className="flex items-center justify-between mb-4">
                             <div className="flex flex-col">
-                              <Badge 
-                                variant="outline" 
+                              <Badge
+                                variant="outline"
                                 className="text-[10px] font-black tracking-widest uppercase border-0 p-0 text-muted-foreground"
                               >
                                 {patient.ticket}
                               </Badge>
                             </div>
                             <div className="flex flex-col items-end">
-                              <Badge className={cn("text-[9px] font-black uppercase px-2 py-0.5 shadow-sm border-none", getRiskDetails(patient.risk).color)}>
+                              <Badge
+                                className={cn(
+                                  "text-[9px] font-black uppercase px-2 py-0.5 shadow-sm border-none",
+                                  getRiskDetails(patient.risk).color,
+                                )}
+                              >
                                 {getRiskDetails(patient.risk).label}
                               </Badge>
                             </div>
                           </div>
-                          
+
                           <CardTitle className="text-sm font-black uppercase tracking-tight transition-colors truncate mb-1">
-                            {patient.name.toUpperCase().includes('NÃO IDENTIFICADO') || patient.name.toUpperCase().includes('DESCONHECIDO') 
-                              ? "PACIENTE NÃO IDENTIFICADO" 
+                            {patient.name
+                              .toUpperCase()
+                              .includes("NÃO IDENTIFICADO") ||
+                            patient.name.toUpperCase().includes("DESCONHECIDO")
+                              ? "PACIENTE NÃO IDENTIFICADO"
                               : formatWords(patient.name)}
                           </CardTitle>
                           <p className="text-[10px] text-muted-foreground/80 font-bold uppercase tracking-wider">
-                            {patient.age} Anos • CPF: {patient.cpf || '***'}
+                            {patient.age} Anos • CPF: {patient.cpf || "***"}
                           </p>
                         </CardHeader>
-                        
+
                         <CardContent className="p-4 pt-0 flex-1 flex flex-col justify-end">
                           <div className="flex items-center gap-2 mb-4 mt-2">
-                             <div className={cn(
-                               "h-1.5 w-1.5 rounded-full animate-pulse",
-                               patient.risk === 'emergency' ? "bg-red-500" : 
-                               patient.risk === 'very-urgent' ? "bg-orange-500" :
-                               patient.risk === 'urgent' ? "bg-amber-400" : 
-                               patient.risk === 'less-urgent' ? "bg-emerald-500" : "bg-blue-600"
-                             )} />
-                             <span className="text-[10px] font-bold text-muted-foreground uppercase">
-                               {patient.sector || 'TRIAGEM'}
-                             </span>
+                            <div
+                              className={cn(
+                                "h-1.5 w-1.5 rounded-full animate-pulse",
+                                patient.risk === "emergency"
+                                  ? "bg-red-500"
+                                  : patient.risk === "very-urgent"
+                                    ? "bg-orange-500"
+                                    : patient.risk === "urgent"
+                                      ? "bg-amber-400"
+                                      : patient.risk === "less-urgent"
+                                        ? "bg-emerald-500"
+                                        : "bg-blue-600",
+                              )}
+                            />
+                            <span className="text-[10px] font-bold text-muted-foreground uppercase">
+                              {patient.sector || "TRIAGEM"}
+                            </span>
                           </div>
 
                           <div className="flex items-center justify-between bg-white/30 dark:bg-slate-950/40 px-3 py-2 rounded-xl border border-white/40 dark:border-white/10 text-[10px] font-bold text-muted-foreground uppercase shadow-inner mb-4">
                             <span className="flex items-center gap-1.5">
                               <Clock className="h-3.5 w-3.5 text-[#006699] dark:text-sky-400" />
-                              Entrada: {format(new Date(patient.arrivalTime), "HH:mm", { locale: ptBR })}
+                              Entrada:{" "}
+                              {format(new Date(patient.arrivalTime), "HH:mm", {
+                                locale: ptBR,
+                              })}
                             </span>
-                            <span className={cn(pDiff > 15 ? "text-amber-600 dark:text-amber-400 font-extrabold animate-pulse" : "text-muted-foreground/80")}>
+                            <span
+                              className={cn(
+                                pDiff > 15
+                                  ? "text-amber-600 dark:text-amber-400 font-extrabold animate-pulse"
+                                  : "text-muted-foreground/80",
+                              )}
+                            >
                               Há {Math.floor(pDiff)} min
                             </span>
                           </div>
-                          
-                          <Button 
-                            variant="outline" 
-                            size="sm" 
+
+                          <Button
+                            variant="outline"
+                            size="sm"
                             className="w-full text-[10px] font-black uppercase tracking-widest rounded-xl h-10 border border-white/40 dark:border-white/10 glass-card-premium hover:text-[#006699] dark:hover:text-sky-400 transition-all shadow-sm hover:scale-[1.02]"
                             onClick={() => setRecordPatientId(patient.id)}
                           >
-                            Visualizar Prontuário <ChevronRight className="h-3.5 w-3.5 ml-1" />
+                            Visualizar Prontuário{" "}
+                            <ChevronRight className="h-3.5 w-3.5 ml-1" />
                           </Button>
                         </CardContent>
                       </Card>
                     );
                   })}
-                  {allPatients.filter(p => p.status !== 'completed' && (!selectedRisk || p.risk === selectedRisk)).length === 0 && (
-                    <div className="col-span-full py-16 text-center flex flex-col items-center gap-3">
-                      <div className="h-16 w-16 rounded-2xl bg-muted/50 flex items-center justify-center">
-                        <Users className="h-8 w-8 text-muted-foreground/30" />
-                      </div>
-                      <p className="text-[11px] font-black uppercase tracking-[0.2em] text-muted-foreground">Nenhum paciente encontrado com este filtro</p>
+                {allPatients.filter(
+                  (p) =>
+                    p.status !== "completed" &&
+                    (!selectedRisk || p.risk === selectedRisk),
+                ).length === 0 && (
+                  <div className="col-span-full py-16 text-center flex flex-col items-center gap-3">
+                    <div className="h-16 w-16 rounded-2xl bg-muted/50 flex items-center justify-center">
+                      <Users className="h-8 w-8 text-muted-foreground/30" />
                     </div>
-                  )}
+                    <p className="text-[11px] font-black uppercase tracking-[0.2em] text-muted-foreground">
+                      Nenhum paciente encontrado com este filtro
+                    </p>
+                  </div>
+                )}
               </div>
             </CardContent>
           </Card>
@@ -522,49 +846,108 @@ export default function Sectors() {
         <TabsContent value="map" className="mt-0">
           <Card className="glass-card-premium border-none shadow-[0_8px_30px_rgba(0,0,0,0.12)] overflow-hidden rounded-2xl">
             <CardHeader className="p-6 bg-gradient-to-r from-white/40 to-white/10 dark:from-slate-900/40 dark:to-slate-900/10 backdrop-blur-md border-b border-white/40 dark:border-white/10">
-              <CardTitle className="text-sm font-black tracking-widest text-[#006699] dark:text-sky-400 uppercase">Mapa da Unidade (Todos os Setores)</CardTitle>
+              <CardTitle className="text-sm font-black tracking-widest text-[#006699] dark:text-sky-400 uppercase">
+                Mapa da Unidade (Todos os Setores)
+              </CardTitle>
             </CardHeader>
             <CardContent className="p-6 bg-transparent space-y-10">
-              {sectorGroups.map(group => (
-                <div key={group.id} className={cn("p-6 rounded-2xl border-2 relative bg-white/30 dark:bg-slate-950/20 backdrop-blur-sm", group.borderColor)}>
-                  <div className={cn("absolute -top-3 left-6 px-3 bg-background font-black text-xs uppercase tracking-widest rounded-full shadow-sm", group.color, group.borderColor, "border")}>
+              {sectorGroups.map((group) => (
+                <div
+                  key={group.id}
+                  className={cn(
+                    "p-6 rounded-2xl border-2 relative bg-white/30 dark:bg-slate-950/20 backdrop-blur-sm",
+                    group.borderColor,
+                  )}
+                >
+                  <div
+                    className={cn(
+                      "absolute -top-3 left-6 px-3 bg-background font-black text-xs uppercase tracking-widest rounded-full shadow-sm",
+                      group.color,
+                      group.borderColor,
+                      "border",
+                    )}
+                  >
                     {group.label}
                   </div>
                   <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-3 mt-3">
                     {group.sectors.map((sector, idx) => {
-                      const sectorPatients = allPatients.filter(p => p.sector === sector.name && p.status !== 'completed');
-                      const occupancy = (sectorPatients.length / sector.max) * 100;
-                      
-                      const maxTimeInMinutes = sectorPatients.reduce((max, p) => {
-                         const diff = (now.getTime() - new Date(p.arrivalTime).getTime()) / 60000;
-                         return Math.max(max, diff);
-                      }, 0);
+                      const sectorPatients = allPatients.filter(
+                        (p) =>
+                          p.sector === sector.name && p.status !== "completed",
+                      );
+                      const occupancy =
+                        (sectorPatients.length / sector.max) * 100;
+
+                      const maxTimeInMinutes = sectorPatients.reduce(
+                        (max, p) => {
+                          const diff =
+                            (now.getTime() -
+                              new Date(p.arrivalTime).getTime()) /
+                            60000;
+                          return Math.max(max, diff);
+                        },
+                        0,
+                      );
 
                       const isRedAlert = maxTimeInMinutes > 30;
                       const isAmberAlert = maxTimeInMinutes > 15;
 
                       return (
-                        <div 
+                        <div
                           key={sector.name}
                           className={cn(
-                            "p-3 rounded-xl border flex flex-col items-center justify-center text-center gap-1.5 transition-all cursor-pointer hover:scale-105 min-h-[90px]", 
-                            occupancy >= 100 
-                               ? "bg-red-500/20 border-red-500/40 shadow-sm" 
-                               : occupancy > 0 
-                                 ? "bg-emerald-500/10 border-emerald-500/30" 
-                                 : cn(group.bgColor, group.borderColor, "opacity-70 hover:opacity-100"),
-                            isRedAlert ? "animate-blink-red shadow-md shadow-red-500/20 border-red-500" : isAmberAlert ? "animate-blink-amber shadow-md shadow-amber-400/20 border-amber-500" : ""
+                            "p-3 rounded-xl border flex flex-col items-center justify-center text-center gap-1.5 transition-all cursor-pointer hover:scale-105 min-h-[90px]",
+                            occupancy >= 100
+                              ? "bg-red-500/20 border-red-500/40 shadow-sm"
+                              : occupancy > 0
+                                ? "bg-emerald-500/10 border-emerald-500/30"
+                                : cn(
+                                    group.bgColor,
+                                    group.borderColor,
+                                    "opacity-70 hover:opacity-100",
+                                  ),
+                            isRedAlert
+                              ? "animate-blink-red shadow-md shadow-red-500/20 border-red-500"
+                              : isAmberAlert
+                                ? "animate-blink-amber shadow-md shadow-amber-400/20 border-amber-500"
+                                : "",
                           )}
                           onClick={() => {
                             setSelectedSector({ ...sector, group });
                             setShowSectorDialog(true);
                           }}
                         >
-                          <group.icon className={cn("h-5 w-5 mb-0.5", occupancy >= 100 ? "text-red-500" : occupancy > 0 ? "text-emerald-500" : group.color)} />
-                          <span className="text-[9px] font-black uppercase tracking-widest text-foreground line-clamp-2 leading-tight">{sector.name}</span>
+                          <group.icon
+                            className={cn(
+                              "h-5 w-5 mb-0.5",
+                              occupancy >= 100
+                                ? "text-red-500"
+                                : occupancy > 0
+                                  ? "text-emerald-500"
+                                  : group.color,
+                            )}
+                          />
+                          <span className="text-[9px] font-black uppercase tracking-widest text-foreground line-clamp-2 leading-tight">
+                            {sector.name}
+                          </span>
                           <div className="flex flex-col items-center gap-0.5 mt-auto">
-                            {occupancy > 0 && <span className="text-[8px] font-bold text-muted-foreground truncate w-full pointer-events-none">{sectorPatients.length}/{sector.max} Pacientes</span>}
-                            {isAmberAlert && <span className={cn("text-[7px] font-black uppercase", isRedAlert ? "text-red-500" : "text-amber-500")}>{isRedAlert ? "Atraso Crítico" : "No Limite"}</span>}
+                            {occupancy > 0 && (
+                              <span className="text-[8px] font-bold text-muted-foreground truncate w-full pointer-events-none">
+                                {sectorPatients.length}/{sector.max} Pacientes
+                              </span>
+                            )}
+                            {isAmberAlert && (
+                              <span
+                                className={cn(
+                                  "text-[7px] font-black uppercase",
+                                  isRedAlert
+                                    ? "text-red-500"
+                                    : "text-amber-500",
+                                )}
+                              >
+                                {isRedAlert ? "Atraso Crítico" : "No Limite"}
+                              </span>
+                            )}
                           </div>
                         </div>
                       );
@@ -576,17 +959,20 @@ export default function Sectors() {
           </Card>
         </TabsContent>
 
-        {sectorGroups.map(group => (
+        {sectorGroups.map((group) => (
           <TabsContent key={group.id} value={group.id} className="mt-0">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               {group.sectors.map((sector, idx) => {
-                const sectorPatients = allPatients.filter(p => p.sector === sector.name && p.status !== 'completed');
+                const sectorPatients = allPatients.filter(
+                  (p) => p.sector === sector.name && p.status !== "completed",
+                );
                 const occupancy = (sectorPatients.length / sector.max) * 100;
-                
+
                 // Cálculo de tempo para alertas visuais
                 const maxTimeInMinutes = sectorPatients.reduce((max, p) => {
-                   const diff = (now.getTime() - new Date(p.arrivalTime).getTime()) / 60000;
-                   return Math.max(max, diff);
+                  const diff =
+                    (now.getTime() - new Date(p.arrivalTime).getTime()) / 60000;
+                  return Math.max(max, diff);
                 }, 0);
 
                 const isRedAlert = maxTimeInMinutes > 30; // Mais de 30 min (Crítico)
@@ -605,34 +991,51 @@ export default function Sectors() {
                     }}
                     className="cursor-pointer h-full"
                   >
-                    <Card 
+                    <Card
                       className={cn(
                         "group hover:shadow-xl transition-all duration-300 border overflow-hidden rounded-2xl border-l-[4px] h-full flex flex-col glass-card-premium",
                         group.borderColor,
-                        occupancy >= 100 ? "bg-red-500/10 dark:bg-red-500/10 border-white/40" : "border-white/40 dark:border-white/10 opacity-90 hover:opacity-100 hover:scale-[1.02]",
-                        isRedAlert ? "animate-blink-red border-red-500 dark:border-red-500/50 shadow-md shadow-red-500/10" : 
-                        isAmberAlert ? "animate-blink-amber border-amber-400 dark:border-amber-500/50 shadow-md shadow-amber-400/10" : ""
+                        occupancy >= 100
+                          ? "bg-red-500/10 dark:bg-red-500/10 border-white/40"
+                          : "border-white/40 dark:border-white/10 opacity-90 hover:opacity-100 hover:scale-[1.02]",
+                        isRedAlert
+                          ? "animate-blink-red border-red-500 dark:border-red-500/50 shadow-md shadow-red-500/10"
+                          : isAmberAlert
+                            ? "animate-blink-amber border-amber-400 dark:border-amber-500/50 shadow-md shadow-amber-400/10"
+                            : "",
                       )}
                     >
                       <CardHeader className="p-4 pb-3 space-y-0 shrink-0">
                         <div className="flex items-center justify-between mb-2">
                           <div className="flex flex-col">
-                            <Badge 
-                              variant="outline" 
+                            <Badge
+                              variant="outline"
                               className={cn(
                                 "text-[10px] font-black tracking-widest uppercase border-0 p-0",
-                                occupancy >= 100 ? "text-red-500" : 
-                                occupancy >= 80 ? "text-orange-500" : 
-                                occupancy > 0 ? "text-emerald-500" : "text-muted-foreground"
+                                occupancy >= 100
+                                  ? "text-red-500"
+                                  : occupancy >= 80
+                                    ? "text-orange-500"
+                                    : occupancy > 0
+                                      ? "text-emerald-500"
+                                      : "text-muted-foreground",
                               )}
                             >
-                              {occupancy >= 100 ? 'LOTADO' : occupancy > 0 ? 'OCUPADO' : 'LIVRE'}
+                              {occupancy >= 100
+                                ? "LOTADO"
+                                : occupancy > 0
+                                  ? "OCUPADO"
+                                  : "LIVRE"}
                             </Badge>
                             {isAmberAlert && (
-                              <span className={cn(
-                                "text-[8px] font-black uppercase mt-0.5",
-                                isRedAlert ? "text-red-500 dark:text-red-400" : "text-amber-500 dark:text-amber-400"
-                              )}>
+                              <span
+                                className={cn(
+                                  "text-[8px] font-black uppercase mt-0.5",
+                                  isRedAlert
+                                    ? "text-red-500 dark:text-red-400"
+                                    : "text-amber-500 dark:text-amber-400",
+                                )}
+                              >
                                 {isRedAlert ? "Atraso Crítico" : "No Limite"}
                               </span>
                             )}
@@ -640,19 +1043,32 @@ export default function Sectors() {
                           <div className={cn("flex flex-col items-end")}>
                             <div className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg border border-slate-200/30 dark:border-slate-800/40 bg-slate-100/30 dark:bg-slate-950/20">
                               <Users className={cn("h-3 w-3", group.color)} />
-                              <span className={cn("text-[10px] font-black", group.color)}>
+                              <span
+                                className={cn(
+                                  "text-[10px] font-black",
+                                  group.color,
+                                )}
+                              >
                                 {sectorPatients.length}/{sector.max}
                               </span>
                             </div>
                           </div>
                         </div>
-                        <CardTitle className={cn(
-                          "text-sm font-black uppercase tracking-tight transition-colors truncate", 
-                          isRedAlert ? "text-red-500 dark:text-red-450 text-red-500" : isAmberAlert ? "text-amber-500 dark:text-amber-450 text-amber-500" : group.color
-                        )}>
+                        <CardTitle
+                          className={cn(
+                            "text-sm font-black uppercase tracking-tight transition-colors truncate",
+                            isRedAlert
+                              ? "text-red-500 dark:text-red-450 text-red-500"
+                              : isAmberAlert
+                                ? "text-amber-500 dark:text-amber-450 text-amber-500"
+                                : group.color,
+                          )}
+                        >
                           {sector.name}
                         </CardTitle>
-                        <p className="text-[10px] text-muted-foreground/60 font-bold uppercase tracking-wider">{sector.description}</p>
+                        <p className="text-[10px] text-muted-foreground/60 font-bold uppercase tracking-wider">
+                          {sector.description}
+                        </p>
                       </CardHeader>
                       <CardContent className="p-4 pt-0 flex-1 flex flex-col">
                         <div className="h-1.5 bg-slate-205/50 dark:bg-slate-800/40 rounded-full overflow-hidden mb-4 p-0 shrink-0">
@@ -661,10 +1077,13 @@ export default function Sectors() {
                             animate={{ width: `${Math.min(occupancy, 100)}%` }}
                             className={cn(
                               "h-full rounded-full transition-all",
-                              occupancy >= 100 ? "bg-gradient-to-r from-red-500 to-red-650" : 
-                              isRedAlert ? "bg-gradient-to-r from-red-400 to-red-500" : 
-                              isAmberAlert ? "bg-gradient-to-r from-amber-400 to-amber-500" : 
-                              group.progressBarColor || "bg-[#006699]"
+                              occupancy >= 100
+                                ? "bg-gradient-to-r from-red-500 to-red-650"
+                                : isRedAlert
+                                  ? "bg-gradient-to-r from-red-400 to-red-500"
+                                  : isAmberAlert
+                                    ? "bg-gradient-to-r from-amber-400 to-amber-500"
+                                    : group.progressBarColor || "bg-[#006699]",
                             )}
                           />
                         </div>
@@ -673,62 +1092,99 @@ export default function Sectors() {
                           {sectorPatients.length > 0 ? (
                             <div className="space-y-2">
                               {sectorPatients
-                            .sort((a, b) => {
-                              const orderA = RISK_ORDER[a.risk] ?? 99;
-                              const orderB = RISK_ORDER[b.risk] ?? 99;
-                              if (orderA !== orderB) return orderA - orderB;
-                              return new Date(a.arrivalTime).getTime() - new Date(b.arrivalTime).getTime();
-                            })
-                            .map(p => {
-                                const pDiff = (now.getTime() - new Date(p.arrivalTime).getTime()) / 60000;
-                                return (
-                                  <div 
-                                    key={p.id} 
-                                    className="flex items-center justify-between group/p cursor-pointer"
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      navigate(`/paciente/${p.id}`, { state: { from: '/setores', label: 'Setores' } });
-                                    }}
-                                  >
-                                    <div className="flex items-center gap-2 overflow-hidden">
-                                       <div className={cn(
-                                         "h-1.5 w-1.5 rounded-full",
-                                         p.risk === 'emergency' ? "bg-red-500 animate-pulse" : 
-                                         p.risk === 'very-urgent' ? "bg-orange-500 animate-pulse" :
-                                         p.risk === 'urgent' ? "bg-amber-400 animate-pulse" : 
-                                         p.risk === 'less-urgent' ? "bg-emerald-500" : "bg-blue-600"
-                                       )} />
-                                       <span className={cn(
-                                         "text-[11px] font-bold truncate group-hover/p:text-[#006699] dark:group-hover/p:text-sky-400 transition-colors tracking-tight",
-                                         pDiff > 15 ? "text-amber-500 dark:text-amber-400 underline decoration-amber-305 decoration-wavy underline-offset-2" : ""
-                                       )}>
-                                         {formatWords(`${p.name.split(' ')[0]} ${p.name.split(' ').pop()}`)}
-                                       </span>
+                                .sort((a, b) => {
+                                  const orderA = RISK_ORDER[a.risk] ?? 99;
+                                  const orderB = RISK_ORDER[b.risk] ?? 99;
+                                  if (orderA !== orderB) return orderA - orderB;
+                                  return (
+                                    new Date(a.arrivalTime).getTime() -
+                                    new Date(b.arrivalTime).getTime()
+                                  );
+                                })
+                                .map((p) => {
+                                  const pDiff =
+                                    (now.getTime() -
+                                      new Date(p.arrivalTime).getTime()) /
+                                    60000;
+                                  return (
+                                    <div
+                                      key={p.id}
+                                      className="flex items-center justify-between group/p cursor-pointer"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        navigate(`/paciente/${p.id}`, {
+                                          state: {
+                                            from: "/setores",
+                                            label: "Setores",
+                                          },
+                                        });
+                                      }}
+                                    >
+                                      <div className="flex items-center gap-2 overflow-hidden">
+                                        <div
+                                          className={cn(
+                                            "h-1.5 w-1.5 rounded-full",
+                                            p.risk === "emergency"
+                                              ? "bg-red-500 animate-pulse"
+                                              : p.risk === "very-urgent"
+                                                ? "bg-orange-500 animate-pulse"
+                                                : p.risk === "urgent"
+                                                  ? "bg-amber-400 animate-pulse"
+                                                  : p.risk === "less-urgent"
+                                                    ? "bg-emerald-500"
+                                                    : "bg-blue-600",
+                                          )}
+                                        />
+                                        <span
+                                          className={cn(
+                                            "text-[11px] font-bold truncate group-hover/p:text-[#006699] dark:group-hover/p:text-sky-400 transition-colors tracking-tight",
+                                            pDiff > 15
+                                              ? "text-amber-500 dark:text-amber-400 underline decoration-amber-305 decoration-wavy underline-offset-2"
+                                              : "",
+                                          )}
+                                        >
+                                          {formatWords(
+                                            `${p.name.split(" ")[0]} ${p.name.split(" ").pop()}`,
+                                          )}
+                                        </span>
+                                      </div>
+                                      <div className="flex items-center gap-1">
+                                        {pDiff > 15 && (
+                                          <Clock className="h-2 w-2 text-amber-500 dark:text-amber-400 animate-pulse" />
+                                        )}
+                                        <Badge
+                                          variant="outline"
+                                          className="h-4 text-[8px] font-bold px-1.5 opacity-50 border-slate-200/50 dark:border-slate-800"
+                                        >
+                                          {p.ticket}
+                                        </Badge>
+                                      </div>
                                     </div>
-                                    <div className="flex items-center gap-1">
-                                      {pDiff > 15 && <Clock className="h-2 w-2 text-amber-500 dark:text-amber-400 animate-pulse" />}
-                                      <Badge variant="outline" className="h-4 text-[8px] font-bold px-1.5 opacity-50 border-slate-200/50 dark:border-slate-800">{p.ticket}</Badge>
-                                    </div>
-                                  </div>
-                                );
-                            })}
+                                  );
+                                })}
                             </div>
                           ) : (
                             <div className="py-2 h-[44px] border border-dashed border-slate-200/40 dark:border-slate-850 rounded-lg flex items-center justify-center opacity-40">
-                               <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground">Livre</span>
+                              <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground">
+                                Livre
+                              </span>
                             </div>
                           )}
                         </div>
 
                         {professional && (
                           <div className="mt-4 pt-3 border-t border-slate-200/30 dark:border-slate-800/40 flex items-center gap-2">
-                             <div className="p-1 rounded bg-slate-100/50 dark:bg-slate-900/40">
-                               <UserCheck className="h-3 w-3 text-primary" />
-                             </div>
-                             <div className="flex flex-col">
-                               <span className="text-[8px] font-black text-muted-foreground uppercase leading-none mb-0.5">Responsável</span>
-                               <span className="text-[9px] font-black text-foreground uppercase tracking-tight truncate">{professional}</span>
-                             </div>
+                            <div className="p-1 rounded bg-slate-100/50 dark:bg-slate-900/40">
+                              <UserCheck className="h-3 w-3 text-primary" />
+                            </div>
+                            <div className="flex flex-col">
+                              <span className="text-[8px] font-black text-muted-foreground uppercase leading-none mb-0.5">
+                                Responsável
+                              </span>
+                              <span className="text-[9px] font-black text-foreground uppercase tracking-tight truncate">
+                                {professional}
+                              </span>
+                            </div>
                           </div>
                         )}
                       </CardContent>
@@ -744,24 +1200,47 @@ export default function Sectors() {
         <DialogContent className="sm:max-w-[550px] p-0 overflow-hidden glass-card-premium border-white/40 dark:border-white/10 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.3)] rounded-2xl">
           {selectedSector && (
             <>
-              <div className={cn("h-1.5 w-full", selectedSector.group.progressBarColor)} />
+              <div
+                className={cn(
+                  "h-1.5 w-full",
+                  selectedSector.group.progressBarColor,
+                )}
+              />
               <DialogHeader className="p-6 pb-2">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className={cn("p-2 rounded-lg bg-slate-100/50 dark:bg-slate-900/40 border border-slate-200/20 dark:border-slate-800/30")}>
-                      <selectedSector.group.icon className={cn("h-5 w-5", selectedSector.group.color)} />
+                    <div
+                      className={cn(
+                        "p-2 rounded-lg bg-slate-100/50 dark:bg-slate-900/40 border border-slate-200/20 dark:border-slate-800/30",
+                      )}
+                    >
+                      <selectedSector.group.icon
+                        className={cn("h-5 w-5", selectedSector.group.color)}
+                      />
                     </div>
                     <div>
                       <DialogTitle className="text-lg font-black uppercase tracking-tight text-foreground">
                         {selectedSector.name}
                       </DialogTitle>
                       <DialogDescription className="text-[10px] font-black uppercase tracking-widest text-[#006699] dark:text-sky-400 mt-0.5">
-                        {selectedSector.description} • {selectedSector.group.label}
+                        {selectedSector.description} •{" "}
+                        {selectedSector.group.label}
                       </DialogDescription>
                     </div>
                   </div>
-                  <Badge variant="outline" className="font-black px-3 py-1 border-slate-200/50 dark:border-slate-800 bg-white/40 dark:bg-slate-950/10 text-foreground text-[10px]">
-                    OCUPAÇÃO: {allPatients.filter(p => p.sector === selectedSector.name && p.status !== 'completed').length}/{selectedSector.max}
+                  <Badge
+                    variant="outline"
+                    className="font-black px-3 py-1 border-slate-200/50 dark:border-slate-800 bg-white/40 dark:bg-slate-950/10 text-foreground text-[10px]"
+                  >
+                    OCUPAÇÃO:{" "}
+                    {
+                      allPatients.filter(
+                        (p) =>
+                          p.sector === selectedSector.name &&
+                          p.status !== "completed",
+                      ).length
+                    }
+                    /{selectedSector.max}
                   </Badge>
                 </div>
 
@@ -774,8 +1253,12 @@ export default function Sectors() {
                           <UserCheck className="h-4 w-4 text-[#006699] dark:text-sky-400" />
                         </div>
                         <div>
-                          <p className="text-[9px] font-black text-muted-foreground uppercase leading-none mb-1">Profissional Responsável</p>
-                          <p className="text-xs font-black text-[#006699] dark:text-sky-450 uppercase tracking-tight">{prof}</p>
+                          <p className="text-[9px] font-black text-muted-foreground uppercase leading-none mb-1">
+                            Profissional Responsável
+                          </p>
+                          <p className="text-xs font-black text-[#006699] dark:text-sky-450 uppercase tracking-tight">
+                            {prof}
+                          </p>
                         </div>
                         <Badge className="ml-auto bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 dark:border-emerald-500/30 text-[8px] font-black uppercase tracking-widest">
                           Em Atividade
@@ -790,8 +1273,10 @@ export default function Sectors() {
                   <div className="mt-4 p-4 rounded-lg bg-slate-50/50 dark:bg-slate-900/30 border border-slate-200/35 dark:border-slate-800/40 relative group">
                     <div className="flex items-center gap-2 mb-2 bg-transparent">
                       <Stethoscope className="h-3.5 w-3.5 text-[#006699] dark:text-sky-450  text-sky-400" />
-                      <span className="text-[9px] font-black uppercase tracking-widest text-[#006699] dark:text-sky-400">Função e Estrutura</span>
-                      {selectedSector.name.includes('TRIAGEM') && (
+                      <span className="text-[9px] font-black uppercase tracking-widest text-[#006699] dark:text-sky-400">
+                        Função e Estrutura
+                      </span>
+                      {selectedSector.name.includes("TRIAGEM") && (
                         <Badge className="ml-auto bg-red-500/10 text-red-600 dark:text-red-400 border border-red-500/20 text-[8px] font-black uppercase tracking-widest">
                           Acesso Restrito: Enfermagem
                         </Badge>
@@ -800,10 +1285,12 @@ export default function Sectors() {
                     <div className="italic text-[10px] text-muted-foreground font-semibold leading-relaxed">
                       {selectedSector.structure}
                     </div>
-                    {selectedSector.name.includes('TRIAGEM') && (
+                    {selectedSector.name.includes("TRIAGEM") && (
                       <div className="mt-3 pt-3 border-t border-slate-200/30 dark:border-slate-800/35">
                         <p className="text-[9px] font-semibold text-muted-foreground/85 leading-normal">
-                          Utilizada para aferição de sinais vitais, classificação de risco pelo Protocolo de Manchester e encaminhamento ao fluxo clínico adequado.
+                          Utilizada para aferição de sinais vitais,
+                          classificação de risco pelo Protocolo de Manchester e
+                          encaminhamento ao fluxo clínico adequado.
                         </p>
                       </div>
                     )}
@@ -814,7 +1301,7 @@ export default function Sectors() {
               <div className="p-6 pt-4 space-y-6">
                 <AnimatePresence mode="wait">
                   {!transferringPatientId ? (
-                    <motion.div 
+                    <motion.div
                       key="list"
                       initial={{ opacity: 0, x: -20 }}
                       animate={{ opacity: 1, x: 0 }}
@@ -824,96 +1311,137 @@ export default function Sectors() {
                       <h3 className="text-[11px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2">
                         <Users className="h-3.5 w-3.5" /> Pacientes no Local
                       </h3>
-                      
+
                       <div className="space-y-3">
                         {(() => {
                           const patients = allPatients
-                            .filter(p => p.sector === selectedSector.name && p.status !== 'completed')
+                            .filter(
+                              (p) =>
+                                p.sector === selectedSector.name &&
+                                p.status !== "completed",
+                            )
                             .sort((a, b) => {
                               const orderA = RISK_ORDER[a.risk] ?? 99;
                               const orderB = RISK_ORDER[b.risk] ?? 99;
                               if (orderA !== orderB) return orderA - orderB;
-                              return new Date(a.arrivalTime).getTime() - new Date(b.arrivalTime).getTime();
+                              return (
+                                new Date(a.arrivalTime).getTime() -
+                                new Date(b.arrivalTime).getTime()
+                              );
                             });
-                          
+
                           if (patients.length === 0) {
                             return (
                               <div className="py-12 border border-dashed border-slate-200 dark:border-slate-800 rounded-lg flex flex-col items-center justify-center gap-2 opacity-50 bg-slate-50/10 dark:bg-slate-900/10">
                                 <Users className="h-8 w-8 text-slate-400 dark:text-slate-600" />
-                                <p className="text-[10px] font-black uppercase tracking-widest text-[#006699] dark:text-sky-400">Sem pacientes alocados</p>
+                                <p className="text-[10px] font-black uppercase tracking-widest text-[#006699] dark:text-sky-400">
+                                  Sem pacientes alocados
+                                </p>
                               </div>
                             );
                           }
 
-                          const isTriage = selectedSector.name.includes('TRIAGEM');
+                          const isTriage =
+                            selectedSector.name.includes("TRIAGEM");
 
-                          return patients.map(patient => (
-                            <div key={patient.id} className="p-4 rounded-xl border border-slate-200/45 dark:border-slate-800/45 bg-slate-50/30 dark:bg-slate-900/20 hover:bg-slate-50/70 dark:hover:bg-slate-900/40 transition-colors group/row">
+                          return patients.map((patient) => (
+                            <div
+                              key={patient.id}
+                              className="p-4 rounded-xl border border-slate-200/45 dark:border-slate-800/45 bg-slate-50/30 dark:bg-slate-900/20 hover:bg-slate-50/70 dark:hover:bg-slate-900/40 transition-colors group/row"
+                            >
                               <div className="flex items-center justify-between mb-3 bg-transparent">
                                 <div className="flex items-center gap-3">
-                                  <div className={cn(
-                                    "h-3 w-3 rounded-full animate-pulse",
-                                    patient.risk === 'emergency' ? "bg-red-500" : 
-                                    patient.risk === 'very-urgent' ? "bg-orange-500" :
-                                    patient.risk === 'urgent' ? "bg-[#FFDE21]" : 
-                                    patient.risk === 'less-urgent' ? "bg-green-500" : "bg-blue-600"
-                                  )} />
+                                  <div
+                                    className={cn(
+                                      "h-3 w-3 rounded-full animate-pulse",
+                                      patient.risk === "emergency"
+                                        ? "bg-red-500"
+                                        : patient.risk === "very-urgent"
+                                          ? "bg-orange-500"
+                                          : patient.risk === "urgent"
+                                            ? "bg-[#FFDE21]"
+                                            : patient.risk === "less-urgent"
+                                              ? "bg-green-500"
+                                              : "bg-blue-600",
+                                    )}
+                                  />
                                   <div>
                                     <p className="text-sm font-bold text-foreground">
-                                      {patient.name.toUpperCase().includes('NÃO IDENTIFICADO') || patient.name.toUpperCase().includes('DESCONHECIDO') 
-                                        ? "PACIENTE NÃO IDENTIFICADO" 
+                                      {patient.name
+                                        .toUpperCase()
+                                        .includes("NÃO IDENTIFICADO") ||
+                                      patient.name
+                                        .toUpperCase()
+                                        .includes("DESCONHECIDO")
+                                        ? "PACIENTE NÃO IDENTIFICADO"
                                         : formatWords(patient.name)}
                                     </p>
                                     <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
-                                      {patient.age} anos • Ticket: {patient.ticket}
+                                      {patient.age} anos • Ticket:{" "}
+                                      {patient.ticket}
                                     </p>
                                   </div>
                                 </div>
                                 <div className="flex gap-1.5 opacity-0 group-hover/row:opacity-100 transition-opacity">
                                   {isTriage && (
-                                    <Button 
-                                      variant="default" 
-                                      size="sm" 
+                                    <Button
+                                      variant="default"
+                                      size="sm"
                                       className="h-7 px-2 text-[8px] font-black uppercase bg-[#006699] hover:bg-[#005580] dark:bg-sky-500 dark:hover:bg-sky-400 dark:text-slate-950 text-white border-none"
-                                      onClick={() => navigate('/triagem')}
+                                      onClick={() => navigate("/triagem")}
                                     >
                                       Ir para Triagem
                                     </Button>
                                   )}
-                                  <Button 
-                                    variant="secondary" 
-                                    size="sm" 
+                                  <Button
+                                    variant="secondary"
+                                    size="sm"
                                     className="h-7 px-2 text-[8px] font-black uppercase border border-slate-200/50 dark:border-slate-800 text-foreground"
-                                    onClick={() => setTransferringPatientId(patient.id)}
+                                    onClick={() =>
+                                      setTransferringPatientId(patient.id)
+                                    }
                                   >
                                     Transferir
                                   </Button>
                                 </div>
                               </div>
-                              
+
                               <div className="grid grid-cols-2 gap-4">
                                 <div className="flex items-center gap-2">
                                   <Clock className="h-3.5 w-3.5 text-muted-foreground" />
-                                  <span className="text-[10px] font-bold text-muted-foreground uppercase">Tempo em sala: {(() => {
-                                    const diff = Math.floor((new Date().getTime() - new Date(patient.arrivalTime).getTime()) / 60000);
-                                    return diff > 60 ? `${Math.floor(diff/60)}h ${diff%60}min` : `${diff} min`;
-                                  })()}</span>
+                                  <span className="text-[10px] font-bold text-muted-foreground uppercase">
+                                    Tempo em sala:{" "}
+                                    {(() => {
+                                      const diff = Math.floor(
+                                        (new Date().getTime() -
+                                          new Date(
+                                            patient.arrivalTime,
+                                          ).getTime()) /
+                                          60000,
+                                      );
+                                      return diff > 60
+                                        ? `${Math.floor(diff / 60)}h ${diff % 60}min`
+                                        : `${diff} min`;
+                                    })()}
+                                  </span>
                                 </div>
                               </div>
 
                               <div className="grid grid-cols-2 gap-2 mt-4 pt-4 border-t border-slate-205 dark:border-slate-800">
-                                <Button 
+                                <Button
                                   variant="outline"
                                   className="w-full h-9 text-[10px] font-black uppercase border border-slate-200/50 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-900"
                                   onClick={() => setRecordPatientId(patient.id)}
                                 >
                                   Prontuário
                                 </Button>
-                                <Button 
+                                <Button
                                   variant="outline"
                                   className="w-full h-9 text-[10px] font-black uppercase border border-red-200/70 dark:border-red-900/40 text-red-600 dark:text-red-400 hover:bg-red-500/10"
                                   onClick={() => {
-                                    updatePatient(patient.id, { status: 'completed' });
+                                    updatePatient(patient.id, {
+                                      status: "completed",
+                                    });
                                     setShowSectorDialog(false);
                                   }}
                                 >
@@ -926,7 +1454,7 @@ export default function Sectors() {
                       </div>
                     </motion.div>
                   ) : (
-                    <motion.div 
+                    <motion.div
                       key="transfer"
                       initial={{ opacity: 0, x: 20 }}
                       animate={{ opacity: 1, x: 0 }}
@@ -935,11 +1463,12 @@ export default function Sectors() {
                     >
                       <div className="flex items-center justify-between mb-4 bg-transparent">
                         <h3 className="text-[11px] font-black uppercase tracking-widest text-[#006699] dark:text-sky-400 flex items-center gap-2">
-                          <HeartPulse className="h-3.5 w-3.5 text-red-500" /> Selecionar Destino
+                          <HeartPulse className="h-3.5 w-3.5 text-red-500" />{" "}
+                          Selecionar Destino
                         </h3>
-                        <Button 
-                          variant="ghost" 
-                          size="sm" 
+                        <Button
+                          variant="ghost"
+                          size="sm"
                           className="h-6 text-[8px] font-black uppercase text-muted-foreground hover:text-foreground hover:bg-slate-50/50 dark:hover:bg-slate-800/40"
                           onClick={() => setTransferringPatientId(null)}
                         >
@@ -949,8 +1478,8 @@ export default function Sectors() {
 
                       <div className="relative mb-4">
                         <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground opacity-50" />
-                        <Input 
-                          placeholder="BUSCAR SETOR..." 
+                        <Input
+                          placeholder="BUSCAR SETOR..."
                           className="pl-10 h-10 text-[10px] font-bold uppercase tracking-wider rounded-lg border border-slate-200/50 dark:border-slate-850 bg-white/70 dark:bg-slate-900/30 backdrop-blur-md"
                           value={searchSector}
                           onChange={(e) => setSearchSector(e.target.value)}
@@ -963,19 +1492,30 @@ export default function Sectors() {
                             <button
                               key={s.name}
                               onClick={() => {
-                                updatePatient(transferringPatientId!, { sector: s.name });
+                                updatePatient(transferringPatientId!, {
+                                  sector: s.name,
+                                });
                                 setTransferringPatientId(null);
                                 setShowSectorDialog(false);
                               }}
                               className="w-full p-4 rounded-xl border border-slate-205 dark:border-slate-800/45 hover:border-[#006699]/40 dark:hover:border-sky-500/30 hover:bg-[#006699]/5 dark:hover:bg-sky-400/5 transition-all flex items-center justify-between group bg-white/40 dark:bg-slate-900/10 text-left"
                             >
                               <div className="flex items-center gap-3 text-left">
-                                <div className={cn("p-1.5 rounded-lg bg-slate-100 dark:bg-slate-900/70 border border-slate-200/30 dark:border-slate-800/30", s.groupColor)}>
+                                <div
+                                  className={cn(
+                                    "p-1.5 rounded-lg bg-slate-100 dark:bg-slate-900/70 border border-slate-200/30 dark:border-slate-800/30",
+                                    s.groupColor,
+                                  )}
+                                >
                                   <s.groupIcon className="h-3.5 w-3.5" />
                                 </div>
                                 <div>
-                                  <p className="text-[11px] font-black uppercase tracking-tight text-foreground">{s.name}</p>
-                                  <p className="text-[8px] font-bold text-muted-foreground uppercase">{s.description}</p>
+                                  <p className="text-[11px] font-black uppercase tracking-tight text-foreground">
+                                    {s.name}
+                                  </p>
+                                  <p className="text-[8px] font-bold text-muted-foreground uppercase">
+                                    {s.description}
+                                  </p>
                                 </div>
                               </div>
                               <ChevronRight className="h-4 w-4 text-muted-foreground/60 opacity-0 group-hover:opacity-100 transition-all text-[#006699] dark:text-sky-400" />
@@ -989,7 +1529,7 @@ export default function Sectors() {
 
                 {!transferringPatientId && (
                   <div className="pt-4 border-t border-slate-200/45 dark:border-slate-800/45">
-                    <Button 
+                    <Button
                       className="w-full font-black uppercase text-[10px] h-12 bg-slate-100 dark:bg-slate-800 border-none hover:bg-slate-200 dark:hover:bg-slate-700 text-foreground"
                       variant="secondary"
                       onClick={() => setShowSectorDialog(false)}
@@ -1005,7 +1545,10 @@ export default function Sectors() {
       </Dialog>
 
       {/* Patient Record Modal (Quick View) */}
-      <Dialog open={!!recordPatientId} onOpenChange={(open) => !open && setRecordPatientId(null)}>
+      <Dialog
+        open={!!recordPatientId}
+        onOpenChange={(open) => !open && setRecordPatientId(null)}
+      >
         <DialogContent className="max-w-5xl w-[95vw] h-[85vh] p-0 overflow-y-auto glass-card-premium border-white/40 dark:border-white/10 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.3)] rounded-[2rem] flex flex-col bg-white dark:bg-slate-950">
           <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-white/10 dark:from-slate-900/80 dark:to-slate-950/90 pointer-events-none -z-10" />
           <div className="p-4 sm:p-6 sticky top-0 z-50 bg-white/40 dark:bg-slate-900/60 backdrop-blur-xl border-b border-white/20 dark:border-white/10 flex justify-between items-center shrink-0 shadow-sm rounded-t-[2rem]">
@@ -1017,7 +1560,9 @@ export default function Sectors() {
             </h2>
           </div>
           <div className="flex-1 overflow-y-auto p-4 sm:p-8 relative z-10">
-            {recordPatientId && <PatientRecord patientId={String(recordPatientId)} />}
+            {recordPatientId && (
+              <PatientRecord patientId={String(recordPatientId)} />
+            )}
           </div>
         </DialogContent>
       </Dialog>
@@ -1025,28 +1570,41 @@ export default function Sectors() {
       {/* Call Control Dialog */}
       <Dialog open={showCallControl} onOpenChange={setShowCallControl}>
         <DialogContent className="max-w-md p-0 overflow-hidden rounded-xl border-none shadow-2xl bg-white dark:bg-slate-950 [&>button]:hidden">
-          <DialogHeader className={cn(
-            "p-6 text-white transition-colors duration-500",
-            callingTicket?.risk === 'emergency' ? 'bg-red-600' :
-            callingTicket?.risk === 'very-urgent' ? 'bg-orange-500' :
-            callingTicket?.risk === 'urgent' ? 'bg-[#FFDE21] text-black' :
-            callingTicket?.risk === 'less-urgent' ? 'bg-green-500' :
-            (callingTicket?.priority === 'preferential' ? 'bg-purple-600' : 
-             callingTicket?.priority === 'pediatric' ? 'bg-orange-500' : 'bg-[#006699] dark:bg-sky-950/60')
-          )}>
+          <DialogHeader
+            className={cn(
+              "p-6 text-white transition-colors duration-500",
+              callingTicket?.risk === "emergency"
+                ? "bg-red-600"
+                : callingTicket?.risk === "very-urgent"
+                  ? "bg-orange-500"
+                  : callingTicket?.risk === "urgent"
+                    ? "bg-[#FFDE21] text-black"
+                    : callingTicket?.risk === "less-urgent"
+                      ? "bg-green-500"
+                      : callingTicket?.priority === "preferential"
+                        ? "bg-purple-600"
+                        : callingTicket?.priority === "pediatric"
+                          ? "bg-orange-500"
+                          : "bg-[#006699] dark:bg-sky-950/60",
+            )}
+          >
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="p-2 bg-white/20 rounded-xl">
                   <Megaphone className="h-6 w-6" />
                 </div>
                 <div>
-                  <DialogTitle className="text-xl font-black uppercase tracking-tight text-white">Controle de Chamada</DialogTitle>
-                  <DialogDescription className="text-white/70 text-[10px] font-bold uppercase tracking-widest mt-0.5">Sincronizado com o Painel Central</DialogDescription>
+                  <DialogTitle className="text-xl font-black uppercase tracking-tight text-white">
+                    Controle de Chamada
+                  </DialogTitle>
+                  <DialogDescription className="text-white/70 text-[10px] font-bold uppercase tracking-widest mt-0.5">
+                    Sincronizado com o Painel Central
+                  </DialogDescription>
                 </div>
               </div>
-              <Button 
-                variant="secondary" 
-                size="icon" 
+              <Button
+                variant="secondary"
+                size="icon"
                 className="bg-white text-black hover:bg-white/90 dark:bg-white/10 dark:text-slate-100 rounded-xl h-10 w-10 shadow-lg border-none cursor-pointer"
                 onClick={() => setShowCallControl(false)}
               >
@@ -1057,65 +1615,115 @@ export default function Sectors() {
 
           <div className="p-8 space-y-8 bg-slate-50 dark:bg-slate-950 text-center">
             <div className="space-y-2">
-              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#006699] dark:text-sky-400">Chamando agora</p>
-              <h2 className={cn(
-                "text-7xl font-black tracking-tighter leading-none mb-4",
-                callingTicket?.risk === 'emergency' ? 'text-red-655 dark:text-red-400' :
-                callingTicket?.risk === 'very-urgent' ? 'text-orange-500 dark:text-orange-400' :
-                callingTicket?.risk === 'urgent' ? 'text-black dark:text-slate-100' :
-                callingTicket?.risk === 'less-urgent' ? 'text-green-655 dark:text-green-400' :
-                (callingTicket?.priority === 'preferential' ? 'text-purple-600 dark:text-purple-400' : 
-                 callingTicket?.priority === 'pediatric' ? 'text-orange-500 dark:text-orange-400' : 'text-[#006699] dark:text-sky-400')
-              )}>{callingTicket?.ticket}</h2>
-              <p className="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase">{formatPatientNameLGPD(callingTicket?.patientName || "")}</p>
-              <p className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase">{callingTicket?.age} ANOS • CPF: {callingTicket?.cpf}</p>
+              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#006699] dark:text-sky-400">
+                Chamando agora
+              </p>
+              <h2
+                className={cn(
+                  "text-7xl font-black tracking-tighter leading-none mb-4",
+                  callingTicket?.risk === "emergency"
+                    ? "text-red-655 dark:text-red-400"
+                    : callingTicket?.risk === "very-urgent"
+                      ? "text-orange-500 dark:text-orange-400"
+                      : callingTicket?.risk === "urgent"
+                        ? "text-black dark:text-slate-100"
+                        : callingTicket?.risk === "less-urgent"
+                          ? "text-green-655 dark:text-green-400"
+                          : callingTicket?.priority === "preferential"
+                            ? "text-purple-600 dark:text-purple-400"
+                            : callingTicket?.priority === "pediatric"
+                              ? "text-orange-500 dark:text-orange-400"
+                              : "text-[#006699] dark:text-sky-400",
+                )}
+              >
+                {callingTicket?.ticket}
+              </h2>
+              <p className="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase">
+                {formatPatientNameLGPD(callingTicket?.patientName || "")}
+              </p>
+              <p className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase">
+                {callingTicket?.age} ANOS • CPF: {callingTicket?.cpf}
+              </p>
             </div>
 
             <div className="grid grid-cols-1 gap-4">
-              <Button 
+              <Button
                 onClick={() => {
                   if (callingTicket) {
-                    callTicket(callingTicket.ticket, callingTicket.room, callingTicket.risk, callingTicket.patientName);
+                    callTicket(
+                      callingTicket.ticket,
+                      callingTicket.room,
+                      callingTicket.risk,
+                      callingTicket.patientName,
+                    );
                     toast.success("Chamada enviada novamente ao painel.");
                   }
                 }}
                 className={cn(
                   "h-16 rounded-xl text-white font-black uppercase tracking-widest text-sm shadow-xl gap-3 transition-all duration-300 border-0 cursor-pointer",
-                  callingTicket?.risk === 'emergency' ? 'bg-red-600 hover:bg-red-700 shadow-red-600/20' :
-                  callingTicket?.risk === 'very-urgent' ? 'bg-orange-500 hover:bg-orange-600 shadow-orange-600/20' :
-                  callingTicket?.risk === 'urgent' ? 'bg-[#FFDE21] hover:bg-[#FFDE21]/90 shadow-[#FFDE21]/20 text-black' :
-                  callingTicket?.risk === 'less-urgent' ? 'bg-green-500 hover:bg-green-600 shadow-green-500/20' :
-                  (callingTicket?.priority === 'preferential' ? 'bg-purple-600 hover:bg-purple-700 shadow-purple-600/20' : 
-                   callingTicket?.priority === 'pediatric' ? 'bg-orange-500 hover:bg-orange-600 shadow-orange-600/20' : 'bg-[#006699] hover:bg-[#005580] shadow-[#006699]/20 dark:bg-sky-600 dark:hover:bg-sky-550')
+                  callingTicket?.risk === "emergency"
+                    ? "bg-red-600 hover:bg-red-700 shadow-red-600/20"
+                    : callingTicket?.risk === "very-urgent"
+                      ? "bg-orange-500 hover:bg-orange-600 shadow-orange-600/20"
+                      : callingTicket?.risk === "urgent"
+                        ? "bg-[#FFDE21] hover:bg-[#FFDE21]/90 shadow-[#FFDE21]/20 text-black"
+                        : callingTicket?.risk === "less-urgent"
+                          ? "bg-green-500 hover:bg-green-600 shadow-green-500/20"
+                          : callingTicket?.priority === "preferential"
+                            ? "bg-purple-600 hover:bg-purple-700 shadow-purple-600/20"
+                            : callingTicket?.priority === "pediatric"
+                              ? "bg-orange-500 hover:bg-orange-600 shadow-orange-600/20"
+                              : "bg-[#006699] hover:bg-[#005580] shadow-[#006699]/20 dark:bg-sky-600 dark:hover:bg-sky-550",
                 )}
               >
                 <Volume2 className="h-6 w-6" />
                 Chamar Novamente
               </Button>
 
-              <div 
+              <div
                 className="flex items-center justify-between p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200/40 dark:border-slate-800/40 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-900/85 transition-colors"
                 onClick={() => setIsAudioEnabled(!isAudioEnabled)}
               >
                 <div className="flex items-center gap-3 text-left">
-                  <div className={cn("p-2 rounded-lg", isAudioEnabled ? 'bg-green-500/10 text-green-600 dark:text-green-400' : 'bg-red-500/10 text-red-600 dark:text-red-400')}>
-                    {isAudioEnabled ? <Volume2 className="h-5 w-5" /> : <VolumeX className="h-5 w-5" />}
+                  <div
+                    className={cn(
+                      "p-2 rounded-lg",
+                      isAudioEnabled
+                        ? "bg-green-500/10 text-green-600 dark:text-green-400"
+                        : "bg-red-500/10 text-red-600 dark:text-red-400",
+                    )}
+                  >
+                    {isAudioEnabled ? (
+                      <Volume2 className="h-5 w-5" />
+                    ) : (
+                      <VolumeX className="h-5 w-5" />
+                    )}
                   </div>
                   <div>
-                    <p className="text-xs font-black uppercase text-slate-800 dark:text-slate-100">Áudio do Painel</p>
-                    <p className="text-[10px] text-slate-550 dark:text-slate-400 font-bold uppercase">{isAudioEnabled ? 'Ativado (Voz + Chime)' : 'Desativado (Mudo)'}</p>
+                    <p className="text-xs font-black uppercase text-slate-800 dark:text-slate-100">
+                      Áudio do Painel
+                    </p>
+                    <p className="text-[10px] text-slate-550 dark:text-slate-400 font-bold uppercase">
+                      {isAudioEnabled
+                        ? "Ativado (Voz + Chime)"
+                        : "Desativado (Mudo)"}
+                    </p>
                   </div>
                 </div>
                 <div
                   className={cn(
                     "h-8 w-14 rounded-full transition-all relative flex items-center shrink-0",
-                    isAudioEnabled ? "bg-green-500" : "bg-slate-300 dark:bg-slate-800"
+                    isAudioEnabled
+                      ? "bg-green-500"
+                      : "bg-slate-300 dark:bg-slate-800",
                   )}
                 >
-                  <div className={cn(
-                    "absolute h-6 w-6 rounded-full bg-white transition-all shadow-md",
-                    isAudioEnabled ? "right-1" : "left-1"
-                  )} />
+                  <div
+                    className={cn(
+                      "absolute h-6 w-6 rounded-full bg-white transition-all shadow-md",
+                      isAudioEnabled ? "right-1" : "left-1",
+                    )}
+                  />
                 </div>
               </div>
             </div>

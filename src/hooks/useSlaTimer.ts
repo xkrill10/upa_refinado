@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 
 function computeTimeRemaining(deadline: string): string {
   const diff = new Date(deadline).getTime() - Date.now();
-  const sign = diff < 0 ? '-' : '';
+  const sign = diff < 0 ? "-" : "";
   const abs = Math.abs(diff);
   const minutes = Math.floor(abs / 60000);
   const seconds = Math.floor((abs % 60000) / 1000);
@@ -16,7 +16,9 @@ function computeTimeRemaining(deadline: string): string {
  * @returns A string like "5m 23s" or "-2m 10s" when overdue.
  */
 export function useSlaTimer(deadline: string): string {
-  const [timeRemaining, setTimeRemaining] = useState<string>(() => computeTimeRemaining(deadline));
+  const [timeRemaining, setTimeRemaining] = useState<string>(() =>
+    computeTimeRemaining(deadline),
+  );
 
   useEffect(() => {
     const interval = setInterval(() => {

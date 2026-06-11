@@ -1,7 +1,19 @@
 import React, { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Activity } from "lucide-react";
@@ -45,7 +57,12 @@ export function MewsModal({ isOpen, onClose, onApply }: MewsModalProps) {
     return parseInt(mewsAvdi) || 0;
   };
 
-  const score = getPasScore() + getFcScore() + getFrScore() + getTempScore() + getAvdiScore();
+  const score =
+    getPasScore() +
+    getFcScore() +
+    getFrScore() +
+    getTempScore() +
+    getAvdiScore();
 
   let mewsClass = "Baixo Risco";
   let mewsColor = "bg-emerald-500 text-white";
@@ -70,11 +87,11 @@ export function MewsModal({ isOpen, onClose, onApply }: MewsModalProps) {
 
   const handleConfirm = () => {
     const descText = `- ESCORE MEWS (ALERTA DE DETERIORAÇÃO): ${score} pontos (${mewsClass.toUpperCase()}).\n  Conduta sugerida: ${
-      score >= 5 
-        ? "ALERTA CLÍNICO IMEDIATO! Notificar médico assistente do setor, preparar monitor cardíaco contínuo e leito de suporte avançado (Sala Vermelha)." 
-        : score >= 3 
-        ? "Deterioração clínica moderada. Comunicar enfermeiro supervisor e equipe médica para avaliação do paciente. Registrar sinais vitais a cada hora." 
-        : "Baixo risco de deterioração fisiológica. Manter monitoramento de rotina do paciente."
+      score >= 5
+        ? "ALERTA CLÍNICO IMEDIATO! Notificar médico assistente do setor, preparar monitor cardíaco contínuo e leito de suporte avançado (Sala Vermelha)."
+        : score >= 3
+          ? "Deterioração clínica moderada. Comunicar enfermeiro supervisor e equipe médica para avaliação do paciente. Registrar sinais vitais a cada hora."
+          : "Baixo risco de deterioração fisiológica. Manter monitoramento de rotina do paciente."
     }`;
     onApply(descText, `MEWS: ${score} pts`);
     onClose(false);
@@ -97,7 +114,9 @@ export function MewsModal({ isOpen, onClose, onApply }: MewsModalProps) {
         <div className="space-y-4 py-3">
           {/* 1. PAS (Pressão Arterial Sistólica) */}
           <div className="space-y-1">
-            <Label className="text-xs font-black uppercase text-foreground/80">1. Pressão Arterial Sistólica (mmHg)</Label>
+            <Label className="text-xs font-black uppercase text-foreground/80">
+              1. Pressão Arterial Sistólica (mmHg)
+            </Label>
             <Select value={mewsPas} onValueChange={setMewsPas}>
               <SelectTrigger className="h-10 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
                 <SelectValue placeholder="Selecione a faixa de PAS..." />
@@ -114,7 +133,9 @@ export function MewsModal({ isOpen, onClose, onApply }: MewsModalProps) {
 
           {/* 2. FC (Frequência Cardíaca) */}
           <div className="space-y-1">
-            <Label className="text-xs font-black uppercase text-foreground/80">2. Frequência Cardíaca (bpm)</Label>
+            <Label className="text-xs font-black uppercase text-foreground/80">
+              2. Frequência Cardíaca (bpm)
+            </Label>
             <Select value={mewsFc} onValueChange={setMewsFc}>
               <SelectTrigger className="h-10 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
                 <SelectValue placeholder="Selecione a faixa de FC..." />
@@ -132,7 +153,9 @@ export function MewsModal({ isOpen, onClose, onApply }: MewsModalProps) {
 
           {/* 3. FR (Frequência Respiratória) */}
           <div className="space-y-1">
-            <Label className="text-xs font-black uppercase text-foreground/80">3. Frequência Respiratória (irpm)</Label>
+            <Label className="text-xs font-black uppercase text-foreground/80">
+              3. Frequência Respiratória (irpm)
+            </Label>
             <Select value={mewsFr} onValueChange={setMewsFr}>
               <SelectTrigger className="h-10 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
                 <SelectValue placeholder="Selecione a faixa de FR..." />
@@ -149,7 +172,9 @@ export function MewsModal({ isOpen, onClose, onApply }: MewsModalProps) {
 
           {/* 4. Temperatura */}
           <div className="space-y-1">
-            <Label className="text-xs font-black uppercase text-foreground/80">4. Temperatura Corporal (°C)</Label>
+            <Label className="text-xs font-black uppercase text-foreground/80">
+              4. Temperatura Corporal (°C)
+            </Label>
             <Select value={mewsTemp} onValueChange={setMewsTemp}>
               <SelectTrigger className="h-10 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
                 <SelectValue placeholder="Selecione a faixa de temperatura..." />
@@ -164,16 +189,22 @@ export function MewsModal({ isOpen, onClose, onApply }: MewsModalProps) {
 
           {/* 5. Nível de Consciência (AVDI) */}
           <div className="space-y-1">
-            <Label className="text-xs font-black uppercase text-foreground/80">5. Nível de Consciência (Escala AVDI)</Label>
+            <Label className="text-xs font-black uppercase text-foreground/80">
+              5. Nível de Consciência (Escala AVDI)
+            </Label>
             <Select value={mewsAvdi} onValueChange={setMewsAvdi}>
               <SelectTrigger className="h-10 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
                 <SelectValue placeholder="Selecione o estado neurológico..." />
               </SelectTrigger>
               <SelectContent className="rounded-xl">
-                <SelectItem value="0">A - Alerta / Responsivo (0 pts)</SelectItem>
+                <SelectItem value="0">
+                  A - Alerta / Responsivo (0 pts)
+                </SelectItem>
                 <SelectItem value="1">V - Responsivo à Voz (1 pt)</SelectItem>
                 <SelectItem value="2">D - Responsivo à Dor (2 pts)</SelectItem>
-                <SelectItem value="3">I - Inconsciente / Sem resposta (3 pts)</SelectItem>
+                <SelectItem value="3">
+                  I - Inconsciente / Sem resposta (3 pts)
+                </SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -182,15 +213,30 @@ export function MewsModal({ isOpen, onClose, onApply }: MewsModalProps) {
           <div className="mt-6 p-4 rounded-xl bg-slate-50/70 dark:bg-slate-900/40 backdrop-blur-md border border-slate-200/60 dark:border-slate-800/50 space-y-3">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-[10px] font-black uppercase text-muted-foreground tracking-wider">Pontuação Calculada</p>
-                <p className="text-3xl font-black text-foreground">{isComplete ? score : 0} <span className="text-sm font-bold text-muted-foreground">pts</span></p>
+                <p className="text-[10px] font-black uppercase text-muted-foreground tracking-wider">
+                  Pontuação Calculada
+                </p>
+                <p className="text-3xl font-black text-foreground">
+                  {isComplete ? score : 0}{" "}
+                  <span className="text-sm font-bold text-muted-foreground">
+                    pts
+                  </span>
+                </p>
               </div>
               {isComplete ? (
-                <Badge className={cn("h-7 rounded-lg text-xs font-black uppercase tracking-wider", mewsColor)}>
+                <Badge
+                  className={cn(
+                    "h-7 rounded-lg text-xs font-black uppercase tracking-wider",
+                    mewsColor,
+                  )}
+                >
                   {mewsClass}
                 </Badge>
               ) : (
-                <Badge variant="secondary" className="h-7 rounded-lg text-xs font-black uppercase tracking-wider">
+                <Badge
+                  variant="secondary"
+                  className="h-7 rounded-lg text-xs font-black uppercase tracking-wider"
+                >
                   Incompleto
                 </Badge>
               )}

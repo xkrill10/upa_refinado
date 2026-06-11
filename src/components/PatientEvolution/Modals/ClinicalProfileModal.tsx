@@ -1,11 +1,30 @@
 import React, { useState, useEffect } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ShieldAlert, Heart, Clipboard, Check, Plus, Trash2 } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  ShieldAlert,
+  Heart,
+  Clipboard,
+  Check,
+  Plus,
+  Trash2,
+} from "lucide-react";
 import { Patient } from "@/context/PatientsContext";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -17,7 +36,12 @@ interface ClinicalProfileModalProps {
   onSave: (id: string, updates: Partial<Patient>) => void;
 }
 
-export function ClinicalProfileModal({ isOpen, onClose, patient, onSave }: ClinicalProfileModalProps) {
+export function ClinicalProfileModal({
+  isOpen,
+  onClose,
+  patient,
+  onSave,
+}: ClinicalProfileModalProps) {
   const [mainComplaint, setMainComplaint] = useState("");
   const [bloodType, setBloodType] = useState("");
   const [allergiesText, setAllergiesText] = useState("");
@@ -32,13 +56,17 @@ export function ClinicalProfileModal({ isOpen, onClose, patient, onSave }: Clini
       setAllergiesText(patient.allergies || "");
       setComorbidities(patient.comorbidities || "");
       setCurrentMedications(patient.currentMedications || "");
-      setNoAllergies(patient.allergies === "Sem alergias conhecidas" || !patient.allergies);
+      setNoAllergies(
+        patient.allergies === "Sem alergias conhecidas" || !patient.allergies,
+      );
     }
   }, [patient, isOpen]);
 
   const handleSave = () => {
-    const finalAllergies = noAllergies ? "Sem alergias conhecidas" : allergiesText.trim();
-    
+    const finalAllergies = noAllergies
+      ? "Sem alergias conhecidas"
+      : allergiesText.trim();
+
     onSave(patient.id, {
       mainComplaint: mainComplaint.trim(),
       bloodType,
@@ -62,7 +90,8 @@ export function ClinicalProfileModal({ isOpen, onClose, patient, onSave }: Clini
             Perfil Clínico & Fatores de Risco
           </DialogTitle>
           <DialogDescription className="text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">
-            Atualização de Anamnese, Alergias e Condições Crônicas de {patient?.name}
+            Atualização de Anamnese, Alergias e Condições Crônicas de{" "}
+            {patient?.name}
           </DialogDescription>
         </DialogHeader>
 
@@ -93,11 +122,17 @@ export function ClinicalProfileModal({ isOpen, onClose, patient, onSave }: Clini
                   <SelectValue placeholder="Selecione o tipo sanguíneo" />
                 </SelectTrigger>
                 <SelectContent className="rounded-xl border-slate-200 dark:border-slate-800 bg-white/95 dark:bg-slate-950/95 backdrop-blur-md">
-                  {["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"].map((type) => (
-                    <SelectItem key={type} value={type} className="rounded-lg font-semibold">
-                      Grupo {type}
-                    </SelectItem>
-                  ))}
+                  {["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"].map(
+                    (type) => (
+                      <SelectItem
+                        key={type}
+                        value={type}
+                        className="rounded-lg font-semibold"
+                      >
+                        Grupo {type}
+                      </SelectItem>
+                    ),
+                  )}
                 </SelectContent>
               </Select>
             </div>
@@ -128,7 +163,7 @@ export function ClinicalProfileModal({ isOpen, onClose, patient, onSave }: Clini
                 placeholder="Ex: Dipirona, Penicilina, Corantes..."
                 className={cn(
                   "rounded-xl border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-slate-900/50 focus:border-orange-500",
-                  noAllergies && "opacity-55 cursor-not-allowed"
+                  noAllergies && "opacity-55 cursor-not-allowed",
                 )}
               />
               {!noAllergies && allergiesText && (

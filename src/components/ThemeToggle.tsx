@@ -26,9 +26,9 @@ export function ThemeToggle({ position = "bottom" }: ThemeToggleProps) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button 
-          variant="ghost" 
-          size="icon" 
+        <Button
+          variant="ghost"
+          size="icon"
           className="relative h-12 w-12 rounded-xl bg-transparent hover:bg-primary/10 dark:hover:bg-white/10 border-2 border-zinc-300 dark:border-zinc-700 hover:border-zinc-400 dark:hover:border-zinc-600 transition-all duration-300 overflow-hidden flex items-center justify-center shrink-0"
         >
           <AnimatePresence mode="wait" initial={false}>
@@ -70,26 +70,26 @@ export function ThemeToggle({ position = "bottom" }: ThemeToggleProps) {
           <span className="sr-only">Alternar tema</span>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent 
-        align="end" 
+      <DropdownMenuContent
+        align="end"
         side={isTop ? "bottom" : "top"}
         className="glass-card min-w-[130px] p-1 border border-border shadow-md"
       >
-        <DropdownMenuItem 
+        <DropdownMenuItem
           onClick={() => setTheme("light")}
           className="flex items-center gap-2.5 px-3 py-2 cursor-pointer transition-colors rounded-lg font-semibold text-xs text-foreground/90 hover:text-foreground hover:bg-secondary"
         >
           <Sun className="h-[18px] w-[18px] text-amber-500 stroke-[2px]" />
           <span>Claro</span>
         </DropdownMenuItem>
-        <DropdownMenuItem 
+        <DropdownMenuItem
           onClick={() => setTheme("dark")}
           className="flex items-center gap-2.5 px-3 py-2 cursor-pointer transition-colors rounded-lg font-semibold text-xs text-foreground/90 hover:text-foreground hover:bg-secondary"
         >
           <Moon className="h-[18px] w-[18px] text-sky-400 stroke-[2px]" />
           <span>Escuro</span>
         </DropdownMenuItem>
-        <DropdownMenuItem 
+        <DropdownMenuItem
           onClick={() => setTheme("system")}
           className="flex items-center gap-2.5 px-3 py-2 cursor-pointer transition-colors rounded-lg font-semibold text-xs text-foreground/90 hover:text-foreground hover:bg-secondary"
         >

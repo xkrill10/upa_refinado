@@ -867,13 +867,12 @@ export default function PediatriaRoom() {
     }
 
     // Pouco Urgente (Verde)
-    if (
-      (nTemp >= 37 && nTemp < 38) ||
-      (nGlicemia > 140 && nGlicemia < 250)
-    ) {
+    if ((nTemp >= 37 && nTemp < 38) || (nGlicemia > 140 && nGlicemia < 250)) {
       return "less-urgent";
     }
-    const hasVitals = Boolean(fc || pa || fr || spo2 || temperature || glicemia);
+    const hasVitals = Boolean(
+      fc || pa || fr || spo2 || temperature || glicemia,
+    );
     if (!hasVitals) {
       return null;
     }
@@ -2012,10 +2011,15 @@ export default function PediatriaRoom() {
                                             )}
                                           />
                                           <span className="text-[9px] font-black uppercase tracking-widest">
-                                            {lastCalculatedRisk === 'emergency' ? 'Risco: Emergência' :
-                                             lastCalculatedRisk === 'very-urgent' ? 'Risco: Muito Urgente' :
-                                             lastCalculatedRisk === 'urgent' ? 'Risco: Urgente' :
-                                             'Risco: Pouco Urgente'}
+                                            {lastCalculatedRisk === "emergency"
+                                              ? "Risco: Emergência"
+                                              : lastCalculatedRisk ===
+                                                  "very-urgent"
+                                                ? "Risco: Muito Urgente"
+                                                : lastCalculatedRisk ===
+                                                    "urgent"
+                                                  ? "Risco: Urgente"
+                                                  : "Risco: Pouco Urgente"}
                                           </span>
                                         </motion.div>
                                       )}

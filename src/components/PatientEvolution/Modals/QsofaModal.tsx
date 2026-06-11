@@ -1,7 +1,19 @@
 import React, { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ShieldAlert } from "lucide-react";
@@ -52,7 +64,7 @@ export function QsofaModal({ isOpen, onClose, onApply }: QsofaModalProps) {
               "flex-1 py-2 text-xs font-black uppercase tracking-wider rounded-xl transition-all",
               sepsisTab === "qsofa"
                 ? "bg-background text-foreground shadow-sm"
-                : "text-muted-foreground hover:text-foreground"
+                : "text-muted-foreground hover:text-foreground",
             )}
           >
             qSOFA (Sepsis-3)
@@ -64,7 +76,7 @@ export function QsofaModal({ isOpen, onClose, onApply }: QsofaModalProps) {
               "flex-1 py-2 text-xs font-black uppercase tracking-wider rounded-xl transition-all",
               sepsisTab === "sirs"
                 ? "bg-background text-foreground shadow-sm"
-                : "text-muted-foreground hover:text-foreground"
+                : "text-muted-foreground hover:text-foreground",
             )}
           >
             SIRS (Diretriz ILAS)
@@ -76,7 +88,9 @@ export function QsofaModal({ isOpen, onClose, onApply }: QsofaModalProps) {
             <>
               {/* 1. FR >= 22 irpm */}
               <div className="space-y-1">
-                <Label className="text-xs font-black uppercase text-foreground/80">1. Frequência Respiratória &gt;= 22 irpm</Label>
+                <Label className="text-xs font-black uppercase text-foreground/80">
+                  1. Frequência Respiratória &gt;= 22 irpm
+                </Label>
                 <Select value={qsofaFr} onValueChange={setQsofaFr}>
                   <SelectTrigger className="h-10 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
                     <SelectValue placeholder="Selecione..." />
@@ -90,7 +104,10 @@ export function QsofaModal({ isOpen, onClose, onApply }: QsofaModalProps) {
 
               {/* 2. Alteração do Estado Mental */}
               <div className="space-y-1">
-                <Label className="text-xs font-black uppercase text-foreground/80">2. Alteração do Estado Mental (Glasgow &lt; 15 ou Desorientação)</Label>
+                <Label className="text-xs font-black uppercase text-foreground/80">
+                  2. Alteração do Estado Mental (Glasgow &lt; 15 ou
+                  Desorientação)
+                </Label>
                 <Select value={qsofaMental} onValueChange={setQsofaMental}>
                   <SelectTrigger className="h-10 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
                     <SelectValue placeholder="Selecione..." />
@@ -104,7 +121,9 @@ export function QsofaModal({ isOpen, onClose, onApply }: QsofaModalProps) {
 
               {/* 3. PAS <= 100 mmHg */}
               <div className="space-y-1">
-                <Label className="text-xs font-black uppercase text-foreground/80">3. Pressão Arterial Sistólica &lt;= 100 mmHg</Label>
+                <Label className="text-xs font-black uppercase text-foreground/80">
+                  3. Pressão Arterial Sistólica &lt;= 100 mmHg
+                </Label>
                 <Select value={qsofaPas} onValueChange={setQsofaPas}>
                   <SelectTrigger className="h-10 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
                     <SelectValue placeholder="Selecione..." />
@@ -136,15 +155,30 @@ export function QsofaModal({ isOpen, onClose, onApply }: QsofaModalProps) {
                   <div className="mt-6 p-4 rounded-xl bg-slate-50/70 dark:bg-slate-900/40 backdrop-blur-md border border-slate-200/60 dark:border-slate-800/50 space-y-3">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-[10px] font-black uppercase text-muted-foreground tracking-wider">Pontuação qSOFA</p>
-                        <p className="text-3xl font-black text-foreground">{score} <span className="text-sm font-bold text-muted-foreground">/ 3 pts</span></p>
+                        <p className="text-[10px] font-black uppercase text-muted-foreground tracking-wider">
+                          Pontuação qSOFA
+                        </p>
+                        <p className="text-3xl font-black text-foreground">
+                          {score}{" "}
+                          <span className="text-sm font-bold text-muted-foreground">
+                            / 3 pts
+                          </span>
+                        </p>
                       </div>
                       {isComplete ? (
-                        <Badge className={cn("h-7 rounded-lg text-[10px] font-black uppercase tracking-wider px-2", riskColor)}>
+                        <Badge
+                          className={cn(
+                            "h-7 rounded-lg text-[10px] font-black uppercase tracking-wider px-2",
+                            riskColor,
+                          )}
+                        >
                           {riskClass}
                         </Badge>
                       ) : (
-                        <Badge variant="secondary" className="h-7 rounded-lg text-xs font-black uppercase tracking-wider">
+                        <Badge
+                          variant="secondary"
+                          className="h-7 rounded-lg text-xs font-black uppercase tracking-wider"
+                        >
                           Incompleto
                         </Badge>
                       )}
@@ -169,11 +203,16 @@ export function QsofaModal({ isOpen, onClose, onApply }: QsofaModalProps) {
                         disabled={!isComplete}
                         onClick={() => {
                           const descText = `- ESCORE qSOFA (RISCO DE SEPSE): ${score}/3 pontos (${riskClass}).\n  Conduta sugerida: ${
-                            score >= 2 
-                              ? "ALERTA PROTOCOLO SEPSE IMEDIATO! Notificar equipe médica com urgência, solicitar exames laboratoriais (incluindo lactato venoso e hemoculturas pareadas) e monitoramento cardíaco contínuo." 
+                            score >= 2
+                              ? "ALERTA PROTOCOLO SEPSE IMEDIATO! Notificar equipe médica com urgência, solicitar exames laboratoriais (incluindo lactato venoso e hemoculturas pareadas) e monitoramento cardíaco contínuo."
                               : "Manter acompanhamento clínico e observações de rotina do paciente."
                           }`;
-                          onApply(descText, score >= 2 ? `qSOFA: ${score} (ALERTA)` : `qSOFA: ${score} pts`);
+                          onApply(
+                            descText,
+                            score >= 2
+                              ? `qSOFA: ${score} (ALERTA)`
+                              : `qSOFA: ${score} pts`,
+                          );
                           onClose(false);
                           toast.success("Escore qSOFA integrado com sucesso!");
                         }}
@@ -191,7 +230,9 @@ export function QsofaModal({ isOpen, onClose, onApply }: QsofaModalProps) {
               {/* SIRS Items */}
               {/* 1. Temp < 36 ou > 38 */}
               <div className="space-y-1">
-                <Label className="text-xs font-black uppercase text-foreground/80">1. Temperatura corporal &lt; 36°C ou &gt; 38°C</Label>
+                <Label className="text-xs font-black uppercase text-foreground/80">
+                  1. Temperatura corporal &lt; 36°C ou &gt; 38°C
+                </Label>
                 <Select value={sirsTemp} onValueChange={setSirsTemp}>
                   <SelectTrigger className="h-10 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
                     <SelectValue placeholder="Selecione..." />
@@ -205,7 +246,9 @@ export function QsofaModal({ isOpen, onClose, onApply }: QsofaModalProps) {
 
               {/* 2. FC > 90 bpm */}
               <div className="space-y-1">
-                <Label className="text-xs font-black uppercase text-foreground/80">2. Frequência Cardíaca &gt; 90 bpm</Label>
+                <Label className="text-xs font-black uppercase text-foreground/80">
+                  2. Frequência Cardíaca &gt; 90 bpm
+                </Label>
                 <Select value={sirsHr} onValueChange={setSirsHr}>
                   <SelectTrigger className="h-10 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
                     <SelectValue placeholder="Selecione..." />
@@ -219,7 +262,9 @@ export function QsofaModal({ isOpen, onClose, onApply }: QsofaModalProps) {
 
               {/* 3. FR > 20 irpm */}
               <div className="space-y-1">
-                <Label className="text-xs font-black uppercase text-foreground/80">3. Frequência Respiratória &gt; 20 irpm ou PaCO2 &lt; 32 mmHg</Label>
+                <Label className="text-xs font-black uppercase text-foreground/80">
+                  3. Frequência Respiratória &gt; 20 irpm ou PaCO2 &lt; 32 mmHg
+                </Label>
                 <Select value={sirsRr} onValueChange={setSirsRr}>
                   <SelectTrigger className="h-10 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
                     <SelectValue placeholder="Selecione..." />
@@ -233,7 +278,9 @@ export function QsofaModal({ isOpen, onClose, onApply }: QsofaModalProps) {
 
               {/* 4. Leucócitos */}
               <div className="space-y-1">
-                <Label className="text-xs font-black uppercase text-foreground/80">4. Leucócitos &lt; 4000 ou &gt; 12000 ou &gt; 10% de Bastões</Label>
+                <Label className="text-xs font-black uppercase text-foreground/80">
+                  4. Leucócitos &lt; 4000 ou &gt; 12000 ou &gt; 10% de Bastões
+                </Label>
                 <Select value={sirsWbc} onValueChange={setSirsWbc}>
                   <SelectTrigger className="h-10 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
                     <SelectValue placeholder="Selecione..." />
@@ -247,28 +294,41 @@ export function QsofaModal({ isOpen, onClose, onApply }: QsofaModalProps) {
 
               {/* 5. Foco Infeccioso */}
               <div className="space-y-1">
-                <Label className="text-xs font-black uppercase text-purple-600 dark:text-purple-400">5. Suspeita de Foco Infeccioso Ativo?</Label>
+                <Label className="text-xs font-black uppercase text-purple-600 dark:text-purple-400">
+                  5. Suspeita de Foco Infeccioso Ativo?
+                </Label>
                 <Select value={sirsFocus} onValueChange={setSirsFocus}>
                   <SelectTrigger className="h-10 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
                     <SelectValue placeholder="Selecione..." />
                   </SelectTrigger>
                   <SelectContent className="rounded-xl">
                     <SelectItem value="no">Não / Indefinido</SelectItem>
-                    <SelectItem value="yes">Sim (Suspeito/Confirmado)</SelectItem>
+                    <SelectItem value="yes">
+                      Sim (Suspeito/Confirmado)
+                    </SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
               {/* 6. Disfunção Orgânica */}
               <div className="space-y-1">
-                <Label className="text-xs font-black uppercase text-purple-600 dark:text-purple-400">6. Evidência de Disfunção Orgânica de Início Recente?</Label>
-                <Select value={sirsDysfunction} onValueChange={setSirsDysfunction}>
+                <Label className="text-xs font-black uppercase text-purple-600 dark:text-purple-400">
+                  6. Evidência de Disfunção Orgânica de Início Recente?
+                </Label>
+                <Select
+                  value={sirsDysfunction}
+                  onValueChange={setSirsDysfunction}
+                >
                   <SelectTrigger className="h-10 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
                     <SelectValue placeholder="Selecione..." />
                   </SelectTrigger>
                   <SelectContent className="rounded-xl">
                     <SelectItem value="no">Não (Ausente)</SelectItem>
-                    <SelectItem value="yes">Sim (Hipotensão PAS &lt; 90, Lactato &gt; 2.0, Plaquetas &lt; 100k, Glasgow &lt; 15, rebaixamento sensorial ou oligúria)</SelectItem>
+                    <SelectItem value="yes">
+                      Sim (Hipotensão PAS &lt; 90, Lactato &gt; 2.0, Plaquetas
+                      &lt; 100k, Glasgow &lt; 15, rebaixamento sensorial ou
+                      oligúria)
+                    </SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -303,21 +363,43 @@ export function QsofaModal({ isOpen, onClose, onApply }: QsofaModalProps) {
                   riskColor = "bg-purple-600 text-white animate-pulse";
                 }
 
-                const isComplete = !!(sirsTemp && sirsHr && sirsRr && sirsWbc && sirsFocus && sirsDysfunction);
+                const isComplete = !!(
+                  sirsTemp &&
+                  sirsHr &&
+                  sirsRr &&
+                  sirsWbc &&
+                  sirsFocus &&
+                  sirsDysfunction
+                );
 
                 return (
                   <div className="mt-6 p-4 rounded-xl bg-slate-50/70 dark:bg-slate-900/40 backdrop-blur-md border border-slate-200/60 dark:border-slate-800/50 space-y-3">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-[10px] font-black uppercase text-muted-foreground tracking-wider">Critérios SIRS</p>
-                        <p className="text-3xl font-black text-foreground">{sirsScore} <span className="text-sm font-bold text-muted-foreground">/ 4 pts</span></p>
+                        <p className="text-[10px] font-black uppercase text-muted-foreground tracking-wider">
+                          Critérios SIRS
+                        </p>
+                        <p className="text-3xl font-black text-foreground">
+                          {sirsScore}{" "}
+                          <span className="text-sm font-bold text-muted-foreground">
+                            / 4 pts
+                          </span>
+                        </p>
                       </div>
                       {isComplete ? (
-                        <Badge className={cn("h-7 rounded-lg text-[9px] font-black uppercase tracking-wider px-2", riskColor)}>
+                        <Badge
+                          className={cn(
+                            "h-7 rounded-lg text-[9px] font-black uppercase tracking-wider px-2",
+                            riskColor,
+                          )}
+                        >
                           {riskClass}
                         </Badge>
                       ) : (
-                        <Badge variant="secondary" className="h-7 rounded-lg text-xs font-black uppercase tracking-wider">
+                        <Badge
+                          variant="secondary"
+                          className="h-7 rounded-lg text-xs font-black uppercase tracking-wider"
+                        >
                           Incompleto
                         </Badge>
                       )}
@@ -327,30 +409,35 @@ export function QsofaModal({ isOpen, onClose, onApply }: QsofaModalProps) {
                       type="button"
                       disabled={!isComplete}
                       onClick={() => {
-                        const descText = `- AVALIAÇÃO DE SEPSE (CRITÉRIOS SIRS - DIRETRIZ ILAS):\n  ` +
+                        const descText =
+                          `- AVALIAÇÃO DE SEPSE (CRITÉRIOS SIRS - DIRETRIZ ILAS):\n  ` +
                           `• Critérios SIRS Presentes: ${sirsScore}/4. ` +
                           `• Foco Infeccioso Ativo Suspeito/Confirmado: ${hasFocus ? "SIM" : "NÃO"}.\n  ` +
                           `• Sinais de Disfunção Orgânica: ${hasDysfunction ? "SIM" : "NÃO"}.\n  ` +
                           `• Classificação: ${riskClass.toUpperCase()}.\n  ` +
                           `Conduta sugerida: ${
-                            (sirsScore >= 2 && hasFocus && hasDysfunction) || (hasFocus && hasDysfunction)
+                            (sirsScore >= 2 && hasFocus && hasDysfunction) ||
+                            (hasFocus && hasDysfunction)
                               ? "ABRIR PROTOCOLO DE SEPSE IMEDIATO (CRÍTICO)! Colher 2 pares de hemoculturas e lactato arterial imediato. Iniciar antibioticoterapia de amplo espectro na primeira hora ('Golden Hour'). Realizar expansão volêmica imediata (30 mL/kg de cristaloide) se hipotensão ou lactato >= 4.0 mmol/L, e monitorar débito urinário rigoroso."
                               : sirsScore >= 2 && hasFocus
-                              ? "ABRIR PROTOCOLO DE SEPSE! Colher hemoculturas pareadas, dosar lactato (e repetir de 2/2h se > 2.0). Iniciar antibiótico guiado na primeira hora e monitorizar sinais vitais continuamente."
-                              : sirsScore >= 2
-                              ? "SIRS positivo sem foco infeccioso evidente. Avaliar cuidadosamente foco infeccioso oculto (urocultura, radiografia de tórax, hemograma completo). Monitorar de 2/2h."
-                              : "Baixa suspeita pelo SIRS. Manter acompanhamento clínico de rotina."
+                                ? "ABRIR PROTOCOLO DE SEPSE! Colher hemoculturas pareadas, dosar lactato (e repetir de 2/2h se > 2.0). Iniciar antibiótico guiado na primeira hora e monitorizar sinais vitais continuamente."
+                                : sirsScore >= 2
+                                  ? "SIRS positivo sem foco infeccioso evidente. Avaliar cuidadosamente foco infeccioso oculto (urocultura, radiografia de tórax, hemograma completo). Monitorar de 2/2h."
+                                  : "Baixa suspeita pelo SIRS. Manter acompanhamento clínico de rotina."
                           }`;
                         onApply(
                           descText,
-                          (sirsScore >= 2 && hasFocus && hasDysfunction) || (hasFocus && hasDysfunction)
+                          (sirsScore >= 2 && hasFocus && hasDysfunction) ||
+                            (hasFocus && hasDysfunction)
                             ? "SEPSE: PROTOCOLO ATIVO (CRÍTICO)"
                             : sirsScore >= 2 && hasFocus
-                            ? "SEPSE: PROTOCOLO ATIVO"
-                            : `SIRS: ${sirsScore} pts`
+                              ? "SEPSE: PROTOCOLO ATIVO"
+                              : `SIRS: ${sirsScore} pts`,
                         );
                         onClose(false);
-                        toast.success("Escore SIRS integrado ao prontuário com sucesso!");
+                        toast.success(
+                          "Escore SIRS integrado ao prontuário com sucesso!",
+                        );
                       }}
                       className="w-full h-11 rounded-xl font-bold uppercase tracking-wider text-[10px] bg-primary text-primary-foreground"
                     >

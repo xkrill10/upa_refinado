@@ -1,58 +1,109 @@
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
-import { FileText, Calendar, Download, FileSpreadsheet, FileArchive, Info, Users, Clock, Globe, HeartPulse, Activity, ClipboardList, Stethoscope } from "lucide-react";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell,
+} from "recharts";
+import {
+  FileText,
+  Calendar,
+  Download,
+  FileSpreadsheet,
+  FileArchive,
+  Info,
+  Users,
+  Clock,
+  Globe,
+  HeartPulse,
+  Activity,
+  ClipboardList,
+  Stethoscope,
+} from "lucide-react";
 import { motion } from "motion/react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 const attendanceWeeklyData = [
-  { name: 'Seg', total: 110 },
-  { name: 'Ter', total: 135 },
-  { name: 'Qua', total: 95 },
-  { name: 'Qui', total: 145 },
-  { name: 'Sex', total: 170 },
-  { name: 'Sáb', total: 185 },
-  { name: 'Dom', total: 140 },
+  { name: "Seg", total: 110 },
+  { name: "Ter", total: 135 },
+  { name: "Qua", total: 95 },
+  { name: "Qui", total: 145 },
+  { name: "Sex", total: 170 },
+  { name: "Sáb", total: 185 },
+  { name: "Dom", total: 140 },
 ];
 
 const riskDistributionData = [
-  { name: 'Vermelho', value: 8, color: '#ef4444' },
-  { name: 'Laranja', value: 15, color: '#f97316' },
-  { name: 'Amarelo', value: 32, color: '#eab308' },
-  { name: 'Verde', value: 25, color: '#22c55e' },
-  { name: 'Azul', value: 20, color: '#3b82f6' },
+  { name: "Vermelho", value: 8, color: "#ef4444" },
+  { name: "Laranja", value: 15, color: "#f97316" },
+  { name: "Amarelo", value: 32, color: "#eab308" },
+  { name: "Verde", value: 25, color: "#22c55e" },
+  { name: "Azul", value: 20, color: "#3b82f6" },
 ];
 
 const actionComparisonData = [
-  { name: 'Triagem (Entradas)', value: 156 },
-  { name: 'Altas Médicas', value: 114 },
-  { name: 'Exames Raio-X', value: 95 },
-  { name: 'Observação (24h)', value: 24 },
-  { name: 'Transferências', value: 12 },
+  { name: "Triagem (Entradas)", value: 156 },
+  { name: "Altas Médicas", value: 114 },
+  { name: "Exames Raio-X", value: 95 },
+  { name: "Observação (24h)", value: 24 },
+  { name: "Transferências", value: 12 },
 ];
 
 const consolidatedMetrics = [
   { label: "Total de Entradas na Triagem", value: "156", icon: ClipboardList },
   { label: "Pacientes em Observação (24h)", value: "24", icon: Clock },
-  { label: "Transferências Realizadas (Cross/Sisreg)", value: "12", icon: Globe },
+  {
+    label: "Transferências Realizadas (Cross/Sisreg)",
+    value: "12",
+    icon: Globe,
+  },
   { label: "Altas Médicas Concedidas", value: "114", icon: HeartPulse },
   { label: "Óbitos Confirmados", value: "0", icon: Activity },
-  { label: "Exames Laboratoriais Coletados", value: "340", icon: ClipboardList },
+  {
+    label: "Exames Laboratoriais Coletados",
+    value: "340",
+    icon: ClipboardList,
+  },
   { label: "Exames de Raio-X Realizados", value: "95", icon: Stethoscope },
 ];
 
 export default function Reports() {
-  const [selectedKpi, setSelectedKpi] = useState<{ label: string; value: string; sub: string; subColor: string; highlight?: boolean } | null>(null);
+  const [selectedKpi, setSelectedKpi] = useState<{
+    label: string;
+    value: string;
+    sub: string;
+    subColor: string;
+    highlight?: boolean;
+  } | null>(null);
 
-  const currentDate = new Date().toLocaleDateString('pt-BR', {
-    day: '2-digit',
-    month: 'long',
-    year: 'numeric'
+  const currentDate = new Date().toLocaleDateString("pt-BR", {
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
   });
 
   return (
-    <motion.div 
+    <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       className="space-y-6 pb-10"
@@ -60,21 +111,35 @@ export default function Reports() {
       {/* Header Section */}
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
         <div>
-          <h1 className="text-3xl font-black mission-control-title">Relatório do Ministério da Saúde</h1>
+          <h1 className="text-3xl font-black mission-control-title">
+            Relatório do Ministério da Saúde
+          </h1>
           <div className="flex items-center gap-2 text-muted-foreground mt-1">
             <Calendar className="h-4 w-4" />
             <span className="text-sm font-medium">{currentDate}</span>
           </div>
         </div>
-        
+
         <div className="flex gap-2">
-          <Button variant="outline" size="sm" className="glass-card-premium border-red-500/30 text-red-600 hover:text-red-700 hover:bg-red-500/10 dark:text-red-400 dark:hover:text-red-300">
+          <Button
+            variant="outline"
+            size="sm"
+            className="glass-card-premium border-red-500/30 text-red-600 hover:text-red-700 hover:bg-red-500/10 dark:text-red-400 dark:hover:text-red-300"
+          >
             <FileText className="mr-2 h-4 w-4" /> PDF
           </Button>
-          <Button variant="outline" size="sm" className="glass-card-premium border-emerald-500/30 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-500/10 dark:text-emerald-400 dark:hover:text-emerald-300">
+          <Button
+            variant="outline"
+            size="sm"
+            className="glass-card-premium border-emerald-500/30 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-500/10 dark:text-emerald-400 dark:hover:text-emerald-300"
+          >
             <FileSpreadsheet className="mr-2 h-4 w-4" /> EXCEL
           </Button>
-          <Button variant="outline" size="sm" className="glass-card-premium border-blue-500/30 text-blue-600 hover:text-blue-700 hover:bg-blue-500/10 dark:text-blue-400 dark:hover:text-blue-300">
+          <Button
+            variant="outline"
+            size="sm"
+            className="glass-card-premium border-blue-500/30 text-blue-600 hover:text-blue-700 hover:bg-blue-500/10 dark:text-blue-400 dark:hover:text-blue-300"
+          >
             <FileArchive className="mr-2 h-4 w-4" /> WORD
           </Button>
         </div>
@@ -83,22 +148,49 @@ export default function Reports() {
       {/* KPI Cards Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {[
-          { label: "Atendimentos do Dia", value: "142", sub: "+20% em relação a ontem", subColor: "text-emerald-500" },
-          { label: "Taxa de Ocupação Geral", value: "85%", sub: "32/38 leitos ocupados", subColor: "text-muted-foreground" },
-          { label: "Casos de Urgência (Vermelho)", value: "8", sub: "Encaminhados para estabilização/UTI", subColor: "text-red-500", highlight: true },
-          { label: "Tempo Médio de Espera", value: "45 min", sub: "Classificação Verde/Azul", subColor: "text-muted-foreground" },
+          {
+            label: "Atendimentos do Dia",
+            value: "142",
+            sub: "+20% em relação a ontem",
+            subColor: "text-emerald-500",
+          },
+          {
+            label: "Taxa de Ocupação Geral",
+            value: "85%",
+            sub: "32/38 leitos ocupados",
+            subColor: "text-muted-foreground",
+          },
+          {
+            label: "Casos de Urgência (Vermelho)",
+            value: "8",
+            sub: "Encaminhados para estabilização/UTI",
+            subColor: "text-red-500",
+            highlight: true,
+          },
+          {
+            label: "Tempo Médio de Espera",
+            value: "45 min",
+            sub: "Classificação Verde/Azul",
+            subColor: "text-muted-foreground",
+          },
         ].map((kpi, i) => (
-          <motion.div 
-            key={i} 
-            whileTap={{ scale: 0.95 }} 
+          <motion.div
+            key={i}
+            whileTap={{ scale: 0.95 }}
             onClick={() => setSelectedKpi(kpi)}
             className="cursor-pointer"
           >
             <Card className="glass-card-premium border-white/40 dark:border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.12)] hover:scale-[1.02] transition-transform h-full">
               <CardContent className="pt-6">
-                <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-1">{kpi.label}</p>
+                <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-1">
+                  {kpi.label}
+                </p>
                 <div className="flex flex-col">
-                  <span className={`text-4xl font-black tabular-nums ${kpi.highlight ? 'text-red-500' : ''}`}>{kpi.value}</span>
+                  <span
+                    className={`text-4xl font-black tabular-nums ${kpi.highlight ? "text-red-500" : ""}`}
+                  >
+                    {kpi.value}
+                  </span>
                   <p className={`text-[10px] font-bold mt-1 ${kpi.subColor}`}>
                     {kpi.sub}
                   </p>
@@ -114,41 +206,63 @@ export default function Reports() {
         {/* Weekly Attendance Bar Chart */}
         <Card className="lg:col-span-8 glass-card-premium border-white/40 dark:border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.12)]">
           <CardHeader>
-            <CardTitle className="text-xl font-black mission-control-title">Atendimentos por Dia (Última Semana)</CardTitle>
-            <CardDescription className="text-xs uppercase font-bold tracking-widest">Volume diário de pacientes acolhidos na unidade</CardDescription>
+            <CardTitle className="text-xl font-black mission-control-title">
+              Atendimentos por Dia (Última Semana)
+            </CardTitle>
+            <CardDescription className="text-xs uppercase font-bold tracking-widest">
+              Volume diário de pacientes acolhidos na unidade
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="h-[350px] w-full pt-4">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={attendanceWeeklyData}>
                   <defs>
-                    <linearGradient id="barGradient" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="#3b82f6" stopOpacity={1}/>
-                      <stop offset="100%" stopColor="#3b82f6" stopOpacity={0.6}/>
+                    <linearGradient
+                      id="barGradient"
+                      x1="0"
+                      y1="0"
+                      x2="0"
+                      y2="1"
+                    >
+                      <stop offset="0%" stopColor="#3b82f6" stopOpacity={1} />
+                      <stop
+                        offset="100%"
+                        stopColor="#3b82f6"
+                        stopOpacity={0.6}
+                      />
                     </linearGradient>
                   </defs>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
-                  <XAxis 
-                    dataKey="name" 
-                    axisLine={false} 
-                    tickLine={false} 
-                    tick={{fontSize: 12, fontWeight: 600}} 
+                  <CartesianGrid
+                    strokeDasharray="3 3"
+                    vertical={false}
+                    stroke="#e2e8f0"
+                  />
+                  <XAxis
+                    dataKey="name"
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{ fontSize: 12, fontWeight: 600 }}
                     dy={10}
                   />
-                  <YAxis 
-                    axisLine={false} 
-                    tickLine={false} 
-                    tick={{fontSize: 10}} 
+                  <YAxis
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{ fontSize: 10 }}
                   />
-                  <Tooltip 
-                    cursor={{fill: 'transparent', opacity: 0.1}}
-                    contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 30px rgba(0,0,0,0.1)' }} 
+                  <Tooltip
+                    cursor={{ fill: "transparent", opacity: 0.1 }}
+                    contentStyle={{
+                      borderRadius: "12px",
+                      border: "none",
+                      boxShadow: "0 10px 30px rgba(0,0,0,0.1)",
+                    }}
                   />
-                  <Bar 
-                    dataKey="total" 
-                    fill="url(#barGradient)" 
-                    radius={[4, 4, 0, 0]} 
-                    barSize={60} 
+                  <Bar
+                    dataKey="total"
+                    fill="url(#barGradient)"
+                    radius={[4, 4, 0, 0]}
+                    barSize={60}
                   />
                 </BarChart>
               </ResponsiveContainer>
@@ -159,8 +273,12 @@ export default function Reports() {
         {/* Risk Classification Donut Chart */}
         <Card className="lg:col-span-4 glass-card-premium border-white/40 dark:border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.12)]">
           <CardHeader>
-            <CardTitle className="text-xl font-black mission-control-title">Classificação de Risco</CardTitle>
-            <CardDescription className="text-xs uppercase font-bold tracking-widest">Distribuição de pacientes por prioridade</CardDescription>
+            <CardTitle className="text-xl font-black mission-control-title">
+              Classificação de Risco
+            </CardTitle>
+            <CardDescription className="text-xs uppercase font-bold tracking-widest">
+              Distribuição de pacientes por prioridade
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="h-[280px] w-full">
@@ -187,8 +305,13 @@ export default function Reports() {
               <div className="flex flex-wrap gap-x-4 gap-y-2 justify-center">
                 {riskDistributionData.map((risk) => (
                   <div key={risk.name} className="flex items-center gap-1.5">
-                    <div className="h-2 w-2 rounded-full" style={{ backgroundColor: risk.color }} />
-                    <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-tighter">{risk.name}</span>
+                    <div
+                      className="h-2 w-2 rounded-full"
+                      style={{ backgroundColor: risk.color }}
+                    />
+                    <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-tighter">
+                      {risk.name}
+                    </span>
                   </div>
                 ))}
               </div>
@@ -199,8 +322,12 @@ export default function Reports() {
 
       {/* Footer Consolidated Data Section */}
       <div className="space-y-4">
-        <h2 className="text-2xl font-black mission-control-title">Dados Consolidados da Unidade</h2>
-        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground -mt-2">Informações detalhadas das últimas 24 horas para o e-SUS</p>
+        <h2 className="text-2xl font-black mission-control-title">
+          Dados Consolidados da Unidade
+        </h2>
+        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground -mt-2">
+          Informações detalhadas das últimas 24 horas para o e-SUS
+        </p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
@@ -208,14 +335,21 @@ export default function Reports() {
           <CardContent className="pt-6">
             <div className="divide-y divide-border/50">
               {consolidatedMetrics.map((metric, i) => (
-                <div key={i} className="flex items-center justify-between py-4 group hover:bg-primary/5 px-2 transition-colors rounded-lg">
+                <div
+                  key={i}
+                  className="flex items-center justify-between py-4 group hover:bg-primary/5 px-2 transition-colors rounded-lg"
+                >
                   <div className="flex items-center gap-3">
                     <div className="h-8 w-8 rounded-lg bg-muted flex items-center justify-center group-hover:bg-primary/10 transition-colors">
                       <metric.icon className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
                     </div>
-                    <span className="text-sm font-black uppercase tracking-wide text-foreground/80">{metric.label}</span>
+                    <span className="text-sm font-black uppercase tracking-wide text-foreground/80">
+                      {metric.label}
+                    </span>
                   </div>
-                  <span className="text-lg font-black tabular-nums text-primary">{metric.value}</span>
+                  <span className="text-lg font-black tabular-nums text-primary">
+                    {metric.value}
+                  </span>
                 </div>
               ))}
             </div>
@@ -224,7 +358,9 @@ export default function Reports() {
 
         <Card className="lg:col-span-5 glass-card-premium border-white/40 dark:border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.12)]">
           <CardHeader>
-            <CardTitle className="text-[10px] font-black uppercase tracking-[0.1em] text-muted-foreground text-center">Comparativo de Ações e Desfechos (Últimas 24h)</CardTitle>
+            <CardTitle className="text-[10px] font-black uppercase tracking-[0.1em] text-muted-foreground text-center">
+              Comparativo de Ações e Desfechos (Últimas 24h)
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="h-[300px] w-full pt-4">
@@ -234,21 +370,39 @@ export default function Reports() {
                   layout="vertical"
                   margin={{ top: 5, right: 30, left: 100, bottom: 5 }}
                 >
-                  <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} stroke="#e2e8f0" />
+                  <CartesianGrid
+                    strokeDasharray="3 3"
+                    horizontal={true}
+                    vertical={false}
+                    stroke="#e2e8f0"
+                  />
                   <XAxis type="number" hide />
-                  <YAxis 
-                    dataKey="name" 
-                    type="category" 
-                    axisLine={false} 
-                    tickLine={false} 
+                  <YAxis
+                    dataKey="name"
+                    type="category"
+                    axisLine={false}
+                    tickLine={false}
                     width={110}
-                    tick={{ fontSize: 9, fontWeight: 900, fill: 'currentColor' }}
+                    tick={{
+                      fontSize: 9,
+                      fontWeight: 900,
+                      fill: "currentColor",
+                    }}
                   />
-                  <Tooltip 
-                    cursor={{fill: 'transparent', opacity: 0.1}}
-                    contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 30px rgba(0,0,0,0.1)' }}
+                  <Tooltip
+                    cursor={{ fill: "transparent", opacity: 0.1 }}
+                    contentStyle={{
+                      borderRadius: "12px",
+                      border: "none",
+                      boxShadow: "0 10px 30px rgba(0,0,0,0.1)",
+                    }}
                   />
-                  <Bar dataKey="value" fill="#8b5cf6" radius={[0, 4, 4, 0]} barSize={25} />
+                  <Bar
+                    dataKey="value"
+                    fill="#8b5cf6"
+                    radius={[0, 4, 4, 0]}
+                    barSize={25}
+                  />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -262,7 +416,10 @@ export default function Reports() {
         </Card>
       </div>
 
-      <Dialog open={!!selectedKpi} onOpenChange={(open) => !open && setSelectedKpi(null)}>
+      <Dialog
+        open={!!selectedKpi}
+        onOpenChange={(open) => !open && setSelectedKpi(null)}
+      >
         <DialogContent className="sm:max-w-[700px] p-0 overflow-hidden glass-card-premium border-white/40 dark:border-white/10 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.3)] rounded-2xl">
           <DialogHeader className="p-8 pb-4 bg-gradient-to-r from-white/40 to-white/10 dark:from-slate-900/40 dark:to-slate-900/10 border-b border-white/20 dark:border-white/5">
             <DialogTitle className="text-2xl font-black uppercase tracking-tight mission-control-title flex items-center gap-3">
@@ -278,35 +435,58 @@ export default function Reports() {
           <div className="p-8 space-y-6">
             <div className="flex items-center justify-between p-6 bg-white/40 dark:bg-slate-900/40 rounded-xl border border-white/30 dark:border-white/10">
               <div>
-                <p className="text-[10px] font-black uppercase text-muted-foreground tracking-widest">Valor Consolidado</p>
-                <p className={`text-5xl font-black mt-1 ${selectedKpi?.highlight ? 'text-red-500' : 'text-foreground'}`}>{selectedKpi?.value}</p>
+                <p className="text-[10px] font-black uppercase text-muted-foreground tracking-widest">
+                  Valor Consolidado
+                </p>
+                <p
+                  className={`text-5xl font-black mt-1 ${selectedKpi?.highlight ? "text-red-500" : "text-foreground"}`}
+                >
+                  {selectedKpi?.value}
+                </p>
               </div>
               <div className="h-16 w-16 rounded-full border-4 border-primary/20 flex items-center justify-center relative">
                 <Activity className="h-6 w-6 text-primary absolute animate-pulse" />
               </div>
             </div>
-            
+
             <div className="space-y-4">
               <h4 className="text-[11px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2">
                 <ClipboardList className="h-4 w-4" /> Quebra de Dados Recentes
               </h4>
               <div className="grid grid-cols-2 gap-4">
                 <div className="p-4 rounded-xl border border-white/20 dark:border-white/10 bg-white/20 dark:bg-slate-950/20">
-                  <p className="text-[10px] font-black uppercase text-muted-foreground">Variação 24h</p>
-                  <p className="text-lg font-bold text-emerald-500 mt-1">+12.4%</p>
+                  <p className="text-[10px] font-black uppercase text-muted-foreground">
+                    Variação 24h
+                  </p>
+                  <p className="text-lg font-bold text-emerald-500 mt-1">
+                    +12.4%
+                  </p>
                 </div>
                 <div className="p-4 rounded-xl border border-white/20 dark:border-white/10 bg-white/20 dark:bg-slate-950/20">
-                  <p className="text-[10px] font-black uppercase text-muted-foreground">Meta do Período</p>
-                  <p className="text-lg font-bold text-blue-500 mt-1">Atingida</p>
+                  <p className="text-[10px] font-black uppercase text-muted-foreground">
+                    Meta do Período
+                  </p>
+                  <p className="text-lg font-bold text-blue-500 mt-1">
+                    Atingida
+                  </p>
                 </div>
                 <div className="col-span-2 p-4 rounded-xl border border-white/20 dark:border-white/10 bg-white/20 dark:bg-slate-950/20 flex justify-between items-center">
-                  <p className="text-xs font-bold uppercase text-muted-foreground">Última Atualização do Banco</p>
+                  <p className="text-xs font-bold uppercase text-muted-foreground">
+                    Última Atualização do Banco
+                  </p>
                   <p className="text-xs font-mono font-bold">Hoje, 10:45</p>
                 </div>
               </div>
             </div>
-            
-            <Button className="w-full h-12 rounded-xl text-[11px] font-black uppercase tracking-widest" onClick={() => toast.success("Exportação iniciada. O download começará em breve.")}>
+
+            <Button
+              className="w-full h-12 rounded-xl text-[11px] font-black uppercase tracking-widest"
+              onClick={() =>
+                toast.success(
+                  "Exportação iniciada. O download começará em breve.",
+                )
+              }
+            >
               Exportar Detalhamento em CSV
             </Button>
           </div>
@@ -315,5 +495,3 @@ export default function Reports() {
     </motion.div>
   );
 }
-
-

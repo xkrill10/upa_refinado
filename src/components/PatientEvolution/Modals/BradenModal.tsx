@@ -1,7 +1,19 @@
 import React, { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Activity } from "lucide-react";
@@ -32,7 +44,7 @@ export function BradenModal({ isOpen, onClose, onApply }: BradenModalProps) {
 
   let riskClass = "Sem Risco";
   let riskColor = "bg-emerald-500 text-white";
-  
+
   if (score > 0) {
     if (score <= 9) {
       riskClass = "Risco Muito Alto";
@@ -49,7 +61,14 @@ export function BradenModal({ isOpen, onClose, onApply }: BradenModalProps) {
     }
   }
 
-  const isComplete = !!(bradenSensory && bradenMoisture && bradenActivity && bradenMobility && bradenNutrition && bradenFriction);
+  const isComplete = !!(
+    bradenSensory &&
+    bradenMoisture &&
+    bradenActivity &&
+    bradenMobility &&
+    bradenNutrition &&
+    bradenFriction
+  );
 
   const handleClear = () => {
     setBradenSensory("4");
@@ -63,13 +82,16 @@ export function BradenModal({ isOpen, onClose, onApply }: BradenModalProps) {
 
   const handleConfirm = () => {
     const descText = `- ESCALA DE BRADEN (LPP): ${score} pontos (${riskClass.toUpperCase()}).\n  Conduta recomendada: ${
-      score <= 12 
-        ? "Colchão pneumático/piramidal instalado, mudança de decúbito estrita de 2/2h, hidratação profunda da pele, proteção de calcâneos." 
-        : score <= 14 
-        ? "Mudança de decúbito programada de 3/3h, aplicação de película protetora de pele, manter pele seca e limpa." 
-        : "Manter mobilização activa/passiva no leito, hidratação regular da pele e observação diária."
+      score <= 12
+        ? "Colchão pneumático/piramidal instalado, mudança de decúbito estrita de 2/2h, hidratação profunda da pele, proteção de calcâneos."
+        : score <= 14
+          ? "Mudança de decúbito programada de 3/3h, aplicação de película protetora de pele, manter pele seca e limpa."
+          : "Manter mobilização activa/passiva no leito, hidratação regular da pele e observação diária."
     }`;
-    onApply(descText, `${score} pts (${riskClass === "Risco Alto" || riskClass === "Risco Muito Alto" ? "Alto" : riskClass === "Risco Moderado" ? "Mod" : "Baixo"})`);
+    onApply(
+      descText,
+      `${score} pts (${riskClass === "Risco Alto" || riskClass === "Risco Muito Alto" ? "Alto" : riskClass === "Risco Moderado" ? "Mod" : "Baixo"})`,
+    );
     onClose(false);
     toast.success("Resultado da Escala de Braden inserido no prontuário!");
   };
@@ -90,7 +112,9 @@ export function BradenModal({ isOpen, onClose, onApply }: BradenModalProps) {
         <div className="space-y-4 py-3">
           {/* 1. Percepção Sensorial */}
           <div className="space-y-1">
-            <Label className="text-xs font-black uppercase text-foreground/80">1. Percepção Sensorial</Label>
+            <Label className="text-xs font-black uppercase text-foreground/80">
+              1. Percepção Sensorial
+            </Label>
             <Select value={bradenSensory} onValueChange={setBradenSensory}>
               <SelectTrigger className="h-10 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
                 <SelectValue placeholder="Selecione o nível de percepção..." />
@@ -106,7 +130,9 @@ export function BradenModal({ isOpen, onClose, onApply }: BradenModalProps) {
 
           {/* 2. Umidade */}
           <div className="space-y-1">
-            <Label className="text-xs font-black uppercase text-foreground/80">2. Umidade da Pele</Label>
+            <Label className="text-xs font-black uppercase text-foreground/80">
+              2. Umidade da Pele
+            </Label>
             <Select value={bradenMoisture} onValueChange={setBradenMoisture}>
               <SelectTrigger className="h-10 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
                 <SelectValue placeholder="Selecione o nível de umidade..." />
@@ -122,7 +148,9 @@ export function BradenModal({ isOpen, onClose, onApply }: BradenModalProps) {
 
           {/* 3. Atividade */}
           <div className="space-y-1">
-            <Label className="text-xs font-black uppercase text-foreground/80">3. Atividade Física</Label>
+            <Label className="text-xs font-black uppercase text-foreground/80">
+              3. Atividade Física
+            </Label>
             <Select value={bradenActivity} onValueChange={setBradenActivity}>
               <SelectTrigger className="h-10 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
                 <SelectValue placeholder="Selecione a atividade física..." />
@@ -138,7 +166,9 @@ export function BradenModal({ isOpen, onClose, onApply }: BradenModalProps) {
 
           {/* 4. Mobilidade */}
           <div className="space-y-1">
-            <Label className="text-xs font-black uppercase text-foreground/80">4. Mobilidade (Capacidade de mudar posição)</Label>
+            <Label className="text-xs font-black uppercase text-foreground/80">
+              4. Mobilidade (Capacidade de mudar posição)
+            </Label>
             <Select value={bradenMobility} onValueChange={setBradenMobility}>
               <SelectTrigger className="h-10 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
                 <SelectValue placeholder="Selecione o nível de mobilidade..." />
@@ -154,7 +184,9 @@ export function BradenModal({ isOpen, onClose, onApply }: BradenModalProps) {
 
           {/* 5. Nutrição */}
           <div className="space-y-1">
-            <Label className="text-xs font-black uppercase text-foreground/80">5. Padrão de Nutrição</Label>
+            <Label className="text-xs font-black uppercase text-foreground/80">
+              5. Padrão de Nutrição
+            </Label>
             <Select value={bradenNutrition} onValueChange={setBradenNutrition}>
               <SelectTrigger className="h-10 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
                 <SelectValue placeholder="Selecione o padrão nutricional..." />
@@ -170,7 +202,9 @@ export function BradenModal({ isOpen, onClose, onApply }: BradenModalProps) {
 
           {/* 6. Fricção e Cisalhamento */}
           <div className="space-y-1">
-            <Label className="text-xs font-black uppercase text-foreground/80">6. Fricção e Cisalhamento</Label>
+            <Label className="text-xs font-black uppercase text-foreground/80">
+              6. Fricção e Cisalhamento
+            </Label>
             <Select value={bradenFriction} onValueChange={setBradenFriction}>
               <SelectTrigger className="h-10 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
                 <SelectValue placeholder="Selecione fricção/cisalhamento..." />
@@ -187,15 +221,30 @@ export function BradenModal({ isOpen, onClose, onApply }: BradenModalProps) {
           <div className="mt-6 p-4 rounded-xl bg-slate-50/70 dark:bg-slate-900/40 backdrop-blur-md border border-slate-200/60 dark:border-slate-800/50 space-y-3">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-[10px] font-black uppercase text-muted-foreground tracking-wider">Pontuação Calculada</p>
-                <p className="text-3xl font-black text-foreground">{isComplete ? score : 0} <span className="text-sm font-bold text-muted-foreground">pts</span></p>
+                <p className="text-[10px] font-black uppercase text-muted-foreground tracking-wider">
+                  Pontuação Calculada
+                </p>
+                <p className="text-3xl font-black text-foreground">
+                  {isComplete ? score : 0}{" "}
+                  <span className="text-sm font-bold text-muted-foreground">
+                    pts
+                  </span>
+                </p>
               </div>
               {isComplete ? (
-                <Badge className={cn("h-7 rounded-lg text-xs font-black uppercase tracking-wider", riskColor)}>
+                <Badge
+                  className={cn(
+                    "h-7 rounded-lg text-xs font-black uppercase tracking-wider",
+                    riskColor,
+                  )}
+                >
                   {riskClass}
                 </Badge>
               ) : (
-                <Badge variant="secondary" className="h-7 rounded-lg text-xs font-black uppercase tracking-wider">
+                <Badge
+                  variant="secondary"
+                  className="h-7 rounded-lg text-xs font-black uppercase tracking-wider"
+                >
                   Incompleto
                 </Badge>
               )}

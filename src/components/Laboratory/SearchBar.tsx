@@ -1,6 +1,12 @@
 import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface Filters {
   status: string;
@@ -25,9 +31,9 @@ export function SearchBar({ onSearch, onFilter }: SearchBarProps) {
 
   // Notify filter changes immediately
   useEffect(() => {
-    onFilter({ 
-      status: status === "all" ? "" : status, 
-      priority: priority === "all" ? "" : priority 
+    onFilter({
+      status: status === "all" ? "" : status,
+      priority: priority === "all" ? "" : priority,
     });
   }, [status, priority, onFilter]);
 
@@ -37,7 +43,7 @@ export function SearchBar({ onSearch, onFilter }: SearchBarProps) {
         <Input
           placeholder="Buscar por paciente, exame ou ticket…"
           value={query}
-          onChange={e => setQuery(e.target.value)}
+          onChange={(e) => setQuery(e.target.value)}
         />
       </div>
       <Select value={status} onValueChange={setStatus}>

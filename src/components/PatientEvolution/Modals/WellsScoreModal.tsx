@@ -1,7 +1,19 @@
 import React, { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Activity } from "lucide-react";
@@ -14,7 +26,11 @@ interface WellsScoreModalProps {
   onApply: (descText: string, summary: string) => void;
 }
 
-export function WellsScoreModal({ isOpen, onClose, onApply }: WellsScoreModalProps) {
+export function WellsScoreModal({
+  isOpen,
+  onClose,
+  onApply,
+}: WellsScoreModalProps) {
   const [dvtSigns, setDvtSigns] = useState("");
   const [altDiagnosis, setAltDiagnosis] = useState("");
   const [hr, setHr] = useState("");
@@ -23,7 +39,15 @@ export function WellsScoreModal({ isOpen, onClose, onApply }: WellsScoreModalPro
   const [hemoptysis, setHemoptysis] = useState("");
   const [malignancy, setMalignancy] = useState("");
 
-  const isComplete = !!(dvtSigns && altDiagnosis && hr && immobility && prevDvt && hemoptysis && malignancy);
+  const isComplete = !!(
+    dvtSigns &&
+    altDiagnosis &&
+    hr &&
+    immobility &&
+    prevDvt &&
+    hemoptysis &&
+    malignancy
+  );
 
   let score = 0;
   if (dvtSigns === "3") score += 3;
@@ -45,7 +69,8 @@ export function WellsScoreModal({ isOpen, onClose, onApply }: WellsScoreModalPro
   } else {
     riskClass = "TEP IMPROVÁVEL";
     riskColor = "bg-emerald-500 text-white";
-    conduta = "Considerar solicitação de D-Dímero para exclusão ou avaliar outros diagnósticos.";
+    conduta =
+      "Considerar solicitação de D-Dímero para exclusão ou avaliar outros diagnósticos.";
   }
 
   return (
@@ -64,7 +89,9 @@ export function WellsScoreModal({ isOpen, onClose, onApply }: WellsScoreModalPro
         <div className="space-y-4 py-2">
           {/* DVT Signs */}
           <div className="space-y-1">
-            <Label className="text-xs font-black uppercase text-foreground/80">Sinais Clínicos de TVP (Edema e dor à palpação)</Label>
+            <Label className="text-xs font-black uppercase text-foreground/80">
+              Sinais Clínicos de TVP (Edema e dor à palpação)
+            </Label>
             <Select value={dvtSigns} onValueChange={setDvtSigns}>
               <SelectTrigger className="h-10 rounded-xl bg-slate-50/50 dark:bg-slate-900/50">
                 <SelectValue placeholder="Selecione..." />
@@ -78,7 +105,9 @@ export function WellsScoreModal({ isOpen, onClose, onApply }: WellsScoreModalPro
 
           {/* Alternative Diagnosis */}
           <div className="space-y-1">
-            <Label className="text-xs font-black uppercase text-foreground/80">TEP é o diagnóstico mais provável?</Label>
+            <Label className="text-xs font-black uppercase text-foreground/80">
+              TEP é o diagnóstico mais provável?
+            </Label>
             <Select value={altDiagnosis} onValueChange={setAltDiagnosis}>
               <SelectTrigger className="h-10 rounded-xl bg-slate-50/50 dark:bg-slate-900/50">
                 <SelectValue placeholder="Selecione..." />
@@ -92,7 +121,9 @@ export function WellsScoreModal({ isOpen, onClose, onApply }: WellsScoreModalPro
 
           {/* HR */}
           <div className="space-y-1">
-            <Label className="text-xs font-black uppercase text-foreground/80">Frequência Cardíaca &gt; 100 bpm</Label>
+            <Label className="text-xs font-black uppercase text-foreground/80">
+              Frequência Cardíaca &gt; 100 bpm
+            </Label>
             <Select value={hr} onValueChange={setHr}>
               <SelectTrigger className="h-10 rounded-xl bg-slate-50/50 dark:bg-slate-900/50">
                 <SelectValue placeholder="Selecione..." />
@@ -106,7 +137,9 @@ export function WellsScoreModal({ isOpen, onClose, onApply }: WellsScoreModalPro
 
           {/* Immobility */}
           <div className="space-y-1">
-            <Label className="text-xs font-black uppercase text-foreground/80">Imobilização (&ge; 3 dias) ou Cirurgia nas últimas 4 semanas</Label>
+            <Label className="text-xs font-black uppercase text-foreground/80">
+              Imobilização (&ge; 3 dias) ou Cirurgia nas últimas 4 semanas
+            </Label>
             <Select value={immobility} onValueChange={setImmobility}>
               <SelectTrigger className="h-10 rounded-xl bg-slate-50/50 dark:bg-slate-900/50">
                 <SelectValue placeholder="Selecione..." />
@@ -120,7 +153,9 @@ export function WellsScoreModal({ isOpen, onClose, onApply }: WellsScoreModalPro
 
           {/* Prev DVT */}
           <div className="space-y-1">
-            <Label className="text-xs font-black uppercase text-foreground/80">TVP ou TEP prévio diagnosticado</Label>
+            <Label className="text-xs font-black uppercase text-foreground/80">
+              TVP ou TEP prévio diagnosticado
+            </Label>
             <Select value={prevDvt} onValueChange={setPrevDvt}>
               <SelectTrigger className="h-10 rounded-xl bg-slate-50/50 dark:bg-slate-900/50">
                 <SelectValue placeholder="Selecione..." />
@@ -134,7 +169,9 @@ export function WellsScoreModal({ isOpen, onClose, onApply }: WellsScoreModalPro
 
           {/* Hemoptysis */}
           <div className="space-y-1">
-            <Label className="text-xs font-black uppercase text-foreground/80">Hemoptise</Label>
+            <Label className="text-xs font-black uppercase text-foreground/80">
+              Hemoptise
+            </Label>
             <Select value={hemoptysis} onValueChange={setHemoptysis}>
               <SelectTrigger className="h-10 rounded-xl bg-slate-50/50 dark:bg-slate-900/50">
                 <SelectValue placeholder="Selecione..." />
@@ -148,7 +185,9 @@ export function WellsScoreModal({ isOpen, onClose, onApply }: WellsScoreModalPro
 
           {/* Malignancy */}
           <div className="space-y-1">
-            <Label className="text-xs font-black uppercase text-foreground/80">Malignidade (em tratamento ou paliativo)</Label>
+            <Label className="text-xs font-black uppercase text-foreground/80">
+              Malignidade (em tratamento ou paliativo)
+            </Label>
             <Select value={malignancy} onValueChange={setMalignancy}>
               <SelectTrigger className="h-10 rounded-xl bg-slate-50/50 dark:bg-slate-900/50">
                 <SelectValue placeholder="Selecione..." />
@@ -164,15 +203,30 @@ export function WellsScoreModal({ isOpen, onClose, onApply }: WellsScoreModalPro
           <div className="mt-6 p-4 rounded-xl bg-slate-50/70 dark:bg-slate-900/40 border border-slate-200/60 dark:border-slate-800/50 space-y-3">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-[10px] font-black uppercase text-muted-foreground tracking-wider">Pontuação Total</p>
-                <p className="text-3xl font-black text-foreground">{score} <span className="text-sm font-bold text-muted-foreground">pts</span></p>
+                <p className="text-[10px] font-black uppercase text-muted-foreground tracking-wider">
+                  Pontuação Total
+                </p>
+                <p className="text-3xl font-black text-foreground">
+                  {score}{" "}
+                  <span className="text-sm font-bold text-muted-foreground">
+                    pts
+                  </span>
+                </p>
               </div>
               {isComplete ? (
-                <Badge className={cn("h-7 rounded-lg text-[10px] font-black uppercase px-2", riskColor)}>
+                <Badge
+                  className={cn(
+                    "h-7 rounded-lg text-[10px] font-black uppercase px-2",
+                    riskColor,
+                  )}
+                >
                   {riskClass}
                 </Badge>
               ) : (
-                <Badge variant="secondary" className="h-7 rounded-lg text-xs font-black uppercase">
+                <Badge
+                  variant="secondary"
+                  className="h-7 rounded-lg text-xs font-black uppercase"
+                >
                   Incompleto
                 </Badge>
               )}
@@ -183,7 +237,13 @@ export function WellsScoreModal({ isOpen, onClose, onApply }: WellsScoreModalPro
                 type="button"
                 variant="outline"
                 onClick={() => {
-                  setDvtSigns(""); setAltDiagnosis(""); setHr(""); setImmobility(""); setPrevDvt(""); setHemoptysis(""); setMalignancy("");
+                  setDvtSigns("");
+                  setAltDiagnosis("");
+                  setHr("");
+                  setImmobility("");
+                  setPrevDvt("");
+                  setHemoptysis("");
+                  setMalignancy("");
                   toast.info("Campos limpos.");
                 }}
                 className="h-11 px-6 rounded-xl font-bold uppercase text-[10px]"

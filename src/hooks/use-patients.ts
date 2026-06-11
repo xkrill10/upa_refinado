@@ -1,4 +1,4 @@
-import { usePatientsContext, Patient } from '@/context/PatientsContext';
+import { usePatientsContext, Patient } from "@/context/PatientsContext";
 
 export type { Patient };
 

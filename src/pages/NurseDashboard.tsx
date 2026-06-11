@@ -3,7 +3,17 @@ import { useNavigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Stethoscope, Baby, DoorOpen, User, Syringe, BedDouble, HeartPulse, Activity, AlertTriangle } from "lucide-react";
+import {
+  Stethoscope,
+  Baby,
+  DoorOpen,
+  User,
+  Syringe,
+  BedDouble,
+  HeartPulse,
+  Activity,
+  AlertTriangle,
+} from "lucide-react";
 import { motion } from "motion/react";
 import { cn, formatWords } from "@/lib/utils";
 import {
@@ -15,34 +25,98 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const ROOMS = [
-  { id: "TRIAGEM 1", name: "Triagem 1", type: "triage", destination: "/sala/triagem", icon: Stethoscope, color: "blue" },
-  { id: "TRIAGEM 2", name: "Triagem 2", type: "triage", destination: "/sala/triagem", icon: Stethoscope, color: "blue" },
-  { id: "TRIAGEM 3", name: "Triagem 3", type: "triage", destination: "/sala/triagem", icon: Stethoscope, color: "blue" },
-  { id: "TRIAGEM PEDIÁTRICA 1", name: "Triagem Pediátrica 1", type: "pediatric-triage", destination: "/sala/pediatria", icon: Baby, color: "orange" },
-  { id: "TRIAGEM PEDIÁTRICA 2", name: "Triagem Pediátrica 2", type: "pediatric-triage", destination: "/sala/pediatria", icon: Baby, color: "orange" },
+  {
+    id: "TRIAGEM 1",
+    name: "Triagem 1",
+    type: "triage",
+    destination: "/sala/triagem",
+    icon: Stethoscope,
+    color: "blue",
+  },
+  {
+    id: "TRIAGEM 2",
+    name: "Triagem 2",
+    type: "triage",
+    destination: "/sala/triagem",
+    icon: Stethoscope,
+    color: "blue",
+  },
+  {
+    id: "TRIAGEM 3",
+    name: "Triagem 3",
+    type: "triage",
+    destination: "/sala/triagem",
+    icon: Stethoscope,
+    color: "blue",
+  },
+  {
+    id: "TRIAGEM PEDIÁTRICA 1",
+    name: "Triagem Pediátrica 1",
+    type: "pediatric-triage",
+    destination: "/sala/pediatria",
+    icon: Baby,
+    color: "orange",
+  },
+  {
+    id: "TRIAGEM PEDIÁTRICA 2",
+    name: "Triagem Pediátrica 2",
+    type: "pediatric-triage",
+    destination: "/sala/pediatria",
+    icon: Baby,
+    color: "orange",
+  },
 
-  { id: "SALA DE MEDICAÇÃO", name: "Sala de Medicação", type: "medication", destination: "/sala/checagem", icon: Syringe, color: "emerald" },
-  { id: "OBSERVAÇÃO ADULTO", name: "Observação Adulto", type: "medication", destination: "/sala/checagem", icon: BedDouble, color: "emerald" },
-  { id: "OBSERVAÇÃO PEDIÁTRICA", name: "Observação Pediátrica", type: "medication", destination: "/sala/checagem", icon: BedDouble, color: "orange" },
+  {
+    id: "SALA DE MEDICAÇÃO",
+    name: "Sala de Medicação",
+    type: "medication",
+    destination: "/sala/checagem",
+    icon: Syringe,
+    color: "emerald",
+  },
+  {
+    id: "OBSERVAÇÃO ADULTO",
+    name: "Observação Adulto",
+    type: "medication",
+    destination: "/sala/checagem",
+    icon: BedDouble,
+    color: "emerald",
+  },
+  {
+    id: "OBSERVAÇÃO PEDIÁTRICA",
+    name: "Observação Pediátrica",
+    type: "medication",
+    destination: "/sala/checagem",
+    icon: BedDouble,
+    color: "orange",
+  },
 ];
 
 export default function NurseDashboard() {
   const navigate = useNavigate();
-  const [selectedRoom, setSelectedRoom] = useState<typeof ROOMS[0] | null>(null);
+  const [selectedRoom, setSelectedRoom] = useState<(typeof ROOMS)[0] | null>(
+    null,
+  );
   const [nurseName, setNurseName] = useState("");
-  const [corenNumber, setCorenNumber] = useState(() => localStorage.getItem("upa_stamp_number") || "");
-  const [corenState, setCorenState] = useState(() => localStorage.getItem("upa_stamp_state") || "");
-  const [occupiedRooms, setOccupiedRooms] = useState<Record<string, string>>({});
+  const [corenNumber, setCorenNumber] = useState(
+    () => localStorage.getItem("upa_stamp_number") || "",
+  );
+  const [corenState, setCorenState] = useState(
+    () => localStorage.getItem("upa_stamp_state") || "",
+  );
+  const [occupiedRooms, setOccupiedRooms] = useState<Record<string, string>>(
+    {},
+  );
   const currentRoomId = localStorage.getItem("upa_active_room");
   const lastColorRef = useRef<string>("blue");
 
-  const handleSelectRoom = (room: typeof ROOMS[0]) => {
+  const handleSelectRoom = (room: (typeof ROOMS)[0]) => {
     setSelectedRoom(room);
     const savedNurse = localStorage.getItem("upa_active_nurse");
     const savedCoren = localStorage.getItem("upa_stamp_number") || "";
     const savedState = localStorage.getItem("upa_stamp_state") || "SP";
     const isMyRoom = localStorage.getItem("upa_active_room") === room.id;
-    
+
     if (isMyRoom && savedNurse) {
       let initialName = savedNurse;
       if (!/^enf[a]?\.?\s+/i.test(initialName.trim())) {
@@ -67,14 +141,14 @@ export default function NurseDashboard() {
   useEffect(() => {
     const currentRoom = localStorage.getItem("upa_active_room");
     const currentNurse = localStorage.getItem("upa_active_nurse");
-    
+
     if (currentRoom && currentNurse) {
       // Formata igual ao que aparece no campo de nome
       let formattedName = currentNurse;
       if (!/^enf[a]?\.?\s+/i.test(formattedName.trim())) {
         formattedName = `Enf. ${formattedName.trim()}`;
       }
-      setOccupiedRooms(prev => ({ ...prev, [currentRoom]: formattedName }));
+      setOccupiedRooms((prev) => ({ ...prev, [currentRoom]: formattedName }));
     }
   }, []);
 
@@ -83,7 +157,7 @@ export default function NurseDashboard() {
 
     localStorage.setItem("upa_active_room", selectedRoom.id);
     localStorage.setItem("upa_active_nurse", nurseName.trim());
-    
+
     // Salvar carimbo digital integrado
     localStorage.setItem("upa_stamp_name", nurseName.trim());
     localStorage.setItem("upa_stamp_council", "COREN");
@@ -100,7 +174,7 @@ export default function NurseDashboard() {
   return (
     <div className="flex-1 w-full flex flex-col items-center justify-start min-h-[calc(100vh-6rem)] p-4 sm:p-8 pt-12 sm:pt-20 relative">
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-emerald-500/5 rounded-full blur-[120px] pointer-events-none" />
-      
+
       <div className="max-w-5xl w-full z-10 space-y-8">
         <div className="text-center space-y-3">
           <div className="inline-flex items-center justify-center p-3 rounded-2xl bg-white/60 dark:bg-slate-900/40 backdrop-blur-xl shadow-[0_8px_32px_0_rgba(0,0,0,0.1)] border border-white/50 dark:border-white/10 mb-2">
@@ -117,22 +191,22 @@ export default function NurseDashboard() {
         <Tabs defaultValue="triage" className="w-full max-w-4xl mx-auto">
           <div className="flex justify-center mb-8">
             <TabsList className="grid w-full max-w-2xl grid-cols-3 p-1.5 bg-white/40 dark:bg-slate-900/40 backdrop-blur-2xl border border-white/50 dark:border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.1)] rounded-2xl h-14">
-              <TabsTrigger 
-                value="triage" 
+              <TabsTrigger
+                value="triage"
                 className="rounded-xl text-[10px] sm:text-xs font-black uppercase tracking-widest data-[state=active]:bg-[#006699] data-[state=active]:text-white data-[state=active]:shadow-md transition-all duration-300"
               >
                 <Stethoscope className="h-4 w-4 mr-1 sm:mr-2" />
                 Triagem
               </TabsTrigger>
-              <TabsTrigger 
-                value="pediatric-triage" 
+              <TabsTrigger
+                value="pediatric-triage"
                 className="rounded-xl text-[10px] sm:text-xs font-black uppercase tracking-widest data-[state=active]:bg-orange-500 data-[state=active]:text-white data-[state=active]:shadow-md transition-all duration-300"
               >
                 <Baby className="h-4 w-4 mr-1 sm:mr-2" />
                 Triagem Pediátrica
               </TabsTrigger>
-              <TabsTrigger 
-                value="medication" 
+              <TabsTrigger
+                value="medication"
                 className="rounded-xl text-[10px] sm:text-xs font-black uppercase tracking-widest data-[state=active]:bg-emerald-600 data-[state=active]:text-white data-[state=active]:shadow-md transition-all duration-300"
               >
                 <Syringe className="h-4 w-4 mr-1 sm:mr-2" />
@@ -141,9 +215,12 @@ export default function NurseDashboard() {
             </TabsList>
           </div>
 
-          <TabsContent value="triage" className="mt-0 focus-visible:outline-none focus-visible:ring-0">
+          <TabsContent
+            value="triage"
+            className="mt-0 focus-visible:outline-none focus-visible:ring-0"
+          >
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {ROOMS.filter(r => r.type === 'triage').map((room) => {
+              {ROOMS.filter((r) => r.type === "triage").map((room) => {
                 const isOccupied = !!occupiedRooms[room.id];
                 const occupant = occupiedRooms[room.id];
                 const isOccupiedByMe = currentRoomId === room.id;
@@ -155,29 +232,31 @@ export default function NurseDashboard() {
                     whileHover={{ scale: 1.02, y: -2 }}
                     whileTap={{ scale: 0.98 }}
                   >
-                    <Card 
+                    <Card
                       className={cn(
                         "relative overflow-hidden cursor-pointer transition-all duration-300 h-full border-2",
                         isOccupiedByMe
                           ? "border-emerald-500/40 dark:border-emerald-400/40 hover:border-emerald-500/60 shadow-[0_4px_20px_0_rgba(16,185,129,0.1)] bg-emerald-50/50 dark:bg-emerald-950/20 backdrop-blur-xl"
-                          : isOccupied 
-                          ? "opacity-80 border-slate-300 dark:border-slate-700 bg-white/40 dark:bg-slate-900/20 backdrop-blur-md hover:border-slate-400 dark:hover:border-slate-600" 
-                          : "border-[#006699]/20 dark:border-sky-400/20 hover:border-[#006699]/40 dark:hover:border-sky-400/40 hover:shadow-[0_8px_32px_0_rgba(0,102,153,0.15)] bg-gradient-to-br from-[#006699]/10 to-[#006699]/5 dark:from-[#006699]/20 dark:to-[#006699]/10 backdrop-blur-xl shadow-[0_4px_16px_0_rgba(0,0,0,0.05)]"
+                          : isOccupied
+                            ? "opacity-80 border-slate-300 dark:border-slate-700 bg-white/40 dark:bg-slate-900/20 backdrop-blur-md hover:border-slate-400 dark:hover:border-slate-600"
+                            : "border-[#006699]/20 dark:border-sky-400/20 hover:border-[#006699]/40 dark:hover:border-sky-400/40 hover:shadow-[0_8px_32px_0_rgba(0,102,153,0.15)] bg-gradient-to-br from-[#006699]/10 to-[#006699]/5 dark:from-[#006699]/20 dark:to-[#006699]/10 backdrop-blur-xl shadow-[0_4px_16px_0_rgba(0,0,0,0.05)]",
                       )}
                       onClick={() => handleSelectRoom(room)}
                     >
                       <CardContent className="p-6 sm:p-8 flex flex-col items-center text-center space-y-4">
-                        <div className={cn(
-                          "p-4 rounded-2xl transition-colors",
-                          isOccupiedByMe
-                            ? "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400"
-                            : isOccupied 
-                            ? "bg-red-500/10 text-red-500 dark:text-red-400"
-                            : "bg-[#006699]/15 text-[#006699] dark:bg-sky-400/20 dark:text-sky-400"
-                        )}>
+                        <div
+                          className={cn(
+                            "p-4 rounded-2xl transition-colors",
+                            isOccupiedByMe
+                              ? "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400"
+                              : isOccupied
+                                ? "bg-red-500/10 text-red-500 dark:text-red-400"
+                                : "bg-[#006699]/15 text-[#006699] dark:bg-sky-400/20 dark:text-sky-400",
+                          )}
+                        >
                           <Icon className="h-8 w-8" />
                         </div>
-                        
+
                         <div className="space-y-2">
                           <h3 className="font-black text-sm sm:text-base uppercase tracking-tight text-foreground">
                             {room.name}
@@ -209,77 +288,93 @@ export default function NurseDashboard() {
             </div>
           </TabsContent>
 
-          <TabsContent value="pediatric-triage" className="mt-0 focus-visible:outline-none focus-visible:ring-0">
+          <TabsContent
+            value="pediatric-triage"
+            className="mt-0 focus-visible:outline-none focus-visible:ring-0"
+          >
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {ROOMS.filter(r => r.type === 'pediatric-triage').map((room) => {
-                const isOccupied = !!occupiedRooms[room.id];
-                const occupant = occupiedRooms[room.id];
-                const isOccupiedByMe = currentRoomId === room.id;
-                const Icon = room.icon;
+              {ROOMS.filter((r) => r.type === "pediatric-triage").map(
+                (room) => {
+                  const isOccupied = !!occupiedRooms[room.id];
+                  const occupant = occupiedRooms[room.id];
+                  const isOccupiedByMe = currentRoomId === room.id;
+                  const Icon = room.icon;
 
-                return (
-                  <motion.div
-                    key={room.id}
-                    whileHover={!isOccupied || isOccupiedByMe ? { scale: 1.02, y: -2 } : {}}
-                    whileTap={!isOccupied || isOccupiedByMe ? { scale: 0.98 } : {}}
-                  >
-                    <Card 
-                      className={cn(
-                        "relative overflow-hidden cursor-pointer transition-all duration-300 h-full border-2",
-                        isOccupiedByMe
-                          ? "border-emerald-500/40 dark:border-emerald-400/40 hover:border-emerald-500/60 shadow-[0_4px_20px_0_rgba(16,185,129,0.1)] bg-emerald-50/50 dark:bg-emerald-950/20 backdrop-blur-xl"
-                          : isOccupied 
-                          ? "opacity-80 border-slate-300 dark:border-slate-700 bg-white/40 dark:bg-slate-900/20 backdrop-blur-md hover:border-slate-400 dark:hover:border-slate-600" 
-                          : "border-orange-500/20 dark:border-orange-400/20 hover:border-orange-500/40 dark:hover:border-orange-400/40 hover:shadow-[0_8px_32px_0_rgba(249,115,22,0.15)] bg-gradient-to-br from-orange-500/10 to-orange-500/5 dark:from-orange-500/20 dark:to-orange-500/10 backdrop-blur-xl shadow-[0_4px_16px_0_rgba(0,0,0,0.05)]"
-                      )}
-                      onClick={() => handleSelectRoom(room)}
+                  return (
+                    <motion.div
+                      key={room.id}
+                      whileHover={
+                        !isOccupied || isOccupiedByMe
+                          ? { scale: 1.02, y: -2 }
+                          : {}
+                      }
+                      whileTap={
+                        !isOccupied || isOccupiedByMe ? { scale: 0.98 } : {}
+                      }
                     >
-                      <CardContent className="p-6 sm:p-8 flex flex-col items-center text-center space-y-4">
-                        <div className={cn(
-                          "p-4 rounded-2xl transition-colors",
+                      <Card
+                        className={cn(
+                          "relative overflow-hidden cursor-pointer transition-all duration-300 h-full border-2",
                           isOccupiedByMe
-                            ? "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400"
-                            : isOccupied 
-                            ? "bg-red-500/10 text-red-500 dark:text-red-400"
-                            : "bg-orange-500/15 text-orange-600 dark:bg-orange-400/20 dark:text-orange-400"
-                        )}>
-                          <Icon className="h-8 w-8" />
-                        </div>
-                        
-                        <div className="space-y-2">
-                          <h3 className="font-black text-sm sm:text-base uppercase tracking-tight text-foreground">
-                            {room.name}
-                          </h3>
-                          <div className="flex justify-center">
-                            {isOccupiedByMe ? (
-                              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/15 text-[9px] sm:text-[10px] font-bold uppercase tracking-widest text-emerald-700 dark:text-emerald-400">
-                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                                <span>Sua Sala - Voltar</span>
-                              </div>
-                            ) : isOccupied ? (
-                              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-500/10 text-[9px] sm:text-[10px] font-bold uppercase tracking-widest text-red-600 dark:text-red-400">
-                                <span className="w-1.5 h-1.5 rounded-full bg-red-500" />
-                                <span>Ocupado: {occupant}</span>
-                              </div>
-                            ) : (
-                              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[9px] sm:text-[10px] font-bold uppercase tracking-widest bg-orange-500/15 text-orange-600 dark:bg-orange-400/20 dark:text-orange-400">
-                                <span className="w-1.5 h-1.5 rounded-full bg-orange-500 dark:bg-orange-400 animate-pulse" />
-                                Livre para Entrada
-                              </div>
+                            ? "border-emerald-500/40 dark:border-emerald-400/40 hover:border-emerald-500/60 shadow-[0_4px_20px_0_rgba(16,185,129,0.1)] bg-emerald-50/50 dark:bg-emerald-950/20 backdrop-blur-xl"
+                            : isOccupied
+                              ? "opacity-80 border-slate-300 dark:border-slate-700 bg-white/40 dark:bg-slate-900/20 backdrop-blur-md hover:border-slate-400 dark:hover:border-slate-600"
+                              : "border-orange-500/20 dark:border-orange-400/20 hover:border-orange-500/40 dark:hover:border-orange-400/40 hover:shadow-[0_8px_32px_0_rgba(249,115,22,0.15)] bg-gradient-to-br from-orange-500/10 to-orange-500/5 dark:from-orange-500/20 dark:to-orange-500/10 backdrop-blur-xl shadow-[0_4px_16px_0_rgba(0,0,0,0.05)]",
+                        )}
+                        onClick={() => handleSelectRoom(room)}
+                      >
+                        <CardContent className="p-6 sm:p-8 flex flex-col items-center text-center space-y-4">
+                          <div
+                            className={cn(
+                              "p-4 rounded-2xl transition-colors",
+                              isOccupiedByMe
+                                ? "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400"
+                                : isOccupied
+                                  ? "bg-red-500/10 text-red-500 dark:text-red-400"
+                                  : "bg-orange-500/15 text-orange-600 dark:bg-orange-400/20 dark:text-orange-400",
                             )}
+                          >
+                            <Icon className="h-8 w-8" />
                           </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </motion.div>
-                );
-              })}
+
+                          <div className="space-y-2">
+                            <h3 className="font-black text-sm sm:text-base uppercase tracking-tight text-foreground">
+                              {room.name}
+                            </h3>
+                            <div className="flex justify-center">
+                              {isOccupiedByMe ? (
+                                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/15 text-[9px] sm:text-[10px] font-bold uppercase tracking-widest text-emerald-700 dark:text-emerald-400">
+                                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                                  <span>Sua Sala - Voltar</span>
+                                </div>
+                              ) : isOccupied ? (
+                                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-500/10 text-[9px] sm:text-[10px] font-bold uppercase tracking-widest text-red-600 dark:text-red-400">
+                                  <span className="w-1.5 h-1.5 rounded-full bg-red-500" />
+                                  <span>Ocupado: {occupant}</span>
+                                </div>
+                              ) : (
+                                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[9px] sm:text-[10px] font-bold uppercase tracking-widest bg-orange-500/15 text-orange-600 dark:bg-orange-400/20 dark:text-orange-400">
+                                  <span className="w-1.5 h-1.5 rounded-full bg-orange-500 dark:bg-orange-400 animate-pulse" />
+                                  Livre para Entrada
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </motion.div>
+                  );
+                },
+              )}
             </div>
           </TabsContent>
 
-          <TabsContent value="medication" className="mt-0 focus-visible:outline-none focus-visible:ring-0">
+          <TabsContent
+            value="medication"
+            className="mt-0 focus-visible:outline-none focus-visible:ring-0"
+          >
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {ROOMS.filter(r => r.type === 'medication').map((room) => {
+              {ROOMS.filter((r) => r.type === "medication").map((room) => {
                 const isOccupied = !!occupiedRooms[room.id];
                 const occupant = occupiedRooms[room.id];
                 const isOccupiedByMe = currentRoomId === room.id;
@@ -288,36 +383,44 @@ export default function NurseDashboard() {
                 return (
                   <motion.div
                     key={room.id}
-                    whileHover={!isOccupied || isOccupiedByMe ? { scale: 1.02, y: -2 } : {}}
-                    whileTap={!isOccupied || isOccupiedByMe ? { scale: 0.98 } : {}}
+                    whileHover={
+                      !isOccupied || isOccupiedByMe
+                        ? { scale: 1.02, y: -2 }
+                        : {}
+                    }
+                    whileTap={
+                      !isOccupied || isOccupiedByMe ? { scale: 0.98 } : {}
+                    }
                   >
-                    <Card 
+                    <Card
                       className={cn(
                         "relative overflow-hidden cursor-pointer transition-all duration-300 h-full border-2",
                         isOccupiedByMe
                           ? "border-emerald-500/40 dark:border-emerald-400/40 hover:border-emerald-500/60 shadow-[0_4px_20px_0_rgba(16,185,129,0.1)] bg-emerald-50/50 dark:bg-emerald-950/20 backdrop-blur-xl"
-                          : isOccupied 
-                          ? "opacity-80 border-slate-300 dark:border-slate-700 bg-white/40 dark:bg-slate-900/20 backdrop-blur-md hover:border-slate-400 dark:hover:border-slate-600" 
-                          : room.color === "emerald" 
-                            ? "border-emerald-500/20 dark:border-emerald-400/20 hover:border-emerald-500/40 dark:hover:border-emerald-400/40 hover:shadow-[0_8px_32px_0_rgba(16,185,129,0.15)] bg-gradient-to-br from-emerald-500/10 to-emerald-500/5 dark:from-emerald-500/20 dark:to-emerald-500/10 backdrop-blur-xl shadow-[0_4px_16px_0_rgba(0,0,0,0.05)]"
-                            : "border-orange-500/20 dark:border-orange-400/20 hover:border-orange-500/40 dark:hover:border-orange-400/40 hover:shadow-[0_8px_32px_0_rgba(249,115,22,0.15)] bg-gradient-to-br from-orange-500/10 to-orange-500/5 dark:from-orange-500/20 dark:to-orange-500/10 backdrop-blur-xl shadow-[0_4px_16px_0_rgba(0,0,0,0.05)]"
+                          : isOccupied
+                            ? "opacity-80 border-slate-300 dark:border-slate-700 bg-white/40 dark:bg-slate-900/20 backdrop-blur-md hover:border-slate-400 dark:hover:border-slate-600"
+                            : room.color === "emerald"
+                              ? "border-emerald-500/20 dark:border-emerald-400/20 hover:border-emerald-500/40 dark:hover:border-emerald-400/40 hover:shadow-[0_8px_32px_0_rgba(16,185,129,0.15)] bg-gradient-to-br from-emerald-500/10 to-emerald-500/5 dark:from-emerald-500/20 dark:to-emerald-500/10 backdrop-blur-xl shadow-[0_4px_16px_0_rgba(0,0,0,0.05)]"
+                              : "border-orange-500/20 dark:border-orange-400/20 hover:border-orange-500/40 dark:hover:border-orange-400/40 hover:shadow-[0_8px_32px_0_rgba(249,115,22,0.15)] bg-gradient-to-br from-orange-500/10 to-orange-500/5 dark:from-orange-500/20 dark:to-orange-500/10 backdrop-blur-xl shadow-[0_4px_16px_0_rgba(0,0,0,0.05)]",
                       )}
                       onClick={() => handleSelectRoom(room)}
                     >
                       <CardContent className="p-6 sm:p-8 flex flex-col items-center text-center space-y-4">
-                        <div className={cn(
-                          "p-4 rounded-2xl transition-colors",
-                          isOccupiedByMe
-                            ? "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400"
-                            : isOccupied 
-                            ? "bg-red-500/10 text-red-500 dark:text-red-400"
-                            : room.color === "emerald"
-                            ? "bg-emerald-500/15 text-emerald-600 dark:bg-emerald-400/20 dark:text-emerald-400"
-                            : "bg-orange-500/15 text-orange-600 dark:bg-orange-400/20 dark:text-orange-400"
-                        )}>
+                        <div
+                          className={cn(
+                            "p-4 rounded-2xl transition-colors",
+                            isOccupiedByMe
+                              ? "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400"
+                              : isOccupied
+                                ? "bg-red-500/10 text-red-500 dark:text-red-400"
+                                : room.color === "emerald"
+                                  ? "bg-emerald-500/15 text-emerald-600 dark:bg-emerald-400/20 dark:text-emerald-400"
+                                  : "bg-orange-500/15 text-orange-600 dark:bg-orange-400/20 dark:text-orange-400",
+                          )}
+                        >
                           <Icon className="h-8 w-8" />
                         </div>
-                        
+
                         <div className="space-y-2">
                           <h3 className="font-black text-sm sm:text-base uppercase tracking-tight text-foreground">
                             {room.name}
@@ -334,16 +437,22 @@ export default function NurseDashboard() {
                                 <span>Ocupado: {occupant}</span>
                               </div>
                             ) : (
-                              <div className={cn(
-                                "inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[9px] sm:text-[10px] font-bold uppercase tracking-widest",
-                                room.color === "emerald" 
-                                  ? "bg-emerald-500/15 text-emerald-600 dark:bg-emerald-400/20 dark:text-emerald-400"
-                                  : "bg-orange-500/15 text-orange-600 dark:bg-orange-400/20 dark:text-orange-400"
-                              )}>
-                                <span className={cn(
-                                  "w-1.5 h-1.5 rounded-full animate-pulse",
-                                  room.color === "emerald" ? "bg-emerald-500 dark:bg-emerald-400" : "bg-orange-500 dark:bg-orange-400"
-                                )} />
+                              <div
+                                className={cn(
+                                  "inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[9px] sm:text-[10px] font-bold uppercase tracking-widest",
+                                  room.color === "emerald"
+                                    ? "bg-emerald-500/15 text-emerald-600 dark:bg-emerald-400/20 dark:text-emerald-400"
+                                    : "bg-orange-500/15 text-orange-600 dark:bg-orange-400/20 dark:text-orange-400",
+                                )}
+                              >
+                                <span
+                                  className={cn(
+                                    "w-1.5 h-1.5 rounded-full animate-pulse",
+                                    room.color === "emerald"
+                                      ? "bg-emerald-500 dark:bg-emerald-400"
+                                      : "bg-orange-500 dark:bg-orange-400",
+                                  )}
+                                />
                                 Livre para Entrada
                               </div>
                             )}
@@ -359,145 +468,205 @@ export default function NurseDashboard() {
         </Tabs>
       </div>
 
-      <Dialog open={!!selectedRoom} onOpenChange={(open) => !open && setSelectedRoom(null)}>
-        {selectedRoom && (() => {
-          const isSelectedRoomOccupied = !!occupiedRooms[selectedRoom.id];
-          const occupantOfSelectedRoom = occupiedRooms[selectedRoom.id];
-          const isSelectedOccupiedByMe = currentRoomId === selectedRoom.id;
-          
-          const willOverwrite = isSelectedRoomOccupied && nurseName.trim() && nurseName.trim() !== occupantOfSelectedRoom?.trim();
-          const willResume = isSelectedRoomOccupied && nurseName.trim() === occupantOfSelectedRoom?.trim();
+      <Dialog
+        open={!!selectedRoom}
+        onOpenChange={(open) => !open && setSelectedRoom(null)}
+      >
+        {selectedRoom &&
+          (() => {
+            const isSelectedRoomOccupied = !!occupiedRooms[selectedRoom.id];
+            const occupantOfSelectedRoom = occupiedRooms[selectedRoom.id];
+            const isSelectedOccupiedByMe = currentRoomId === selectedRoom.id;
 
-          return (
-            <DialogContent className="sm:max-w-[450px] p-0 overflow-hidden border border-white/20 dark:border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.3)] rounded-3xl bg-white/70 dark:bg-slate-950/60 backdrop-blur-xl [&>button]:hidden">
-              <div className={cn(
-                "p-8 text-center text-white relative shadow-lg backdrop-blur-md transition-colors duration-300",
-                isSelectedRoomOccupied && !willResume
-                  ? "bg-gradient-to-br from-red-600/90 to-red-800/90 dark:from-red-600/50 dark:to-red-900/50"
-                  : selectedRoom.color === "blue" 
-                  ? "bg-gradient-to-br from-[#006699]/90 to-[#004466]/90 dark:from-sky-600/50 dark:to-sky-900/50"
-                  : selectedRoom.color === "emerald"
-                  ? "bg-gradient-to-br from-emerald-600/90 to-emerald-800/90 dark:from-emerald-600/50 dark:to-emerald-900/50"
-                  : "bg-gradient-to-br from-orange-500/90 to-orange-700/90 dark:from-orange-600/50 dark:to-orange-900/50"
-              )}>
-                <div className="bg-white/20 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4 backdrop-blur-sm">
-                  {isSelectedRoomOccupied ? <AlertTriangle className="h-8 w-8 text-white" /> : <DoorOpen className="h-8 w-8" />}
-                </div>
-                <DialogTitle className="text-2xl font-black uppercase tracking-tight text-white mb-2">
-                  {isSelectedRoomOccupied ? "Atenção: Sala Ocupada" : "Assumir Sala"}
-                </DialogTitle>
-                <DialogDescription className="text-white/80 font-medium text-sm">
-                  {isSelectedRoomOccupied ? (
-                    <>
-                      {/^(sala|triagem|observação)/i.test(selectedRoom.name) ? 'A' : 'O'} <strong className="text-white">{selectedRoom.name}</strong> está {/^(sala|triagem|observação)/i.test(selectedRoom.name) ? 'logada' : 'logado'} no momento com: <strong className="text-white">{occupantOfSelectedRoom}</strong>.
-                    </>
-                  ) : (
-                    <>
-                      Você está prestes a iniciar os atendimentos {/^(sala|triagem|observação)/i.test(selectedRoom.name) ? 'na' : 'no'}<br />
-                      <strong className="text-white">{selectedRoom.name}</strong>.
-                    </>
+            const willOverwrite =
+              isSelectedRoomOccupied &&
+              nurseName.trim() &&
+              nurseName.trim() !== occupantOfSelectedRoom?.trim();
+            const willResume =
+              isSelectedRoomOccupied &&
+              nurseName.trim() === occupantOfSelectedRoom?.trim();
+
+            return (
+              <DialogContent className="sm:max-w-[450px] p-0 overflow-hidden border border-white/20 dark:border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.3)] rounded-3xl bg-white/70 dark:bg-slate-950/60 backdrop-blur-xl [&>button]:hidden">
+                <div
+                  className={cn(
+                    "p-8 text-center text-white relative shadow-lg backdrop-blur-md transition-colors duration-300",
+                    isSelectedRoomOccupied && !willResume
+                      ? "bg-gradient-to-br from-red-600/90 to-red-800/90 dark:from-red-600/50 dark:to-red-900/50"
+                      : selectedRoom.color === "blue"
+                        ? "bg-gradient-to-br from-[#006699]/90 to-[#004466]/90 dark:from-sky-600/50 dark:to-sky-900/50"
+                        : selectedRoom.color === "emerald"
+                          ? "bg-gradient-to-br from-emerald-600/90 to-emerald-800/90 dark:from-emerald-600/50 dark:to-emerald-900/50"
+                          : "bg-gradient-to-br from-orange-500/90 to-orange-700/90 dark:from-orange-600/50 dark:to-orange-900/50",
                   )}
-                </DialogDescription>
-              </div>
-              
-              <div className="p-8 space-y-5">
-                <div className="space-y-2">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground block">
-                    Nome Completo do Profissional:
-                  </label>
-                  <Input 
-                    value={nurseName}
-                    onChange={(e) => setNurseName(formatWords(e.target.value))}
-                    placeholder="Ex: Enf. Mariana Santos"
-                    className={cn(
-                      "h-12 rounded-xl px-4 text-sm font-bold border-2 focus-visible:ring-2",
-                      willOverwrite ? "border-red-500 bg-red-50 dark:bg-red-950/30 text-red-700 dark:text-red-400" :
-                      willResume ? "border-emerald-500 bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400" :
-                      "border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900"
+                >
+                  <div className="bg-white/20 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4 backdrop-blur-sm">
+                    {isSelectedRoomOccupied ? (
+                      <AlertTriangle className="h-8 w-8 text-white" />
+                    ) : (
+                      <DoorOpen className="h-8 w-8" />
                     )}
-                    autoFocus
-                  />
+                  </div>
+                  <DialogTitle className="text-2xl font-black uppercase tracking-tight text-white mb-2">
+                    {isSelectedRoomOccupied
+                      ? "Atenção: Sala Ocupada"
+                      : "Assumir Sala"}
+                  </DialogTitle>
+                  <DialogDescription className="text-white/80 font-medium text-sm">
+                    {isSelectedRoomOccupied ? (
+                      <>
+                        {/^(sala|triagem|observação)/i.test(selectedRoom.name)
+                          ? "A"
+                          : "O"}{" "}
+                        <strong className="text-white">
+                          {selectedRoom.name}
+                        </strong>{" "}
+                        está{" "}
+                        {/^(sala|triagem|observação)/i.test(selectedRoom.name)
+                          ? "logada"
+                          : "logado"}{" "}
+                        no momento com:{" "}
+                        <strong className="text-white">
+                          {occupantOfSelectedRoom}
+                        </strong>
+                        .
+                      </>
+                    ) : (
+                      <>
+                        Você está prestes a iniciar os atendimentos{" "}
+                        {/^(sala|triagem|observação)/i.test(selectedRoom.name)
+                          ? "na"
+                          : "no"}
+                        <br />
+                        <strong className="text-white">
+                          {selectedRoom.name}
+                        </strong>
+                        .
+                      </>
+                    )}
+                  </DialogDescription>
                 </div>
 
-                <div className="space-y-2">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground block">
-                    COREN / UF:
-                  </label>
-                  <div className="relative">
-                    {!corenState && !corenNumber && (
-                      <div className="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-bold text-slate-300 dark:text-slate-600 pointer-events-none">
-                        <span className="opacity-0">COREN-</span>SP
-                      </div>
-                    )}
-                    <Input 
-                      value={corenState.length === 2 && corenNumber ? `COREN-${corenState} ${corenNumber}` : `COREN-${corenState}`}
-                      onChange={(e) => {
-                        let rawValue = e.target.value.toUpperCase();
-                        if (rawValue.startsWith('COREN-')) {
-                          rawValue = rawValue.substring(6);
-                        }
-                        rawValue = rawValue.replace(/\s+/g, '');
-
-                        const lettersMatch = rawValue.match(/^[A-Z]{0,2}/);
-                        const letters = lettersMatch ? lettersMatch[0] : '';
-                        
-                        const remaining = rawValue.substring(letters.length);
-                        const numbers = remaining.replace(/[^0-9]/g, '').slice(0, 8);
-
-                        setCorenState(letters);
-                        setCorenNumber(numbers);
-                      }}
-                      placeholder=""
-                      className="h-12 rounded-xl px-4 text-sm font-bold border-2 border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900"
+                <div className="p-8 space-y-5">
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground block">
+                      Nome Completo do Profissional:
+                    </label>
+                    <Input
+                      value={nurseName}
+                      onChange={(e) =>
+                        setNurseName(formatWords(e.target.value))
+                      }
+                      placeholder="Ex: Enf. Mariana Santos"
+                      className={cn(
+                        "h-12 rounded-xl px-4 text-sm font-bold border-2 focus-visible:ring-2",
+                        willOverwrite
+                          ? "border-red-500 bg-red-50 dark:bg-red-950/30 text-red-700 dark:text-red-400"
+                          : willResume
+                            ? "border-emerald-500 bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400"
+                            : "border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900",
+                      )}
+                      autoFocus
                     />
                   </div>
-                  <p className="text-[10px] text-muted-foreground">Digite a UF e depois os números (ex: SP123456).</p>
-                </div>
 
-                {isSelectedRoomOccupied && (
-                  <p className={cn(
-                    "text-[10px] font-bold uppercase tracking-widest text-center mt-2",
-                    willOverwrite ? "text-red-500" :
-                    willResume ? "text-emerald-500" :
-                    "text-slate-500"
-                  )}>
-                    {willResume ? "Identidade confirmada! Pronto para retomar sessão." :
-                     willOverwrite ? "Cuidado! Você irá encerrar a sessão do colega." :
-                     "Digite seu nome para continuar ou assumir."}
-                  </p>
-                )}
-                
-                <div className="grid grid-cols-2 gap-3 pt-2">
-                  <Button 
-                    variant="outline" 
-                    className="h-12 rounded-xl font-bold uppercase tracking-widest border-slate-200 dark:border-slate-800"
-                    onClick={() => setSelectedRoom(null)}
-                  >
-                    Cancelar
-                  </Button>
-                  <Button 
-                    className={cn(
-                      "h-12 rounded-xl text-white font-black uppercase tracking-widest border-0 shadow-lg text-[10px] leading-tight",
-                      willOverwrite 
-                        ? "bg-red-600 hover:bg-red-700 shadow-red-500/20"
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground block">
+                      COREN / UF:
+                    </label>
+                    <div className="relative">
+                      {!corenState && !corenNumber && (
+                        <div className="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-bold text-slate-300 dark:text-slate-600 pointer-events-none">
+                          <span className="opacity-0">COREN-</span>SP
+                        </div>
+                      )}
+                      <Input
+                        value={
+                          corenState.length === 2 && corenNumber
+                            ? `COREN-${corenState} ${corenNumber}`
+                            : `COREN-${corenState}`
+                        }
+                        onChange={(e) => {
+                          let rawValue = e.target.value.toUpperCase();
+                          if (rawValue.startsWith("COREN-")) {
+                            rawValue = rawValue.substring(6);
+                          }
+                          rawValue = rawValue.replace(/\s+/g, "");
+
+                          const lettersMatch = rawValue.match(/^[A-Z]{0,2}/);
+                          const letters = lettersMatch ? lettersMatch[0] : "";
+
+                          const remaining = rawValue.substring(letters.length);
+                          const numbers = remaining
+                            .replace(/[^0-9]/g, "")
+                            .slice(0, 8);
+
+                          setCorenState(letters);
+                          setCorenNumber(numbers);
+                        }}
+                        placeholder=""
+                        className="h-12 rounded-xl px-4 text-sm font-bold border-2 border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900"
+                      />
+                    </div>
+                    <p className="text-[10px] text-muted-foreground">
+                      Digite a UF e depois os números (ex: SP123456).
+                    </p>
+                  </div>
+
+                  {isSelectedRoomOccupied && (
+                    <p
+                      className={cn(
+                        "text-[10px] font-bold uppercase tracking-widest text-center mt-2",
+                        willOverwrite
+                          ? "text-red-500"
+                          : willResume
+                            ? "text-emerald-500"
+                            : "text-slate-500",
+                      )}
+                    >
+                      {willResume
+                        ? "Identidade confirmada! Pronto para retomar sessão."
+                        : willOverwrite
+                          ? "Cuidado! Você irá encerrar a sessão do colega."
+                          : "Digite seu nome para continuar ou assumir."}
+                    </p>
+                  )}
+
+                  <div className="grid grid-cols-2 gap-3 pt-2">
+                    <Button
+                      variant="outline"
+                      className="h-12 rounded-xl font-bold uppercase tracking-widest border-slate-200 dark:border-slate-800"
+                      onClick={() => setSelectedRoom(null)}
+                    >
+                      Cancelar
+                    </Button>
+                    <Button
+                      className={cn(
+                        "h-12 rounded-xl text-white font-black uppercase tracking-widest border-0 shadow-lg text-[10px] leading-tight",
+                        willOverwrite
+                          ? "bg-red-600 hover:bg-red-700 shadow-red-500/20"
+                          : willResume
+                            ? "bg-emerald-500 hover:bg-emerald-600 shadow-emerald-500/20"
+                            : selectedRoom.color === "blue"
+                              ? "bg-[#006699] hover:bg-[#005580] shadow-blue-500/20 dark:bg-sky-500 dark:hover:bg-sky-600"
+                              : selectedRoom.color === "emerald"
+                                ? "bg-emerald-600 hover:bg-emerald-700 shadow-emerald-500/20"
+                                : "bg-orange-500 hover:bg-orange-600 shadow-orange-500/20",
+                      )}
+                      onClick={handleAssumir}
+                      disabled={!nurseName.trim()}
+                    >
+                      {willOverwrite
+                        ? "Sobrescrever Sessão"
                         : willResume
-                        ? "bg-emerald-500 hover:bg-emerald-600 shadow-emerald-500/20"
-                        : selectedRoom.color === "blue" 
-                        ? "bg-[#006699] hover:bg-[#005580] shadow-blue-500/20 dark:bg-sky-500 dark:hover:bg-sky-600"
-                        : selectedRoom.color === "emerald"
-                        ? "bg-emerald-600 hover:bg-emerald-700 shadow-emerald-500/20"
-                        : "bg-orange-500 hover:bg-orange-600 shadow-orange-500/20"
-                    )}
-                    onClick={handleAssumir}
-                    disabled={!nurseName.trim()}
-                  >
-                    {willOverwrite ? "Sobrescrever Sessão" : willResume ? "Retomar Sessão" : "Entrar na Sala"}
-                  </Button>
+                          ? "Retomar Sessão"
+                          : "Entrar na Sala"}
+                    </Button>
+                  </div>
                 </div>
-              </div>
-            </DialogContent>
-          );
-        })()}
+              </DialogContent>
+            );
+          })()}
       </Dialog>
     </div>
   );

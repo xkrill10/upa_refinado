@@ -1,17 +1,61 @@
 import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { FileDown, EyeOff, ShieldCheck, Database, ArrowRight } from "lucide-react";
+import {
+  FileDown,
+  EyeOff,
+  ShieldCheck,
+  Database,
+  ArrowRight,
+} from "lucide-react";
 
 export default function Anonimizacao() {
   const [isExporting, setIsExporting] = useState(false);
 
   const sampleData = [
-    { id: 1, nomeOriginal: "Carlos Eduardo Mendes", cpfOriginal: "123.456.789-00", cid: "J01.9", idade: 45, nomeMascarado: "C***** E****** M*****", cpfMascarado: "***.456.***-**" },
-    { id: 2, nomeOriginal: "Juliana Alves Pereira", cpfOriginal: "987.654.321-11", cid: "A09", idade: 28, nomeMascarado: "J****** A**** P******", cpfMascarado: "***.654.***-**" },
-    { id: 3, nomeOriginal: "Roberto Silva Santos", cpfOriginal: "456.123.789-22", cid: "I10", idade: 62, nomeMascarado: "R****** S**** S*****", cpfMascarado: "***.123.***-**" },
-    { id: 4, nomeOriginal: "Fernanda Costa Souza", cpfOriginal: "321.987.654-33", cid: "J45.9", idade: 19, nomeMascarado: "F******* C**** S****", cpfMascarado: "***.987.***-**" },
+    {
+      id: 1,
+      nomeOriginal: "Carlos Eduardo Mendes",
+      cpfOriginal: "123.456.789-00",
+      cid: "J01.9",
+      idade: 45,
+      nomeMascarado: "C***** E****** M*****",
+      cpfMascarado: "***.456.***-**",
+    },
+    {
+      id: 2,
+      nomeOriginal: "Juliana Alves Pereira",
+      cpfOriginal: "987.654.321-11",
+      cid: "A09",
+      idade: 28,
+      nomeMascarado: "J****** A**** P******",
+      cpfMascarado: "***.654.***-**",
+    },
+    {
+      id: 3,
+      nomeOriginal: "Roberto Silva Santos",
+      cpfOriginal: "456.123.789-22",
+      cid: "I10",
+      idade: 62,
+      nomeMascarado: "R****** S**** S*****",
+      cpfMascarado: "***.123.***-**",
+    },
+    {
+      id: 4,
+      nomeOriginal: "Fernanda Costa Souza",
+      cpfOriginal: "321.987.654-33",
+      cid: "J45.9",
+      idade: 19,
+      nomeMascarado: "F******* C**** S****",
+      cpfMascarado: "***.987.***-**",
+    },
   ];
 
   const simulateExport = () => {
@@ -38,7 +82,10 @@ export default function Anonimizacao() {
         </div>
       </div>
       <p className="text-sm text-slate-500 dark:text-slate-400 max-w-3xl">
-        Painel de demonstração para a extração de dados clínicos (CID, Idade, Gênero) garantindo a proteção da identidade do paciente (PII) por meio de mascaramento automático, fundamental para auditorias externas e pesquisas de saúde.
+        Painel de demonstração para a extração de dados clínicos (CID, Idade,
+        Gênero) garantindo a proteção da identidade do paciente (PII) por meio
+        de mascaramento automático, fundamental para auditorias externas e
+        pesquisas de saúde.
       </p>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
@@ -57,17 +104,32 @@ export default function Anonimizacao() {
             <table className="w-full text-left text-xs">
               <thead className="bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-800">
                 <tr>
-                  <th className="p-3 text-slate-500 font-bold uppercase">Paciente</th>
-                  <th className="p-3 text-slate-500 font-bold uppercase">CPF Real</th>
-                  <th className="p-3 text-slate-500 font-bold uppercase">Diagnóstico</th>
+                  <th className="p-3 text-slate-500 font-bold uppercase">
+                    Paciente
+                  </th>
+                  <th className="p-3 text-slate-500 font-bold uppercase">
+                    CPF Real
+                  </th>
+                  <th className="p-3 text-slate-500 font-bold uppercase">
+                    Diagnóstico
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                 {sampleData.map((row) => (
-                  <tr key={`orig-${row.id}`} className="hover:bg-slate-50 dark:hover:bg-slate-800/30">
-                    <td className="p-3 font-semibold text-red-700 dark:text-red-400">{row.nomeOriginal}</td>
-                    <td className="p-3 font-mono text-slate-600 dark:text-slate-400">{row.cpfOriginal}</td>
-                    <td className="p-3 text-slate-700 dark:text-slate-300">{row.cid}</td>
+                  <tr
+                    key={`orig-${row.id}`}
+                    className="hover:bg-slate-50 dark:hover:bg-slate-800/30"
+                  >
+                    <td className="p-3 font-semibold text-red-700 dark:text-red-400">
+                      {row.nomeOriginal}
+                    </td>
+                    <td className="p-3 font-mono text-slate-600 dark:text-slate-400">
+                      {row.cpfOriginal}
+                    </td>
+                    <td className="p-3 text-slate-700 dark:text-slate-300">
+                      {row.cid}
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -95,17 +157,32 @@ export default function Anonimizacao() {
             <table className="w-full text-left text-xs">
               <thead className="bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-800">
                 <tr>
-                  <th className="p-3 text-slate-500 font-bold uppercase">Paciente (Mascarado)</th>
-                  <th className="p-3 text-slate-500 font-bold uppercase">CPF (Mascarado)</th>
-                  <th className="p-3 text-slate-500 font-bold uppercase">Diagnóstico</th>
+                  <th className="p-3 text-slate-500 font-bold uppercase">
+                    Paciente (Mascarado)
+                  </th>
+                  <th className="p-3 text-slate-500 font-bold uppercase">
+                    CPF (Mascarado)
+                  </th>
+                  <th className="p-3 text-slate-500 font-bold uppercase">
+                    Diagnóstico
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                 {sampleData.map((row) => (
-                  <tr key={`mask-${row.id}`} className="hover:bg-slate-50 dark:hover:bg-slate-800/30">
-                    <td className="p-3 font-semibold text-cyan-700 dark:text-cyan-400">{row.nomeMascarado}</td>
-                    <td className="p-3 font-mono text-slate-600 dark:text-slate-400">{row.cpfMascarado}</td>
-                    <td className="p-3 text-slate-700 dark:text-slate-300">{row.cid}</td>
+                  <tr
+                    key={`mask-${row.id}`}
+                    className="hover:bg-slate-50 dark:hover:bg-slate-800/30"
+                  >
+                    <td className="p-3 font-semibold text-cyan-700 dark:text-cyan-400">
+                      {row.nomeMascarado}
+                    </td>
+                    <td className="p-3 font-mono text-slate-600 dark:text-slate-400">
+                      {row.cpfMascarado}
+                    </td>
+                    <td className="p-3 text-slate-700 dark:text-slate-300">
+                      {row.cid}
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -115,17 +192,19 @@ export default function Anonimizacao() {
       </div>
 
       <div className="flex justify-center mt-6">
-        <Button 
-          size="lg" 
+        <Button
+          size="lg"
           className="bg-cyan-600 hover:bg-cyan-700 text-white font-bold gap-3 shadow-lg px-8 py-6 rounded-full transition-all hover:scale-105"
           onClick={simulateExport}
           disabled={isExporting}
         >
           {isExporting ? (
-            <span className="flex items-center gap-2">Aplicando Filtros LGPD...</span>
+            <span className="flex items-center gap-2">
+              Aplicando Filtros LGPD...
+            </span>
           ) : (
             <>
-              <FileDown className="h-5 w-5" /> 
+              <FileDown className="h-5 w-5" />
               Exportar Relatório Anonimizado (.CSV)
             </>
           )}

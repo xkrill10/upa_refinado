@@ -12,10 +12,14 @@ export function useVitals() {
   const vsSystolic = vsBloodPressure.split("/")[0] || "";
   const vsDiastolic = vsBloodPressure.split("/")[1] || "";
 
-  const isDefaultBloodPressure = vsBloodPressure === "120/080" || vsBloodPressure === "120/80" || vsBloodPressure === "";
+  const isDefaultBloodPressure =
+    vsBloodPressure === "120/080" ||
+    vsBloodPressure === "120/80" ||
+    vsBloodPressure === "";
   const isDefaultHeartRate = vsHeartRate === "80";
   const isDefaultRespiratoryRate = vsRespiratoryRate === "16";
-  const isDefaultTemperature = vsTemperature === "36.5" || vsTemperature === "36,5";
+  const isDefaultTemperature =
+    vsTemperature === "36.5" || vsTemperature === "36,5";
   const isDefaultSpO2 = vsSpO2 === "98";
   const isDefaultPain = vsPain === "0";
   const isDefaultConsciousness = vsConsciousness === "A";
@@ -23,20 +27,20 @@ export function useVitals() {
   const handleBloodPressureChange = (val: string) => {
     let clean = val.replace(/[^\d/]/g, "");
     const isDeleting = val.length < vsBloodPressure.length;
-    
+
     if (isDeleting && vsBloodPressure.endsWith("/") && !clean.includes("/")) {
       setVsBloodPressure(clean.slice(0, -1));
       return;
     }
-    
+
     if (!clean.includes("/") && clean.length > 3) {
       clean = clean.slice(0, 3) + "/" + clean.slice(3);
     }
-    
+
     const parts = clean.split("/");
     const sys = parts[0] ? parts[0].slice(0, 3) : "";
     const dia = parts[1] ? parts[1].slice(0, 3) : "";
-    
+
     if (clean.includes("/")) {
       setVsBloodPressure(sys + "/" + dia);
     } else {
@@ -50,25 +54,25 @@ export function useVitals() {
 
   const handleBloodPressureBlur = () => {
     if (!vsBloodPressure) return;
-    
+
     const parts = vsBloodPressure.split("/");
     const sysPart = parts[0] ? parts[0].replace(/\D/g, "") : "";
     const diaPart = parts[1] ? parts[1].replace(/\D/g, "") : "";
-    
+
     if (!sysPart && !diaPart) {
       setVsBloodPressure("");
       return;
     }
-    
+
     const formattedSys = sysPart ? sysPart.padStart(3, "0") : "120";
     const formattedDia = diaPart ? diaPart.padStart(3, "0") : "080";
-    
+
     setVsBloodPressure(`${formattedSys}/${formattedDia}`);
   };
 
   const calculateMEWS = () => {
     let score = 0;
-    
+
     const pas = parseInt(vsSystolic);
     if (!isNaN(pas)) {
       if (pas <= 70) score += 3;
@@ -108,9 +112,23 @@ export function useVitals() {
   };
 
   const getMEWSClassification = (score: number) => {
-    if (score >= 5) return { label: "RISCO IMEDIATO (Grave)", color: "text-red-600 bg-red-500/10 border-red-500/20", alert: "Alta urgência! Chame a equipe médica imediatamente." };
-    if (score >= 3) return { label: "ATENÇÃO (Moderado)", color: "text-amber-600 bg-amber-500/10 border-amber-500/20", alert: "Alerta de risco. Monitore o paciente com maior frequência." };
-    return { label: "ESTÁVEL (Baixo Risco)", color: "text-emerald-500 bg-emerald-500/10 border-emerald-500/20", alert: "Paciente estável e dentro dos parâmetros normais." };
+    if (score >= 5)
+      return {
+        label: "RISCO IMEDIATO (Grave)",
+        color: "text-red-600 bg-red-500/10 border-red-500/20",
+        alert: "Alta urgência! Chame a equipe médica imediatamente.",
+      };
+    if (score >= 3)
+      return {
+        label: "ATENÇÃO (Moderado)",
+        color: "text-amber-600 bg-amber-500/10 border-amber-500/20",
+        alert: "Alerta de risco. Monitore o paciente com maior frequência.",
+      };
+    return {
+      label: "ESTÁVEL (Baixo Risco)",
+      color: "text-emerald-500 bg-emerald-500/10 border-emerald-500/20",
+      alert: "Paciente estável e dentro dos parâmetros normais.",
+    };
   };
 
   const clearVitals = () => {
@@ -134,13 +152,20 @@ export function useVitals() {
   };
 
   return {
-    vsBloodPressure, setVsBloodPressure,
-    vsHeartRate, setVsHeartRate,
-    vsRespiratoryRate, setVsRespiratoryRate,
-    vsTemperature, setVsTemperature,
-    vsSpO2, setVsSpO2,
-    vsPain, setVsPain,
-    vsConsciousness, setVsConsciousness,
+    vsBloodPressure,
+    setVsBloodPressure,
+    vsHeartRate,
+    setVsHeartRate,
+    vsRespiratoryRate,
+    setVsRespiratoryRate,
+    vsTemperature,
+    setVsTemperature,
+    vsSpO2,
+    setVsSpO2,
+    vsPain,
+    setVsPain,
+    vsConsciousness,
+    setVsConsciousness,
     vsSystolic,
     vsDiastolic,
     isDefaultBloodPressure,
@@ -155,6 +180,6 @@ export function useVitals() {
     calculateMEWS,
     getMEWSClassification,
     clearVitals,
-    setInitialVitals
+    setInitialVitals,
   };
 }

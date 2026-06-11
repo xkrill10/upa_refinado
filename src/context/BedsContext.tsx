@@ -1,14 +1,14 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, ReactNode } from "react";
 
-export type BedStatus = 'available' | 'occupied' | 'maintenance' | 'cleaning';
-export type CleaningStatus = 'waiting' | 'in_progress';
-export type PriorityLevel = 'normal' | 'high' | 'urgent';
+export type BedStatus = "available" | "occupied" | "maintenance" | "cleaning";
+export type CleaningStatus = "waiting" | "in_progress";
+export type PriorityLevel = "normal" | "high" | "urgent";
 
-export interface Cleaner { 
-  id: string; 
-  name: string; 
-  avatar: string; 
-  color: string; 
+export interface Cleaner {
+  id: string;
+  name: string;
+  avatar: string;
+  color: string;
 }
 
 export interface BedHistoryRecord {
@@ -25,7 +25,7 @@ export interface Bed {
   room: string;
   lastUpdated: string;
   patientId?: string;
-  
+
   // Governance / Cleaning extra fields
   cleaningStatus?: CleaningStatus;
   assignedCleaner?: Cleaner;
@@ -61,90 +61,135 @@ interface BedsContextType {
   cleaningHistory: CleaningLog[];
   updateBedStatus: (id: string, status: BedStatus) => void;
   assignPatient: (bedId: string, patientId: string) => void;
-  releaseBed: (bedId: string, priority?: PriorityLevel, isIsolation?: boolean) => void;
+  releaseBed: (
+    bedId: string,
+    priority?: PriorityLevel,
+    isIsolation?: boolean,
+  ) => void;
   transferPatient: (sourceBedId: string, targetBedId: string) => void;
-  getStats: () => { available: number, occupied: number, maintenance: number, cleaning: number };
-  
+  getStats: () => {
+    available: number;
+    occupied: number;
+    maintenance: number;
+    cleaning: number;
+  };
+
   // Governance functions
   startCleaning: (bedId: string, cleaner: Cleaner) => void;
-  finishCleaning: (bedId: string, logDetails: { supplies: string[], observations: string, ccihConfirmed: boolean }) => void;
+  finishCleaning: (
+    bedId: string,
+    logDetails: {
+      supplies: string[];
+      observations: string;
+      ccihConfirmed: boolean;
+    },
+  ) => void;
   reportBedDefect: (bedId: string, reason: string) => void;
 }
 
 const MOCK_CLEANERS: Cleaner[] = [
-  { id: '1', name: 'Maria Silva', avatar: 'MS', color: 'bg-pink-500' },
-  { id: '2', name: 'João Souza', avatar: 'JS', color: 'bg-indigo-500' },
-  { id: '3', name: 'Ana Clara', avatar: 'AC', color: 'bg-emerald-500' },
+  { id: "1", name: "Maria Silva", avatar: "MS", color: "bg-pink-500" },
+  { id: "2", name: "João Souza", avatar: "JS", color: "bg-indigo-500" },
+  { id: "3", name: "Ana Clara", avatar: "AC", color: "bg-emerald-500" },
 ];
 
 const generateBeds = () => {
-  const occupiedPatientIds = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14'];
+  const occupiedPatientIds = [
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8",
+    "9",
+    "10",
+    "11",
+    "12",
+    "13",
+    "14",
+  ];
 
   const emergencyBeds: Bed[] = Array.from({ length: 10 }, (_, i) => {
-    let status: BedStatus = 'available';
-    if (i < 4) status = 'occupied';
-    else if (i === 4) status = 'cleaning';
-    else if (i === 5) status = 'maintenance';
+    let status: BedStatus = "available";
+    if (i < 4) status = "occupied";
+    else if (i === 4) status = "cleaning";
+    else if (i === 5) status = "maintenance";
 
     return {
       id: `e-${i + 1}`,
       name: `Leito Emergência ${i + 1}`,
       status,
-      ward: 'Emergência',
+      ward: "Emergência",
       room: `Box ${i + 1}`,
-      lastUpdated: '15min',
-      patientId: status === 'occupied' ? occupiedPatientIds[i] : undefined,
-      bedHistory: status === 'occupied' ? [
-        {
-          patientId: occupiedPatientIds[i],
-          admittedAt: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(),
-        }
-      ] : undefined,
-      ...(status === 'cleaning' && {
-        cleaningStatus: 'waiting',
-        priority: 'urgent',
+      lastUpdated: "15min",
+      patientId: status === "occupied" ? occupiedPatientIds[i] : undefined,
+      bedHistory:
+        status === "occupied"
+          ? [
+              {
+                patientId: occupiedPatientIds[i],
+                admittedAt: new Date(
+                  Date.now() - 1000 * 60 * 60 * 2,
+                ).toISOString(),
+              },
+            ]
+          : undefined,
+      ...(status === "cleaning" && {
+        cleaningStatus: "waiting",
+        priority: "urgent",
         requestedAt: new Date(Date.now() - 1000 * 60 * 18),
       }),
-      ...(status === 'maintenance' && {
-        maintenanceReason: 'Grade quebrada',
+      ...(status === "maintenance" && {
+        maintenanceReason: "Grade quebrada",
         requestedAt: new Date(Date.now() - 1000 * 60 * 120),
-      })
+      }),
     };
   });
 
   const observationBeds: Bed[] = Array.from({ length: 17 }, (_, i) => {
-    let status: BedStatus = 'available';
-    if (i < 8) status = 'occupied';
-    else if (i === 8) status = 'cleaning';
-    else if (i === 9) status = 'cleaning';
+    let status: BedStatus = "available";
+    if (i < 8) status = "occupied";
+    else if (i === 8) status = "cleaning";
+    else if (i === 9) status = "cleaning";
 
     return {
       id: `o-${i + 1}`,
       name: `Leito Observação ${i + 1}`,
       status,
-      ward: 'Observação',
+      ward: "Observação",
       room: `Quarto ${Math.floor(i / 4) + 1}`,
-      lastUpdated: '45min',
-      patientId: status === 'occupied' ? occupiedPatientIds[(i + 4) % occupiedPatientIds.length] : undefined,
-      bedHistory: status === 'occupied' ? [
-        {
-          patientId: occupiedPatientIds[(i + 4) % occupiedPatientIds.length],
-          admittedAt: new Date(Date.now() - 1000 * 60 * 60 * 1.5).toISOString(),
-        }
-      ] : undefined,
+      lastUpdated: "45min",
+      patientId:
+        status === "occupied"
+          ? occupiedPatientIds[(i + 4) % occupiedPatientIds.length]
+          : undefined,
+      bedHistory:
+        status === "occupied"
+          ? [
+              {
+                patientId:
+                  occupiedPatientIds[(i + 4) % occupiedPatientIds.length],
+                admittedAt: new Date(
+                  Date.now() - 1000 * 60 * 60 * 1.5,
+                ).toISOString(),
+              },
+            ]
+          : undefined,
       ...(i === 8 && {
-        cleaningStatus: 'waiting',
-        priority: 'high',
+        cleaningStatus: "waiting",
+        priority: "high",
         isIsolation: true,
         requestedAt: new Date(Date.now() - 1000 * 60 * 5),
       }),
       ...(i === 9 && {
-        cleaningStatus: 'in_progress',
-        priority: 'normal',
+        cleaningStatus: "in_progress",
+        priority: "normal",
         requestedAt: new Date(Date.now() - 1000 * 60 * 30),
         startedAt: new Date(Date.now() - 1000 * 60 * 12),
         assignedCleaner: MOCK_CLEANERS[0],
-      })
+      }),
     };
   });
 
@@ -156,20 +201,20 @@ const initialBeds: Bed[] = generateBeds();
 // Histórico de auditoria fake inicial
 const initialHistory: CleaningLog[] = [
   {
-    id: 'log-1',
-    bedId: 'e-9',
-    bedName: 'Leito Emergência 9',
-    ward: 'Emergência',
-    room: 'Box 9',
-    cleanerName: 'Maria Silva',
-    cleanerAvatar: 'MS',
-    cleanerColor: 'bg-pink-500',
-    supplies: ['soap', 'towel'],
-    observations: 'Limpeza padrão realizada com sucesso.',
+    id: "log-1",
+    bedId: "e-9",
+    bedName: "Leito Emergência 9",
+    ward: "Emergência",
+    room: "Box 9",
+    cleanerName: "Maria Silva",
+    cleanerAvatar: "MS",
+    cleanerColor: "bg-pink-500",
+    supplies: ["soap", "towel"],
+    observations: "Limpeza padrão realizada com sucesso.",
     durationMinutes: 14,
     ccihConfirmed: true,
     finishedAt: new Date(Date.now() - 1000 * 60 * 60 * 2), // 2 horas atrás
-  }
+  },
 ];
 
 const BedsContext = createContext<BedsContextType | undefined>(undefined);
@@ -177,74 +222,97 @@ const BedsContext = createContext<BedsContextType | undefined>(undefined);
 export function BedsProvider({ children }: { children: ReactNode }) {
   const [beds, setBeds] = useState<Bed[]>(initialBeds);
   const [cleaners] = useState<Cleaner[]>(MOCK_CLEANERS);
-  const [cleaningHistory, setCleaningHistory] = useState<CleaningLog[]>(initialHistory);
+  const [cleaningHistory, setCleaningHistory] =
+    useState<CleaningLog[]>(initialHistory);
 
   const updateBedStatus = (id: string, status: BedStatus) => {
-    setBeds(prev => prev.map(bed => 
-      bed.id === id ? { ...bed, status, lastUpdated: 'Agora' } : bed
-    ));
+    setBeds((prev) =>
+      prev.map((bed) =>
+        bed.id === id ? { ...bed, status, lastUpdated: "Agora" } : bed,
+      ),
+    );
   };
 
   const assignPatient = (bedId: string, patientId: string) => {
-    setBeds(prev => prev.map(bed => {
-      if (bed.id === bedId) {
-        const newHistoryRecord: BedHistoryRecord = {
-          patientId,
-          admittedAt: new Date().toISOString(),
-        };
-        const updatedHistory = [newHistoryRecord, ...(bed.bedHistory || [])];
-        return { ...bed, status: 'occupied', patientId, lastUpdated: 'Agora', bedHistory: updatedHistory };
-      }
-      return bed;
-    }));
+    setBeds((prev) =>
+      prev.map((bed) => {
+        if (bed.id === bedId) {
+          const newHistoryRecord: BedHistoryRecord = {
+            patientId,
+            admittedAt: new Date().toISOString(),
+          };
+          const updatedHistory = [newHistoryRecord, ...(bed.bedHistory || [])];
+          return {
+            ...bed,
+            status: "occupied",
+            patientId,
+            lastUpdated: "Agora",
+            bedHistory: updatedHistory,
+          };
+        }
+        return bed;
+      }),
+    );
   };
 
-  const releaseBed = (bedId: string, priority: PriorityLevel = 'normal', isIsolation = false) => {
-    setBeds(prev => prev.map(bed => {
-      if (bed.id === bedId) {
-        let updatedHistory = bed.bedHistory || [];
-        if (updatedHistory.length > 0 && !updatedHistory[0].dischargedAt) {
-          updatedHistory = [{ ...updatedHistory[0], dischargedAt: new Date().toISOString() }, ...updatedHistory.slice(1)];
+  const releaseBed = (
+    bedId: string,
+    priority: PriorityLevel = "normal",
+    isIsolation = false,
+  ) => {
+    setBeds((prev) =>
+      prev.map((bed) => {
+        if (bed.id === bedId) {
+          let updatedHistory = bed.bedHistory || [];
+          if (updatedHistory.length > 0 && !updatedHistory[0].dischargedAt) {
+            updatedHistory = [
+              { ...updatedHistory[0], dischargedAt: new Date().toISOString() },
+              ...updatedHistory.slice(1),
+            ];
+          }
+          return {
+            ...bed,
+            status: "cleaning",
+            patientId: undefined,
+            lastUpdated: "Agora",
+            cleaningStatus: "waiting",
+            requestedAt: new Date(),
+            priority,
+            isIsolation,
+            bedHistory: updatedHistory,
+          };
         }
-        return { 
-          ...bed, 
-          status: 'cleaning', 
-          patientId: undefined, 
-          lastUpdated: 'Agora',
-          cleaningStatus: 'waiting',
-          requestedAt: new Date(),
-          priority,
-          isIsolation,
-          bedHistory: updatedHistory
-        };
-      }
-      return bed;
-    }));
+        return bed;
+      }),
+    );
   };
-  
+
   const transferPatient = (sourceBedId: string, targetBedId: string) => {
-    setBeds(prev => {
-      const sourceBed = prev.find(b => b.id === sourceBedId);
+    setBeds((prev) => {
+      const sourceBed = prev.find((b) => b.id === sourceBedId);
       if (!sourceBed || !sourceBed.patientId) return prev;
-      
+
       const patientId = sourceBed.patientId;
-      
-      return prev.map(bed => {
+
+      return prev.map((bed) => {
         if (bed.id === sourceBedId) {
           let updatedHistory = bed.bedHistory || [];
           if (updatedHistory.length > 0 && !updatedHistory[0].dischargedAt) {
-            updatedHistory = [{ ...updatedHistory[0], dischargedAt: new Date().toISOString() }, ...updatedHistory.slice(1)];
+            updatedHistory = [
+              { ...updatedHistory[0], dischargedAt: new Date().toISOString() },
+              ...updatedHistory.slice(1),
+            ];
           }
-          return { 
-            ...bed, 
-            status: 'cleaning', 
-            patientId: undefined, 
-            lastUpdated: 'Agora',
-            cleaningStatus: 'waiting',
+          return {
+            ...bed,
+            status: "cleaning",
+            patientId: undefined,
+            lastUpdated: "Agora",
+            cleaningStatus: "waiting",
             requestedAt: new Date(),
-            priority: 'normal',
+            priority: "normal",
             isIsolation: false,
-            bedHistory: updatedHistory
+            bedHistory: updatedHistory,
           };
         }
         if (bed.id === targetBedId) {
@@ -253,7 +321,13 @@ export function BedsProvider({ children }: { children: ReactNode }) {
             admittedAt: new Date().toISOString(),
           };
           const updatedHistory = [newHistoryRecord, ...(bed.bedHistory || [])];
-          return { ...bed, status: 'occupied', patientId, lastUpdated: 'Agora', bedHistory: updatedHistory };
+          return {
+            ...bed,
+            status: "occupied",
+            patientId,
+            lastUpdated: "Agora",
+            bedHistory: updatedHistory,
+          };
         }
         return bed;
       });
@@ -261,42 +335,67 @@ export function BedsProvider({ children }: { children: ReactNode }) {
   };
 
   const getStats = () => {
-    return beds.reduce((acc, bed) => {
-      acc[bed.status]++;
-      return acc;
-    }, { available: 0, occupied: 0, maintenance: 0, cleaning: 0 });
+    return beds.reduce(
+      (acc, bed) => {
+        acc[bed.status]++;
+        return acc;
+      },
+      { available: 0, occupied: 0, maintenance: 0, cleaning: 0 },
+    );
   };
 
   const startCleaning = (bedId: string, cleaner: Cleaner) => {
-    setBeds(prev => prev.map(bed => 
-      bed.id === bedId ? {
-        ...bed,
-        cleaningStatus: 'in_progress',
-        startedAt: new Date(),
-        assignedCleaner: cleaner,
-        lastUpdated: 'Agora'
-      } : bed
-    ));
+    setBeds((prev) =>
+      prev.map((bed) =>
+        bed.id === bedId
+          ? {
+              ...bed,
+              cleaningStatus: "in_progress",
+              startedAt: new Date(),
+              assignedCleaner: cleaner,
+              lastUpdated: "Agora",
+            }
+          : bed,
+      ),
+    );
   };
 
-  const finishCleaning = (bedId: string, logDetails: { supplies: string[], observations: string, ccihConfirmed: boolean }) => {
-    setBeds(prev => {
+  const finishCleaning = (
+    bedId: string,
+    logDetails: {
+      supplies: string[];
+      observations: string;
+      ccihConfirmed: boolean;
+    },
+  ) => {
+    setBeds((prev) => {
       let targetBed: Bed | undefined;
-      const newBeds = prev.map(bed => {
+      const newBeds = prev.map((bed) => {
         if (bed.id === bedId) {
           targetBed = bed;
-          const { cleaningStatus, assignedCleaner, requestedAt, startedAt, priority, isIsolation, maintenanceReason, ...cleanBed } = bed;
+          const {
+            cleaningStatus,
+            assignedCleaner,
+            requestedAt,
+            startedAt,
+            priority,
+            isIsolation,
+            maintenanceReason,
+            ...cleanBed
+          } = bed;
           return {
             ...cleanBed,
-            status: 'available' as BedStatus,
-            lastUpdated: 'Agora'
+            status: "available" as BedStatus,
+            lastUpdated: "Agora",
           };
         }
         return bed;
       });
 
       if (targetBed && targetBed.assignedCleaner) {
-        const durationMinutes = targetBed.startedAt ? Math.floor((Date.now() - targetBed.startedAt.getTime()) / 60000) : 0;
+        const durationMinutes = targetBed.startedAt
+          ? Math.floor((Date.now() - targetBed.startedAt.getTime()) / 60000)
+          : 0;
         const newLog: CleaningLog = {
           id: `log-${Date.now()}`,
           bedId: targetBed.id,
@@ -314,7 +413,7 @@ export function BedsProvider({ children }: { children: ReactNode }) {
           requestedAt: targetBed.requestedAt,
           startedAt: targetBed.startedAt,
         };
-        setCleaningHistory(h => [newLog, ...h]);
+        setCleaningHistory((h) => [newLog, ...h]);
       }
 
       return newBeds;
@@ -322,21 +421,36 @@ export function BedsProvider({ children }: { children: ReactNode }) {
   };
 
   const reportBedDefect = (bedId: string, reason: string) => {
-    setBeds(prev => prev.map(bed => 
-      bed.id === bedId ? {
-        ...bed,
-        status: 'maintenance',
-        maintenanceReason: reason,
-        lastUpdated: 'Agora'
-      } : bed
-    ));
+    setBeds((prev) =>
+      prev.map((bed) =>
+        bed.id === bedId
+          ? {
+              ...bed,
+              status: "maintenance",
+              maintenanceReason: reason,
+              lastUpdated: "Agora",
+            }
+          : bed,
+      ),
+    );
   };
 
   return (
-    <BedsContext.Provider value={{ 
-      beds, cleaners, cleaningHistory, updateBedStatus, assignPatient, releaseBed, transferPatient, getStats,
-      startCleaning, finishCleaning, reportBedDefect
-    }}>
+    <BedsContext.Provider
+      value={{
+        beds,
+        cleaners,
+        cleaningHistory,
+        updateBedStatus,
+        assignPatient,
+        releaseBed,
+        transferPatient,
+        getStats,
+        startCleaning,
+        finishCleaning,
+        reportBedDefect,
+      }}
+    >
       {children}
     </BedsContext.Provider>
   );
@@ -345,7 +459,7 @@ export function BedsProvider({ children }: { children: ReactNode }) {
 export function useBeds() {
   const context = useContext(BedsContext);
   if (context === undefined) {
-    throw new Error('useBeds must be used within a BedsProvider');
+    throw new Error("useBeds must be used within a BedsProvider");
   }
   return context;
 }

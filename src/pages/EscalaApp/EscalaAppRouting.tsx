@@ -1,15 +1,15 @@
-import React from 'react';
-import { Routes, Route } from 'react-router-dom';
-import AppLayout from '@/components/layout/AppLayout';
-import '@/api/dbClient';
+import React from "react";
+import { Routes, Route } from "react-router-dom";
+import AppLayout from "@/components/layout/AppLayout";
+import "@/api/dbClient";
 
-import Dashboard from './pages/Dashboard';
-import NewEmployee from './pages/NewEmployee';
-import SearchPage from './pages/Search';
-import Management from './pages/Management';
-import Certificates from './pages/Certificates';
-import Reports from './pages/Reports';
-import EscalaControl from './pages/EscalaControl';
+import Dashboard from "./pages/Dashboard";
+import NewEmployee from "./pages/NewEmployee";
+import SearchPage from "./pages/Search";
+import Management from "./pages/Management";
+import Certificates from "./pages/Certificates";
+import Reports from "./pages/Reports";
+import EscalaControl from "./pages/EscalaControl";
 
 export default function EscalaAppRouting() {
   return (

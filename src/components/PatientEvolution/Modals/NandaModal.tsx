@@ -1,5 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { CheckCircle2, Activity } from "lucide-react";
@@ -15,7 +21,9 @@ interface NandaModalProps {
 
 export function NandaModal({ isOpen, onClose, onApply }: NandaModalProps) {
   const [viewedNanda, setViewedNanda] = useState<string | null>(null);
-  const [activePlans, setActivePlans] = useState<Record<string, { nocs: string[], nics: string[] }>>({});
+  const [activePlans, setActivePlans] = useState<
+    Record<string, { nocs: string[]; nics: string[] }>
+  >({});
 
   useEffect(() => {
     if (isOpen) {
@@ -26,9 +34,9 @@ export function NandaModal({ isOpen, onClose, onApply }: NandaModalProps) {
 
   const handleClear = () => {
     if (viewedNanda) {
-      setActivePlans(prev => ({
+      setActivePlans((prev) => ({
         ...prev,
-        [viewedNanda]: { nocs: [], nics: [] }
+        [viewedNanda]: { nocs: [], nics: [] },
       }));
       toast.info("Seleções limpas apenas para este diagnóstico.");
     }
@@ -36,18 +44,22 @@ export function NandaModal({ isOpen, onClose, onApply }: NandaModalProps) {
 
   const toggleNoc = (noc: string) => {
     if (!viewedNanda) return;
-    setActivePlans(prev => {
+    setActivePlans((prev) => {
       const plan = prev[viewedNanda] || { nocs: [], nics: [] };
-      const newNocs = plan.nocs.includes(noc) ? plan.nocs.filter(n => n !== noc) : [...plan.nocs, noc];
+      const newNocs = plan.nocs.includes(noc)
+        ? plan.nocs.filter((n) => n !== noc)
+        : [...plan.nocs, noc];
       return { ...prev, [viewedNanda]: { ...plan, nocs: newNocs } };
     });
   };
 
   const toggleNic = (nic: string) => {
     if (!viewedNanda) return;
-    setActivePlans(prev => {
+    setActivePlans((prev) => {
       const plan = prev[viewedNanda] || { nocs: [], nics: [] };
-      const newNics = plan.nics.includes(nic) ? plan.nics.filter(n => n !== nic) : [...plan.nics, nic];
+      const newNics = plan.nics.includes(nic)
+        ? plan.nics.filter((n) => n !== nic)
+        : [...plan.nics, nic];
       return { ...prev, [viewedNanda]: { ...plan, nics: newNics } };
     });
   };
@@ -59,17 +71,17 @@ export function NandaModal({ isOpen, onClose, onApply }: NandaModalProps) {
 
     for (const [diagId, plan] of Object.entries(activePlans)) {
       if (plan.nocs.length === 0 && plan.nics.length === 0) continue;
-      
-      const matchedDiag = NANDA_DIAGNOSES.find(d => d.id === diagId);
+
+      const matchedDiag = NANDA_DIAGNOSES.find((d) => d.id === diagId);
       if (matchedDiag) {
         hasAny = true;
         summaryTitles.push(matchedDiag.title);
         finalDesc += `\n\n  · NANDA: ${matchedDiag.title} (${matchedDiag.definition})`;
         if (plan.nocs.length > 0) {
-          finalDesc += `\n  · NOC (Resultados Esperados):\n    ${plan.nocs.map(noc => `- ${noc}`).join("\n    ")}`;
+          finalDesc += `\n  · NOC (Resultados Esperados):\n    ${plan.nocs.map((noc) => `- ${noc}`).join("\n    ")}`;
         }
         if (plan.nics.length > 0) {
-          finalDesc += `\n  · NIC (Intervenções Prescritas):\n    ${plan.nics.map(nic => `- ${nic}`).join("\n    ")}`;
+          finalDesc += `\n  · NIC (Intervenções Prescritas):\n    ${plan.nics.map((nic) => `- ${nic}`).join("\n    ")}`;
         }
       }
     }
@@ -78,18 +90,21 @@ export function NandaModal({ isOpen, onClose, onApply }: NandaModalProps) {
       toast.error("Selecione ao menos um NOC ou NIC em algum diagnóstico.");
       return;
     }
-    
-    const activePlanSummary = summaryTitles.length > 1 
-      ? `Múltiplos Diagnósticos (${summaryTitles.length})`
-      : summaryTitles[0];
+
+    const activePlanSummary =
+      summaryTitles.length > 1
+        ? `Múltiplos Diagnósticos (${summaryTitles.length})`
+        : summaryTitles[0];
 
     onApply(finalDesc, activePlanSummary);
     onClose(false);
     toast.success("Plano NANDA-NOC-NIC inserido no prontuário!");
   };
 
-  const viewedDiag = NANDA_DIAGNOSES.find(d => d.id === viewedNanda);
-  const currentPlan = viewedNanda ? (activePlans[viewedNanda] || { nocs: [], nics: [] }) : null;
+  const viewedDiag = NANDA_DIAGNOSES.find((d) => d.id === viewedNanda);
+  const currentPlan = viewedNanda
+    ? activePlans[viewedNanda] || { nocs: [], nics: [] }
+    : null;
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -110,20 +125,28 @@ export function NandaModal({ isOpen, onClose, onApply }: NandaModalProps) {
             <Label className="text-xs font-black uppercase text-foreground/80 flex items-center justify-between mb-2">
               <span>1. Diagnósticos (NANDA)</span>
               <span className="text-[10px] text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
-                {Object.values(activePlans).filter(p => p.nocs.length > 0 || p.nics.length > 0).length} Ativos
+                {
+                  Object.values(activePlans).filter(
+                    (p) => p.nocs.length > 0 || p.nics.length > 0,
+                  ).length
+                }{" "}
+                Ativos
               </span>
             </Label>
             <div className="space-y-2 max-h-[380px] overflow-y-auto pr-1">
-              {NANDA_DIAGNOSES.map(diag => {
+              {NANDA_DIAGNOSES.map((diag) => {
                 const isViewed = viewedNanda === diag.id;
                 const plan = activePlans[diag.id];
-                const isActive = plan && (plan.nocs.length > 0 || plan.nics.length > 0);
+                const isActive =
+                  plan && (plan.nocs.length > 0 || plan.nics.length > 0);
 
                 let btnClass = "bg-card border-border hover:bg-muted/40";
                 if (isViewed) {
-                  btnClass = "bg-primary/5 border-primary text-primary animate-pulse";
+                  btnClass =
+                    "bg-primary/5 border-primary text-primary animate-pulse";
                 } else if (isActive) {
-                  btnClass = "bg-emerald-500/5 border-emerald-500/40 text-foreground hover:bg-emerald-500/10";
+                  btnClass =
+                    "bg-emerald-500/5 border-emerald-500/40 text-foreground hover:bg-emerald-500/10";
                 }
 
                 return (
@@ -133,24 +156,35 @@ export function NandaModal({ isOpen, onClose, onApply }: NandaModalProps) {
                     onClick={() => {
                       setViewedNanda(diag.id);
                       if (!activePlans[diag.id]) {
-                        setActivePlans(prev => ({
+                        setActivePlans((prev) => ({
                           ...prev,
-                          [diag.id]: { nocs: [], nics: [] }
+                          [diag.id]: { nocs: [], nics: [] },
                         }));
                       }
                     }}
                     className={cn(
                       "w-full p-3 rounded-xl border text-left transition-all relative",
-                      btnClass
+                      btnClass,
                     )}
                   >
                     {isActive && !isViewed && (
                       <CheckCircle2 className="absolute top-3 right-3 h-4 w-4 text-emerald-500" />
                     )}
-                    <p className={cn("font-bold text-xs pr-6", isViewed ? "text-primary" : isActive ? "text-emerald-600 dark:text-emerald-400" : "")}>
+                    <p
+                      className={cn(
+                        "font-bold text-xs pr-6",
+                        isViewed
+                          ? "text-primary"
+                          : isActive
+                            ? "text-emerald-600 dark:text-emerald-400"
+                            : "",
+                      )}
+                    >
                       {diag.title}
                     </p>
-                    <p className="text-[10px] text-muted-foreground mt-1 line-clamp-2 leading-relaxed">{diag.definition}</p>
+                    <p className="text-[10px] text-muted-foreground mt-1 line-clamp-2 leading-relaxed">
+                      {diag.definition}
+                    </p>
                   </button>
                 );
               })}
@@ -173,24 +207,34 @@ export function NandaModal({ isOpen, onClose, onApply }: NandaModalProps) {
                   </div>
                   <div className="p-3.5 rounded-xl bg-muted/20 border border-border/60 space-y-1">
                     {viewedDiag.nocs.map((noc, idx) => (
-                      <div 
-                        key={idx} 
+                      <div
+                        key={idx}
                         className={cn(
                           "flex items-start gap-2.5 p-2 rounded-lg cursor-pointer transition-all border",
-                          currentPlan.nocs.includes(noc) 
-                            ? "bg-emerald-500/10 border-emerald-500/30" 
-                            : "bg-transparent border-transparent hover:bg-muted/50"
+                          currentPlan.nocs.includes(noc)
+                            ? "bg-emerald-500/10 border-emerald-500/30"
+                            : "bg-transparent border-transparent hover:bg-muted/50",
                         )}
                         onClick={() => toggleNoc(noc)}
                       >
-                        <CheckCircle2 className={cn(
-                          "h-4 w-4 mt-0.5 shrink-0 transition-colors",
-                          currentPlan.nocs.includes(noc) ? "text-emerald-500" : "text-muted-foreground/40"
-                        )} />
-                        <span className={cn(
-                          "text-[11px] font-medium leading-relaxed transition-colors",
-                          currentPlan.nocs.includes(noc) ? "text-foreground/90" : "text-muted-foreground/60"
-                        )}>{noc}</span>
+                        <CheckCircle2
+                          className={cn(
+                            "h-4 w-4 mt-0.5 shrink-0 transition-colors",
+                            currentPlan.nocs.includes(noc)
+                              ? "text-emerald-500"
+                              : "text-muted-foreground/40",
+                          )}
+                        />
+                        <span
+                          className={cn(
+                            "text-[11px] font-medium leading-relaxed transition-colors",
+                            currentPlan.nocs.includes(noc)
+                              ? "text-foreground/90"
+                              : "text-muted-foreground/60",
+                          )}
+                        >
+                          {noc}
+                        </span>
                       </div>
                     ))}
                   </div>
@@ -208,24 +252,34 @@ export function NandaModal({ isOpen, onClose, onApply }: NandaModalProps) {
                   </div>
                   <div className="p-3.5 rounded-xl bg-muted/20 border border-border/60 space-y-1">
                     {viewedDiag.nics.map((nic, idx) => (
-                      <div 
-                        key={idx} 
+                      <div
+                        key={idx}
                         className={cn(
                           "flex items-start gap-2.5 p-2 rounded-lg cursor-pointer transition-all border",
-                          currentPlan.nics.includes(nic) 
-                            ? "bg-primary/10 border-primary/30" 
-                            : "bg-transparent border-transparent hover:bg-muted/50"
+                          currentPlan.nics.includes(nic)
+                            ? "bg-primary/10 border-primary/30"
+                            : "bg-transparent border-transparent hover:bg-muted/50",
                         )}
                         onClick={() => toggleNic(nic)}
                       >
-                        <CheckCircle2 className={cn(
-                          "h-4 w-4 mt-0.5 shrink-0 transition-colors",
-                          currentPlan.nics.includes(nic) ? "text-primary" : "text-muted-foreground/40"
-                        )} />
-                        <span className={cn(
-                          "text-[11px] font-medium leading-relaxed transition-colors",
-                          currentPlan.nics.includes(nic) ? "text-foreground/90" : "text-muted-foreground/60"
-                        )}>{nic}</span>
+                        <CheckCircle2
+                          className={cn(
+                            "h-4 w-4 mt-0.5 shrink-0 transition-colors",
+                            currentPlan.nics.includes(nic)
+                              ? "text-primary"
+                              : "text-muted-foreground/40",
+                          )}
+                        />
+                        <span
+                          className={cn(
+                            "text-[11px] font-medium leading-relaxed transition-colors",
+                            currentPlan.nics.includes(nic)
+                              ? "text-foreground/90"
+                              : "text-muted-foreground/60",
+                          )}
+                        >
+                          {nic}
+                        </span>
                       </div>
                     ))}
                   </div>
@@ -234,8 +288,13 @@ export function NandaModal({ isOpen, onClose, onApply }: NandaModalProps) {
             ) : (
               <div className="flex-1 flex flex-col items-center justify-center border-2 border-dashed border-border rounded-xl p-6 text-center text-muted-foreground bg-muted/5">
                 <Activity className="h-10 w-10 text-muted-foreground/30 mb-2 animate-pulse" />
-                <p className="text-xs font-black uppercase tracking-wider text-muted-foreground/60">Aguardando Seleção</p>
-                <p className="text-[10px] text-muted-foreground/40 mt-1 max-w-[240px]">Selecione um diagnóstico de enfermagem na coluna esquerda para planejar os cuidados NOC/NIC.</p>
+                <p className="text-xs font-black uppercase tracking-wider text-muted-foreground/60">
+                  Aguardando Seleção
+                </p>
+                <p className="text-[10px] text-muted-foreground/40 mt-1 max-w-[240px]">
+                  Selecione um diagnóstico de enfermagem na coluna esquerda para
+                  planejar os cuidados NOC/NIC.
+                </p>
               </div>
             )}
 
@@ -260,7 +319,9 @@ export function NandaModal({ isOpen, onClose, onApply }: NandaModalProps) {
               </Button>
               <Button
                 type="button"
-                disabled={Object.values(activePlans).every(p => p.nocs.length === 0 && p.nics.length === 0)}
+                disabled={Object.values(activePlans).every(
+                  (p) => p.nocs.length === 0 && p.nics.length === 0,
+                )}
                 onClick={handleConfirm}
                 className="rounded-xl font-bold h-10 text-xs px-6 bg-primary text-primary-foreground animate-shimmer disabled:opacity-50 disabled:animate-none"
               >

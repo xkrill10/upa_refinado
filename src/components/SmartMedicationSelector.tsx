@@ -12,27 +12,35 @@ interface SmartMedicationSelectorProps {
   onSelectFull?: (medication: MedicationItem) => void;
 }
 
-export function SmartMedicationSelector({ value, onChange, onSelectFull }: SmartMedicationSelectorProps) {
+export function SmartMedicationSelector({
+  value,
+  onChange,
+  onSelectFull,
+}: SmartMedicationSelectorProps) {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
 
   const filteredMedications = useMemo(() => {
     if (!search) return MEDICATIONS_DATABASE;
     const lower = search.toLowerCase();
-    return MEDICATIONS_DATABASE.filter(med => 
-      med.name.toLowerCase().includes(lower) || 
-      med.category.toLowerCase().includes(lower) ||
-      med.description.toLowerCase().includes(lower)
+    return MEDICATIONS_DATABASE.filter(
+      (med) =>
+        med.name.toLowerCase().includes(lower) ||
+        med.category.toLowerCase().includes(lower) ||
+        med.description.toLowerCase().includes(lower),
     );
   }, [search]);
 
   // Group by category for rendering
   const grouped = useMemo(() => {
-    return filteredMedications.reduce((acc, med) => {
-      if (!acc[med.category]) acc[med.category] = [];
-      acc[med.category].push(med);
-      return acc;
-    }, {} as Record<string, MedicationItem[]>);
+    return filteredMedications.reduce(
+      (acc, med) => {
+        if (!acc[med.category]) acc[med.category] = [];
+        acc[med.category].push(med);
+        return acc;
+      },
+      {} as Record<string, MedicationItem[]>,
+    );
   }, [filteredMedications]);
 
   const handleSelect = (med: MedicationItem) => {
@@ -60,10 +68,9 @@ export function SmartMedicationSelector({ value, onChange, onSelectFull }: Smart
           <ChevronDown className="h-3 w-3 shrink-0 opacity-50" />
         </Button>
       </DialogTrigger>
-      
+
       <DialogContent className="w-[350px] sm:w-[450px] p-0 rounded-2xl border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden [&>button]:hidden">
         <div className="flex flex-col bg-white dark:bg-slate-950">
-          
           <div className="p-3 border-b border-slate-100 dark:border-slate-800/60 bg-slate-50/50 dark:bg-slate-900/50">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
@@ -80,11 +87,15 @@ export function SmartMedicationSelector({ value, onChange, onSelectFull }: Smart
             {Object.keys(grouped).length === 0 ? (
               <div className="py-12 text-center flex flex-col items-center">
                 <Pill className="h-8 w-8 text-slate-300 dark:text-slate-700 mb-3" />
-                <p className="text-sm font-bold text-slate-500">Nenhum medicamento encontrado.</p>
-                <p className="text-xs text-slate-400 mt-1">Você pode digitar o nome livremente caso não esteja na lista.</p>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
+                <p className="text-sm font-bold text-slate-500">
+                  Nenhum medicamento encontrado.
+                </p>
+                <p className="text-xs text-slate-400 mt-1">
+                  Você pode digitar o nome livremente caso não esteja na lista.
+                </p>
+                <Button
+                  variant="outline"
+                  size="sm"
                   className="mt-4 rounded-lg text-xs font-bold"
                   onClick={() => {
                     onChange(search);
@@ -122,8 +133,11 @@ export function SmartMedicationSelector({ value, onChange, onSelectFull }: Smart
                               {med.description}
                             </p>
                             <div className="flex flex-wrap gap-1 mt-1.5">
-                              {med.routes.map(route => (
-                                <span key={route} className="text-[9px] font-bold uppercase px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400">
+                              {med.routes.map((route) => (
+                                <span
+                                  key={route}
+                                  className="text-[9px] font-bold uppercase px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400"
+                                >
                                   {route}
                                 </span>
                               ))}

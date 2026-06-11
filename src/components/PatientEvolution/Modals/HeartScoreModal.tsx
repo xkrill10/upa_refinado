@@ -1,7 +1,19 @@
 import React, { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Heart } from "lucide-react";
@@ -14,7 +26,11 @@ interface HeartScoreModalProps {
   onApply: (descText: string, summary: string) => void;
 }
 
-export function HeartScoreModal({ isOpen, onClose, onApply }: HeartScoreModalProps) {
+export function HeartScoreModal({
+  isOpen,
+  onClose,
+  onApply,
+}: HeartScoreModalProps) {
   const [history, setHistory] = useState("");
   const [ecg, setEcg] = useState("");
   const [age, setAge] = useState("");
@@ -42,15 +58,18 @@ export function HeartScoreModal({ isOpen, onClose, onApply }: HeartScoreModalPro
   if (score >= 7) {
     riskClass = "ALTO RISCO";
     riskColor = "bg-red-600 text-white animate-pulse";
-    conduta = "Risco de MACE (Eventos Cardíacos Adversos Maiores) em 6 semanas é de 50-65%. Internação urgente e estratificação invasiva precoce indicada.";
+    conduta =
+      "Risco de MACE (Eventos Cardíacos Adversos Maiores) em 6 semanas é de 50-65%. Internação urgente e estratificação invasiva precoce indicada.";
   } else if (score >= 4) {
     riskClass = "RISCO MODERADO";
     riskColor = "bg-amber-500 text-white";
-    conduta = "Risco de MACE de 12-16.6%. Admissão para observação clínica e estratificação não invasiva sugerida.";
+    conduta =
+      "Risco de MACE de 12-16.6%. Admissão para observação clínica e estratificação não invasiva sugerida.";
   } else {
     riskClass = "BAIXO RISCO";
     riskColor = "bg-emerald-500 text-white";
-    conduta = "Risco de MACE de 0.9-1.7%. Considerar alta hospitalar precoce se não houver outros achados.";
+    conduta =
+      "Risco de MACE de 0.9-1.7%. Considerar alta hospitalar precoce se não houver outros achados.";
   }
 
   return (
@@ -69,7 +88,9 @@ export function HeartScoreModal({ isOpen, onClose, onApply }: HeartScoreModalPro
         <div className="space-y-4 py-2">
           {/* History */}
           <div className="space-y-1">
-            <Label className="text-xs font-black uppercase text-foreground/80">História Clínica (H)</Label>
+            <Label className="text-xs font-black uppercase text-foreground/80">
+              História Clínica (H)
+            </Label>
             <Select value={history} onValueChange={setHistory}>
               <SelectTrigger className="h-10 rounded-xl bg-slate-50/50 dark:bg-slate-900/50">
                 <SelectValue placeholder="Selecione..." />
@@ -84,22 +105,30 @@ export function HeartScoreModal({ isOpen, onClose, onApply }: HeartScoreModalPro
 
           {/* ECG */}
           <div className="space-y-1">
-            <Label className="text-xs font-black uppercase text-foreground/80">Eletrocardiograma (E)</Label>
+            <Label className="text-xs font-black uppercase text-foreground/80">
+              Eletrocardiograma (E)
+            </Label>
             <Select value={ecg} onValueChange={setEcg}>
               <SelectTrigger className="h-10 rounded-xl bg-slate-50/50 dark:bg-slate-900/50">
                 <SelectValue placeholder="Selecione..." />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="0">Normal (0 pts)</SelectItem>
-                <SelectItem value="1">Alteração inespecífica da repolarização (1 pt)</SelectItem>
-                <SelectItem value="2">Depressão significativa do segmento ST (2 pts)</SelectItem>
+                <SelectItem value="1">
+                  Alteração inespecífica da repolarização (1 pt)
+                </SelectItem>
+                <SelectItem value="2">
+                  Depressão significativa do segmento ST (2 pts)
+                </SelectItem>
               </SelectContent>
             </Select>
           </div>
 
           {/* Age */}
           <div className="space-y-1">
-            <Label className="text-xs font-black uppercase text-foreground/80">Idade (A)</Label>
+            <Label className="text-xs font-black uppercase text-foreground/80">
+              Idade (A)
+            </Label>
             <Select value={age} onValueChange={setAge}>
               <SelectTrigger className="h-10 rounded-xl bg-slate-50/50 dark:bg-slate-900/50">
                 <SelectValue placeholder="Selecione..." />
@@ -114,22 +143,30 @@ export function HeartScoreModal({ isOpen, onClose, onApply }: HeartScoreModalPro
 
           {/* Risk Factors */}
           <div className="space-y-1">
-            <Label className="text-xs font-black uppercase text-foreground/80">Fatores de Risco (R)</Label>
+            <Label className="text-xs font-black uppercase text-foreground/80">
+              Fatores de Risco (R)
+            </Label>
             <Select value={riskFactors} onValueChange={setRiskFactors}>
               <SelectTrigger className="h-10 rounded-xl bg-slate-50/50 dark:bg-slate-900/50">
                 <SelectValue placeholder="Selecione..." />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="0">Nenhum (0 pts)</SelectItem>
-                <SelectItem value="1">1 ou 2 fatores de risco (1 pt)</SelectItem>
-                <SelectItem value="2">&ge; 3 fatores ou doença aterosclerótica prévia (2 pts)</SelectItem>
+                <SelectItem value="1">
+                  1 ou 2 fatores de risco (1 pt)
+                </SelectItem>
+                <SelectItem value="2">
+                  &ge; 3 fatores ou doença aterosclerótica prévia (2 pts)
+                </SelectItem>
               </SelectContent>
             </Select>
           </div>
 
           {/* Troponin */}
           <div className="space-y-1">
-            <Label className="text-xs font-black uppercase text-foreground/80">Troponina (T)</Label>
+            <Label className="text-xs font-black uppercase text-foreground/80">
+              Troponina (T)
+            </Label>
             <Select value={troponin} onValueChange={setTroponin}>
               <SelectTrigger className="h-10 rounded-xl bg-slate-50/50 dark:bg-slate-900/50">
                 <SelectValue placeholder="Selecione..." />
@@ -137,7 +174,9 @@ export function HeartScoreModal({ isOpen, onClose, onApply }: HeartScoreModalPro
               <SelectContent>
                 <SelectItem value="0">&le; Limite normal (0 pts)</SelectItem>
                 <SelectItem value="1">1 a 3x o limite normal (1 pt)</SelectItem>
-                <SelectItem value="2">&ge; 3x o limite normal (2 pts)</SelectItem>
+                <SelectItem value="2">
+                  &ge; 3x o limite normal (2 pts)
+                </SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -146,15 +185,30 @@ export function HeartScoreModal({ isOpen, onClose, onApply }: HeartScoreModalPro
           <div className="mt-6 p-4 rounded-xl bg-slate-50/70 dark:bg-slate-900/40 border border-slate-200/60 dark:border-slate-800/50 space-y-3">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-[10px] font-black uppercase text-muted-foreground tracking-wider">Pontuação Total</p>
-                <p className="text-3xl font-black text-foreground">{score} <span className="text-sm font-bold text-muted-foreground">/ 10 pts</span></p>
+                <p className="text-[10px] font-black uppercase text-muted-foreground tracking-wider">
+                  Pontuação Total
+                </p>
+                <p className="text-3xl font-black text-foreground">
+                  {score}{" "}
+                  <span className="text-sm font-bold text-muted-foreground">
+                    / 10 pts
+                  </span>
+                </p>
               </div>
               {isComplete ? (
-                <Badge className={cn("h-7 rounded-lg text-[10px] font-black uppercase px-2", riskColor)}>
+                <Badge
+                  className={cn(
+                    "h-7 rounded-lg text-[10px] font-black uppercase px-2",
+                    riskColor,
+                  )}
+                >
                   {riskClass}
                 </Badge>
               ) : (
-                <Badge variant="secondary" className="h-7 rounded-lg text-xs font-black uppercase">
+                <Badge
+                  variant="secondary"
+                  className="h-7 rounded-lg text-xs font-black uppercase"
+                >
                   Incompleto
                 </Badge>
               )}
@@ -165,7 +219,11 @@ export function HeartScoreModal({ isOpen, onClose, onApply }: HeartScoreModalPro
                 type="button"
                 variant="outline"
                 onClick={() => {
-                  setHistory(""); setEcg(""); setAge(""); setRiskFactors(""); setTroponin("");
+                  setHistory("");
+                  setEcg("");
+                  setAge("");
+                  setRiskFactors("");
+                  setTroponin("");
                   toast.info("Campos limpos.");
                 }}
                 className="h-11 px-6 rounded-xl font-bold uppercase text-[10px]"

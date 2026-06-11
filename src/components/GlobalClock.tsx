@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 
 export function GlobalClock() {
   const [time, setTime] = useState(new Date());
@@ -11,17 +11,38 @@ export function GlobalClock() {
   }, []);
 
   const formatDateTime = (date: Date) => {
-    const days = ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'];
-    const months = ['Jan.', 'Fev.', 'Mar.', 'Abr.', 'Mai.', 'Jun.', 'Jul.', 'Ago.', 'Set.', 'Out.', 'Nov.', 'Dez.'];
-    
+    const days = [
+      "Domingo",
+      "Segunda-feira",
+      "Terça-feira",
+      "Quarta-feira",
+      "Quinta-feira",
+      "Sexta-feira",
+      "Sábado",
+    ];
+    const months = [
+      "Jan.",
+      "Fev.",
+      "Mar.",
+      "Abr.",
+      "Mai.",
+      "Jun.",
+      "Jul.",
+      "Ago.",
+      "Set.",
+      "Out.",
+      "Nov.",
+      "Dez.",
+    ];
+
     const dayName = days[date.getDay()];
     const day = date.getDate();
     const month = months[date.getMonth()];
     const year = date.getFullYear();
-    
-    const hours = date.getHours().toString().padStart(2, '0');
-    const minutes = date.getMinutes().toString().padStart(2, '0');
-    const seconds = date.getSeconds().toString().padStart(2, '0');
+
+    const hours = date.getHours().toString().padStart(2, "0");
+    const minutes = date.getMinutes().toString().padStart(2, "0");
+    const seconds = date.getSeconds().toString().padStart(2, "0");
 
     return `${dayName}, ${day} de ${month} ${year} • ${hours}:${minutes}:${seconds}`;
   };

@@ -1,8 +1,22 @@
 import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { DatabaseBackup, HardDrive, ShieldAlert, Cloud, Clock, CheckCircle2, AlertCircle } from "lucide-react";
+import {
+  DatabaseBackup,
+  HardDrive,
+  ShieldAlert,
+  Cloud,
+  Clock,
+  CheckCircle2,
+  AlertCircle,
+} from "lucide-react";
 import { motion } from "motion/react";
 import { cn } from "@/lib/utils";
 
@@ -26,10 +40,34 @@ export default function BackupAdmin() {
   };
 
   const backupHistory = [
-    { id: "BK-882", date: "09/06/2026 23:00", size: "2.4 GB", type: "Automático", status: "success" },
-    { id: "BK-881", date: "08/06/2026 23:00", size: "2.3 GB", type: "Automático", status: "success" },
-    { id: "BK-880", date: "07/06/2026 23:00", size: "2.3 GB", type: "Automático", status: "success" },
-    { id: "BK-879", date: "06/06/2026 14:20", size: "2.1 GB", type: "Manual", status: "warning" },
+    {
+      id: "BK-882",
+      date: "09/06/2026 23:00",
+      size: "2.4 GB",
+      type: "Automático",
+      status: "success",
+    },
+    {
+      id: "BK-881",
+      date: "08/06/2026 23:00",
+      size: "2.3 GB",
+      type: "Automático",
+      status: "success",
+    },
+    {
+      id: "BK-880",
+      date: "07/06/2026 23:00",
+      size: "2.3 GB",
+      type: "Automático",
+      status: "success",
+    },
+    {
+      id: "BK-879",
+      date: "06/06/2026 14:20",
+      size: "2.1 GB",
+      type: "Manual",
+      status: "warning",
+    },
   ];
 
   return (
@@ -48,7 +86,9 @@ export default function BackupAdmin() {
         </div>
       </div>
       <p className="text-sm text-slate-500 dark:text-slate-400 max-w-2xl">
-        Painel de demonstração para a configuração de rotinas de backup automático (Bicapo) e espelhamento em nuvem, garantindo disponibilidade de dados LGPD.
+        Painel de demonstração para a configuração de rotinas de backup
+        automático (Bicapo) e espelhamento em nuvem, garantindo disponibilidade
+        de dados LGPD.
       </p>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -58,8 +98,12 @@ export default function BackupAdmin() {
               <CheckCircle2 className="h-5 w-5" />
             </div>
             <div>
-              <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Último Backup</p>
-              <p className="text-lg font-black text-slate-800 dark:text-white">Há 12 horas</p>
+              <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                Último Backup
+              </p>
+              <p className="text-lg font-black text-slate-800 dark:text-white">
+                Há 12 horas
+              </p>
             </div>
           </CardContent>
         </Card>
@@ -69,8 +113,12 @@ export default function BackupAdmin() {
               <Cloud className="h-5 w-5" />
             </div>
             <div>
-              <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Armazenamento Cloud</p>
-              <p className="text-lg font-black text-slate-800 dark:text-white">45.2 GB Usados</p>
+              <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                Armazenamento Cloud
+              </p>
+              <p className="text-lg font-black text-slate-800 dark:text-white">
+                45.2 GB Usados
+              </p>
             </div>
           </CardContent>
         </Card>
@@ -80,8 +128,12 @@ export default function BackupAdmin() {
               <ShieldAlert className="h-5 w-5" />
             </div>
             <div>
-              <p className="text-xs font-semibold text-amber-600 dark:text-amber-400 uppercase tracking-wider">Retenção Ativa</p>
-              <p className="text-lg font-black text-amber-700 dark:text-amber-400">30 Dias (Diários)</p>
+              <p className="text-xs font-semibold text-amber-600 dark:text-amber-400 uppercase tracking-wider">
+                Retenção Ativa
+              </p>
+              <p className="text-lg font-black text-amber-700 dark:text-amber-400">
+                30 Dias (Diários)
+              </p>
             </div>
           </CardContent>
         </Card>
@@ -94,17 +146,23 @@ export default function BackupAdmin() {
               <HardDrive className="h-5 w-5 text-emerald-500" />
               Executar Backup Manual
             </CardTitle>
-            <CardDescription>Inicie uma cópia de segurança imediata de todo o banco de dados e arquivos anexos.</CardDescription>
+            <CardDescription>
+              Inicie uma cópia de segurança imediata de todo o banco de dados e
+              arquivos anexos.
+            </CardDescription>
           </CardHeader>
           <CardContent className="flex flex-col items-center justify-center py-6">
             {!isBackingUp && progress === 0 ? (
-              <Button onClick={startBackup} className="bg-emerald-600 hover:bg-emerald-700 text-white gap-2 font-bold px-8 py-6 rounded-full shadow-lg shadow-emerald-500/30 transition-transform hover:scale-105">
+              <Button
+                onClick={startBackup}
+                className="bg-emerald-600 hover:bg-emerald-700 text-white gap-2 font-bold px-8 py-6 rounded-full shadow-lg shadow-emerald-500/30 transition-transform hover:scale-105"
+              >
                 <DatabaseBackup className="h-5 w-5" /> INICIAR BACKUP AGORA
               </Button>
             ) : (
               <div className="w-full max-w-md flex flex-col items-center gap-4">
                 <div className="w-full bg-slate-100 dark:bg-slate-800 h-4 rounded-full overflow-hidden border border-slate-200 dark:border-slate-700">
-                  <motion.div 
+                  <motion.div
                     className="h-full bg-emerald-500"
                     initial={{ width: 0 }}
                     animate={{ width: `${progress}%` }}
@@ -112,10 +170,16 @@ export default function BackupAdmin() {
                   />
                 </div>
                 <p className="text-sm font-bold text-slate-600 dark:text-slate-300">
-                  {progress < 100 ? `Copiando dados sensíveis... ${progress}%` : 'Backup concluído com sucesso!'}
+                  {progress < 100
+                    ? `Copiando dados sensíveis... ${progress}%`
+                    : "Backup concluído com sucesso!"}
                 </p>
                 {progress === 100 && (
-                  <Button variant="outline" onClick={() => setProgress(0)} className="mt-2">
+                  <Button
+                    variant="outline"
+                    onClick={() => setProgress(0)}
+                    className="mt-2"
+                  >
                     Novo Backup
                   </Button>
                 )}
@@ -130,26 +194,40 @@ export default function BackupAdmin() {
               <Clock className="h-5 w-5 text-blue-500" />
               Histórico de Backups
             </CardTitle>
-            <CardDescription>Últimas rotinas de salvamento executadas no sistema.</CardDescription>
+            <CardDescription>
+              Últimas rotinas de salvamento executadas no sistema.
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
               {backupHistory.map((bkp) => (
-                <div key={bkp.id} className="flex items-center justify-between p-3 rounded-lg border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/30">
+                <div
+                  key={bkp.id}
+                  className="flex items-center justify-between p-3 rounded-lg border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/30"
+                >
                   <div className="flex items-center gap-3">
-                    {bkp.status === 'success' ? (
+                    {bkp.status === "success" ? (
                       <CheckCircle2 className="h-4 w-4 text-emerald-500" />
                     ) : (
                       <AlertCircle className="h-4 w-4 text-amber-500" />
                     )}
                     <div className="flex flex-col">
-                      <span className="font-bold text-sm text-slate-700 dark:text-slate-300">{bkp.id}</span>
+                      <span className="font-bold text-sm text-slate-700 dark:text-slate-300">
+                        {bkp.id}
+                      </span>
                       <span className="text-xs text-slate-500">{bkp.date}</span>
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
-                    <Badge variant="outline" className="text-[10px] uppercase font-bold">{bkp.type}</Badge>
-                    <span className="text-sm font-mono text-slate-600 dark:text-slate-400">{bkp.size}</span>
+                    <Badge
+                      variant="outline"
+                      className="text-[10px] uppercase font-bold"
+                    >
+                      {bkp.type}
+                    </Badge>
+                    <span className="text-sm font-mono text-slate-600 dark:text-slate-400">
+                      {bkp.size}
+                    </span>
                   </div>
                 </div>
               ))}

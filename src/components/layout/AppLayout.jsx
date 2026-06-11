@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
-import { Outlet, useLocation } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import Sidebar from './Sidebar';
+import React, { useState } from "react";
+import { Outlet, useLocation } from "react-router-dom";
+import { motion } from "framer-motion";
+import Sidebar from "./Sidebar";
 
 export default function AppLayout() {
   const location = useLocation();
-  const isSchedulePage = location.pathname === '/escala';
+  const isSchedulePage = location.pathname === "/escala";
 
   return (
     <div className="h-full rounded-xl overflow-hidden bg-background flex shadow-sm border">

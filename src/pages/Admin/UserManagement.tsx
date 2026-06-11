@@ -3,14 +3,33 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Search, Plus, Shield, UserCog, AlertCircle } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { toast } from "sonner";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 
-type UserRole = "ADMIN" | "MEDICO" | "ENFERMEIRO" | "TECNICO" | "FISIOTERAPEUTA" | "NUTRICIONISTA" | "PSICOLOGO" | "RECEPCAO";
+type UserRole =
+  | "ADMIN"
+  | "MEDICO"
+  | "ENFERMEIRO"
+  | "TECNICO"
+  | "FISIOTERAPEUTA"
+  | "NUTRICIONISTA"
+  | "PSICOLOGO"
+  | "RECEPCAO";
 
 interface MockUser {
   id: string;
@@ -21,10 +40,34 @@ interface MockUser {
 }
 
 const defaultMockUsers: MockUser[] = [
-  { id: '1', name: 'Administrador do Sistema', email: 'admin@upa.com.br', role: 'ADMIN', status: 'active' },
-  { id: '2', name: 'Dr. Ricardo Braga', email: 'ricardo@upa.com.br', role: 'MEDICO', status: 'active' },
-  { id: '3', name: 'Enf. Juliana', email: 'juliana@upa.com.br', role: 'ENFERMEIRO', status: 'active' },
-  { id: '4', name: 'Fisio. Carlos', email: 'carlos@upa.com.br', role: 'FISIOTERAPEUTA', status: 'active' },
+  {
+    id: "1",
+    name: "Administrador do Sistema",
+    email: "admin@upa.com.br",
+    role: "ADMIN",
+    status: "active",
+  },
+  {
+    id: "2",
+    name: "Dr. Ricardo Braga",
+    email: "ricardo@upa.com.br",
+    role: "MEDICO",
+    status: "active",
+  },
+  {
+    id: "3",
+    name: "Enf. Juliana",
+    email: "juliana@upa.com.br",
+    role: "ENFERMEIRO",
+    status: "active",
+  },
+  {
+    id: "4",
+    name: "Fisio. Carlos",
+    email: "carlos@upa.com.br",
+    role: "FISIOTERAPEUTA",
+    status: "active",
+  },
 ];
 
 export default function UserManagement() {
@@ -38,23 +81,24 @@ export default function UserManagement() {
     name: "",
     email: "",
     role: "MEDICO" as UserRole,
-    status: "active" as "active" | "inactive"
+    status: "active" as "active" | "inactive",
   });
 
   useEffect(() => {
-    const saved = localStorage.getItem('upa_mock_users');
+    const saved = localStorage.getItem("upa_mock_users");
     if (saved) setUsers(JSON.parse(saved));
     else setUsers(defaultMockUsers);
   }, []);
 
   const saveUsers = (newUsers: MockUser[]) => {
     setUsers(newUsers);
-    localStorage.setItem('upa_mock_users', JSON.stringify(newUsers));
+    localStorage.setItem("upa_mock_users", JSON.stringify(newUsers));
   };
 
-  const filteredUsers = users.filter(u => {
-    const matchesSearch = u.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                          u.email.toLowerCase().includes(searchTerm.toLowerCase());
+  const filteredUsers = users.filter((u) => {
+    const matchesSearch =
+      u.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      u.email.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesRole = roleFilter === "ALL" || u.role === roleFilter;
     return matchesSearch && matchesRole;
   });
@@ -62,7 +106,12 @@ export default function UserManagement() {
   const handleOpenModal = (user?: MockUser) => {
     if (user) {
       setEditingUser(user);
-      setFormData({ name: user.name, email: user.email, role: user.role, status: user.status });
+      setFormData({
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        status: user.status,
+      });
     } else {
       setEditingUser(null);
       setFormData({ name: "", email: "", role: "MEDICO", status: "active" });
@@ -78,7 +127,9 @@ export default function UserManagement() {
     }
 
     if (editingUser) {
-      const updated = users.map(u => u.id === editingUser.id ? { ...u, ...formData } : u);
+      const updated = users.map((u) =>
+        u.id === editingUser.id ? { ...u, ...formData } : u,
+      );
       saveUsers(updated);
       toast.success("Usuário atualizado com sucesso!");
     } else {
@@ -94,9 +145,11 @@ export default function UserManagement() {
       <div className="p-4 bg-sky-500/10 border border-sky-500/20 rounded-xl flex gap-3 items-start">
         <AlertCircle className="h-5 w-5 text-sky-500 shrink-0 mt-0.5" />
         <p className="text-sm text-slate-400">
-          <strong>Aviso de Protótipo:</strong> O sistema utiliza Supabase para autenticação real. 
-          Criar usuários por este painel no frontend requer Edge Functions/Admin API. 
-          Atualmente este painel funciona como um <strong>Mock de Interface</strong> para gerenciar os 120 colaboradores visualmente.
+          <strong>Aviso de Protótipo:</strong> O sistema utiliza Supabase para
+          autenticação real. Criar usuários por este painel no frontend requer
+          Edge Functions/Admin API. Atualmente este painel funciona como um{" "}
+          <strong>Mock de Interface</strong> para gerenciar os 120 colaboradores
+          visualmente.
         </p>
       </div>
 
@@ -106,10 +159,14 @@ export default function UserManagement() {
             <Shield className="h-6 w-6" /> Gestão de Colaboradores
           </h1>
           <p className="text-sm font-semibold text-muted-foreground mt-1">
-            Controle de {users.length} acessos e perfis da equipe multidisciplinar
+            Controle de {users.length} acessos e perfis da equipe
+            multidisciplinar
           </p>
         </div>
-        <Button onClick={() => handleOpenModal()} className="bg-[#006699] hover:bg-[#005580] text-white gap-2 rounded-xl h-10 shadow-sm transition-all active:scale-95">
+        <Button
+          onClick={() => handleOpenModal()}
+          className="bg-[#006699] hover:bg-[#005580] text-white gap-2 rounded-xl h-10 shadow-sm transition-all active:scale-95"
+        >
           <Plus className="h-4 w-4" /> Novo Colaborador
         </Button>
       </div>
@@ -127,7 +184,10 @@ export default function UserManagement() {
               />
             </div>
             <div className="w-full sm:w-[200px]">
-              <Select value={roleFilter} onValueChange={(v) => setRoleFilter(v as UserRole | "ALL")}>
+              <Select
+                value={roleFilter}
+                onValueChange={(v) => setRoleFilter(v as UserRole | "ALL")}
+              >
                 <SelectTrigger className="h-10 rounded-xl">
                   <SelectValue placeholder="Filtrar Cargo" />
                 </SelectTrigger>
@@ -151,35 +211,69 @@ export default function UserManagement() {
             <table className="w-full text-sm text-left">
               <thead className="text-xs text-muted-foreground uppercase bg-slate-50/50 dark:bg-slate-900/20 border-b">
                 <tr>
-                  <th className="px-6 py-4 font-black tracking-wider">Colaborador</th>
-                  <th className="px-6 py-4 font-black tracking-wider">E-mail</th>
-                  <th className="px-6 py-4 font-black tracking-wider">Especialidade</th>
-                  <th className="px-6 py-4 font-black tracking-wider text-right">Ações</th>
+                  <th className="px-6 py-4 font-black tracking-wider">
+                    Colaborador
+                  </th>
+                  <th className="px-6 py-4 font-black tracking-wider">
+                    E-mail
+                  </th>
+                  <th className="px-6 py-4 font-black tracking-wider">
+                    Especialidade
+                  </th>
+                  <th className="px-6 py-4 font-black tracking-wider text-right">
+                    Ações
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border/50">
                 <AnimatePresence>
                   {filteredUsers.map((user) => (
-                    <motion.tr key={user.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="hover:bg-muted/30">
+                    <motion.tr
+                      key={user.id}
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      className="hover:bg-muted/30"
+                    >
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center gap-3">
                           <div className="h-8 w-8 rounded-full bg-[#006699]/10 text-[#006699] flex items-center justify-center font-black text-xs">
                             {user.name.substring(0, 2).toUpperCase()}
                           </div>
                           <div>
-                            <p className="font-bold text-foreground">{user.name}</p>
-                            <span className={user.status === 'active' ? "text-[9px] font-black uppercase text-emerald-500" : "text-[9px] font-black uppercase text-rose-500"}>
-                              {user.status === 'active' ? 'Ativo' : 'Bloqueado'}
+                            <p className="font-bold text-foreground">
+                              {user.name}
+                            </p>
+                            <span
+                              className={
+                                user.status === "active"
+                                  ? "text-[9px] font-black uppercase text-emerald-500"
+                                  : "text-[9px] font-black uppercase text-rose-500"
+                              }
+                            >
+                              {user.status === "active" ? "Ativo" : "Bloqueado"}
                             </span>
                           </div>
                         </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap font-medium text-muted-foreground">{user.email}</td>
+                      <td className="px-6 py-4 whitespace-nowrap font-medium text-muted-foreground">
+                        {user.email}
+                      </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <Badge variant="outline" className="font-bold text-[10px] uppercase tracking-wider">{user.role}</Badge>
+                        <Badge
+                          variant="outline"
+                          className="font-bold text-[10px] uppercase tracking-wider"
+                        >
+                          {user.role}
+                        </Badge>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right">
-                        <Button variant="ghost" size="sm" onClick={() => handleOpenModal(user)} className="h-8 text-xs font-bold text-[#006699] hover:bg-[#006699]/10 rounded-lg">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleOpenModal(user)}
+                          className="h-8 text-xs font-bold text-[#006699] hover:bg-[#006699]/10 rounded-lg"
+                        >
                           <UserCog className="h-4 w-4 mr-2" /> Editar
                         </Button>
                       </td>
@@ -196,25 +290,53 @@ export default function UserManagement() {
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
             <DialogTitle className="text-lg font-black uppercase tracking-tight text-[#006699] dark:text-sky-400 flex items-center gap-2">
-              <UserCog className="h-5 w-5" /> 
+              <UserCog className="h-5 w-5" />
               {editingUser ? "Editar Colaborador" : "Novo Colaborador"}
             </DialogTitle>
           </DialogHeader>
           <form onSubmit={handleSave} className="space-y-4 pt-4">
             <div className="space-y-2">
-              <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Nome Completo</Label>
-              <Input value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} placeholder="Ex: Dra. Ana Silva" className="rounded-xl" />
-            </div>
-            
-            <div className="space-y-2">
-              <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">E-mail Institucional</Label>
-              <Input type="email" value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} placeholder="Ex: ana.silva@upa.com.br" className="rounded-xl" />
+              <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                Nome Completo
+              </Label>
+              <Input
+                value={formData.name}
+                onChange={(e) =>
+                  setFormData({ ...formData, name: e.target.value })
+                }
+                placeholder="Ex: Dra. Ana Silva"
+                className="rounded-xl"
+              />
             </div>
 
             <div className="space-y-2">
-              <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Especialidade / Cargo</Label>
-              <Select value={formData.role} onValueChange={(v: UserRole) => setFormData({...formData, role: v})}>
-                <SelectTrigger className="rounded-xl"><SelectValue /></SelectTrigger>
+              <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                E-mail Institucional
+              </Label>
+              <Input
+                type="email"
+                value={formData.email}
+                onChange={(e) =>
+                  setFormData({ ...formData, email: e.target.value })
+                }
+                placeholder="Ex: ana.silva@upa.com.br"
+                className="rounded-xl"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                Especialidade / Cargo
+              </Label>
+              <Select
+                value={formData.role}
+                onValueChange={(v: UserRole) =>
+                  setFormData({ ...formData, role: v })
+                }
+              >
+                <SelectTrigger className="rounded-xl">
+                  <SelectValue />
+                </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="ADMIN">Administrador (TI)</SelectItem>
                   <SelectItem value="MEDICO">Médico</SelectItem>
@@ -228,7 +350,10 @@ export default function UserManagement() {
               </Select>
             </div>
 
-            <Button type="submit" className="w-full bg-[#006699] hover:bg-[#005580] text-white font-bold tracking-wider rounded-xl h-11 mt-2">
+            <Button
+              type="submit"
+              className="w-full bg-[#006699] hover:bg-[#005580] text-white font-bold tracking-wider rounded-xl h-11 mt-2"
+            >
               {editingUser ? "Salvar Alterações" : "Cadastrar Colaborador"}
             </Button>
           </form>

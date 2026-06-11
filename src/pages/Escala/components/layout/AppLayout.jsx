@@ -1,12 +1,12 @@
-import React, { useState } from 'react';
-import { Outlet, useLocation } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import Sidebar from './Sidebar';
+import React, { useState } from "react";
+import { Outlet, useLocation } from "react-router-dom";
+import { motion } from "framer-motion";
+import Sidebar from "./Sidebar";
 
 export default function AppLayout() {
   const [collapsed, setCollapsed] = useState(false);
   const location = useLocation();
-  const isSchedulePage = location.pathname === '/escala';
+  const isSchedulePage = location.pathname === "/escala";
 
   return (
     <div className="h-screen overflow-hidden bg-background flex">
@@ -14,7 +14,7 @@ export default function AppLayout() {
       <motion.main
         initial={false}
         animate={{ marginLeft: collapsed ? 72 : 260 }}
-        transition={{ duration: 0.3, ease: 'easeInOut' }}
+        transition={{ duration: 0.3, ease: "easeInOut" }}
         className="flex-1 h-screen overflow-hidden"
       >
         {isSchedulePage ? (

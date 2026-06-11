@@ -1,7 +1,19 @@
 import React, { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Activity } from "lucide-react";
@@ -24,28 +36,51 @@ export function News2Modal({ isOpen, onClose, onApply }: News2ModalProps) {
   const [news2Acvpu, setNews2Acvpu] = useState("0");
   const [news2Temp, setNews2Temp] = useState("0");
 
-  const score = parseInt(news2Fr) + parseInt(news2Spo2) + parseInt(news2O2) + parseInt(news2Temp) + parseInt(news2Pas) + parseInt(news2Fc) + parseInt(news2Acvpu);
-  const hasRedScore = [news2Fr, news2Spo2, news2O2, news2Temp, news2Pas, news2Fc, news2Acvpu].some(val => parseInt(val || "0") === 3);
+  const score =
+    parseInt(news2Fr) +
+    parseInt(news2Spo2) +
+    parseInt(news2O2) +
+    parseInt(news2Temp) +
+    parseInt(news2Pas) +
+    parseInt(news2Fc) +
+    parseInt(news2Acvpu);
+  const hasRedScore = [
+    news2Fr,
+    news2Spo2,
+    news2O2,
+    news2Temp,
+    news2Pas,
+    news2Fc,
+    news2Acvpu,
+  ].some((val) => parseInt(val || "0") === 3);
 
   let newsClass = "Risco Baixo";
-  let colorClass = "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20";
+  let colorClass =
+    "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20";
   let actionText = "Monitorar a cada 12 horas. Resposta baseada na enfermaria.";
 
   if (score >= 7) {
     newsClass = "Risco Alto (Emergência)";
-    colorClass = "bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/20";
-    actionText = "Resposta de Emergência (Sala Vermelha). Acionar médico imediatamente. Monitorização contínua.";
+    colorClass =
+      "bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/20";
+    actionText =
+      "Resposta de Emergência (Sala Vermelha). Acionar médico imediatamente. Monitorização contínua.";
   } else if (score >= 5) {
     newsClass = "Risco Médio (Urgente)";
-    colorClass = "bg-orange-500/10 text-orange-600 dark:text-orange-400 border-orange-500/20";
-    actionText = "Resposta Urgente. Avaliação médica rápida. Monitorização no mínimo a cada 1 hora.";
+    colorClass =
+      "bg-orange-500/10 text-orange-600 dark:text-orange-400 border-orange-500/20";
+    actionText =
+      "Resposta Urgente. Avaliação médica rápida. Monitorização no mínimo a cada 1 hora.";
   } else if (hasRedScore) {
     newsClass = "Risco Baixo-Médio (Avaliar)";
-    colorClass = "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20";
-    actionText = "Requer revisão urgente pelo médico ou enfermeiro sênior para decidir se escalona o cuidado.";
+    colorClass =
+      "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20";
+    actionText =
+      "Requer revisão urgente pelo médico ou enfermeiro sênior para decidir se escalona o cuidado.";
   } else if (score >= 1) {
     newsClass = "Risco Baixo";
-    colorClass = "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20";
+    colorClass =
+      "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20";
     actionText = "Monitorar a cada 4-6 horas.";
   }
 
@@ -84,24 +119,33 @@ export function News2Modal({ isOpen, onClose, onApply }: News2ModalProps) {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3 py-3">
           {/* O paciente retém CO2? */}
           <div className="space-y-1 sm:col-span-2">
-            <Label className="text-xs font-black uppercase text-foreground/80">O paciente tem DPOC / Retém CO2 crônico?</Label>
-            <Select value={news2Scale} onValueChange={(val) => {
-              setNews2Scale(val);
-              setNews2Spo2("0");
-            }}>
+            <Label className="text-xs font-black uppercase text-foreground/80">
+              O paciente tem DPOC / Retém CO2 crônico?
+            </Label>
+            <Select
+              value={news2Scale}
+              onValueChange={(val) => {
+                setNews2Scale(val);
+                setNews2Spo2("0");
+              }}
+            >
               <SelectTrigger className="h-10 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium border-dashed">
                 <SelectValue placeholder="Selecione..." />
               </SelectTrigger>
               <SelectContent className="rounded-xl">
                 <SelectItem value="1">Não - Usar Escala 1 (Padrão)</SelectItem>
-                <SelectItem value="2">Sim - Usar Escala 2 (Alvo 88-92%)</SelectItem>
+                <SelectItem value="2">
+                  Sim - Usar Escala 2 (Alvo 88-92%)
+                </SelectItem>
               </SelectContent>
             </Select>
           </div>
 
           {/* 1. FR */}
           <div className="space-y-1">
-            <Label className="text-xs font-black uppercase text-foreground/80">1. Frequência Respiratória (irpm)</Label>
+            <Label className="text-xs font-black uppercase text-foreground/80">
+              1. Frequência Respiratória (irpm)
+            </Label>
             <Select value={news2Fr} onValueChange={setNews2Fr}>
               <SelectTrigger className="h-10 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
                 <SelectValue placeholder="Selecione a faixa de FR..." />
@@ -118,10 +162,14 @@ export function News2Modal({ isOpen, onClose, onApply }: News2ModalProps) {
 
           {/* 2. Saturação O2 */}
           <div className="space-y-1">
-            <Label className="text-xs font-black uppercase text-foreground/80">2. Saturação de Oxigênio (SpO2 %)</Label>
+            <Label className="text-xs font-black uppercase text-foreground/80">
+              2. Saturação de Oxigênio (SpO2 %)
+            </Label>
             <Select value={news2Spo2} onValueChange={setNews2Spo2}>
               <SelectTrigger className="h-10 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
-                <SelectValue placeholder={`Selecione SpO2 (Escala ${news2Scale})...`} />
+                <SelectValue
+                  placeholder={`Selecione SpO2 (Escala ${news2Scale})...`}
+                />
               </SelectTrigger>
               <SelectContent className="rounded-xl">
                 {news2Scale === "1" ? (
@@ -136,10 +184,18 @@ export function News2Modal({ isOpen, onClose, onApply }: News2ModalProps) {
                     <SelectItem value="3">&lt;= 83% (3 pts)</SelectItem>
                     <SelectItem value="2">84 - 85% (2 pts)</SelectItem>
                     <SelectItem value="1">86 - 87% (1 pt)</SelectItem>
-                    <SelectItem value="0">88 - 92% ou &gt;=93% ar ambiente (0 pts)</SelectItem>
-                    <SelectItem value="1_high">93 - 94% c/ O2 (1 pt)</SelectItem>
-                    <SelectItem value="2_high">95 - 96% c/ O2 (2 pts)</SelectItem>
-                    <SelectItem value="3_high">&gt;= 97% c/ O2 (3 pts)</SelectItem>
+                    <SelectItem value="0">
+                      88 - 92% ou &gt;=93% ar ambiente (0 pts)
+                    </SelectItem>
+                    <SelectItem value="1_high">
+                      93 - 94% c/ O2 (1 pt)
+                    </SelectItem>
+                    <SelectItem value="2_high">
+                      95 - 96% c/ O2 (2 pts)
+                    </SelectItem>
+                    <SelectItem value="3_high">
+                      &gt;= 97% c/ O2 (3 pts)
+                    </SelectItem>
                   </>
                 )}
               </SelectContent>
@@ -148,7 +204,9 @@ export function News2Modal({ isOpen, onClose, onApply }: News2ModalProps) {
 
           {/* 3. Uso de O2 Suplementar */}
           <div className="space-y-1">
-            <Label className="text-xs font-black uppercase text-foreground/80">3. Uso de Oxigênio Suplementar</Label>
+            <Label className="text-xs font-black uppercase text-foreground/80">
+              3. Uso de Oxigênio Suplementar
+            </Label>
             <Select value={news2O2} onValueChange={setNews2O2}>
               <SelectTrigger className="h-10 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
                 <SelectValue placeholder="Selecione o uso de O2..." />
@@ -162,7 +220,9 @@ export function News2Modal({ isOpen, onClose, onApply }: News2ModalProps) {
 
           {/* 4. PAS */}
           <div className="space-y-1">
-            <Label className="text-xs font-black uppercase text-foreground/80">4. Pressão Arterial Sistólica (mmHg)</Label>
+            <Label className="text-xs font-black uppercase text-foreground/80">
+              4. Pressão Arterial Sistólica (mmHg)
+            </Label>
             <Select value={news2Pas} onValueChange={setNews2Pas}>
               <SelectTrigger className="h-10 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
                 <SelectValue placeholder="Selecione a faixa de PAS..." />
@@ -179,7 +239,9 @@ export function News2Modal({ isOpen, onClose, onApply }: News2ModalProps) {
 
           {/* 5. FC */}
           <div className="space-y-1">
-            <Label className="text-xs font-black uppercase text-foreground/80">5. Frequência Cardíaca (bpm)</Label>
+            <Label className="text-xs font-black uppercase text-foreground/80">
+              5. Frequência Cardíaca (bpm)
+            </Label>
             <Select value={news2Fc} onValueChange={setNews2Fc}>
               <SelectTrigger className="h-10 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
                 <SelectValue placeholder="Selecione a faixa de FC..." />
@@ -197,13 +259,17 @@ export function News2Modal({ isOpen, onClose, onApply }: News2ModalProps) {
 
           {/* 6. Nível de Consciência (ACVPU) */}
           <div className="space-y-1">
-            <Label className="text-xs font-black uppercase text-foreground/80">6. Nível de Consciência (ACVPU)</Label>
+            <Label className="text-xs font-black uppercase text-foreground/80">
+              6. Nível de Consciência (ACVPU)
+            </Label>
             <Select value={news2Acvpu} onValueChange={setNews2Acvpu}>
               <SelectTrigger className="h-10 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
                 <SelectValue placeholder="Selecione o nível de consciência..." />
               </SelectTrigger>
               <SelectContent className="rounded-xl">
-                <SelectItem value="0">A - Alerta / Orientado (0 pts)</SelectItem>
+                <SelectItem value="0">
+                  A - Alerta / Orientado (0 pts)
+                </SelectItem>
                 <SelectItem value="3_c">C - Confusão Nova (3 pts)</SelectItem>
                 <SelectItem value="3_v">V - Responde à Voz (3 pts)</SelectItem>
                 <SelectItem value="3_p">P - Responde à Dor (3 pts)</SelectItem>
@@ -214,7 +280,9 @@ export function News2Modal({ isOpen, onClose, onApply }: News2ModalProps) {
 
           {/* 7. Temperatura */}
           <div className="space-y-1">
-            <Label className="text-xs font-black uppercase text-foreground/80">7. Temperatura Corporal (°C)</Label>
+            <Label className="text-xs font-black uppercase text-foreground/80">
+              7. Temperatura Corporal (°C)
+            </Label>
             <Select value={news2Temp} onValueChange={setNews2Temp}>
               <SelectTrigger className="h-10 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
                 <SelectValue placeholder="Selecione a faixa de temperatura..." />
@@ -232,13 +300,29 @@ export function News2Modal({ isOpen, onClose, onApply }: News2ModalProps) {
           {/* RESULT */}
           <div className="sm:col-span-2 mt-2">
             <div className="pt-2 animate-in fade-in slide-in-from-bottom-2">
-              <div className={cn("p-4 rounded-xl border flex flex-col items-center justify-center text-center gap-2", colorClass)}>
-                <h4 className="font-black text-xs uppercase tracking-wider">Pontuação NEWS2</h4>
+              <div
+                className={cn(
+                  "p-4 rounded-xl border flex flex-col items-center justify-center text-center gap-2",
+                  colorClass,
+                )}
+              >
+                <h4 className="font-black text-xs uppercase tracking-wider">
+                  Pontuação NEWS2
+                </h4>
                 <div className="flex items-baseline gap-1">
                   <span className="text-4xl font-black">{score}</span>
                   <span className="text-sm font-bold opacity-70">pts</span>
                 </div>
-                <Badge variant="outline" className={cn("font-bold uppercase text-[10px] tracking-wider", colorClass.replace("bg-", "bg-transparent").replace("text-", "text-").replace("border-", "border-"))}>
+                <Badge
+                  variant="outline"
+                  className={cn(
+                    "font-bold uppercase text-[10px] tracking-wider",
+                    colorClass
+                      .replace("bg-", "bg-transparent")
+                      .replace("text-", "text-")
+                      .replace("border-", "border-"),
+                  )}
+                >
                   {newsClass}
                 </Badge>
                 <p className="text-[10px] mt-1 font-semibold opacity-80 max-w-[90%]">
@@ -254,7 +338,7 @@ export function News2Modal({ isOpen, onClose, onApply }: News2ModalProps) {
                 >
                   Limpar
                 </Button>
-                <Button 
+                <Button
                   type="button"
                   onClick={handleConfirm}
                   className="flex-1 h-11 rounded-xl font-bold uppercase tracking-wider text-[10px] bg-primary text-primary-foreground"

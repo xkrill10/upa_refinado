@@ -1,10 +1,10 @@
-import { supabase } from './supabase';
+import { supabase } from "./supabase";
 
 export interface SendMessagePayload {
   targetSector: string;
-  messageType: 'push' | 'sms' | 'whatsapp';
+  messageType: "push" | "sms" | "whatsapp";
   content: string;
-  priority?: 'normal' | 'high' | 'critical';
+  priority?: "normal" | "high" | "critical";
 }
 
 export interface SendMessageResponse {
@@ -16,21 +16,23 @@ export interface SendMessageResponse {
 
 /**
  * Insere a mensagem na tabela 'notifications' do Supabase.
- * A partir daqui, as Edge Functions/Triggers do Supabase 
+ * A partir daqui, as Edge Functions/Triggers do Supabase
  * assumem o disparo para os celulares.
  */
-export const sendPushNotification = async (payload: SendMessagePayload): Promise<SendMessageResponse> => {
+export const sendPushNotification = async (
+  payload: SendMessagePayload,
+): Promise<SendMessageResponse> => {
   try {
     const { data, error } = await supabase
-      .from('notifications')
+      .from("notifications")
       .insert([
-        { 
-          target_sector: payload.targetSector, 
-          message_type: payload.messageType, 
+        {
+          target_sector: payload.targetSector,
+          message_type: payload.messageType,
           content: payload.content,
-          priority: payload.priority || 'normal',
-          status: 'pending' // status inicial
-        }
+          priority: payload.priority || "normal",
+          status: "pending", // status inicial
+        },
       ])
       .select();
 
@@ -42,7 +44,11 @@ export const sendPushNotification = async (payload: SendMessagePayload): Promise
       timestamp: new Date().toISOString(),
     };
   } catch (err: unknown) {
-    console.error('Erro detalhado do Supabase:', err);
-    throw new Error(err instanceof Error ? err.message : 'Falha ao registrar notificação no banco de dados. Verifique a conexão.');
+    console.error("Erro detalhado do Supabase:", err);
+    throw new Error(
+      err instanceof Error
+        ? err.message
+        : "Falha ao registrar notificação no banco de dados. Verifique a conexão.",
+    );
   }
 };

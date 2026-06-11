@@ -1,9 +1,9 @@
 import React, { useState, useMemo, useEffect } from "react";
-import { 
-  Search, 
-  ChevronDown, 
+import {
+  Search,
+  ChevronDown,
   ChevronRight,
-  Activity, 
+  Activity,
   X,
   Heart,
   Wind,
@@ -13,9 +13,15 @@ import {
   ShieldAlert,
   Bone,
   Pill,
-  Stethoscope
+  Stethoscope,
 } from "lucide-react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import { CID10_DATABASE, CID10Item } from "@/data/cid10";
@@ -46,11 +52,12 @@ interface CategoryMeta {
 function getCategoryMeta(category: string): CategoryMeta {
   switch (category) {
     case "Cardiovascular":
-      return { 
-        icon: Heart, 
+      return {
+        icon: Heart,
         description: "Doenças cardíacas, hipertensão e vasos",
         color: "#ef4444",
-        bgGradient: "from-red-500/20 to-rose-500/5 dark:from-red-500/25 dark:to-rose-500/10",
+        bgGradient:
+          "from-red-500/20 to-rose-500/5 dark:from-red-500/25 dark:to-rose-500/10",
         borderClass: "border-red-500/30 dark:border-red-500/20",
         glowClass: "shadow-[0_0_15px_rgba(239,68,68,0.15)]",
         iconColor: "text-red-500 dark:text-red-400",
@@ -59,14 +66,16 @@ function getCategoryMeta(category: string): CategoryMeta {
         inactiveIconColor: "text-red-500/40 dark:text-red-400/40",
         hoverBg: "hover:bg-red-500/[0.08] dark:hover:bg-red-500/[0.12]",
         hoverBorder: "hover:border-red-500/25 dark:hover:border-red-500/20",
-        hoverIconColor: "group-hover:text-red-500 dark:group-hover:text-red-400"
+        hoverIconColor:
+          "group-hover:text-red-500 dark:group-hover:text-red-400",
       };
     case "Gastrointestinal":
-      return { 
-        icon: Pill, 
+      return {
+        icon: Pill,
         description: "Estômago, fígado, vesícula e intestinos",
         color: "#10b981",
-        bgGradient: "from-emerald-500/20 to-teal-500/5 dark:from-emerald-500/25 dark:to-teal-500/10",
+        bgGradient:
+          "from-emerald-500/20 to-teal-500/5 dark:from-emerald-500/25 dark:to-teal-500/10",
         borderClass: "border-emerald-500/30 dark:border-emerald-500/20",
         glowClass: "shadow-[0_0_15px_rgba(16,185,129,0.15)]",
         iconColor: "text-emerald-500 dark:text-emerald-400",
@@ -74,15 +83,18 @@ function getCategoryMeta(category: string): CategoryMeta {
         inactiveBorder: "border-emerald-500/10 dark:border-emerald-500/10",
         inactiveIconColor: "text-emerald-500/40 dark:text-emerald-400/40",
         hoverBg: "hover:bg-emerald-500/[0.08] dark:hover:bg-emerald-500/[0.12]",
-        hoverBorder: "hover:border-emerald-500/25 dark:hover:border-emerald-500/20",
-        hoverIconColor: "group-hover:text-emerald-500 dark:group-hover:text-emerald-400"
+        hoverBorder:
+          "hover:border-emerald-500/25 dark:hover:border-emerald-500/20",
+        hoverIconColor:
+          "group-hover:text-emerald-500 dark:group-hover:text-emerald-400",
       };
     case "Geral/Outros":
-      return { 
-        icon: Stethoscope, 
+      return {
+        icon: Stethoscope,
         description: "Virose, exames, check-ups e profilaxia",
         color: "#3b82f6",
-        bgGradient: "from-blue-500/20 to-indigo-500/5 dark:from-blue-500/25 dark:to-indigo-500/10",
+        bgGradient:
+          "from-blue-500/20 to-indigo-500/5 dark:from-blue-500/25 dark:to-indigo-500/10",
         borderClass: "border-blue-500/30 dark:border-blue-500/20",
         glowClass: "shadow-[0_0_15px_rgba(59,130,246,0.15)]",
         iconColor: "text-blue-500 dark:text-blue-400",
@@ -91,14 +103,16 @@ function getCategoryMeta(category: string): CategoryMeta {
         inactiveIconColor: "text-blue-500/40 dark:text-blue-400/40",
         hoverBg: "hover:bg-blue-500/[0.08] dark:hover:bg-blue-500/[0.12]",
         hoverBorder: "hover:border-blue-500/25 dark:hover:border-blue-500/20",
-        hoverIconColor: "group-hover:text-blue-500 dark:group-hover:text-blue-400"
+        hoverIconColor:
+          "group-hover:text-blue-500 dark:group-hover:text-blue-400",
       };
     case "Psiquiatria/Geral":
-      return { 
-        icon: Brain, 
+      return {
+        icon: Brain,
         description: "Saúde mental, ansiedade, depressão e sono",
         color: "#a855f7",
-        bgGradient: "from-purple-500/20 to-fuchsia-500/5 dark:from-purple-500/25 dark:to-fuchsia-500/10",
+        bgGradient:
+          "from-purple-500/20 to-fuchsia-500/5 dark:from-purple-500/25 dark:to-fuchsia-500/10",
         borderClass: "border-purple-500/30 dark:border-purple-500/20",
         glowClass: "shadow-[0_0_15px_rgba(168,85,247,0.15)]",
         iconColor: "text-purple-500 dark:text-purple-400",
@@ -106,15 +120,18 @@ function getCategoryMeta(category: string): CategoryMeta {
         inactiveBorder: "border-purple-500/10 dark:border-purple-500/10",
         inactiveIconColor: "text-purple-500/40 dark:text-purple-400/40",
         hoverBg: "hover:bg-purple-500/[0.08] dark:hover:bg-purple-500/[0.12]",
-        hoverBorder: "hover:border-purple-500/25 dark:hover:border-purple-500/20",
-        hoverIconColor: "group-hover:text-purple-500 dark:group-hover:text-purple-400"
+        hoverBorder:
+          "hover:border-purple-500/25 dark:hover:border-purple-500/20",
+        hoverIconColor:
+          "group-hover:text-purple-500 dark:group-hover:text-purple-400",
       };
     case "Respiratório":
-      return { 
-        icon: Wind, 
+      return {
+        icon: Wind,
         description: "Gripe, asma, pneumonia e vias aéreas",
         color: "#06b6d4",
-        bgGradient: "from-cyan-500/20 to-sky-500/5 dark:from-cyan-500/25 dark:to-sky-500/10",
+        bgGradient:
+          "from-cyan-500/20 to-sky-500/5 dark:from-cyan-500/25 dark:to-sky-500/10",
         borderClass: "border-cyan-500/30 dark:border-cyan-500/20",
         glowClass: "shadow-[0_0_15px_rgba(6,182,212,0.15)]",
         iconColor: "text-cyan-500 dark:text-cyan-400",
@@ -123,14 +140,16 @@ function getCategoryMeta(category: string): CategoryMeta {
         inactiveIconColor: "text-cyan-500/40 dark:text-cyan-400/40",
         hoverBg: "hover:bg-cyan-500/[0.08] dark:hover:bg-cyan-500/[0.12]",
         hoverBorder: "hover:border-cyan-500/25 dark:hover:border-cyan-500/20",
-        hoverIconColor: "group-hover:text-cyan-500 dark:group-hover:text-cyan-400"
+        hoverIconColor:
+          "group-hover:text-cyan-500 dark:group-hover:text-cyan-400",
       };
     case "Sintomas Gerais":
-      return { 
-        icon: Thermometer, 
+      return {
+        icon: Thermometer,
         description: "Febre, dores, tontura, náusea e mal-estar",
         color: "#f59e0b",
-        bgGradient: "from-amber-500/20 to-orange-500/5 dark:from-amber-500/25 dark:to-orange-500/10",
+        bgGradient:
+          "from-amber-500/20 to-orange-500/5 dark:from-amber-500/25 dark:to-orange-500/10",
         borderClass: "border-amber-500/30 dark:border-amber-500/20",
         glowClass: "shadow-[0_0_15px_rgba(245,158,11,0.15)]",
         iconColor: "text-amber-500 dark:text-amber-400",
@@ -139,14 +158,16 @@ function getCategoryMeta(category: string): CategoryMeta {
         inactiveIconColor: "text-amber-500/40 dark:text-amber-400/40",
         hoverBg: "hover:bg-amber-500/[0.08] dark:hover:bg-amber-500/[0.12]",
         hoverBorder: "hover:border-amber-500/25 dark:hover:border-amber-500/20",
-        hoverIconColor: "group-hover:text-amber-500 dark:group-hover:text-amber-400"
+        hoverIconColor:
+          "group-hover:text-amber-500 dark:group-hover:text-amber-400",
       };
     case "Trauma / Causas Externas":
-      return { 
-        icon: ShieldAlert, 
+      return {
+        icon: ShieldAlert,
         description: "Acidentes, queimaduras e lesões",
         color: "#ef4444",
-        bgGradient: "from-red-500/20 to-orange-500/5 dark:from-red-500/25 dark:to-orange-500/10",
+        bgGradient:
+          "from-red-500/20 to-orange-500/5 dark:from-red-500/25 dark:to-orange-500/10",
         borderClass: "border-red-500/30 dark:border-red-500/20",
         glowClass: "shadow-[0_0_15px_rgba(239,68,68,0.15)]",
         iconColor: "text-red-500 dark:text-red-400",
@@ -155,14 +176,16 @@ function getCategoryMeta(category: string): CategoryMeta {
         inactiveIconColor: "text-red-500/40 dark:text-red-400/40",
         hoverBg: "hover:bg-red-500/[0.08] dark:hover:bg-red-500/[0.12]",
         hoverBorder: "hover:border-red-500/25 dark:hover:border-red-500/20",
-        hoverIconColor: "group-hover:text-red-500 dark:group-hover:text-red-400"
+        hoverIconColor:
+          "group-hover:text-red-500 dark:group-hover:text-red-400",
       };
     case "Trauma / Externas":
-      return { 
-        icon: Bone, 
+      return {
+        icon: Bone,
         description: "Fraturas, entorses, mialgias e traumas",
         color: "#64748b",
-        bgGradient: "from-slate-500/20 to-zinc-500/5 dark:from-slate-500/25 dark:to-zinc-500/10",
+        bgGradient:
+          "from-slate-500/20 to-zinc-500/5 dark:from-slate-500/25 dark:to-zinc-500/10",
         borderClass: "border-slate-500/30 dark:border-slate-500/20",
         glowClass: "shadow-[0_0_15px_rgba(100,116,139,0.15)]",
         iconColor: "text-slate-500 dark:text-slate-400",
@@ -171,14 +194,16 @@ function getCategoryMeta(category: string): CategoryMeta {
         inactiveIconColor: "text-slate-500/40 dark:text-slate-400/40",
         hoverBg: "hover:bg-slate-500/[0.08] dark:hover:bg-slate-500/[0.12]",
         hoverBorder: "hover:border-slate-500/25 dark:hover:border-slate-500/20",
-        hoverIconColor: "group-hover:text-slate-500 dark:group-hover:text-slate-400"
+        hoverIconColor:
+          "group-hover:text-slate-500 dark:group-hover:text-slate-400",
       };
     default:
-      return { 
-        icon: ClipboardList, 
+      return {
+        icon: ClipboardList,
         description: "Consultas e diagnósticos gerais",
         color: "#0ea5e9",
-        bgGradient: "from-sky-500/20 to-blue-500/5 dark:from-sky-500/25 dark:to-blue-500/10",
+        bgGradient:
+          "from-sky-500/20 to-blue-500/5 dark:from-sky-500/25 dark:to-blue-500/10",
         borderClass: "border-sky-500/30 dark:border-sky-500/20",
         glowClass: "shadow-[0_0_15px_rgba(14,165,233,0.15)]",
         iconColor: "text-sky-500 dark:text-sky-400",
@@ -187,12 +212,16 @@ function getCategoryMeta(category: string): CategoryMeta {
         inactiveIconColor: "text-sky-500/40 dark:text-sky-400/40",
         hoverBg: "hover:bg-sky-500/[0.08] dark:hover:bg-sky-500/[0.12]",
         hoverBorder: "hover:border-sky-500/25 dark:hover:border-sky-500/20",
-        hoverIconColor: "group-hover:text-sky-500 dark:group-hover:text-sky-400"
+        hoverIconColor:
+          "group-hover:text-sky-500 dark:group-hover:text-sky-400",
       };
   }
 }
 
-export function SmartCidSelector({ selectedCid, onSelectCid }: SmartCidSelectorProps) {
+export function SmartCidSelector({
+  selectedCid,
+  onSelectCid,
+}: SmartCidSelectorProps) {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [tempCid, setTempCid] = useState<CID10Item | null>(null);
@@ -202,10 +231,10 @@ export function SmartCidSelector({ selectedCid, onSelectCid }: SmartCidSelectorP
       setTempCid(selectedCid);
     }
   }, [open, selectedCid]);
-  
+
   // Extract unique categories
   const categories = useMemo(() => {
-    const cats = new Set(CID10_DATABASE.map(item => item.category));
+    const cats = new Set(CID10_DATABASE.map((item) => item.category));
     return Array.from(cats).sort();
   }, []);
 
@@ -214,15 +243,16 @@ export function SmartCidSelector({ selectedCid, onSelectCid }: SmartCidSelectorP
   const filteredItems = useMemo(() => {
     if (!search.trim()) return [];
     const lowerSearch = search.toLowerCase();
-    return CID10_DATABASE.filter(item => 
-      item.searchTerms.includes(lowerSearch) || 
-      item.code.toLowerCase().includes(lowerSearch) || 
-      item.name.toLowerCase().includes(lowerSearch)
+    return CID10_DATABASE.filter(
+      (item) =>
+        item.searchTerms.includes(lowerSearch) ||
+        item.code.toLowerCase().includes(lowerSearch) ||
+        item.name.toLowerCase().includes(lowerSearch),
     );
   }, [search]);
 
   const getItemsByCategory = (cat: string) => {
-    return CID10_DATABASE.filter(item => item.category === cat);
+    return CID10_DATABASE.filter((item) => item.category === cat);
   };
 
   const handleConfirm = () => {
@@ -247,16 +277,20 @@ export function SmartCidSelector({ selectedCid, onSelectCid }: SmartCidSelectorP
               <span className="font-extrabold text-xs uppercase tracking-wider px-2.5 py-1 rounded-lg bg-primary/10 text-primary border border-primary/20 shadow-sm shrink-0">
                 {selectedCid.code}
               </span>
-              <span className="text-sm font-semibold text-foreground truncate">{selectedCid.name}</span>
+              <span className="text-sm font-semibold text-foreground truncate">
+                {selectedCid.name}
+              </span>
             </div>
           ) : (
             <div className="flex items-center gap-2.5 text-muted-foreground">
               <Search className="w-4.5 h-4.5 text-muted-foreground/50 group-hover:text-primary transition-colors duration-300" />
-              <span className="text-sm font-medium">Buscar e selecionar CID-10...</span>
+              <span className="text-sm font-medium">
+                Buscar e selecionar CID-10...
+              </span>
             </div>
           )}
           {selectedCid ? (
-            <div 
+            <div
               role="button"
               className="p-1.5 hover:bg-red-500/10 dark:hover:bg-red-500/20 text-muted-foreground hover:text-red-500 rounded-lg z-10 transition-colors"
               onClick={(e) => {
@@ -271,7 +305,7 @@ export function SmartCidSelector({ selectedCid, onSelectCid }: SmartCidSelectorP
           )}
         </button>
       </DialogTrigger>
-      
+
       <DialogContent className="sm:max-w-[850px] p-0 overflow-hidden flex flex-col h-[85vh] sm:h-[600px] rounded-2xl glass-card-premium border border-white/40 dark:border-white/10 bg-transparent shadow-[0_30px_60px_-15px_rgba(0,0,0,0.3)] backdrop-blur-2xl">
         <DialogHeader className="p-5 border-b border-white/20 dark:border-white/5 bg-white/30 dark:bg-slate-900/30 backdrop-blur-md">
           <DialogTitle className="text-lg font-black uppercase tracking-wider flex items-center gap-2 text-foreground">
@@ -296,7 +330,7 @@ export function SmartCidSelector({ selectedCid, onSelectCid }: SmartCidSelectorP
               <ScrollArea className="h-full">
                 <div className="p-3.5 space-y-1.5 pb-8">
                   {filteredItems.length > 0 ? (
-                    filteredItems.map(item => (
+                    filteredItems.map((item) => (
                       <button
                         key={item.code}
                         onClick={() => setTempCid(item)}
@@ -304,22 +338,28 @@ export function SmartCidSelector({ selectedCid, onSelectCid }: SmartCidSelectorP
                           "w-full text-left px-5 py-4 rounded-2xl transition-all duration-300 hover:scale-[1.01] active:scale-[0.99] flex items-center justify-between border group",
                           tempCid?.code === item.code
                             ? "border-primary bg-primary/10 shadow-sm"
-                            : "border-transparent hover:border-white/35 dark:hover:border-slate-800/40 hover:bg-white/45 dark:hover:bg-slate-900/45 text-foreground hover:shadow-[0_10px_20px_-8px_rgba(0,0,0,0.04)]"
+                            : "border-transparent hover:border-white/35 dark:hover:border-slate-800/40 hover:bg-white/45 dark:hover:bg-slate-900/45 text-foreground hover:shadow-[0_10px_20px_-8px_rgba(0,0,0,0.04)]",
                         )}
                       >
                         <div className="flex items-center gap-4 min-w-0">
-                          <span className={cn(
-                            "font-bold text-xs uppercase tracking-wider px-3 py-1.5 rounded-lg border transition-all duration-300 shadow-sm shrink-0",
-                            tempCid?.code === item.code
-                              ? "bg-primary text-primary-foreground border-transparent"
-                              : "bg-primary/10 text-primary border-primary/20 group-hover:bg-primary group-hover:text-primary-foreground group-hover:border-transparent"
-                          )}>
+                          <span
+                            className={cn(
+                              "font-bold text-xs uppercase tracking-wider px-3 py-1.5 rounded-lg border transition-all duration-300 shadow-sm shrink-0",
+                              tempCid?.code === item.code
+                                ? "bg-primary text-primary-foreground border-transparent"
+                                : "bg-primary/10 text-primary border-primary/20 group-hover:bg-primary group-hover:text-primary-foreground group-hover:border-transparent",
+                            )}
+                          >
                             {item.code}
                           </span>
-                          <span className={cn(
-                            "text-sm font-semibold truncate transition-colors duration-300",
-                            tempCid?.code === item.code ? "text-primary" : "group-hover:text-primary"
-                          )}>
+                          <span
+                            className={cn(
+                              "text-sm font-semibold truncate transition-colors duration-300",
+                              tempCid?.code === item.code
+                                ? "text-primary"
+                                : "group-hover:text-primary",
+                            )}
+                          >
                             {item.name}
                           </span>
                         </div>
@@ -327,12 +367,14 @@ export function SmartCidSelector({ selectedCid, onSelectCid }: SmartCidSelectorP
                           <span className="text-[9px] uppercase font-black tracking-widest text-muted-foreground bg-white/40 dark:bg-slate-800/40 px-2.5 py-1 rounded-full border border-border/40">
                             {item.category}
                           </span>
-                          <div className={cn(
-                            "w-6 h-6 rounded-full flex items-center justify-center transition-all duration-300",
-                            tempCid?.code === item.code
-                              ? "opacity-100 bg-primary/10 text-primary translate-x-0"
-                              : "bg-muted/40 opacity-0 group-hover:opacity-100 group-hover:bg-primary/10 group-hover:text-primary translate-x-2 group-hover:translate-x-0"
-                          )}>
+                          <div
+                            className={cn(
+                              "w-6 h-6 rounded-full flex items-center justify-center transition-all duration-300",
+                              tempCid?.code === item.code
+                                ? "opacity-100 bg-primary/10 text-primary translate-x-0"
+                                : "bg-muted/40 opacity-0 group-hover:opacity-100 group-hover:bg-primary/10 group-hover:text-primary translate-x-2 group-hover:translate-x-0",
+                            )}
+                          >
                             <ChevronRight className="w-3.5 h-3.5" />
                           </div>
                         </div>
@@ -343,7 +385,9 @@ export function SmartCidSelector({ selectedCid, onSelectCid }: SmartCidSelectorP
                       <div className="w-12 h-12 rounded-full bg-muted/30 flex items-center justify-center border border-dashed border-muted-foreground/30">
                         <Search className="w-5 h-5 text-muted-foreground/50" />
                       </div>
-                      <p className="text-sm font-medium">Nenhum resultado encontrado para "{search}".</p>
+                      <p className="text-sm font-medium">
+                        Nenhum resultado encontrado para "{search}".
+                      </p>
                     </div>
                   )}
                 </div>
@@ -355,21 +399,21 @@ export function SmartCidSelector({ selectedCid, onSelectCid }: SmartCidSelectorP
               <div className="w-[325px] shrink-0 border-r border-white/20 dark:border-white/5 flex flex-col bg-white/20 dark:bg-slate-950/20 backdrop-blur-md">
                 <ScrollArea className="flex-1">
                   <div className="flex flex-col gap-2.5 p-4 w-full">
-                    {categories.map(cat => {
-                      const { 
-                        icon: CategoryIcon, 
-                        description, 
-                        color, 
-                        bgGradient, 
-                        borderClass, 
-                        glowClass, 
+                    {categories.map((cat) => {
+                      const {
+                        icon: CategoryIcon,
+                        description,
+                        color,
+                        bgGradient,
+                        borderClass,
+                        glowClass,
                         iconColor,
                         inactiveBg,
                         inactiveBorder,
                         inactiveIconColor,
                         hoverBg,
                         hoverBorder,
-                        hoverIconColor
+                        hoverIconColor,
                       } = getCategoryMeta(cat);
                       const isActive = activeTab === cat;
                       return (
@@ -386,47 +430,55 @@ export function SmartCidSelector({ selectedCid, onSelectCid }: SmartCidSelectorP
                                   inactiveBg,
                                   inactiveBorder,
                                   hoverBg,
-                                  hoverBorder
-                                )
+                                  hoverBorder,
+                                ),
                           )}
                         >
                           {/* Active Indicating Glowing Line */}
                           {isActive && (
-                            <span 
+                            <span
                               className="absolute left-0 top-3.5 bottom-3.5 w-1 rounded-r-full shadow-lg"
-                              style={{ 
+                              style={{
                                 backgroundColor: color,
-                                boxShadow: `0 0 10px ${color}`
+                                boxShadow: `0 0 10px ${color}`,
                               }}
                             />
                           )}
 
                           {/* Glossy / 3D Specular Glass Icon Container */}
-                          <div className={cn(
-                            "relative w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 transition-all duration-500 overflow-hidden border shadow-sm",
-                            isActive 
-                              ? `bg-gradient-to-br ${bgGradient} ${borderClass} ${glowClass} scale-110 rotate-3` 
-                              : cn(
-                                  "bg-white/40 dark:bg-slate-800/10 border-white/50 dark:border-white/5",
-                                  inactiveBorder
-                                )
-                          )}>
+                          <div
+                            className={cn(
+                              "relative w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 transition-all duration-500 overflow-hidden border shadow-sm",
+                              isActive
+                                ? `bg-gradient-to-br ${bgGradient} ${borderClass} ${glowClass} scale-110 rotate-3`
+                                : cn(
+                                    "bg-white/40 dark:bg-slate-800/10 border-white/50 dark:border-white/5",
+                                    inactiveBorder,
+                                  ),
+                            )}
+                          >
                             {/* Specular Diagonal Reflection Glare */}
                             <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/25 to-transparent pointer-events-none rounded-xl" />
-                            
-                            <CategoryIcon className={cn(
-                              "w-5 h-5 transition-all duration-500",
-                              isActive 
-                                ? `${iconColor} scale-110 drop-shadow-[0_2px_8px_rgba(255,255,255,0.4)]` 
-                                : `${inactiveIconColor} ${hoverIconColor} group-hover:scale-110`
-                            )} />
+
+                            <CategoryIcon
+                              className={cn(
+                                "w-5 h-5 transition-all duration-500",
+                                isActive
+                                  ? `${iconColor} scale-110 drop-shadow-[0_2px_8px_rgba(255,255,255,0.4)]`
+                                  : `${inactiveIconColor} ${hoverIconColor} group-hover:scale-110`,
+                              )}
+                            />
                           </div>
 
                           <div className="flex-1 min-w-0 flex flex-col justify-center leading-tight">
-                            <span className={cn(
-                              "font-black text-[11px] uppercase tracking-wider text-left truncate w-full transition-colors duration-300",
-                              isActive ? "text-primary" : "text-foreground/80"
-                            )}>
+                            <span
+                              className={cn(
+                                "font-black text-[11px] uppercase tracking-wider text-left truncate w-full transition-colors duration-300",
+                                isActive
+                                  ? "text-primary"
+                                  : "text-foreground/80",
+                              )}
+                            >
                               {cat}
                             </span>
                             <span className="text-[10px] text-muted-foreground mt-0.5 text-left font-normal normal-case line-clamp-2 leading-tight">
@@ -444,7 +496,7 @@ export function SmartCidSelector({ selectedCid, onSelectCid }: SmartCidSelectorP
               <div className="flex-1 overflow-hidden bg-white/10 dark:bg-slate-950/10 backdrop-blur-sm">
                 <ScrollArea className="h-full">
                   <div className="p-3.5 space-y-1.5 pb-8">
-                    {getItemsByCategory(activeTab).map(item => (
+                    {getItemsByCategory(activeTab).map((item) => (
                       <button
                         key={item.code}
                         onClick={() => setTempCid(item)}
@@ -452,31 +504,39 @@ export function SmartCidSelector({ selectedCid, onSelectCid }: SmartCidSelectorP
                           "w-full text-left px-5 py-4 rounded-2xl transition-all duration-300 hover:scale-[1.01] active:scale-[0.99] flex items-center justify-between border group",
                           tempCid?.code === item.code
                             ? "border-primary bg-primary/10 shadow-sm"
-                            : "border-transparent hover:border-white/35 dark:hover:border-slate-800/40 hover:bg-white/45 dark:hover:bg-slate-900/45 text-foreground hover:shadow-[0_10px_20px_-8px_rgba(0,0,0,0.04)]"
+                            : "border-transparent hover:border-white/35 dark:hover:border-slate-800/40 hover:bg-white/45 dark:hover:bg-slate-900/45 text-foreground hover:shadow-[0_10px_20px_-8px_rgba(0,0,0,0.04)]",
                         )}
                       >
                         <div className="flex items-center gap-4 min-w-0">
-                          <span className={cn(
-                            "font-bold text-xs uppercase tracking-wider px-3 py-1.5 rounded-lg border transition-all duration-300 shadow-sm shrink-0",
-                            tempCid?.code === item.code
-                              ? "bg-primary text-primary-foreground border-transparent"
-                              : "bg-primary/10 text-primary border-primary/20 group-hover:bg-primary group-hover:text-primary-foreground group-hover:border-transparent"
-                          )}>
+                          <span
+                            className={cn(
+                              "font-bold text-xs uppercase tracking-wider px-3 py-1.5 rounded-lg border transition-all duration-300 shadow-sm shrink-0",
+                              tempCid?.code === item.code
+                                ? "bg-primary text-primary-foreground border-transparent"
+                                : "bg-primary/10 text-primary border-primary/20 group-hover:bg-primary group-hover:text-primary-foreground group-hover:border-transparent",
+                            )}
+                          >
                             {item.code}
                           </span>
-                          <span className={cn(
-                            "text-sm font-semibold truncate transition-colors duration-300",
-                            tempCid?.code === item.code ? "text-primary" : "group-hover:text-primary"
-                          )}>
+                          <span
+                            className={cn(
+                              "text-sm font-semibold truncate transition-colors duration-300",
+                              tempCid?.code === item.code
+                                ? "text-primary"
+                                : "group-hover:text-primary",
+                            )}
+                          >
                             {item.name}
                           </span>
                         </div>
-                        <div className={cn(
-                          "w-6 h-6 rounded-full flex items-center justify-center transition-all duration-300",
-                          tempCid?.code === item.code
-                            ? "opacity-100 bg-primary/10 text-primary translate-x-0"
-                            : "bg-muted/40 opacity-0 group-hover:opacity-100 group-hover:bg-primary/10 group-hover:text-primary translate-x-2 group-hover:translate-x-0"
-                        )}>
+                        <div
+                          className={cn(
+                            "w-6 h-6 rounded-full flex items-center justify-center transition-all duration-300",
+                            tempCid?.code === item.code
+                              ? "opacity-100 bg-primary/10 text-primary translate-x-0"
+                              : "bg-muted/40 opacity-0 group-hover:opacity-100 group-hover:bg-primary/10 group-hover:text-primary translate-x-2 group-hover:translate-x-0",
+                          )}
+                        >
                           <ChevronRight className="w-3.5 h-3.5" />
                         </div>
                       </button>
@@ -487,7 +547,7 @@ export function SmartCidSelector({ selectedCid, onSelectCid }: SmartCidSelectorP
             </>
           )}
         </div>
-        
+
         {/* FOOTER */}
         <div className="shrink-0 p-4 bg-white/30 dark:bg-slate-900/30 backdrop-blur-md border-t border-white/20 dark:border-white/5 flex items-center justify-between gap-4 z-10">
           <div className="flex-1">
@@ -502,14 +562,14 @@ export function SmartCidSelector({ selectedCid, onSelectCid }: SmartCidSelectorP
             )}
           </div>
           <div className="flex items-center gap-3 shrink-0">
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               className="h-10 px-6 rounded-xl font-black uppercase tracking-widest text-[10px] border-slate-200 dark:border-slate-800"
               onClick={handleClear}
             >
               Limpar
             </Button>
-            <Button 
+            <Button
               className="h-10 px-8 rounded-xl font-black uppercase tracking-widest text-[10px] bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg shadow-primary/20"
               onClick={handleConfirm}
             >

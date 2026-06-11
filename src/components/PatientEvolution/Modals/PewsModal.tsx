@@ -1,7 +1,19 @@
 import React, { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Baby } from "lucide-react";
@@ -48,11 +60,11 @@ export function PewsModal({ isOpen, onClose, onApply }: PewsModalProps) {
 
   const handleConfirm = () => {
     const descText = `- ESCORE PEWS (ALERTA PEDIÁTRICO PRECOCE): ${score} pontos (${riskClass.toUpperCase()}).\n  Conduta sugerida: ${
-      score >= 5 
-        ? "ALERTA DE EMERGÊNCIA PEDIÁTRICA! Comunicar o pediatra plantonista de imediato, preparar monitorização intensiva e transferir para leito de emergência pediátrica na Sala Vermelha." 
-        : score >= 3 
-        ? "Comunicar enfermeiro e médico pediatra do setor. Reavaliar sinais vitais e escore PEWS a cada 30 minutos." 
-        : "Manter acompanhamento clínico pediátrico de rotina."
+      score >= 5
+        ? "ALERTA DE EMERGÊNCIA PEDIÁTRICA! Comunicar o pediatra plantonista de imediato, preparar monitorização intensiva e transferir para leito de emergência pediátrica na Sala Vermelha."
+        : score >= 3
+          ? "Comunicar enfermeiro e médico pediatra do setor. Reavaliar sinais vitais e escore PEWS a cada 30 minutos."
+          : "Manter acompanhamento clínico pediátrico de rotina."
     }`;
     onApply(descText, `PEWS: ${score} pts`);
     onClose(false);
@@ -75,55 +87,87 @@ export function PewsModal({ isOpen, onClose, onApply }: PewsModalProps) {
         <div className="space-y-4 py-3">
           {/* 1. Comportamento */}
           <div className="space-y-1">
-            <Label className="text-xs font-black uppercase text-foreground/80">1. Comportamento / Estado Geral</Label>
+            <Label className="text-xs font-black uppercase text-foreground/80">
+              1. Comportamento / Estado Geral
+            </Label>
             <Select value={pewsBehavior} onValueChange={setPewsBehavior}>
               <SelectTrigger className="h-10 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
                 <SelectValue placeholder="Selecione o comportamento da criança..." />
               </SelectTrigger>
               <SelectContent className="rounded-xl">
-                <SelectItem value="0">0 - Ativo, responsivo, corado ou brincando</SelectItem>
-                <SelectItem value="1">1 - Apático, hipoativo, sonolento</SelectItem>
-                <SelectItem value="2">2 - Irritável, choro presumido inconsolável</SelectItem>
-                <SelectItem value="3">3 - Letárgico, torporoso ou resposta diminuída à dor</SelectItem>
+                <SelectItem value="0">
+                  0 - Ativo, responsivo, corado ou brincando
+                </SelectItem>
+                <SelectItem value="1">
+                  1 - Apático, hipoativo, sonolento
+                </SelectItem>
+                <SelectItem value="2">
+                  2 - Irritável, choro presumido inconsolável
+                </SelectItem>
+                <SelectItem value="3">
+                  3 - Letárgico, torporoso ou resposta diminuída à dor
+                </SelectItem>
               </SelectContent>
             </Select>
           </div>
 
           {/* 2. Cardiovascular */}
           <div className="space-y-1">
-            <Label className="text-xs font-black uppercase text-foreground/80">2. Cardiovascular / Perfusão Periférica</Label>
+            <Label className="text-xs font-black uppercase text-foreground/80">
+              2. Cardiovascular / Perfusão Periférica
+            </Label>
             <Select value={pewsCv} onValueChange={setPewsCv}>
               <SelectTrigger className="h-10 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
                 <SelectValue placeholder="Selecione o estado cardiovascular..." />
               </SelectTrigger>
               <SelectContent className="rounded-xl">
-                <SelectItem value="0">0 - Pele corada, perfusão periférica &lt;= 2s</SelectItem>
-                <SelectItem value="1">1 - Pele pálida ou perfusão de 3s</SelectItem>
-                <SelectItem value="2">2 - Pele moteada, perfusão de 4s ou taquicardia severa</SelectItem>
-                <SelectItem value="3">3 - Cianose activa, perfusão &gt;= 5s ou bradicardia grave</SelectItem>
+                <SelectItem value="0">
+                  0 - Pele corada, perfusão periférica &lt;= 2s
+                </SelectItem>
+                <SelectItem value="1">
+                  1 - Pele pálida ou perfusão de 3s
+                </SelectItem>
+                <SelectItem value="2">
+                  2 - Pele moteada, perfusão de 4s ou taquicardia severa
+                </SelectItem>
+                <SelectItem value="3">
+                  3 - Cianose activa, perfusão &gt;= 5s ou bradicardia grave
+                </SelectItem>
               </SelectContent>
             </Select>
           </div>
 
           {/* 3. Esforço Respiratório */}
           <div className="space-y-1">
-            <Label className="text-xs font-black uppercase text-foreground/80">3. Esforço Respiratório / Frequência</Label>
+            <Label className="text-xs font-black uppercase text-foreground/80">
+              3. Esforço Respiratório / Frequência
+            </Label>
             <Select value={pewsResp} onValueChange={setPewsResp}>
               <SelectTrigger className="h-10 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
                 <SelectValue placeholder="Selecione o padrão respiratório..." />
               </SelectTrigger>
               <SelectContent className="rounded-xl">
-                <SelectItem value="0">0 - Padrão e frequência normais para a idade</SelectItem>
-                <SelectItem value="1">1 - Taquipneia leve, uso discreto de musculatura acessória</SelectItem>
-                <SelectItem value="2">2 - Taquipneia moderada, tiragens evidentes ou gemência</SelectItem>
-                <SelectItem value="3">3 - Gemência persistente, batimento de asa de nariz ou apneias</SelectItem>
+                <SelectItem value="0">
+                  0 - Padrão e frequência normais para a idade
+                </SelectItem>
+                <SelectItem value="1">
+                  1 - Taquipneia leve, uso discreto de musculatura acessória
+                </SelectItem>
+                <SelectItem value="2">
+                  2 - Taquipneia moderada, tiragens evidentes ou gemência
+                </SelectItem>
+                <SelectItem value="3">
+                  3 - Gemência persistente, batimento de asa de nariz ou apneias
+                </SelectItem>
               </SelectContent>
             </Select>
           </div>
 
           {/* 4. Nebulização de Resgate */}
           <div className="space-y-1">
-            <Label className="text-xs font-black uppercase text-foreground/80">4. Nebulização de Resgate Recorrente (a cada 15 min)</Label>
+            <Label className="text-xs font-black uppercase text-foreground/80">
+              4. Nebulização de Resgate Recorrente (a cada 15 min)
+            </Label>
             <Select value={pewsNeb} onValueChange={setPewsNeb}>
               <SelectTrigger className="h-10 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
                 <SelectValue placeholder="Selecione..." />
@@ -139,15 +183,30 @@ export function PewsModal({ isOpen, onClose, onApply }: PewsModalProps) {
           <div className="mt-6 p-4 rounded-xl bg-slate-50/70 dark:bg-slate-900/40 backdrop-blur-md border border-slate-200/60 dark:border-slate-800/50 space-y-3">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-[10px] font-black uppercase text-muted-foreground tracking-wider">Pontuação PEWS</p>
-                <p className="text-3xl font-black text-foreground">{isComplete ? score : 0} <span className="text-sm font-bold text-muted-foreground">pts</span></p>
+                <p className="text-[10px] font-black uppercase text-muted-foreground tracking-wider">
+                  Pontuação PEWS
+                </p>
+                <p className="text-3xl font-black text-foreground">
+                  {isComplete ? score : 0}{" "}
+                  <span className="text-sm font-bold text-muted-foreground">
+                    pts
+                  </span>
+                </p>
               </div>
               {isComplete ? (
-                <Badge className={cn("h-7 rounded-lg text-xs font-black uppercase tracking-wider", riskColor)}>
+                <Badge
+                  className={cn(
+                    "h-7 rounded-lg text-xs font-black uppercase tracking-wider",
+                    riskColor,
+                  )}
+                >
                   {riskClass}
                 </Badge>
               ) : (
-                <Badge variant="secondary" className="h-7 rounded-lg text-xs font-black uppercase tracking-wider">
+                <Badge
+                  variant="secondary"
+                  className="h-7 rounded-lg text-xs font-black uppercase tracking-wider"
+                >
                   Incompleto
                 </Badge>
               )}

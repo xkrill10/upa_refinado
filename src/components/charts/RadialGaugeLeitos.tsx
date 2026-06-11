@@ -1,5 +1,5 @@
-import React from 'react';
-import Chart from 'react-apexcharts';
+import React from "react";
+import Chart from "react-apexcharts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BedDouble } from "lucide-react";
 import { useTheme } from "@/components/ThemeProvider";
@@ -13,9 +13,16 @@ interface RadialGaugeProps {
   pure?: boolean;
 }
 
-export function RadialGaugeLeitos({ occupied, available, cleaning, maintenance, total, pure }: RadialGaugeProps) {
+export function RadialGaugeLeitos({
+  occupied,
+  available,
+  cleaning,
+  maintenance,
+  total,
+  pure,
+}: RadialGaugeProps) {
   const { theme } = useTheme();
-  const isDark = theme === 'dark';
+  const isDark = theme === "dark";
 
   const occupiedPct = total > 0 ? Math.round((occupied / total) * 100) : 0;
   const availablePct = total > 0 ? Math.round((available / total) * 100) : 0;
@@ -23,48 +30,58 @@ export function RadialGaugeLeitos({ occupied, available, cleaning, maintenance, 
 
   const options: ApexCharts.ApexOptions = {
     chart: {
-      type: 'radialBar',
-      fontFamily: 'Inter, sans-serif',
-      background: 'transparent',
+      type: "radialBar",
+      fontFamily: "Inter, sans-serif",
+      background: "transparent",
     },
-    colors: ['#ef4444', '#10b981', '#06b6d4'],
+    colors: ["#ef4444", "#10b981", "#06b6d4"],
     plotOptions: {
       radialBar: {
-        hollow: { size: '30%', background: 'transparent' },
+        hollow: { size: "30%", background: "transparent" },
         track: {
-          background: isDark ? '#1e293b' : '#e2e8f0',
-          strokeWidth: '100%',
+          background: isDark ? "#1e293b" : "#e2e8f0",
+          strokeWidth: "100%",
         },
         dataLabels: {
-          name: { fontSize: '10px', color: isDark ? '#94a3b8' : '#64748b' },
-          value: { fontSize: '16px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a' },
+          name: { fontSize: "10px", color: isDark ? "#94a3b8" : "#64748b" },
+          value: {
+            fontSize: "16px",
+            fontWeight: 800,
+            color: isDark ? "#f8fafc" : "#0f172a",
+          },
           total: {
             show: true,
-            label: 'Ocupação',
-            color: isDark ? '#f8fafc' : '#0f172a',
+            label: "Ocupação",
+            color: isDark ? "#f8fafc" : "#0f172a",
             formatter: function (w) {
-              return occupiedPct + '%'
-            }
-          }
-        }
-      }
+              return occupiedPct + "%";
+            },
+          },
+        },
+      },
     },
-    labels: ['Ocupados', 'Livres', 'Limpeza'],
-    stroke: { lineCap: 'round' },
-    theme: { mode: isDark ? 'dark' : 'light' },
+    labels: ["Ocupados", "Livres", "Limpeza"],
+    stroke: { lineCap: "round" },
+    theme: { mode: isDark ? "dark" : "light" },
     legend: {
       show: true,
-      position: 'bottom',
-      fontSize: '10px',
-      labels: { colors: isDark ? '#94a3b8' : '#64748b' }
-    }
+      position: "bottom",
+      fontSize: "10px",
+      labels: { colors: isDark ? "#94a3b8" : "#64748b" },
+    },
   };
 
   const series = [occupiedPct, availablePct, cleaningPct];
 
   const chartContent = (
     <div className="w-full h-[260px] flex items-center justify-center">
-      <Chart options={options} series={series} type="radialBar" height="100%" width="100%" />
+      <Chart
+        options={options}
+        series={series}
+        type="radialBar"
+        height="100%"
+        width="100%"
+      />
     </div>
   );
 

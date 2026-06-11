@@ -8,7 +8,7 @@ const firebaseConfig = {
   projectId: "gen-lang-client-0117387303",
   storageBucket: "gen-lang-client-0117387303.firebasestorage.app",
   messagingSenderId: "771634071092",
-  appId: "1:771634071092:web:c4903786e2b0e458b06c61"
+  appId: "1:771634071092:web:c4903786e2b0e458b06c61",
 };
 
 const app = initializeApp(firebaseConfig);
@@ -21,11 +21,13 @@ export const requestFirebaseNotificationPermission = async () => {
       // NOTE: We need the VAPID KEY from Firebase Console to securely connect Web Push
       // The user needs to add it in the .env file later
       const vapidKey = import.meta.env.VITE_FIREBASE_VAPID_KEY;
-      
+
       if (!vapidKey) {
-        throw new Error("VAPID Key do Firebase não encontrada. Configure VITE_FIREBASE_VAPID_KEY no .env");
+        throw new Error(
+          "VAPID Key do Firebase não encontrada. Configure VITE_FIREBASE_VAPID_KEY no .env",
+        );
       }
-      
+
       const token = await getToken(messaging, { vapidKey });
       return token;
     } else {

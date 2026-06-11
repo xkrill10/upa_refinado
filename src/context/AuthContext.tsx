@@ -1,8 +1,14 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { toast } from 'sonner';
-import { supabase } from '@/lib/supabase';
-import type { User as SupabaseUser } from '@supabase/supabase-js';
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  ReactNode,
+} from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { toast } from "sonner";
+import { supabase } from "@/lib/supabase";
+import type { User as SupabaseUser } from "@supabase/supabase-js";
 
 interface AuthContextType {
   user: SupabaseUser | null;
@@ -22,12 +28,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     // 1. Pega a sessão atual se o usuário der refresh na página
     const getSession = async () => {
-      const { data: { session }, error } = await supabase.auth.getSession();
-      
+      const {
+        data: { session },
+        error,
+      } = await supabase.auth.getSession();
+
       if (error) {
         console.error("Erro ao resgatar sessão:", error.message);
       }
-      
+
       setUser(session?.user || null);
       setIsLoading(false);
 
@@ -37,7 +46,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     getSession();
 
     // 2. Escuta mudanças no estado de autenticação (Login/Logout dinâmico)
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user || null);
       setIsLoading(false);
       // Sem redirecionamentos automáticos
@@ -51,15 +62,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const logout = async () => {
     try {
       await supabase.auth.signOut();
-      toast.info('Sessão encerrada com segurança.');
+      toast.info("Sessão encerrada com segurança.");
     } catch (error) {
       console.error("Erro ao sair:", error);
-      toast.error('Erro ao encerrar sessão.');
+      toast.error("Erro ao encerrar sessão.");
     }
   };
 
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated: !!user, isLoading, logout }}>
+    <AuthContext.Provider
+      value={{ user, isAuthenticated: !!user, isLoading, logout }}
+    >
       {children}
     </AuthContext.Provider>
   );
@@ -68,7 +81,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
 };

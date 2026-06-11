@@ -1,10 +1,23 @@
 import React, { useState, useEffect } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Send, Copy, Check, MessageSquare, AlertCircle, Sparkles } from "lucide-react";
+import {
+  Send,
+  Copy,
+  Check,
+  MessageSquare,
+  AlertCircle,
+  Sparkles,
+} from "lucide-react";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "motion/react";
 import { cn } from "@/lib/utils";
@@ -29,7 +42,7 @@ export function WhatsAppShareModal({ open, onOpenChange, stats }: Props) {
   // Auto formats phone input: (XX) XXXXX-XXXX
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     let rawValue = e.target.value.replace(/\D/g, "");
-    
+
     // Se o usuário digitou ou colou o DDI 55 no início, removemos automaticamente
     // para formatar o restante como número local de forma limpa (já que o +55 já está no badge)
     if (rawValue.startsWith("55") && rawValue.length > 2) {
@@ -67,7 +80,8 @@ export function WhatsAppShareModal({ open, onOpenChange, stats }: Props) {
   }, [open]);
 
   // Builds standard Whatsapp markdown text
-  const messageText = `*📊 UPA DIGITAL - Relatório de Ocupação*\n\n` +
+  const messageText =
+    `*📊 UPA DIGITAL - Relatório de Ocupação*\n\n` +
     `• *Total de Pacientes:* ${stats.totalPatients} hoje\n` +
     `• *Aguardando Triagem:* ${stats.waiting}\n` +
     `• *Em Atendimento:* ${stats.attending}\n` +
@@ -76,11 +90,14 @@ export function WhatsAppShareModal({ open, onOpenChange, stats }: Props) {
     `_Relatório gerado em tempo real pelo painel de monitoramento._`;
 
   const cleanPhone = phoneNumber.replace(/\D/g, "");
-  
+
   // Format for international Brazilian numbers (DDI 55)
   let finalPhone = cleanPhone;
   if (cleanPhone.length > 0) {
-    if (!cleanPhone.startsWith("55") && (cleanPhone.length === 11 || cleanPhone.length === 10)) {
+    if (
+      !cleanPhone.startsWith("55") &&
+      (cleanPhone.length === 11 || cleanPhone.length === 10)
+    ) {
       finalPhone = "55" + cleanPhone;
     }
   }
@@ -90,7 +107,7 @@ export function WhatsAppShareModal({ open, onOpenChange, stats }: Props) {
       await navigator.clipboard.writeText(messageText);
       setCopied(true);
       toast.success("Copiado com sucesso!", {
-        description: "O relatório foi adicionado à sua área de transferência."
+        description: "O relatório foi adicionado à sua área de transferência.",
       });
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
@@ -107,7 +124,7 @@ export function WhatsAppShareModal({ open, onOpenChange, stats }: Props) {
     } else {
       url = `https://wa.me/?text=${encodeURIComponent(messageText)}`;
     }
-    
+
     window.open(url, "_blank");
     toast.success("Redirecionando para o WhatsApp...");
     onOpenChange(false);
@@ -130,12 +147,13 @@ export function WhatsAppShareModal({ open, onOpenChange, stats }: Props) {
                 Relatórios Instantâneos
               </Badge>
             </div>
-            
+
             <DialogTitle className="text-2xl md:text-3xl font-black uppercase tracking-tight mission-control-title">
               Compartilhar no WhatsApp
             </DialogTitle>
             <DialogDescription className="text-emerald-100 font-medium">
-              Envie o relatório operacional em tempo real para a gestão ou equipe médica.
+              Envie o relatório operacional em tempo real para a gestão ou
+              equipe médica.
             </DialogDescription>
           </DialogHeader>
 
@@ -168,29 +186,47 @@ export function WhatsAppShareModal({ open, onOpenChange, stats }: Props) {
               <div className="relative rounded-2xl p-4 bg-[#e5ddd5] dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 shadow-inner overflow-hidden min-h-[160px] flex flex-col justify-between">
                 {/* Whatsapp bubble background pattern for authentic feels */}
                 <div className="absolute inset-0 bg-[radial-gradient(#00000003_1px,transparent_1px)] dark:bg-[radial-gradient(#ffffff03_1px,transparent_1px)] [background-size:12px_12px] pointer-events-none" />
-                
+
                 <div className="relative self-start max-w-[85%] bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 rounded-xl rounded-tl-none p-3 shadow-md text-xs font-mono whitespace-pre-wrap leading-relaxed">
                   {/* Styled simulation of Whatsapp formatting */}
                   <div>
-                    <span className="font-extrabold text-emerald-700 dark:text-emerald-400">📊 UPA DIGITAL - Relatório de Ocupação</span>{"\n\n"}
-                    • <span className="font-bold">Total de Pacientes:</span> {stats.totalPatients} hoje{"\n"}
-                    • <span className="font-bold">Aguardando Triagem:</span> {stats.waiting}{"\n"}
-                    • <span className="font-bold">Em Atendimento:</span> {stats.attending}{"\n"}
-                    • <span className="font-bold">Casos Críticos:</span> {stats.emergencies}{"\n"}
-                    • <span className="font-bold">Ocupação Leitos:</span> {stats.occupiedBeds}/{stats.totalBeds}{"\n\n"}
-                    <span className="italic text-slate-500 dark:text-slate-400">Relatório gerado em tempo real pelo painel de monitoramento.</span>
+                    <span className="font-extrabold text-emerald-700 dark:text-emerald-400">
+                      📊 UPA DIGITAL - Relatório de Ocupação
+                    </span>
+                    {"\n\n"}•{" "}
+                    <span className="font-bold">Total de Pacientes:</span>{" "}
+                    {stats.totalPatients} hoje{"\n"}•{" "}
+                    <span className="font-bold">Aguardando Triagem:</span>{" "}
+                    {stats.waiting}
+                    {"\n"}• <span className="font-bold">Em Atendimento:</span>{" "}
+                    {stats.attending}
+                    {"\n"}• <span className="font-bold">Casos Críticos:</span>{" "}
+                    {stats.emergencies}
+                    {"\n"}• <span className="font-bold">Ocupação Leitos:</span>{" "}
+                    {stats.occupiedBeds}/{stats.totalBeds}
+                    {"\n\n"}
+                    <span className="italic text-slate-500 dark:text-slate-400">
+                      Relatório gerado em tempo real pelo painel de
+                      monitoramento.
+                    </span>
                   </div>
                   <span className="block text-[8px] text-right text-slate-400 dark:text-slate-500 mt-2 font-sans">
-                    {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} ✓✓
+                    {new Date().toLocaleTimeString([], {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}{" "}
+                    ✓✓
                   </span>
                 </div>
               </div>
             </div>
 
-
             {/* Input Phone */}
             <div className="space-y-2">
-              <Label htmlFor="phone" className="text-[10px] font-black uppercase tracking-widest text-emerald-600 dark:text-emerald-400">
+              <Label
+                htmlFor="phone"
+                className="text-[10px] font-black uppercase tracking-widest text-emerald-600 dark:text-emerald-400"
+              >
                 Número do Destinatário (Opcional)
               </Label>
               <div className="relative">
@@ -208,7 +244,8 @@ export function WhatsAppShareModal({ open, onOpenChange, stats }: Props) {
               </div>
               <p className="text-[10px] text-muted-foreground font-medium flex items-center gap-1.5 pt-1 px-1">
                 <AlertCircle className="h-3.5 w-3.5 text-amber-500 shrink-0" />
-                Deixe em branco para selecionar o contato manualmente no WhatsApp.
+                Deixe em branco para selecionar o contato manualmente no
+                WhatsApp.
               </p>
             </div>
 
