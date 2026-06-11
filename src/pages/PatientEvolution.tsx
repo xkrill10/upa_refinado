@@ -58,6 +58,9 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Link } from "react-router-dom";
+import { useEvolutionDropdowns } from "@/hooks/useEvolutionDropdowns";
+import { useEvolutionCalculators } from "@/hooks/useEvolutionCalculators";
+import { useEvolutionPrescriptions } from "@/hooks/useEvolutionPrescriptions";
 
 import {
   EVOLUTION_TEMPLATES,
@@ -259,155 +262,86 @@ export default function PatientEvolution() {
     };
   }, []);
 
-  // Estados para os Dropdowns da Equipe Técnica
-  const [isMedicationDropdownOpen, setIsMedicationDropdownOpen] =
-    useState(false);
-  const [isCareDropdownOpen, setIsCareDropdownOpen] = useState(false);
-  const [isComfortDropdownOpen, setIsComfortDropdownOpen] = useState(false);
-  const [isMovementDropdownOpen, setIsMovementDropdownOpen] = useState(false);
+  const {
+    isMedicationDropdownOpen, setIsMedicationDropdownOpen,
+    isCareDropdownOpen, setIsCareDropdownOpen,
+    isComfortDropdownOpen, setIsComfortDropdownOpen,
+    isMovementDropdownOpen, setIsMovementDropdownOpen,
+    isSaeAdmissionDropdownOpen, setIsSaeAdmissionDropdownOpen,
+    isSaeCareDropdownOpen, setIsSaeCareDropdownOpen,
+    isPrescMedicationDropdownOpen, setIsPrescMedicationDropdownOpen,
+    isPrescDietDropdownOpen, setIsPrescDietDropdownOpen,
+    isDischargeTypeDropdownOpen, setIsDischargeTypeDropdownOpen,
+    isDischargeConductDropdownOpen, setIsDischargeConductDropdownOpen,
+    isMedicalNeuroDropdownOpen, setIsMedicalNeuroDropdownOpen,
+    isMedicalSyndromeDropdownOpen, setIsMedicalSyndromeDropdownOpen,
+    isMedicalConductDropdownOpen, setIsMedicalConductDropdownOpen,
+    isPediatricNeuroDropdownOpen, setIsPediatricNeuroDropdownOpen,
+    isPediatricSyndromeDropdownOpen, setIsPediatricSyndromeDropdownOpen,
+    isPediatricConductDropdownOpen, setIsPediatricConductDropdownOpen,
+    isFisioEvalDropdownOpen, setIsFisioEvalDropdownOpen,
+    isFisioProcDropdownOpen, setIsFisioProcDropdownOpen,
+    isNutriEvalDropdownOpen, setIsNutriEvalDropdownOpen,
+    isNutriProcDropdownOpen, setIsNutriProcDropdownOpen,
+    isPsicoEvalDropdownOpen, setIsPsicoEvalDropdownOpen,
+    isPsicoProcDropdownOpen, setIsPsicoProcDropdownOpen,
+    isSocialEvalDropdownOpen, setIsSocialEvalDropdownOpen,
+    isSocialProcDropdownOpen, setIsSocialProcDropdownOpen,
+    isToEvalDropdownOpen, setIsToEvalDropdownOpen,
+    isToProcDropdownOpen, setIsToProcDropdownOpen,
+    isFonoEvalDropdownOpen, setIsFonoEvalDropdownOpen,
+    isFonoProcDropdownOpen, setIsFonoProcDropdownOpen,
+    isFarmaEvalDropdownOpen, setIsFarmaEvalDropdownOpen,
+    isFarmaProcDropdownOpen, setIsFarmaProcDropdownOpen
+  } = useEvolutionDropdowns();
 
-  // Estados para as calculadoras clínicas (Enfermagem)
-  const [openMorseCalc, setOpenMorseCalc] = useState(false);
-  const [selectedMorse, setSelectedMorse] = useState("");
+  const {
+    openMorseCalc, setOpenMorseCalc,
+    selectedMorse, setSelectedMorse,
+    openBradenCalc, setOpenBradenCalc,
+    selectedBraden, setSelectedBraden,
+    openEvaCalc, setOpenEvaCalc,
+    selectedEva, setSelectedEva,
+    openMewsCalc, setOpenMewsCalc,
+    selectedMews, setSelectedMews,
+    openNews2Calc, setOpenNews2Calc,
+    selectedNews2, setSelectedNews2,
+    openQsofaCalc, setOpenQsofaCalc,
+    selectedQsofa, setSelectedQsofa,
+    openPewsCalc, setOpenPewsCalc,
+    selectedPews, setSelectedPews,
+    openGlasgowCalc, setOpenGlasgowCalc,
+    selectedGlasgow, setSelectedGlasgow,
+    openMentalCalc, setOpenMentalCalc,
+    selectedMentalSummary, setSelectedMentalSummary,
+    openUrgencyCalc, setOpenUrgencyCalc,
+    selectedUrgencySummary, setSelectedUrgencySummary,
+    openNandaCalc, setOpenNandaCalc,
+    activeNandaPlan, setActiveNandaPlan,
+    openNursingCalc, setOpenNursingCalc,
+    selectedNursingSummary, setSelectedNursingSummary,
+    openHeartCalc, setOpenHeartCalc,
+    openCurb65Calc, setOpenCurb65Calc,
+    openWellsCalc, setOpenWellsCalc,
+    openNihssCalc, setOpenNihssCalc,
+    openDehydrationCalc, setOpenDehydrationCalc,
+    openWoodDownesCalc, setOpenWoodDownesCalc,
+    openParklandCalc, setOpenParklandCalc
+  } = useEvolutionCalculators();
 
-  const [openBradenCalc, setOpenBradenCalc] = useState(false);
-  const [selectedBraden, setSelectedBraden] = useState("");
+  const {
+    prescWizard, setPrescWizard,
+    prescribedMedications, setPrescribedMedications,
+    handleAddPrescriptionItem,
+    handleRemovePrescriptionItem
+  } = useEvolutionPrescriptions();
 
-  const [openEvaCalc, setOpenEvaCalc] = useState(false);
-  const [selectedEva, setSelectedEva] = useState("");
-
-  const [openMewsCalc, setOpenMewsCalc] = useState(false);
-  const [selectedMews, setSelectedMews] = useState("");
-
-  const [openNews2Calc, setOpenNews2Calc] = useState(false);
-  const [selectedNews2, setSelectedNews2] = useState("");
-
-  const [openQsofaCalc, setOpenQsofaCalc] = useState(false);
-  const [selectedQsofa, setSelectedQsofa] = useState("");
-
-  const [openPewsCalc, setOpenPewsCalc] = useState(false);
-  const [selectedPews, setSelectedPews] = useState("");
-
-  const [openGlasgowCalc, setOpenGlasgowCalc] = useState(false);
-  const [selectedGlasgow, setSelectedGlasgow] = useState("");
-
-  const [openMentalCalc, setOpenMentalCalc] = useState(false);
-  const [selectedMentalSummary, setSelectedMentalSummary] = useState("");
-
-  const [openUrgencyCalc, setOpenUrgencyCalc] = useState(false);
-  const [selectedUrgencySummary, setSelectedUrgencySummary] = useState("");
-
-  const [openNandaCalc, setOpenNandaCalc] = useState(false);
-  const [activeNandaPlan, setActiveNandaPlan] = useState("");
-
-  const [openNursingCalc, setOpenNursingCalc] = useState(false);
-  const [selectedNursingSummary, setSelectedNursingSummary] = useState("");
-
-  // Estados para os Dropdowns do Super Painel SAE (Enfermagem)
-  const [isSaeAdmissionDropdownOpen, setIsSaeAdmissionDropdownOpen] =
-    useState(false);
-  const [isSaeCareDropdownOpen, setIsSaeCareDropdownOpen] = useState(false);
-
-  // Estados para o Super Painel de Prescrição Médica
-  const [prescWizard, setPrescWizard] = useState({
-    medication: "",
-    dosage: "",
-    route: "",
-    frequency: "",
-  });
-  const [prescribedMedications, setPrescribedMedications] = useState<
-    PrescriptionMedication[]
-  >([]);
   const { addPrescriptionOrder } = usePrescriptions();
-
-  const handleAddPrescriptionItem = () => {
-    if (
-      !prescWizard.medication ||
-      !prescWizard.dosage ||
-      !prescWizard.route ||
-      !prescWizard.frequency
-    ) {
-      toast.error("Preencha todos os campos do medicamento!");
-      return;
-    }
-    const newItem: PrescriptionMedication = {
-      id: `med-${Date.now()}`,
-      medication: prescWizard.medication,
-      dosage: prescWizard.dosage,
-      route: prescWizard.route,
-      frequency: prescWizard.frequency,
-      status: "awaiting_pharmacy",
-      hours: [],
-    };
-    setPrescribedMedications([...prescribedMedications, newItem]);
-    setPrescWizard({ medication: "", dosage: "", route: "", frequency: "" });
-  };
-
-  const handleRemovePrescriptionItem = (idx: number) => {
-    const arr = [...prescribedMedications];
-    arr.splice(idx, 1);
-    setPrescribedMedications(arr);
-  };
-
-  // Estados para os Dropdowns do Super Painel de Prescrição Médica
-  const [isPrescMedicationDropdownOpen, setIsPrescMedicationDropdownOpen] =
-    useState(false);
-  const [isPrescDietDropdownOpen, setIsPrescDietDropdownOpen] = useState(false);
-
-  // Estados para os Dropdowns do Super Painel de Alta
-  const [isDischargeTypeDropdownOpen, setIsDischargeTypeDropdownOpen] =
-    useState(false);
-  const [isDischargeConductDropdownOpen, setIsDischargeConductDropdownOpen] =
-    useState(false);
-  // Estados para os Dropdowns do Super Painel Médico (Evolução Médica)
-  const [isMedicalNeuroDropdownOpen, setIsMedicalNeuroDropdownOpen] =
-    useState(false);
-  const [isMedicalSyndromeDropdownOpen, setIsMedicalSyndromeDropdownOpen] =
-    useState(false);
-  const [isMedicalConductDropdownOpen, setIsMedicalConductDropdownOpen] =
-    useState(false);
-
-  // Estados para os Dropdowns do Super Painel Médico Pediátrico
-  const [isPediatricNeuroDropdownOpen, setIsPediatricNeuroDropdownOpen] =
-    useState(false);
-  const [isPediatricSyndromeDropdownOpen, setIsPediatricSyndromeDropdownOpen] =
-    useState(false);
-  const [isPediatricConductDropdownOpen, setIsPediatricConductDropdownOpen] =
-    useState(false);
-
-  // Estados Calculadoras Médicas Extras
-  const [openHeartCalc, setOpenHeartCalc] = useState(false);
-  const [openCurb65Calc, setOpenCurb65Calc] = useState(false);
-  const [openWellsCalc, setOpenWellsCalc] = useState(false);
-  const [openNihssCalc, setOpenNihssCalc] = useState(false);
-  const [openDehydrationCalc, setOpenDehydrationCalc] = useState(false);
-  const [openWoodDownesCalc, setOpenWoodDownesCalc] = useState(false);
-  const [openParklandCalc, setOpenParklandCalc] = useState(false);
-
-  // Estados Gestão de Leitos
   const [openBedTransfer, setOpenBedTransfer] = useState(false);
   const [openBedStatus, setOpenBedStatus] = useState(false);
-
-  // Estado Linha do Tempo
   const [isTimelineOpen, setIsTimelineOpen] = useState(false);
 
-  // Estados para os Dropdowns da Equipe Multidisciplinar
-  const [isFisioEvalDropdownOpen, setIsFisioEvalDropdownOpen] = useState(false);
-  const [isFisioProcDropdownOpen, setIsFisioProcDropdownOpen] = useState(false);
-  const [isNutriEvalDropdownOpen, setIsNutriEvalDropdownOpen] = useState(false);
-  const [isNutriProcDropdownOpen, setIsNutriProcDropdownOpen] = useState(false);
-  const [isPsicoEvalDropdownOpen, setIsPsicoEvalDropdownOpen] = useState(false);
-  const [isPsicoProcDropdownOpen, setIsPsicoProcDropdownOpen] = useState(false);
-  const [isSocialEvalDropdownOpen, setIsSocialEvalDropdownOpen] =
-    useState(false);
-  const [isSocialProcDropdownOpen, setIsSocialProcDropdownOpen] =
-    useState(false);
-  const [isToEvalDropdownOpen, setIsToEvalDropdownOpen] = useState(false);
-  const [isToProcDropdownOpen, setIsToProcDropdownOpen] = useState(false);
-  const [isFonoEvalDropdownOpen, setIsFonoEvalDropdownOpen] = useState(false);
-  const [isFonoProcDropdownOpen, setIsFonoProcDropdownOpen] = useState(false);
-  const [isFarmaEvalDropdownOpen, setIsFarmaEvalDropdownOpen] = useState(false);
-  const [isFarmaProcDropdownOpen, setIsFarmaProcDropdownOpen] = useState(false);
+
 
   const normalizeText = (text: string) => {
     return text
