@@ -10,7 +10,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { UserX, UserCheck, EyeOff, Pencil, UserPlus, X, Save, RefreshCw, Search, FileHeart, Filter, Clock, Users, Activity, FileText, Sun, Trash2 } from 'lucide-react';
-import { toast } from "sonner";
+import { useToast } from '@/components/ui/use-toast';
 import { formatName, formatPhone } from '@/lib/utils';
 
 const shiftLabels = { diurno_a: 'Diurno A', diurno_b: 'Diurno B', noturno_a: 'Noturno A', noturno_b: 'Noturno B' };
@@ -18,7 +18,7 @@ const statusColors = { active: 'bg-success/20 text-success border-success/30', i
 const statusLabels = { active: 'Ativo', inactive: 'Inativo', on_leave: 'Afastado' };
 
 export default function Management() {
-  
+  const { toast } = useToast();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   
@@ -72,7 +72,7 @@ export default function Management() {
     mutationFn: ({ id, status }) => db.entities.Employee.update(id, { status }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['employees'] });
-      toast.success('Status atualizado com sucesso!');
+      toast({ title: 'Status atualizado com sucesso!' });
     },
   });
 
@@ -80,7 +80,7 @@ export default function Management() {
     mutationFn: ({ id, shift_type }) => db.entities.Employee.update(id, { shift_type }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['employees'] });
-      toast.success('Turno atualizado com sucesso!');
+      toast({ title: 'Turno atualizado com sucesso!' });
     },
   });
 
@@ -94,7 +94,7 @@ export default function Management() {
       });
       queryClient.invalidateQueries({ queryKey: ['employees'] });
       queryClient.invalidateQueries({ queryKey: ['schedules'] });
-      toast.success('Dados do colaborador atualizados!');
+      toast({ title: 'Dados do colaborador atualizados!' });
       setEditingEmployee(null);
     },
   });
@@ -103,7 +103,7 @@ export default function Management() {
     mutationFn: (id) => db.entities.Employee.delete(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['employees'] });
-      toast.success('Colaborador excluído com sucesso!');
+      toast({ title: 'Colaborador excluído com sucesso!' });
     },
   });
 
@@ -134,7 +134,7 @@ export default function Management() {
       queryClient.invalidateQueries({ queryKey: ['employees'] });
       queryClient.invalidateQueries({ queryKey: ['certificates'] });
       queryClient.invalidateQueries({ queryKey: ['schedules'] });
-      toast.success('Atestado cadastrado e colaborador afastado!');
+      toast({ title: 'Atestado cadastrado e colaborador afastado!' });
       
       setQuickCertEmployee(null);
       setCertCid('');
@@ -243,7 +243,7 @@ export default function Management() {
           <p className="text-sm text-muted-foreground">Gerencie status, turnos e colaboradores</p>
         </div>
         <Button 
-          onClick={() => navigate('/escala/novo')}
+          onClick={() => navigate('/novo')}
           className="flex items-center gap-2 text-xs font-semibold bg-primary text-primary-foreground hover:bg-primary/95 transition-all shadow-sm"
         >
           <UserPlus className="h-4 w-4" />

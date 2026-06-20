@@ -16,6 +16,7 @@ const db = globalThis.__B44_DB__ || {
 };
 
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { motion } from "framer-motion";
@@ -30,12 +31,16 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { UserPlus, Check } from "lucide-react";
+import { UserPlus, Check, X, Eraser } from "lucide-react";
 import { toast } from "sonner";
+import { formatName, formatPhone } from "@/lib/utils";
+
 export default function NewEmployee() {
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [form, setForm] = useState({
     name: "",
+    phone: "",
     role: "TEC.ENF",
     coren: "",
     shift_type: "diurno_a",
@@ -79,8 +84,11 @@ export default function NewEmployee() {
       queryClient.invalidateQueries({ queryKey: ["employees"] });
       queryClient.invalidateQueries({ queryKey: ["schedules"] });
       toast.success("Colaborador adicionado com sucesso!");
+      
+      // Auto-limpa o formulário para o próximo cadastro
       setForm({
         name: "",
+        phone: "",
         role: "TEC.ENF",
         coren: "",
         shift_type: "diurno_a",
@@ -91,11 +99,29 @@ export default function NewEmployee() {
         status: "active",
       });
     },
+    onError: (error) => {
+      toast.error(error.message || "Erro ao adicionar colaborador");
+    }
   });
 
   const handleSubmit = (e) => {
     e.preventDefault();
     createEmployee.mutate(form);
+  };
+
+  const handleClear = () => {
+    setForm({
+      name: "",
+      phone: "",
+      role: "TEC.ENF",
+      coren: "",
+      shift_type: "diurno_a",
+      work_hours: "07:00 as 19:00",
+      sector: "",
+      cycle: "par",
+      contract_type: "",
+      status: "active",
+    });
   };
 
   return (
@@ -115,7 +141,14 @@ export default function NewEmployee() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
       >
-        <Card className="glass-card-premium">
+        <Card className="glass-card-premium relative">
+          <button
+            type="button"
+            onClick={() => navigate('/escala/gerenciamento')}
+            className="absolute right-4 top-4 rounded-full p-1.5 text-muted-foreground hover:bg-muted transition-colors"
+          >
+            <X className="h-4 w-4" />
+          </button>
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-base">
               <UserPlus className="h-4 w-4 text-primary" />
@@ -125,13 +158,21 @@ export default function NewEmployee() {
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="sm:col-span-2">
+                <div>
                   <Label>Nome Completo</Label>
                   <Input
                     value={form.name}
-                    onChange={(e) => setForm({ ...form, name: e.target.value })}
+                    onChange={(e) => setForm({ ...form, name: formatName(e.target.value) })}
                     required
                     placeholder="Nome do colaborador"
+                  />
+                </div>
+                <div>
+                  <Label>Telefone / WhatsApp</Label>
+                  <Input
+                    value={form.phone}
+                    onChange={(e) => setForm({ ...form, phone: formatPhone(e.target.value) })}
+                    placeholder="(11) 99999-9999"
                   />
                 </div>
                 <div>
@@ -211,7 +252,7 @@ export default function NewEmployee() {
                   <Input
                     value={form.sector}
                     onChange={(e) =>
-                      setForm({ ...form, sector: e.target.value })
+                      setForm({ ...form, sector: formatName(e.target.value) })
                     }
                     placeholder="Ex: Emergência"
                   />
@@ -221,22 +262,28 @@ export default function NewEmployee() {
                   <Input
                     value={form.contract_type}
                     onChange={(e) =>
-                      setForm({ ...form, contract_type: e.target.value })
+                      setForm({ ...form, contract_type: formatName(e.target.value) })
                     }
                     placeholder="CLT, Estatutário..."
                   />
                 </div>
               </div>
-              <Button
-                type="submit"
-                className="w-full gap-2"
-                disabled={createEmployee.isPending}
-              >
-                <Check className="h-4 w-4" />
-                {createEmployee.isPending
-                  ? "Salvando..."
-                  : "Adicionar Colaborador"}
-              </Button>
+              
+              <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-border/40 mt-4">
+                <Button type="button" variant="ghost" className="w-full sm:w-auto gap-2 text-muted-foreground" onClick={handleClear}>
+                  <Eraser className="h-4 w-4" />
+                  Limpar
+                </Button>
+                <div className="flex-1" />
+                <Button type="button" variant="outline" className="w-full sm:w-auto gap-2" onClick={() => navigate('/escala/gerenciamento')}>
+                  <X className="h-4 w-4" />
+                  Fechar
+                </Button>
+                <Button type="submit" className="w-full sm:w-auto gap-2" disabled={createEmployee.isPending}>
+                  <Check className="h-4 w-4" />
+                  {createEmployee.isPending ? 'Salvando...' : 'Adicionar Colaborador'}
+                </Button>
+              </div>
             </form>
           </CardContent>
         </Card>
