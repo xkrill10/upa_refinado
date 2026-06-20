@@ -22,6 +22,7 @@ import {
   FlaskConical,
   PackagePlus,
   X,
+  XCircle,
   FileText,
   ShieldAlert,
   Biohazard,
@@ -34,6 +35,8 @@ import type { LucideIcon } from "lucide-react";
 import { cn, formatWords } from "@/lib/utils";
 import { ExamsModal } from "@/components/PatientEvolution/Modals/ExamsModal";
 import PatientRecord from "@/pages/PatientRecord";
+import { PatientIconsBanner } from "@/components/PatientIconsBanner";
+import { BedManagementModal } from "@/components/BedManagementModal";
 import {
   Card,
   CardContent,
@@ -96,8 +99,30 @@ const getTimeInBed = (arrivalTime?: string) => {
   return { text: `${h}h ${m}m`, hours, color };
 };
 
+const isBedCompatibleWithPatient = (bed: { room?: string }, patient: Patient | null | undefined) => {
+  if (!patient || !patient.gender) return true;
+  const room = bed.room || '';
+  const isFemaleRoom = room.toLowerCase().includes('fem');
+  const isMaleRoom = room.toLowerCase().includes('masc');
+  if (!isFemaleRoom && !isMaleRoom) return true;
+  
+  const patientGender = patient.gender.toLowerCase();
+  if (isFemaleRoom && (patientGender === 'feminino' || patientGender === 'f')) return true;
+  if (isMaleRoom && (patientGender === 'masculino' || patientGender === 'm')) return true;
+  
+  return false;
+};
+
+const getBedGenderIcon = (room?: string) => {
+  if (!room) return '';
+  if (room.toLowerCase().includes('fem')) return '♀';
+  if (room.toLowerCase().includes('masc')) return '♂';
+  return '';
+};
+
 export default function Beds() {
   const [selectedBedId, setSelectedBedId] = useState<string | null>(null);
+  const [showBedManagementModal, setShowBedManagementModal] = useState<string | null>(null);
   const [filter, setFilter] = useState<
     "all" | "occupied" | "available" | "maintenance" | "cleaning"
   >("all");
@@ -359,8 +384,18 @@ export default function Beds() {
 
   const handleTransfer = () => {
     if (transferringBedId && targetBedId) {
-      transferPatient(transferringBedId, targetBedId);
+      const sourceBed = beds.find((b) => b.id === transferringBedId);
       const targetBed = beds.find((b) => b.id === targetBedId);
+      const patient = sourceBed ? getBedPatient(sourceBed) : null;
+
+      if (targetBed && !isBedCompatibleWithPatient(targetBed, patient)) {
+        toast.error("Transferência bloqueada", {
+          description: "O leito de destino é incompatível com o sexo do paciente.",
+        });
+        return;
+      }
+
+      transferPatient(transferringBedId, targetBedId);
       toast.success("Transferência realizada", {
         description: `Paciente transferido com sucesso para o ${targetBed?.name}.`,
       });
@@ -551,6 +586,11 @@ export default function Beds() {
                             {formatWords(patient?.name || "")}
                           </span>
                         </div>
+                        {patient && (
+                          <div className="mt-2 mb-3 px-1">
+                            <PatientIconsBanner patient={patient} iconSize={14} gap="4px" />
+                          </div>
+                        )}
                         <div className="grid grid-cols-2 gap-2 mt-2">
                           <div
                             className="flex items-center justify-center gap-1.5 bg-white/40 dark:bg-slate-950/40 py-2 rounded-xl text-[9px] font-black text-slate-600 dark:text-slate-400 uppercase cursor-help hover:text-[#006699] dark:hover:text-sky-300 transition-colors border border-white/40 dark:border-white/5 shadow-[inset_0_1px_1px_rgba(255,255,255,0.4)]"
@@ -691,32 +731,42 @@ export default function Beds() {
                   <div className="flex gap-2 pt-2 mt-auto">
                     <Button
                       variant="outline"
-                      className="flex-1 text-[10px] font-black uppercase tracking-[0.15em] h-10 rounded-xl bg-gradient-to-b from-white/60 to-white/30 dark:from-slate-800/60 dark:to-slate-900/60 border border-white/60 dark:border-white/10 hover:from-[#006699] hover:to-[#004d73] hover:text-white dark:hover:from-sky-500 dark:hover:to-sky-600 dark:hover:text-slate-950 transition-all shadow-sm text-foreground hover:shadow-lg"
+                      className="flex-1 px-1 text-[9px] font-black uppercase tracking-widest h-10 rounded-xl bg-gradient-to-b from-white/60 to-white/30 dark:from-slate-800/60 dark:to-slate-900/60 border border-white/60 dark:border-white/10 hover:from-[#006699] hover:to-[#004d73] hover:text-white dark:hover:from-sky-500 dark:hover:to-sky-600 dark:hover:text-slate-950 transition-all shadow-sm text-foreground hover:shadow-lg"
                       onClick={() => setSelectedBedId(bed.id)}
                     >
                       Gerenciar
                     </Button>
+                    {bed.status === "occupied" && (
+                      <Button
+                        variant="default"
+                        className="flex-1 px-1 text-[9px] font-black uppercase tracking-widest h-10 rounded-xl shadow-lg transition-all"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setShowBedManagementModal(bed.id);
+                        }}
+                      >
+                        <FileText className="h-3.5 w-3.5 mr-1" /> Ficha
+                      </Button>
+                    )}
                     {bed.status === "available" && (
                       <Button
                         variant="secondary"
-                        className="flex-1 text-[10px] font-black uppercase tracking-[0.15em] h-10 rounded-xl bg-white/40 dark:bg-slate-800/40 hover:bg-emerald-500 hover:text-white dark:hover:bg-emerald-500 transition-all border border-white/50 dark:border-white/10 backdrop-blur-md shadow-sm"
+                        className="flex-1 px-1 text-[9px] font-black uppercase tracking-widest h-10 rounded-xl bg-white/40 dark:bg-slate-800/40 hover:bg-emerald-500 hover:text-white dark:hover:bg-emerald-500 transition-all border border-white/50 dark:border-white/10 backdrop-blur-md shadow-sm"
                         onClick={() => releaseBed(bed.id, "normal", false)}
                       >
-                        <Sparkles className="h-3.5 w-3.5 mr-1.5" /> Solicitar
-                        Limpeza
+                        <Sparkles className="h-3.5 w-3.5 mr-1" /> Solicitar Limpeza
                       </Button>
                     )}
                     {bed.status === "cleaning" && (
                       <Button
                         variant="secondary"
-                        className="flex-1 text-[10px] font-black uppercase tracking-[0.15em] h-10 rounded-xl bg-orange-500/20 text-orange-500 hover:bg-orange-500 hover:text-white transition-all border border-orange-500/30 backdrop-blur-md shadow-sm"
+                        className="flex-1 px-1 text-[9px] font-black uppercase tracking-widest h-10 rounded-xl bg-orange-500/20 text-orange-500 hover:bg-orange-500 hover:text-white transition-all border border-orange-500/30 backdrop-blur-md shadow-sm"
                         onClick={(e) => {
                           e.stopPropagation();
                           updateBedStatus(bed.id, "available");
                         }}
                       >
-                        <Sparkles className="h-3.5 w-3.5 mr-1.5" /> Limpeza
-                        Concluída
+                        <Sparkles className="h-3.5 w-3.5 mr-1" /> Limpeza Concluída
                       </Button>
                     )}
                   </div>
@@ -2655,26 +2705,79 @@ export default function Beds() {
                   <SelectTrigger className="w-full h-12 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-850 shadow-sm font-bold text-foreground">
                     <SelectValue placeholder="Selecione o novo leito" />
                   </SelectTrigger>
-                  <SelectContent className="rounded-xl border border-slate-200/60 dark:border-slate-800 bg-white dark:bg-slate-950 shadow-xl max-h-[250px]">
-                    {beds
-                      .filter((b) => b.status === "available")
-                      .map((bed) => (
-                        <SelectItem
-                          key={bed.id}
-                          value={bed.id}
-                          className="font-bold text-foreground"
-                        >
-                          {bed.name} ({bed.ward})
-                        </SelectItem>
-                      ))}
-                    {beds.filter((b) => b.status === "available").length ===
-                      0 && (
-                      <div className="p-4 text-center text-xs text-muted-foreground italic">
-                        Nenhum leito disponível no momento.
-                      </div>
-                    )}
+                  <SelectContent className="rounded-xl border border-slate-200/60 dark:border-slate-800 bg-white dark:bg-slate-950 shadow-xl max-h-[350px]">
+                    {(() => {
+                      if (beds.length === 0) {
+                        return (
+                          <div className="p-4 text-center text-xs text-muted-foreground italic">
+                            Nenhum leito cadastrado.
+                          </div>
+                        );
+                      }
+
+                      const currentPatient = transferringBedId ? getBedPatient(beds.find((b) => b.id === transferringBedId)!) : null;
+
+                      return beds.map((bed) => {
+                        const isAvailable = bed.status === "available";
+                        const isCompatible = isAvailable ? isBedCompatibleWithPatient(bed, currentPatient) : false;
+                        const room = bed.room || '';
+                        const isFemale = room.toLowerCase().includes('fem');
+                        const isMale = room.toLowerCase().includes('masc');
+                        
+                        let statusConfig = { text: "", color: "" };
+                        if (bed.status === "available") statusConfig = { text: "Livre", color: "text-emerald-500 dark:text-emerald-400" };
+                        if (bed.status === "occupied") statusConfig = { text: "Ocupado", color: "text-red-500 dark:text-red-400" };
+                        if (bed.status === "cleaning") statusConfig = { text: "Higienização", color: "text-amber-500 dark:text-amber-400" };
+                        if (bed.status === "maintenance") statusConfig = { text: "Manutenção", color: "text-slate-500 dark:text-slate-400" };
+                        
+                        return (
+                          <SelectItem
+                            key={bed.id}
+                            value={bed.id}
+                            disabled={!isAvailable}
+                            className={cn(
+                              "font-bold text-[11px] md:text-sm", 
+                              isAvailable && !isCompatible && "text-red-500"
+                            )}
+                          >
+                            <span className="flex items-center gap-1.5">
+                              {isFemale && <span className={cn("font-black text-sm", isAvailable ? "text-red-500" : "opacity-50")}>♀</span>}
+                              {isMale && <span className={cn("font-black text-sm", isAvailable ? "text-blue-500" : "opacity-50")}>♂</span>}
+                              <span>{bed.name} - <span className={statusConfig.color}>{statusConfig.text}</span></span>
+                              {isAvailable && !isCompatible && <span className="text-red-500 text-[9px] ml-1">⛔</span>}
+                            </span>
+                          </SelectItem>
+                        );
+                      });
+                    })()}
                   </SelectContent>
                 </Select>
+
+                {/* Warning when incompatible bed is selected */}
+                {(() => {
+                  if (!targetBedId || !transferringBedId) return null;
+                  const targetBed = beds.find((b) => b.id === targetBedId);
+                  const currentPatient = getBedPatient(beds.find((b) => b.id === transferringBedId)!);
+                  if (!targetBed || isBedCompatibleWithPatient(targetBed, currentPatient)) return null;
+                  
+                  const room = targetBed.room || '';
+                  const isFemale = room.toLowerCase().includes('fem');
+                  const genderLabel = isFemale ? 'Feminino' : 'Masculino';
+                  
+                  return (
+                    <div className="mt-3 p-3 rounded-xl bg-red-500/10 border border-red-500/30 flex items-start gap-2 animate-in fade-in slide-in-from-top-2 duration-300">
+                      <AlertCircle className="h-4 w-4 text-red-500 shrink-0 mt-0.5" />
+                      <div>
+                        <p className="text-[11px] font-black uppercase tracking-widest text-red-600 dark:text-red-400">
+                          ⚠️ Atenção — Leito Incompatível
+                        </p>
+                        <p className="text-[10px] text-red-500/80 mt-1">
+                          Este leito é permitido somente ao sexo <strong>{genderLabel}</strong>. Selecione outro leito compatível.
+                        </p>
+                      </div>
+                    </div>
+                  );
+                })()}
               </div>
             </div>
           </div>
@@ -2684,15 +2787,33 @@ export default function Beds() {
               variant="outline"
               className="flex-1 h-12 rounded-xl font-black uppercase tracking-widest text-[10px] bg-transparent border-slate-200/60 dark:border-slate-800 text-foreground hover:bg-slate-50 dark:hover:bg-slate-900"
               onClick={() => {
-                setTransferringBedId(null);
-                setTargetBedId("");
+                if (targetBedId) {
+                  setTargetBedId(""); // Limpar apenas a seleção
+                } else {
+                  setTransferringBedId(null); // Fechar o modal
+                  setTargetBedId("");
+                }
               }}
             >
-              Cancelar
+              {targetBedId ? "Limpar Seleção" : "Fechar"}
             </Button>
             <Button
-              className="flex-1 h-12 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-black uppercase tracking-widest text-[10px] shadow-lg shadow-amber-500/20"
-              disabled={!targetBedId}
+              className={cn(
+                "flex-1 h-12 rounded-xl font-black uppercase tracking-widest text-[10px] shadow-lg",
+                (() => {
+                  if (!targetBedId || !transferringBedId) return "bg-amber-500 hover:bg-amber-600 text-white shadow-amber-500/20";
+                  const tBed = beds.find((b) => b.id === targetBedId);
+                  const tPatient = getBedPatient(beds.find((b) => b.id === transferringBedId)!);
+                  if (tBed && !isBedCompatibleWithPatient(tBed, tPatient)) return "bg-red-500/30 text-red-300 cursor-not-allowed shadow-none";
+                  return "bg-amber-500 hover:bg-amber-600 text-white shadow-amber-500/20";
+                })()
+              )}
+              disabled={!targetBedId || (() => {
+                if (!targetBedId || !transferringBedId) return true;
+                const tBed = beds.find((b) => b.id === targetBedId);
+                const tPatient = getBedPatient(beds.find((b) => b.id === transferringBedId)!);
+                return tBed ? !isBedCompatibleWithPatient(tBed, tPatient) : false;
+              })()}
               onClick={handleTransfer}
             >
               Confirmar Troca
@@ -2720,14 +2841,46 @@ export default function Beds() {
             </div>
           </div>
           <div className="p-6 max-h-[60vh] overflow-y-auto space-y-3">
-            {beds.filter((b) => b.status === "available").length === 0 ? (
-              <div className="text-center py-8 text-muted-foreground font-bold text-sm">
-                Nenhum leito disponível no momento.
-              </div>
-            ) : (
-              beds
-                .filter((b) => b.status === "available")
-                .map((bed) => (
+            {(() => {
+              const allocatingPatient = allocatingPatientId ? patients.find((p) => p.id === allocatingPatientId) : null;
+              const availableBeds = beds.filter((b) => b.status === "available");
+
+              if (availableBeds.length === 0) {
+                return (
+                  <div className="text-center py-8 text-muted-foreground font-bold text-sm">
+                    Nenhum leito disponível no momento.
+                  </div>
+                );
+              }
+
+              return availableBeds.map((bed) => {
+                const isCompatible = isBedCompatibleWithPatient(bed, allocatingPatient);
+                const genderIcon = getBedGenderIcon(bed.room);
+
+                if (!isCompatible) {
+                  return (
+                    <div
+                      key={bed.id}
+                      className="p-4 rounded-xl border-2 border-slate-200/50 dark:border-slate-800/50 opacity-60 cursor-not-allowed flex justify-between items-center bg-slate-50 dark:bg-slate-900"
+                    >
+                      <div className="flex items-center gap-4">
+                        <div className="h-10 w-10 rounded-lg bg-slate-200 dark:bg-slate-800 text-slate-400 flex items-center justify-center">
+                          <XCircle className="h-5 w-5" />
+                        </div>
+                        <div>
+                          <h4 className="font-black uppercase tracking-tight text-slate-500 flex items-center gap-1">
+                            {bed.name} {genderIcon && <span className="text-xl leading-none">{genderIcon}</span>}
+                          </h4>
+                          <p className="text-[10px] font-bold text-rose-500 tracking-widest mt-0.5">
+                            ⛔ INCOMPATÍVEL COM O SEXO DO PACIENTE
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                }
+
+                return (
                   <div
                     key={bed.id}
                     onClick={() => {
@@ -2742,7 +2895,7 @@ export default function Beds() {
                               ...patient.admissionRequest,
                               status: "allocated",
                             },
-                            status: "attending", // Garante que saiu de waiting se estava
+                            status: "attending",
                             sector: bed.name,
                           });
                         }
@@ -2757,34 +2910,36 @@ export default function Beds() {
                         <CheckCircle2 className="h-5 w-5" />
                       </div>
                       <div>
-                        <h4 className="font-black uppercase tracking-tight text-foreground">
-                          {bed.name}
+                        <h4 className="font-black uppercase tracking-tight text-foreground flex items-center gap-1">
+                          {bed.name} {genderIcon && <span className="text-xl leading-none text-emerald-600">{genderIcon}</span>}
                         </h4>
-                        <p className="text-[10px] font-bold text-muted-foreground tracking-widest">
+                        <p className="text-[10px] font-bold text-muted-foreground tracking-widest mt-0.5">
                           {bed.ward} • {bed.room}
                         </p>
                       </div>
                     </div>
                   </div>
-                ))
-            )}
+                );
+              });
+            })()}
           </div>
         </DialogContent>
       </Dialog>
       <Dialog open={isExamsModalOpen} onOpenChange={setIsExamsModalOpen}>
-        <DialogContent className="max-w-2xl bg-white dark:bg-slate-900 rounded-2xl border-0 shadow-2xl p-6">
-          <DialogHeader>
+        <DialogContent className="max-w-2xl w-[95vw] h-[85vh] flex flex-col overflow-hidden bg-white dark:bg-slate-900 rounded-2xl border-0 shadow-2xl p-6">
+          <DialogHeader className="shrink-0">
             <DialogTitle className="text-xl font-black uppercase tracking-tight flex items-center gap-2">
-              <FlaskConical className="w-5 h-5 text-blue-600" /> Solicitar
-              Exames
+              <FlaskConical className="w-5 h-5 text-blue-600" /> Solicitar Exames
             </DialogTitle>
           </DialogHeader>
-          {patientForExams && (
-            <ExamsModal
-              patient={patientForExams}
-              onClose={() => setIsExamsModalOpen(false)}
-            />
-          )}
+          <div className="flex-1 overflow-hidden min-h-0 pt-2">
+            {patientForExams && (
+              <ExamsModal
+                patient={patientForExams}
+                onClose={() => setIsExamsModalOpen(false)}
+              />
+            )}
+          </div>
         </DialogContent>
       </Dialog>
 
@@ -3100,6 +3255,16 @@ export default function Beds() {
           </div>
         </DialogContent>
       </Dialog>
+      {showBedManagementModal && (
+        <BedManagementModal
+          patient={getBedPatient(beds.find(b => b.id === showBedManagementModal)!)!}
+          bedName={beds.find(b => b.id === showBedManagementModal)?.name || ''}
+          bedRoom={beds.find(b => b.id === showBedManagementModal)?.room || ''}
+          bedSector={beds.find(b => b.id === showBedManagementModal)?.ward || ''}
+          bedStatus={beds.find(b => b.id === showBedManagementModal)?.status || ''}
+          onClose={() => setShowBedManagementModal(null)}
+        />
+      )}
     </motion.div>
   );
 }

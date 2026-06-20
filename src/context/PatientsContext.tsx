@@ -171,6 +171,43 @@ const getPastTime = (minutes: number) =>
 
 const mockPatients: Patient[] = [
   {
+    id: "super-dummy-test",
+    name: "Desconhecido Super Teste",
+    age: 100,
+    cpf: "999.999.999-99",
+    status: "attending",
+    risk: "emergency",
+    arrivalTime: new Date().toISOString(),
+    sector: "Emergência Maternidade CROSS",
+    mainComplaint: "Dor torácica, COVID positivo, suspeita de IAM e AVC",
+    gender: "M",
+    currentMedications: "Antibiótico, Noradrenalina",
+    allergies: "Dipirona",
+    comorbidities: "Imunossuprimido",
+    dischargePrediction: "Hoje cirurgia",
+    isolation: ["contact", "airborne"],
+    exams: [
+      {
+        id: "ex-super",
+        type: "lab",
+        name: "Cirurgia",
+        priority: "urgent",
+        status: "pending_collection",
+        requestedAt: new Date().toISOString(),
+        doctor: "Dr. Teste",
+      }
+    ],
+    evolutions: [
+      {
+        id: "ev-super",
+        type: "Triagem",
+        professional: "Enf. Teste",
+        description: "Paciente com jejum NPO. Uso de Sonda e VNI. Uso de Noradrenalina. Risco de queda, lpp, agitação psiquiatria, risco de fuga. Sob escolta policial, com risco de broncoaspiração, choque séptico (sepse), vulnerabilidade social assistente social.",
+        timestamp: new Date().toISOString(),
+      }
+    ]
+  },
+  {
     id: "baby-1",
     name: "Noah Almeida",
     age: 0,
@@ -229,6 +266,7 @@ const mockPatients: Patient[] = [
     sector: "Emergência 1",
     responsibleProfessional: "Dr. Ricardo Braga",
     mainComplaint: "Dor torácica intensa",
+    gender: "F",
     ticket: "E001",
     priority: "emergency",
     phone1: "(11) 98765-4321",
@@ -282,6 +320,7 @@ const mockPatients: Patient[] = [
     sector: "Consultório Clínico 1",
     responsibleProfessional: "Dr. Marcos Vale",
     mainComplaint: "Dor no peito",
+    gender: "M",
     ticket: "N015",
     priority: "normal",
     phone1: "(11) 99999-8888",
@@ -308,6 +347,7 @@ const mockPatients: Patient[] = [
     arrivalTime: getPastTime(5),
     sector: "Emergência 1",
     mainComplaint: "AVC - sinais neurológicos",
+    gender: "M",
     ticket: "E002",
     priority: "emergency",
     transferRequest: {
@@ -328,6 +368,7 @@ const mockPatients: Patient[] = [
     arrivalTime: getPastTime(25),
     sector: "Emergência 2",
     mainComplaint: "Febre alta e convulsão",
+    gender: "M",
     ticket: "P001",
     priority: "preferential",
   },
@@ -343,6 +384,7 @@ const mockPatients: Patient[] = [
     sector: "Emergência 2",
     responsibleProfessional: "Dra. Claudia Ramos",
     mainComplaint: "Dispneia severa",
+    gender: "M",
     ticket: "P002",
     priority: "preferential",
   },
@@ -357,6 +399,7 @@ const mockPatients: Patient[] = [
     arrivalTime: getPastTime(20),
     sector: "Consultório Clínico 1",
     mainComplaint: "Dor abdominal aguda",
+    gender: "F",
     ticket: "N001",
     priority: "normal",
   },
@@ -370,6 +413,7 @@ const mockPatients: Patient[] = [
     arrivalTime: getPastTime(120),
     sector: "Consultório Clínico 1",
     mainComplaint: "Crise asmática",
+    gender: "F",
     ticket: "N002",
     priority: "normal",
   },
@@ -381,6 +425,7 @@ const mockPatients: Patient[] = [
     status: "waiting",
     risk: "less-urgent",
     arrivalTime: getPastTime(15),
+    gender: "F",
     ticket: "P003",
     priority: "preferential",
     triaged: false,
@@ -396,6 +441,7 @@ const mockPatients: Patient[] = [
     arrivalTime: getPastTime(5),
     sector: "Consultório Clínico 2",
     mainComplaint: "Dor de cabeça leve e coriza",
+    gender: "M",
     ticket: "N020",
     priority: "normal",
     triaged: true,
@@ -411,6 +457,7 @@ const mockPatients: Patient[] = [
     arrivalTime: getPastTime(2),
     sector: "Consultório Clínico 2",
     mainComplaint: "Renovação de receita médica",
+    gender: "F",
     ticket: "N021",
     priority: "normal",
     triaged: true,
@@ -503,6 +550,9 @@ export function PatientsProvider({ children }: { children: ReactNode }) {
             }
             if (mock.exams && (!p.exams || p.exams.length === 0)) {
               merged.exams = mock.exams;
+            }
+            if (mock.gender && !p.gender) {
+              merged.gender = mock.gender;
             }
             return merged;
           }

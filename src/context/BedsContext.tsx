@@ -93,107 +93,78 @@ const MOCK_CLEANERS: Cleaner[] = [
   { id: "3", name: "Ana Clara", avatar: "AC", color: "bg-emerald-500" },
 ];
 
-const generateBeds = () => {
+const generateBeds = (): Bed[] => {
   const occupiedPatientIds = [
-    "1",
-    "2",
-    "3",
-    "4",
-    "5",
-    "6",
-    "7",
-    "8",
-    "9",
-    "10",
-    "11",
-    "12",
-    "13",
-    "14",
+    "super-dummy-test", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14"
+  ];
+  let nextPatientIdx = 0;
+
+  const createBed = (id: string, name: string, ward: string, room: string, defaultStatus: BedStatus = "available"): Bed => {
+    let status = defaultStatus;
+    let patientId: string | undefined = undefined;
+
+    if (status === "occupied" && nextPatientIdx < occupiedPatientIds.length) {
+      patientId = occupiedPatientIds[nextPatientIdx++];
+    }
+
+    return {
+      id,
+      name,
+      status,
+      ward,
+      room,
+      lastUpdated: "Agora",
+      patientId,
+      bedHistory: patientId
+        ? [
+            {
+              patientId,
+              admittedAt: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(),
+            },
+          ]
+        : undefined,
+    };
+  };
+
+  const beds: Bed[] = [
+    // UPA - Emergência
+    createBed("e-1", "Leito 01", "Emergência", "Emergência", "available"),
+    createBed("e-2", "Leito 02", "Emergência", "Emergência", "occupied"),
+    createBed("e-3", "Leito 03", "Emergência", "Emergência", "available"),
+    createBed("e-4", "Leito 04", "Emergência", "Emergência", "occupied"),
+    createBed("e-5", "Leito 05", "Emergência", "Emergência", "cleaning"),
+    createBed("e-6", "Leito 06", "Emergência", "Emergência", "available"),
+    createBed("e-7", "Leito 07", "Emergência", "Emergência", "available"),
+    createBed("e-8", "Maca de Parada", "Emergência", "Emergência", "available"),
+
+    // UPA - Observação Feminina
+    createBed("o-of1", "Leito 01", "Observação", "Observação Feminina", "available"),
+    createBed("o-of2", "Leito 02", "Observação", "Observação Feminina", "occupied"),
+    createBed("o-of3", "Leito 03", "Observação", "Observação Feminina", "available"),
+    createBed("o-of4", "Leito 04", "Observação", "Observação Feminina", "available"),
+    createBed("o-of5", "Leito 05", "Observação", "Observação Feminina", "maintenance"),
+
+    // UPA - Observação Masculina
+    createBed("o-om1", "Leito 01", "Observação", "Observação Masculina", "available"),
+    createBed("o-om2", "Leito 02", "Observação", "Observação Masculina", "occupied"),
+    createBed("o-om3", "Leito 03", "Observação", "Observação Masculina", "available"),
+    createBed("o-om4", "Leito 04", "Observação", "Observação Masculina", "available"),
+
+    // UPA - Pediatria
+    createBed("o-ped1", "Leito 01", "Observação", "Pediatria", "available"),
+    createBed("o-ped2", "Leito 02", "Observação", "Pediatria", "occupied"),
+    createBed("o-ped3", "Leito 03", "Observação", "Pediatria", "available"),
+    createBed("o-ped4", "Leito 04", "Observação", "Pediatria", "cleaning"),
+
+    // UPA - Isolamento
+    createBed("o-iso1", "Isolamento 01", "Observação", "Isolamento", "available"),
+    createBed("o-iso2", "Isolamento 02", "Observação", "Isolamento", "occupied"),
+
+    // UPA - Retaguarda
+    createBed("o-ret1", "Retaguarda 01", "Observação", "Retaguarda", "available"),
   ];
 
-  const emergencyBeds: Bed[] = Array.from({ length: 10 }, (_, i) => {
-    let status: BedStatus = "available";
-    if (i < 4) status = "occupied";
-    else if (i === 4) status = "cleaning";
-    else if (i === 5) status = "maintenance";
-
-    return {
-      id: `e-${i + 1}`,
-      name: `Leito Emergência ${i + 1}`,
-      status,
-      ward: "Emergência",
-      room: `Box ${i + 1}`,
-      lastUpdated: "15min",
-      patientId: status === "occupied" ? occupiedPatientIds[i] : undefined,
-      bedHistory:
-        status === "occupied"
-          ? [
-              {
-                patientId: occupiedPatientIds[i],
-                admittedAt: new Date(
-                  Date.now() - 1000 * 60 * 60 * 2,
-                ).toISOString(),
-              },
-            ]
-          : undefined,
-      ...(status === "cleaning" && {
-        cleaningStatus: "waiting",
-        priority: "urgent",
-        requestedAt: new Date(Date.now() - 1000 * 60 * 18),
-      }),
-      ...(status === "maintenance" && {
-        maintenanceReason: "Grade quebrada",
-        requestedAt: new Date(Date.now() - 1000 * 60 * 120),
-      }),
-    };
-  });
-
-  const observationBeds: Bed[] = Array.from({ length: 17 }, (_, i) => {
-    let status: BedStatus = "available";
-    if (i < 8) status = "occupied";
-    else if (i === 8) status = "cleaning";
-    else if (i === 9) status = "cleaning";
-
-    return {
-      id: `o-${i + 1}`,
-      name: `Leito Observação ${i + 1}`,
-      status,
-      ward: "Observação",
-      room: `Quarto ${Math.floor(i / 4) + 1}`,
-      lastUpdated: "45min",
-      patientId:
-        status === "occupied"
-          ? occupiedPatientIds[(i + 4) % occupiedPatientIds.length]
-          : undefined,
-      bedHistory:
-        status === "occupied"
-          ? [
-              {
-                patientId:
-                  occupiedPatientIds[(i + 4) % occupiedPatientIds.length],
-                admittedAt: new Date(
-                  Date.now() - 1000 * 60 * 60 * 1.5,
-                ).toISOString(),
-              },
-            ]
-          : undefined,
-      ...(i === 8 && {
-        cleaningStatus: "waiting",
-        priority: "high",
-        isIsolation: true,
-        requestedAt: new Date(Date.now() - 1000 * 60 * 5),
-      }),
-      ...(i === 9 && {
-        cleaningStatus: "in_progress",
-        priority: "normal",
-        requestedAt: new Date(Date.now() - 1000 * 60 * 30),
-        startedAt: new Date(Date.now() - 1000 * 60 * 12),
-        assignedCleaner: MOCK_CLEANERS[0],
-      }),
-    };
-  });
-
-  return [...emergencyBeds, ...observationBeds];
+  return beds;
 };
 
 const initialBeds: Bed[] = generateBeds();

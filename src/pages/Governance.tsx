@@ -416,7 +416,7 @@ export default function Governance() {
                         <Button
                           size="sm"
                           onClick={() => setFinishModalTask(task)}
-                          className="text-[9px] font-black uppercase tracking-widest bg-emerald-500 hover:bg-emerald-600 h-7 px-1"
+                          className="text-[8px] font-bold uppercase tracking-widest bg-emerald-500 hover:bg-emerald-600 h-6 px-2"
                         >
                           Concluir
                         </Button>
@@ -830,10 +830,11 @@ export default function Governance() {
               </Button>
               <Button
                 disabled={!ccihConfirmed}
+                size="sm"
                 className={cn(
                   "font-bold transition-all",
                   ccihConfirmed
-                    ? "bg-emerald-500 hover:bg-emerald-600 text-white shadow-lg shadow-emerald-500/20"
+                    ? "text-[8px] font-bold uppercase tracking-widest bg-emerald-500 hover:bg-emerald-600 h-6 px-2"
                     : "bg-muted text-muted-foreground",
                 )}
                 onClick={() =>
