@@ -44,3 +44,8 @@ DRAFT_firestore.rules
 
 Upa_escala/
 Upa_escala2/
+
+# Arquivos de Referência e Backup
+Leitos/
+*.bak
+*.txt
