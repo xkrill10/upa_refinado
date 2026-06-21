@@ -86,6 +86,10 @@ export function BedStatusModal({
         return "text-amber-500 bg-amber-500/10 border-amber-500/20";
       case "maintenance":
         return "text-red-500 bg-red-500/10 border-red-500/20";
+      case "reserved":
+        return "text-blue-500 bg-blue-500/10 border-blue-500/20";
+      case "cleaning":
+        return "text-orange-500 bg-orange-500/10 border-orange-500/20";
       default:
         return "text-slate-500 bg-slate-500/10 border-slate-500/20";
     }
@@ -99,6 +103,10 @@ export function BedStatusModal({
         return "Ocupado";
       case "maintenance":
         return "Bloqueado";
+      case "reserved":
+        return "Reservado";
+      case "cleaning":
+        return "Higienização";
       default:
         return "Desconhecido";
     }
@@ -229,6 +237,32 @@ export function BedStatusModal({
                   >
                     <CheckCircle2 className="h-4 w-4" />
                     Liberar Leito (Limpo)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setNewStatus("reserved")}
+                    className={cn(
+                      "flex items-center justify-center gap-2 p-3 rounded-xl border font-bold text-xs transition-all",
+                      newStatus === "reserved"
+                        ? "bg-blue-500/10 border-blue-500 text-blue-600 dark:text-blue-400 ring-1 ring-blue-500/50"
+                        : "bg-background border-border/60 hover:border-blue-500/30",
+                    )}
+                  >
+                    <ActivitySquare className="h-4 w-4" />
+                    Reservar Leito
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setNewStatus("cleaning")}
+                    className={cn(
+                      "flex items-center justify-center gap-2 p-3 rounded-xl border font-bold text-xs transition-all",
+                      newStatus === "cleaning"
+                        ? "bg-orange-500/10 border-orange-500 text-orange-600 dark:text-orange-400 ring-1 ring-orange-500/50"
+                        : "bg-background border-border/60 hover:border-orange-500/30",
+                    )}
+                  >
+                    <Sparkles className="h-4 w-4" />
+                    Higienização
                   </button>
                 </div>
               </div>

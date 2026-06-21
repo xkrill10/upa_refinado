@@ -36,6 +36,7 @@ import { usePatients } from "@/hooks/use-patients";
 import { useBeds } from "@/context/BedsContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { ActionTooltip } from "@/components/ui/action-tooltip";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -818,48 +819,64 @@ export default function Dashboard() {
           <div className="p-6 space-y-6">
             <div className="h-8 w-full flex rounded-full overflow-hidden shadow-inner border border-border/50">
               {bedStats.occupied > 0 && (
-                <div
-                  style={{ width: `${(bedStats.occupied / totalBeds) * 100}%` }}
-                  className="bg-red-500 flex items-center justify-center text-[10px] font-bold text-white shadow-inner"
-                  title="Ocupados"
-                >
-                  {bedStats.occupied}
-                </div>
+                <ActionTooltip label="Ocupados">
+                  <div
+                    style={{ width: `${(bedStats.occupied / totalBeds) * 100}%` }}
+                    className="bg-red-500 flex items-center justify-center text-[10px] font-bold text-white shadow-inner cursor-help"
+                  >
+                    {bedStats.occupied}
+                  </div>
+                </ActionTooltip>
               )}
               {bedStats.cleaning > 0 && (
-                <div
-                  style={{ width: `${(bedStats.cleaning / totalBeds) * 100}%` }}
-                  className="bg-cyan-500 flex items-center justify-center text-[10px] font-bold text-white shadow-inner"
-                  title="Higienização"
-                >
-                  {bedStats.cleaning}
-                </div>
+                <ActionTooltip label="Higienização">
+                  <div
+                    style={{ width: `${(bedStats.cleaning / totalBeds) * 100}%` }}
+                    className="bg-cyan-500 flex items-center justify-center text-[10px] font-bold text-white shadow-inner cursor-help"
+                  >
+                    {bedStats.cleaning}
+                  </div>
+                </ActionTooltip>
               )}
               {bedStats.maintenance > 0 && (
-                <div
-                  style={{
-                    width: `${(bedStats.maintenance / totalBeds) * 100}%`,
-                  }}
-                  className="bg-orange-500 flex items-center justify-center text-[10px] font-bold text-white shadow-inner"
-                  title="Manutenção"
-                >
-                  {bedStats.maintenance}
-                </div>
+                <ActionTooltip label="Manutenção">
+                  <div
+                    style={{
+                      width: `${(bedStats.maintenance / totalBeds) * 100}%`,
+                    }}
+                    className="bg-orange-500 flex items-center justify-center text-[10px] font-bold text-white shadow-inner cursor-help"
+                  >
+                    {bedStats.maintenance}
+                  </div>
+                </ActionTooltip>
               )}
               {bedStats.available > 0 && (
-                <div
-                  style={{
-                    width: `${(bedStats.available / totalBeds) * 100}%`,
-                  }}
-                  className="bg-emerald-500 flex items-center justify-center text-[10px] font-bold text-white shadow-inner"
-                  title="Livres"
-                >
-                  {bedStats.available}
-                </div>
+                <ActionTooltip label="Livres">
+                  <div
+                    style={{
+                      width: `${(bedStats.available / totalBeds) * 100}%`,
+                    }}
+                    className="bg-emerald-500 flex items-center justify-center text-[10px] font-bold text-white shadow-inner cursor-help"
+                  >
+                    {bedStats.available}
+                  </div>
+                </ActionTooltip>
+              )}
+              {bedStats.reserved > 0 && (
+                <ActionTooltip label="Reservados">
+                  <div
+                    style={{
+                      width: `${(bedStats.reserved / totalBeds) * 100}%`,
+                    }}
+                    className="bg-blue-500 flex items-center justify-center text-[10px] font-bold text-white shadow-inner rounded-r-full cursor-help"
+                  >
+                    {bedStats.reserved}
+                  </div>
+                </ActionTooltip>
               )}
             </div>
 
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
               <Card className="bg-red-500/10 border-red-500/20">
                 <CardContent className="p-4 flex flex-col items-center">
                   <span className="text-3xl font-black text-red-500">
@@ -897,6 +914,16 @@ export default function Dashboard() {
                   </span>
                   <span className="text-xs font-bold uppercase text-emerald-600/70">
                     Livres
+                  </span>
+                </CardContent>
+              </Card>
+              <Card className="bg-blue-500/10 border-blue-500/20">
+                <CardContent className="p-4 flex flex-col items-center">
+                  <span className="text-3xl font-black text-blue-500">
+                    {bedStats.reserved}
+                  </span>
+                  <span className="text-xs font-bold uppercase text-blue-600/70">
+                    Reservados
                   </span>
                 </CardContent>
               </Card>

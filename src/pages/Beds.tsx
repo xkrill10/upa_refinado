@@ -65,6 +65,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { ActionTooltip } from "@/components/ui/action-tooltip";
 import { toast } from "sonner";
 
 import {
@@ -124,7 +125,7 @@ export default function Beds() {
   const [selectedBedId, setSelectedBedId] = useState<string | null>(null);
   const [showBedManagementModal, setShowBedManagementModal] = useState<string | null>(null);
   const [filter, setFilter] = useState<
-    "all" | "occupied" | "available" | "maintenance" | "cleaning"
+    "all" | "occupied" | "available" | "maintenance" | "cleaning" | "reserved"
   >("all");
   const [selectedRisk, setSelectedRisk] = useState<Patient["risk"] | null>(
     null,
@@ -427,10 +428,16 @@ export default function Beds() {
       description: "Leito em reparo técnico.",
     },
     cleaning: {
-      label: "Limpeza",
+      label: "Higienização",
       color: "bg-orange-500/10 text-orange-500 border-orange-500/20",
       icon: Sparkles,
       description: "Aguardando higienização.",
+    },
+    reserved: {
+      label: "Reservado",
+      color: "bg-blue-500/10 text-blue-500 border-blue-500/20",
+      icon: Clock,
+      description: "Leito reservado para um paciente.",
     },
   };
 
@@ -532,6 +539,9 @@ export default function Beds() {
                 {bed.status === "cleaning" && (
                   <div className="absolute top-0 left-0 right-0 h-1 z-10 bg-orange-500 animate-pulse" />
                 )}
+                {bed.status === "reserved" && (
+                  <div className="absolute top-0 left-0 right-0 h-1 z-10 bg-blue-500" />
+                )}
                 <CardHeader className="pb-3 p-4">
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-2">
@@ -544,7 +554,9 @@ export default function Beds() {
                               ? "bg-yellow-500/10 text-yellow-500"
                               : bed.status === "cleaning"
                                 ? "bg-orange-500/10 text-orange-500"
-                                : "bg-emerald-500/10 text-emerald-500",
+                                : bed.status === "reserved"
+                                  ? "bg-blue-500/10 text-blue-500"
+                                  : "bg-emerald-500/10 text-emerald-500",
                         )}
                       >
                         <BedDouble className="h-4 w-4" />
@@ -717,6 +729,13 @@ export default function Beds() {
                       <Sparkles className="h-8 w-8 text-orange-500 animate-pulse" />
                       <p className="text-[10px] font-black uppercase tracking-widest text-center text-orange-500 animate-pulse">
                         Aguardando Higienização
+                      </p>
+                    </div>
+                  ) : bed.status === "reserved" ? (
+                    <div className="py-6 flex flex-col items-center justify-center gap-2 opacity-80">
+                      <Clock className="h-8 w-8 text-blue-500 animate-pulse" />
+                      <p className="text-[10px] font-black uppercase tracking-widest text-center text-blue-500">
+                        Leito Reservado
                       </p>
                     </div>
                   ) : (
@@ -975,7 +994,30 @@ export default function Beds() {
               )}
             />
             <span className="font-bold text-xs">
-              {stats.cleaning || 0} Limpeza
+              {stats.cleaning || 0} Higienização
+            </span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => toggleFilter("reserved")}
+            className={cn(
+              "px-4 py-1.5 rounded-full border flex items-center gap-2 transition-all duration-300",
+              filter === "reserved"
+                ? "bg-blue-500 text-white border-blue-600 shadow-lg scale-105"
+                : "border-blue-500/30 bg-blue-500/5 text-blue-600 hover:bg-blue-500/10",
+            )}
+          >
+            <div
+              className={cn(
+                "h-2 w-2 rounded-full",
+                filter === "reserved"
+                  ? "bg-white animate-pulse"
+                  : "bg-blue-500",
+              )}
+            />
+            <span className="font-bold text-xs">
+              {stats.reserved || 0} Reservados
             </span>
           </button>
 
@@ -1560,20 +1602,18 @@ export default function Beds() {
                                 <p className="text-[13px] font-black text-foreground tracking-tight group-hover:text-[#006699] dark:group-hover:text-sky-400 transition-colors flex items-center gap-1.5">
                                   {formatWords(patient.name)}
                                   {patient.isolation?.includes("contact") && (
-                                    <span
-                                      title="Precaução de Contato"
-                                      className="flex items-center"
-                                    >
-                                      <ShieldAlert className="h-3 w-3 text-orange-500" />
-                                    </span>
+                                    <ActionTooltip label="Precaução de Contato">
+                                      <span className="flex items-center">
+                                        <ShieldAlert className="h-3 w-3 text-orange-500" />
+                                      </span>
+                                    </ActionTooltip>
                                   )}
                                   {patient.isolation?.includes("droplet") && (
-                                    <span
-                                      title="Gotículas"
-                                      className="flex items-center"
-                                    >
-                                      <Droplets className="h-3 w-3 text-blue-500" />
-                                    </span>
+                                    <ActionTooltip label="Gotículas">
+                                      <span className="flex items-center">
+                                        <Droplets className="h-3 w-3 text-blue-500" />
+                                      </span>
+                                    </ActionTooltip>
                                   )}
                                 </p>
                                 <p className="text-[9px] font-bold uppercase tracking-[0.1em] text-muted-foreground">
@@ -1697,48 +1737,52 @@ export default function Beds() {
                                 Prontuário
                               </Button>
                               {!patient.transferRequest && (
+                                <ActionTooltip label="Registrar Transferência">
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    className="h-8 px-2 text-[9px] font-black uppercase tracking-widest rounded-lg bg-white/50 dark:bg-slate-800/50 hover:bg-orange-500 hover:text-white border-orange-500/30 text-orange-600"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      setPatientForTransfer(patient);
+                                      setTransferRequestForm({
+                                        priority: "normal",
+                                        reason: "",
+                                      });
+                                      setShowTransferModal(true);
+                                    }}
+                                  >
+                                    <Ambulance className="h-3 w-3" />
+                                  </Button>
+                                </ActionTooltip>
+                              )}
+                              <ActionTooltip label="Solicitar Insumos">
+                                <Button
+                                  variant="default"
+                                  size="sm"
+                                  className="h-8 w-8 p-0 rounded-lg bg-sky-500 hover:bg-sky-600 text-white"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setPatientForPharmacy(patient);
+                                    setShowPharmacyModal(true);
+                                  }}
+                                >
+                                  <PackagePlus className="h-3.5 w-3.5" />
+                                </Button>
+                              </ActionTooltip>
+                              <ActionTooltip label="Timeline / Auditoria">
                                 <Button
                                   variant="outline"
                                   size="sm"
-                                  className="h-8 px-2 text-[9px] font-black uppercase tracking-widest rounded-lg bg-white/50 dark:bg-slate-800/50 hover:bg-orange-500 hover:text-white border-orange-500/30 text-orange-600"
+                                  className="h-8 w-8 p-0 rounded-lg border-slate-200 dark:border-slate-800 text-slate-500 hover:text-slate-900 dark:hover:text-white"
                                   onClick={(e) => {
                                     e.stopPropagation();
-                                    setPatientForTransfer(patient);
-                                    setTransferRequestForm({
-                                      priority: "normal",
-                                      reason: "",
-                                    });
-                                    setShowTransferModal(true);
+                                    setSelectedBedId(bed.id);
                                   }}
                                 >
-                                  <Ambulance className="h-3 w-3" />
+                                  <History className="h-3.5 w-3.5" />
                                 </Button>
-                              )}
-                              <Button
-                                variant="default"
-                                size="sm"
-                                className="h-8 w-8 p-0 rounded-lg bg-sky-500 hover:bg-sky-600 text-white"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  setPatientForPharmacy(patient);
-                                  setShowPharmacyModal(true);
-                                }}
-                                title="Solicitar Insumos"
-                              >
-                                <PackagePlus className="h-3.5 w-3.5" />
-                              </Button>
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                className="h-8 w-8 p-0 rounded-lg border-slate-200 dark:border-slate-800 text-slate-500 hover:text-slate-900 dark:hover:text-white"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  setSelectedBedId(bed.id);
-                                }}
-                                title="Timeline / Auditoria"
-                              >
-                                <History className="h-3.5 w-3.5" />
-                              </Button>
+                              </ActionTooltip>
                             </div>
                           </TableCell>
                         </TableRow>
@@ -1882,6 +1926,18 @@ export default function Beds() {
                             className="font-bold text-yellow-600 dark:text-yellow-400"
                           >
                             Manutenção
+                          </SelectItem>
+                          <SelectItem
+                            value="cleaning"
+                            className="font-bold text-orange-600 dark:text-orange-400"
+                          >
+                            Higienização
+                          </SelectItem>
+                          <SelectItem
+                            value="reserved"
+                            className="font-bold text-blue-600 dark:text-blue-400"
+                          >
+                            Reservado
                           </SelectItem>
                         </SelectContent>
                       </Select>
@@ -3094,7 +3150,7 @@ export default function Beds() {
       {/* Transfer Request Modal */}
       {showTransferModal && patientForTransfer && (
         <Dialog open={showTransferModal} onOpenChange={setShowTransferModal}>
-          <DialogContent className="max-w-lg glass-card-premium border-border/50 rounded-[2rem] shadow-2xl p-0 overflow-hidden">
+          <DialogContent className="max-w-lg bg-background dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[2rem] shadow-2xl p-0 overflow-hidden">
             <div className="p-6 border-b border-border/50 flex items-center justify-between bg-orange-500/10">
               <div className="flex items-center gap-3">
                 <div className="h-10 w-10 rounded-xl bg-orange-500/20 flex items-center justify-center border border-orange-500/30">
@@ -3113,8 +3169,8 @@ export default function Beds() {
             </div>
 
             <div className="p-6 space-y-5">
-              <div className="p-4 rounded-xl bg-muted/30 border border-border/50 flex items-center gap-3">
-                <div className="h-10 w-10 rounded-xl bg-white/50 dark:bg-slate-900/50 flex items-center justify-center text-orange-500 border border-orange-500/20 shrink-0">
+              <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 flex items-center gap-3">
+                <div className="h-10 w-10 rounded-xl bg-white dark:bg-slate-900 flex items-center justify-center text-orange-500 border border-orange-500/20 shrink-0 shadow-sm">
                   <UserRound className="h-6 w-6" />
                 </div>
                 <div>
@@ -3142,7 +3198,7 @@ export default function Beds() {
                       })
                     }
                     placeholder="Ex: Vaga de UTI, Especialidade, Agravamento..."
-                    className="w-full h-12 bg-background/50 border border-border/50 rounded-xl px-4 text-sm focus:outline-none focus:border-orange-500/50 text-foreground"
+                    className="w-full h-12 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-4 text-sm focus:outline-none focus:border-orange-500/50 text-foreground"
                   />
                 </div>
 
@@ -3150,7 +3206,7 @@ export default function Beds() {
                   <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-1.5 block">
                     Prioridade
                   </label>
-                  <div className="flex bg-background/50 border border-border/50 rounded-xl p-1 h-12">
+                  <div className="flex bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl p-1 h-12">
                     <button
                       onClick={() =>
                         setTransferRequestForm({
@@ -3161,7 +3217,7 @@ export default function Beds() {
                       className={cn(
                         "flex-1 text-[11px] font-black uppercase tracking-wider rounded-lg transition-all",
                         transferRequestForm.priority === "normal"
-                          ? "bg-muted text-foreground shadow"
+                          ? "bg-white dark:bg-slate-800 text-foreground shadow-sm"
                           : "text-muted-foreground hover:text-foreground",
                       )}
                     >
@@ -3204,7 +3260,7 @@ export default function Beds() {
               </div>
             </div>
 
-            <div className="p-6 border-t border-border/50 bg-muted/10 flex justify-end gap-3">
+            <div className="p-6 border-t border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 flex justify-end gap-3">
               <Button
                 variant="ghost"
                 onClick={() => setShowTransferModal(false)}

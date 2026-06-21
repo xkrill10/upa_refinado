@@ -9,6 +9,7 @@ interface RadialGaugeProps {
   available: number;
   cleaning: number;
   maintenance: number;
+  reserved?: number;
   total: number;
   pure?: boolean;
 }
@@ -18,6 +19,7 @@ export function RadialGaugeLeitos({
   available,
   cleaning,
   maintenance,
+  reserved = 0,
   total,
   pure,
 }: RadialGaugeProps) {
@@ -27,6 +29,7 @@ export function RadialGaugeLeitos({
   const occupiedPct = total > 0 ? Math.round((occupied / total) * 100) : 0;
   const availablePct = total > 0 ? Math.round((available / total) * 100) : 0;
   const cleaningPct = total > 0 ? Math.round((cleaning / total) * 100) : 0;
+  const reservedPct = total > 0 ? Math.round((reserved / total) * 100) : 0;
 
   const options: ApexCharts.ApexOptions = {
     chart: {
@@ -34,7 +37,7 @@ export function RadialGaugeLeitos({
       fontFamily: "Inter, sans-serif",
       background: "transparent",
     },
-    colors: ["#ef4444", "#10b981", "#06b6d4"],
+    colors: ["#ef4444", "#10b981", "#06b6d4", "#3b82f6"],
     plotOptions: {
       radialBar: {
         hollow: { size: "30%", background: "transparent" },
@@ -60,7 +63,7 @@ export function RadialGaugeLeitos({
         },
       },
     },
-    labels: ["Ocupados", "Livres", "Limpeza"],
+    labels: ["Ocupados", "Livres", "Higienização", "Reservados"],
     stroke: { lineCap: "round" },
     theme: { mode: isDark ? "dark" : "light" },
     legend: {
@@ -71,7 +74,7 @@ export function RadialGaugeLeitos({
     },
   };
 
-  const series = [occupiedPct, availablePct, cleaningPct];
+  const series = [occupiedPct, availablePct, cleaningPct, reservedPct];
 
   const chartContent = (
     <div className="w-full h-[260px] flex items-center justify-center">

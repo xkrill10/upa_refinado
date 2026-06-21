@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, ReactNode } from "react";
 
-export type BedStatus = "available" | "occupied" | "maintenance" | "cleaning";
+export type BedStatus = "available" | "occupied" | "maintenance" | "cleaning" | "reserved";
 export type CleaningStatus = "waiting" | "in_progress";
 export type PriorityLevel = "normal" | "high" | "urgent";
 
@@ -72,6 +72,7 @@ interface BedsContextType {
     occupied: number;
     maintenance: number;
     cleaning: number;
+    reserved: number;
   };
 
   // Governance functions
@@ -311,7 +312,7 @@ export function BedsProvider({ children }: { children: ReactNode }) {
         acc[bed.status]++;
         return acc;
       },
-      { available: 0, occupied: 0, maintenance: 0, cleaning: 0 },
+      { available: 0, occupied: 0, maintenance: 0, cleaning: 0, reserved: 0 },
     );
   };
 
