@@ -1892,7 +1892,7 @@ export default function Beds() {
 
                   <TabsContent
                     value="status"
-                    className="space-y-4 outline-none"
+                    className="space-y-4 outline-none overflow-y-auto h-[180px] pr-2 custom-scrollbar"
                   >
                     <div className="p-5 rounded-2xl bg-white/40 dark:bg-slate-900/40 border border-white/50 dark:border-white/5 shadow-[inset_0_1px_2px_rgba(255,255,255,0.4)] backdrop-blur-sm">
                       <h4 className="text-xs font-black uppercase tracking-[0.15em] text-[#006699] dark:text-sky-400 mb-4 flex items-center gap-2">
@@ -1947,8 +1947,8 @@ export default function Beds() {
                     </div>
                   </TabsContent>
 
-                  <TabsContent value="care" className="space-y-4 outline-none">
-                    <div className="space-y-3">
+                  <TabsContent value="care" className="space-y-4 outline-none overflow-y-auto h-[180px] pr-2 custom-scrollbar">
+                    <div className="space-y-3 pb-2">
                       {[
                         {
                           label: "Ronda Médica Realizada",
@@ -1969,6 +1969,31 @@ export default function Beds() {
                           label: "Mudança de Decúbito",
                           icon: BedDouble,
                           color: "text-orange-500",
+                        },
+                        {
+                          label: "Troca de Curativo",
+                          icon: ShieldAlert,
+                          color: "text-red-500",
+                        },
+                        {
+                          label: "Controle de Diurese",
+                          icon: Droplets,
+                          color: "text-sky-400",
+                        },
+                        {
+                          label: "Higiene Oral",
+                          icon: Activity,
+                          color: "text-teal-500",
+                        },
+                        {
+                          label: "Administração de Medicação",
+                          icon: PackagePlus,
+                          color: "text-indigo-500",
+                        },
+                        {
+                          label: "Verificação de Sinais Vitais",
+                          icon: HeartPulse,
+                          color: "text-rose-500",
                         },
                       ].map((care, i) => (
                         <div
@@ -1998,7 +2023,7 @@ export default function Beds() {
                     </div>
                   </TabsContent>
 
-                  <TabsContent value="meds" className="space-y-4 outline-none">
+                  <TabsContent value="meds" className="space-y-4 outline-none overflow-y-auto h-[180px] pr-2 custom-scrollbar">
                     <div className="space-y-3">
                       <div className="p-3 rounded-xl bg-blue-500/5 dark:bg-blue-500/10 border border-blue-500/15 dark:border-blue-500/30">
                         <div className="flex justify-between items-center mb-2">
@@ -2038,7 +2063,7 @@ export default function Beds() {
 
                   <TabsContent
                     value="audit"
-                    className="space-y-4 outline-none overflow-y-auto max-h-[300px] pr-2"
+                    className="space-y-4 outline-none overflow-y-auto h-[180px] pr-2 custom-scrollbar"
                   >
                     <div className="space-y-3 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-slate-200 dark:before:via-slate-800 before:to-transparent">
                       {!selectedBed.bedHistory ||
