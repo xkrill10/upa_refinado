@@ -497,7 +497,7 @@ export default function Queue() {
             <Table>
               <TableHeader className="bg-slate-50/50 dark:bg-slate-950/20 border-b border-slate-200/40 dark:border-slate-800/40">
                 <TableRow className="hover:bg-transparent border-none">
-                  <TableHead className="text-[#006699] dark:text-sky-400 h-14 text-[10px] font-black uppercase tracking-widest pl-6">
+                  <TableHead className="text-[#006699] dark:text-sky-400 h-14 text-[10px] font-black uppercase tracking-widest text-center">
                     Paciente
                   </TableHead>
                   <TableHead className="text-[#006699] dark:text-sky-400 h-14 text-[10px] font-black uppercase tracking-widest text-center">
@@ -509,19 +509,19 @@ export default function Queue() {
                   <TableHead className="text-[#006699] dark:text-sky-400 h-14 text-[10px] font-black uppercase tracking-widest text-center">
                     Classificação
                   </TableHead>
-                  <TableHead className="text-[#006699] dark:text-sky-400 h-14 text-[10px] font-black uppercase tracking-widest">
+                  <TableHead className="text-[#006699] dark:text-sky-400 h-14 text-[10px] font-black uppercase tracking-widest text-center">
                     Queixa
                   </TableHead>
-                  <TableHead className="text-[#006699] dark:text-sky-400 h-14 text-[10px] font-black uppercase tracking-widest">
+                  <TableHead className="text-[#006699] dark:text-sky-400 h-14 text-[10px] font-black uppercase tracking-widest text-center">
                     Setor
                   </TableHead>
-                  <TableHead className="text-[#006699] dark:text-sky-400 h-14 text-[10px] font-black uppercase tracking-widest">
+                  <TableHead className="text-[#006699] dark:text-sky-400 h-14 text-[10px] font-black uppercase tracking-widest text-center">
                     Chegada
                   </TableHead>
                   <TableHead className="text-[#006699] dark:text-sky-400 h-14 text-[10px] font-black uppercase tracking-widest text-center">
                     Status
                   </TableHead>
-                  <TableHead className="text-[#006699] dark:text-sky-400 h-14 text-[10px] font-black uppercase tracking-widest text-right pr-6 min-w-[280px]">
+                  <TableHead className="text-[#006699] dark:text-sky-400 h-14 text-[10px] font-black uppercase tracking-widest text-center min-w-[280px]">
                     Ação
                   </TableHead>
                 </TableRow>
