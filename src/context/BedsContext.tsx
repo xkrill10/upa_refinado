@@ -96,7 +96,7 @@ const MOCK_CLEANERS: Cleaner[] = [
 
 const generateBeds = (): Bed[] => {
   const occupiedPatientIds = [
-    "super-dummy-test", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14"
+    "super-dummy-test", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14"
   ];
   let nextPatientIdx = 0;
 

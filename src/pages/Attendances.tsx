@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { usePatients, Patient } from "@/hooks/use-patients";
+import { ActionTooltip } from "@/components/ui/action-tooltip";
 import {
   Card,
   CardContent,
@@ -559,39 +560,42 @@ export default function Attendances() {
                           </div>
                         </div>
                         <div className="flex items-center gap-1">
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            className="h-9 w-9 rounded-xl p-0 text-slate-500 hover:text-sky-500 hover:bg-sky-50 dark:hover:bg-sky-950/20 cursor-pointer border-0"
-                            onClick={() => setTimelinePatient(patient)}
-                            title="Ver Jornada do Paciente"
-                          >
-                            <Activity className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            className="h-9 w-9 rounded-xl p-0 text-slate-500 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 cursor-pointer border-0"
-                            onClick={() =>
-                              setEvasaoPatient({
-                                id: patient.id,
-                                name: patient.name,
-                              })
-                            }
-                            title="Registrar Evasão"
-                          >
-                            <LogOut className="h-4 w-4" />
-                          </Button>
+                          <ActionTooltip label="Ver Jornada do Paciente" side="top" align="end">
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              className="h-9 w-9 rounded-xl p-0 text-slate-500 hover:text-sky-500 hover:bg-sky-50 dark:hover:bg-sky-950/20 cursor-pointer border-0"
+                              onClick={() => setTimelinePatient(patient)}
+                            >
+                              <Activity className="h-4 w-4" />
+                            </Button>
+                          </ActionTooltip>
+                          <ActionTooltip label="Registrar Evasão" side="top" align="end">
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              className="h-9 w-9 rounded-xl p-0 text-slate-500 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 cursor-pointer border-0"
+                              onClick={() =>
+                                setEvasaoPatient({
+                                  id: patient.id,
+                                  name: patient.name,
+                                })
+                              }
+                            >
+                              <LogOut className="h-4 w-4" />
+                            </Button>
+                          </ActionTooltip>
 
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            className="h-9 w-9 rounded-xl p-0 text-slate-500 hover:text-[#006699] dark:hover:text-sky-400 hover:bg-slate-50 dark:hover:bg-slate-900 border-0 cursor-pointer"
-                            onClick={() => setRecordPatientId(patient.id)}
-                            title="Ver Prontuário"
-                          >
-                            <ExternalLink className="h-4 w-4" />
-                          </Button>
+                          <ActionTooltip label="Ver Prontuário" side="top" align="end">
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              className="h-9 w-9 rounded-xl p-0 text-slate-500 hover:text-[#006699] dark:hover:text-sky-400 hover:bg-slate-50 dark:hover:bg-slate-900 border-0 cursor-pointer"
+                              onClick={() => setRecordPatientId(patient.id)}
+                            >
+                              <ExternalLink className="h-4 w-4" />
+                            </Button>
+                          </ActionTooltip>
                         </div>
                       </div>
                     );

@@ -1,4 +1,5 @@
 import { usePatients, Patient } from "@/hooks/use-patients";
+import { ActionTooltip } from "@/components/ui/action-tooltip";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Search,
@@ -660,121 +661,128 @@ export default function Queue() {
                       </TableCell>
                       <TableCell className="text-right pr-6">
                         <div className="flex items-center justify-end gap-1">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="h-9 rounded-xl px-3 gap-2 text-primary dark:text-sky-400 hover:bg-primary/5 dark:hover:bg-sky-400/5 font-black uppercase text-[10px] tracking-wider cursor-pointer border-0"
-                            onClick={() => {
-                              if (patient.ticket) {
-                                setCallingTicket({
-                                  ticket: patient.ticket,
-                                  patientName: patient.name,
-                                  risk: patient.risk || "not-urgent",
-                                  priority: patient.priority || "normal",
-                                  room: patient.sector || "TRIAGEM",
-                                  age: patient.age,
-                                  cpf: patient.cpf,
-                                });
-                                setShowCallControl(true);
-                                callPatient(patient);
-                              } else {
-                                toast.error("Paciente sem senha registrada.");
+                          <ActionTooltip label="Chamar Senha" side="top" align="end">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-9 rounded-xl px-3 gap-2 text-primary dark:text-sky-400 hover:bg-primary/5 dark:hover:bg-sky-400/5 font-black uppercase text-[10px] tracking-wider cursor-pointer border-0"
+                              onClick={() => {
+                                if (patient.ticket) {
+                                  setCallingTicket({
+                                    ticket: patient.ticket,
+                                    patientName: patient.name,
+                                    risk: patient.risk || "not-urgent",
+                                    priority: patient.priority || "normal",
+                                    room: patient.sector || "TRIAGEM",
+                                    age: patient.age,
+                                    cpf: patient.cpf,
+                                  });
+                                  setShowCallControl(true);
+                                  callPatient(patient);
+                                } else {
+                                  toast.error("Paciente sem senha registrada.");
+                                }
+                              }}
+                            >
+                              <Volume2 className="h-3.5 w-3.5" />
+                              Chamar Senha
+                            </Button>
+                          </ActionTooltip>
+                          <ActionTooltip label="Ver Detalhes" side="top" align="end">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8 text-slate-500 hover:text-[#006699] dark:hover:text-sky-400 hover:bg-[#006699]/5 dark:hover:bg-sky-400/5 cursor-pointer"
+                              onClick={() => {
+                                setPatientForModal(patient);
+                                setIsDetailsModalOpen(true);
+                              }}
+                            >
+                              <Eye className="h-4 w-4" />
+                            </Button>
+                          </ActionTooltip>
+                          <ActionTooltip label="Ver Prontuário" side="top" align="end">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8 text-slate-500 hover:text-[#006699] dark:hover:text-sky-400 hover:bg-[#006699]/5 dark:hover:bg-sky-400/5 cursor-pointer"
+                              onClick={() =>
+                                navigate(`/paciente/${patient.id}`, {
+                                  state: {
+                                    from: "/fila",
+                                    label: "Fila de Atendimento",
+                                  },
+                                })
                               }
-                            }}
-                            title="Chamar Senha"
-                          >
-                            <Volume2 className="h-3.5 w-3.5" />
-                            Chamar Senha
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-8 w-8 text-slate-500 hover:text-[#006699] dark:hover:text-sky-400 hover:bg-[#006699]/5 dark:hover:bg-sky-400/5 cursor-pointer"
-                            onClick={() => {
-                              setPatientForModal(patient);
-                              setIsDetailsModalOpen(true);
-                            }}
-                            title="Ver Detalhes"
-                          >
-                            <Eye className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-8 w-8 text-slate-500 hover:text-[#006699] dark:hover:text-sky-400 hover:bg-[#006699]/5 dark:hover:bg-sky-400/5 cursor-pointer"
-                            onClick={() =>
-                              navigate(`/paciente/${patient.id}`, {
-                                state: {
-                                  from: "/fila",
-                                  label: "Fila de Atendimento",
-                                },
-                              })
-                            }
-                            title="Ver Prontuário"
-                          >
-                            <User className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-8 w-8 text-slate-500 hover:text-orange-500 hover:bg-orange-50 dark:hover:bg-orange-950/20 cursor-pointer"
-                            onClick={() => {
-                              updatePatient(patient.id, {
-                                triaged: false,
-                                risk: undefined,
-                                sector: undefined,
-                                status: "waiting",
-                              });
-                              navigate(`/triagem`);
-                              toast.info(
-                                `Paciente ${patient.name} enviado para reclassificação.`,
-                              );
-                            }}
-                            title="Reclassificar"
-                          >
-                            <Activity className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-8 w-8 text-slate-500 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-950/20 cursor-pointer"
-                            onClick={() => {
-                              setTransferPatient({
-                                id: patient.id,
-                                name: patient.name,
-                                sector: patient.sector || "",
-                              });
-                              setNewSector(
-                                patient.sector || "Consultório Clínico 1",
-                              );
-                            }}
-                            title="Trocar Setor / Encaminhar"
-                          >
-                            <ArrowRightLeft className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-8 w-8 text-slate-500 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
-                            onClick={() => {
-                              toast.success(
-                                `Encaminhando para impressão: ${patient.ticket}...`,
-                              );
-                              setPrintingPatient(patient);
-                            }}
-                            title="Reimprimir Senha"
-                          >
-                            <Printer className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-8 w-8 text-slate-500 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 cursor-pointer"
-                            onClick={() => setEvasaoPatient(patient)}
-                            title="Registrar Evasão"
-                          >
-                            <LogOut className="h-4 w-4" />
-                          </Button>
+                            >
+                              <User className="h-4 w-4" />
+                            </Button>
+                          </ActionTooltip>
+                          <ActionTooltip label="Reclassificar" side="top" align="end">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8 text-slate-500 hover:text-orange-500 hover:bg-orange-50 dark:hover:bg-orange-950/20 cursor-pointer"
+                              onClick={() => {
+                                updatePatient(patient.id, {
+                                  triaged: false,
+                                  risk: undefined,
+                                  sector: undefined,
+                                  status: "waiting",
+                                });
+                                navigate(`/triagem`);
+                                toast.info(
+                                  `Paciente ${patient.name} enviado para reclassificação.`,
+                                );
+                              }}
+                            >
+                              <Activity className="h-4 w-4" />
+                            </Button>
+                          </ActionTooltip>
+                          <ActionTooltip label="Trocar Setor / Encaminhar" side="top" align="end">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8 text-slate-500 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-950/20 cursor-pointer"
+                              onClick={() => {
+                                setTransferPatient({
+                                  id: patient.id,
+                                  name: patient.name,
+                                  sector: patient.sector || "",
+                                });
+                                setNewSector(
+                                  patient.sector || "Consultório Clínico 1",
+                                );
+                              }}
+                            >
+                              <ArrowRightLeft className="h-4 w-4" />
+                            </Button>
+                          </ActionTooltip>
+                          <ActionTooltip label="Reimprimir Senha" side="top" align="end">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8 text-slate-500 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
+                              onClick={() => {
+                                toast.success(
+                                  `Encaminhando para impressão: ${patient.ticket}...`,
+                                );
+                                setPrintingPatient(patient);
+                              }}
+                            >
+                              <Printer className="h-4 w-4" />
+                            </Button>
+                          </ActionTooltip>
+                          <ActionTooltip label="Registrar Evasão" side="top" align="end">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8 text-slate-500 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 cursor-pointer"
+                              onClick={() => setEvasaoPatient(patient)}
+                            >
+                              <LogOut className="h-4 w-4" />
+                            </Button>
+                          </ActionTooltip>
                         </div>
                       </TableCell>
                     </TableRow>

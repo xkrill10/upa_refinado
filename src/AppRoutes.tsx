@@ -57,6 +57,7 @@ const Governance = React.lazy(() => import("./pages/Governance"));
 const Login = React.lazy(() => import("./pages/Login"));
 const NirDashboard = React.lazy(() => import("./pages/NirDashboard"));
 const CleaningDashboard = React.lazy(() => import("./pages/CleaningDashboard"));
+const InpatientList = React.lazy(() => import("./pages/InpatientList"));
 
 export const AppRoutes = () => {
   return (
@@ -117,6 +118,7 @@ export const AppRoutes = () => {
 
       <Route path="/nir" element={<NirDashboard />} />
       <Route path="/higiene" element={<CleaningDashboard />} />
+      <Route path="/lista-internacao" element={<InpatientList />} />
 
       <Route path="*" element={<NotFound />} />
     </Routes>

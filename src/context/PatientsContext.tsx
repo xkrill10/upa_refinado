@@ -275,6 +275,12 @@ const mockPatients: Patient[] = [
     allergies: "Dipirona",
     city: "São Paulo",
     state: "SP",
+    admissionRequest: {
+      status: "pending",
+      bedType: "emergency",
+      requestedAt: getPastTime(65),
+      doctor: "Dr. Ricardo Braga",
+    },
     evolutions: [
       {
         id: "ev-1",
@@ -553,6 +559,9 @@ export function PatientsProvider({ children }: { children: ReactNode }) {
             }
             if (mock.gender && !p.gender) {
               merged.gender = mock.gender;
+            }
+            if (mock.admissionRequest && !p.admissionRequest) {
+              merged.admissionRequest = mock.admissionRequest;
             }
             return merged;
           }

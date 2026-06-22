@@ -68,6 +68,8 @@ import {
 import { ActionTooltip } from "@/components/ui/action-tooltip";
 import { toast } from "sonner";
 
+import { useRole } from "@/context/RoleContext";
+
 import {
   Table,
   TableBody,
@@ -122,6 +124,7 @@ const getBedGenderIcon = (room?: string) => {
 };
 
 export default function Beds() {
+  const { role } = useRole();
   const [selectedBedId, setSelectedBedId] = useState<string | null>(null);
   const [showBedManagementModal, setShowBedManagementModal] = useState<string | null>(null);
   const [filter, setFilter] = useState<
@@ -308,28 +311,6 @@ export default function Beds() {
   );
   const stats = getStats();
   const navigate = useNavigate();
-
-  // Automação: Popup para a Enfermagem / NIR quando entra um novo pedido
-  const [prevQueueLength, setPrevQueueLength] = useState(admissionQueue.length);
-
-  useEffect(() => {
-    if (admissionQueue.length > prevQueueLength) {
-      // Identifica quem é o paciente mais recente na fila (podemos pegar o primeiro da fila)
-      const newPatient = admissionQueue[0];
-      const bedTypeStr =
-        newPatient?.admissionRequest?.bedType === "emergency"
-          ? "EMERGÊNCIA"
-          : "OBSERVAÇÃO";
-
-      toast.error("🚨 URGENTE: NOVO PEDIDO DE LEITO!", {
-        description: `O médico solicitou vaga de ${bedTypeStr} para o paciente ${newPatient?.name || "na fila"}. Por favor, aloque um leito imediatamente.`,
-        duration: 10000, // Fica 10 segundos na tela
-        className:
-          "bg-red-600 text-white font-black border-2 border-red-800 shadow-[0_0_40px_rgba(220,38,38,0.6)] text-lg",
-      });
-    }
-    setPrevQueueLength(admissionQueue.length);
-  }, [admissionQueue, admissionQueue.length, prevQueueLength]);
 
   const handleTabChange = (value: string) => {
     setActiveTab(value);
@@ -767,7 +748,7 @@ export default function Beds() {
                         <FileText className="h-3.5 w-3.5 mr-1" /> Ficha
                       </Button>
                     )}
-                    {bed.status === "available" && (
+                    {bed.status === "available" && role !== "medico" && (
                       <Button
                         variant="secondary"
                         className="flex-1 px-1 text-[9px] font-black uppercase tracking-widest h-10 rounded-xl bg-white/40 dark:bg-slate-800/40 hover:bg-emerald-500 hover:text-white dark:hover:bg-emerald-500 transition-all border border-white/50 dark:border-white/10 backdrop-blur-md shadow-sm"
@@ -776,7 +757,7 @@ export default function Beds() {
                         <Sparkles className="h-3.5 w-3.5 mr-1" /> Solicitar Limpeza
                       </Button>
                     )}
-                    {bed.status === "cleaning" && (
+                    {bed.status === "cleaning" && role !== "medico" && (
                       <Button
                         variant="secondary"
                         className="flex-1 px-1 text-[9px] font-black uppercase tracking-widest h-10 rounded-xl bg-orange-500/20 text-orange-500 hover:bg-orange-500 hover:text-white transition-all border border-orange-500/30 backdrop-blur-md shadow-sm"
@@ -1899,48 +1880,57 @@ export default function Beds() {
                         <Info className="h-4 w-4" />
                         Ocupação do Leito
                       </h4>
-                      <Select
-                        value={selectedBed.status}
-                        onValueChange={(value) =>
-                          handleStatusChange(value as BedStatus)
-                        }
-                      >
-                        <SelectTrigger className="w-full h-12 rounded-xl bg-white/60 dark:bg-slate-800/60 border border-white/60 dark:border-white/10 shadow-sm font-bold text-foreground backdrop-blur-md hover:bg-white/80 dark:hover:bg-slate-800/80 transition-colors">
-                          <SelectValue placeholder="Selecione o status" />
-                        </SelectTrigger>
-                        <SelectContent className="rounded-xl border border-white/40 dark:border-white/10 shadow-2xl bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl">
-                          <SelectItem
-                            value="available"
-                            className="font-bold text-emerald-600 dark:text-emerald-400"
-                          >
-                            Disponível
-                          </SelectItem>
-                          <SelectItem
-                            value="occupied"
-                            className="font-bold text-red-600 dark:text-red-400"
-                          >
-                            Ocupado
-                          </SelectItem>
-                          <SelectItem
-                            value="maintenance"
-                            className="font-bold text-yellow-600 dark:text-yellow-400"
-                          >
-                            Manutenção
-                          </SelectItem>
-                          <SelectItem
-                            value="cleaning"
-                            className="font-bold text-orange-600 dark:text-orange-400"
-                          >
-                            Higienização
-                          </SelectItem>
-                          <SelectItem
-                            value="reserved"
-                            className="font-bold text-blue-600 dark:text-blue-400"
-                          >
-                            Reservado
-                          </SelectItem>
-                        </SelectContent>
-                      </Select>
+                      {role === "medico" ? (
+                        <div className="w-full h-12 flex items-center justify-between px-4 rounded-xl bg-white/60 dark:bg-slate-800/60 border border-white/60 dark:border-white/10 shadow-sm font-bold text-foreground backdrop-blur-md">
+                          <span>Status do Leito</span>
+                          <Badge className={cn("text-[10px] font-bold px-2.5 py-0.5 border-0", statusConfig[selectedBed.status].color)}>
+                            {statusConfig[selectedBed.status].label}
+                          </Badge>
+                        </div>
+                      ) : (
+                        <Select
+                          value={selectedBed.status}
+                          onValueChange={(value) =>
+                            handleStatusChange(value as BedStatus)
+                          }
+                        >
+                          <SelectTrigger className="w-full h-12 rounded-xl bg-white/60 dark:bg-slate-800/60 border border-white/60 dark:border-white/10 shadow-sm font-bold text-foreground backdrop-blur-md hover:bg-white/80 dark:hover:bg-slate-800/80 transition-colors">
+                            <SelectValue placeholder="Selecione o status" />
+                          </SelectTrigger>
+                          <SelectContent className="rounded-xl border border-white/40 dark:border-white/10 shadow-2xl bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl">
+                            <SelectItem
+                              value="available"
+                              className="font-bold text-emerald-600 dark:text-emerald-400"
+                            >
+                              Disponível
+                            </SelectItem>
+                            <SelectItem
+                              value="occupied"
+                              className="font-bold text-red-600 dark:text-red-400"
+                            >
+                              Ocupado
+                            </SelectItem>
+                            <SelectItem
+                              value="maintenance"
+                              className="font-bold text-yellow-600 dark:text-yellow-400"
+                            >
+                              Manutenção
+                            </SelectItem>
+                            <SelectItem
+                              value="cleaning"
+                              className="font-bold text-orange-600 dark:text-orange-400"
+                            >
+                              Higienização
+                            </SelectItem>
+                            <SelectItem
+                              value="reserved"
+                              className="font-bold text-blue-600 dark:text-blue-400"
+                            >
+                              Reservado
+                            </SelectItem>
+                          </SelectContent>
+                        </Select>
+                      )}
                       <p className="mt-4 text-[12px] font-medium text-slate-600 dark:text-slate-400 leading-relaxed italic">
                         {statusConfig[selectedBed.status].description}
                       </p>

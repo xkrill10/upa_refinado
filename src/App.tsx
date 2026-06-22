@@ -46,8 +46,7 @@ const AppContent = () => {
     !isFullscreen &&
     !isCallPanel &&
     !isLogin &&
-    !isCleaning &&
-    role !== "medico";
+    !isCleaning;
 
   return (
     <SidebarProvider defaultOpen={true}>

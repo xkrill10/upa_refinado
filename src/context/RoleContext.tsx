@@ -25,7 +25,7 @@ export const RoleProvider: React.FC<{ children: React.ReactNode }> = ({
     if (newRole === "medico") {
       window.location.href = "/painel-medico";
     } else if (newRole === "enfermeiro") {
-      window.location.href = "/triagem";
+      window.location.href = "/painel-enfermagem";
     } else {
       window.location.href = "/";
     }

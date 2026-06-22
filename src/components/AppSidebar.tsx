@@ -35,6 +35,7 @@ import { NavLink } from "@/components/NavLink";
 import { useRole } from "@/context/RoleContext";
 import { usePatients } from "@/hooks/use-patients";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { useLocation } from "react-router-dom";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
@@ -61,7 +62,12 @@ export function AppSidebar() {
   const collapsed = state === "collapsed";
   const location = useLocation();
   const isActive = (path: string) => location.pathname === path;
-  const [openMenus, setOpenMenus] = useState<Record<string, boolean>>({});
+  const [openMenus, setOpenMenus] = useState<Record<string, boolean>>({
+    "Evoluções": role === "enfermeiro" || role === "medico",
+  });
+
+  const admissionQueue = patients.filter((p) => p.admissionRequest?.status === "pending");
+  const hasPendingAdmissions = admissionQueue.length > 0;
 
   const toggleSubMenu = (title: string, e: React.MouseEvent) => {
     e.preventDefault();
@@ -148,6 +154,7 @@ export function AppSidebar() {
         },
         { title: "Pediátrico", url: "/atendimentos-pediatricos", icon: Baby },
         { title: "Laboratório", url: "/laboratorio", icon: FlaskConical },
+        { title: "Listino Internação", url: "/lista-internacao", icon: BedDouble },
         { title: "Leitos", url: "/leitos", icon: BedDouble },
         { title: "Checagem Leito", url: "/checagem-enfermagem", icon: Syringe },
         { title: "Regulação (NIR)", url: "/nir", icon: Ambulance },
@@ -220,18 +227,57 @@ export function AppSidebar() {
   if (role === "enfermeiro") {
     menuGroups = [
       {
-        label: "Operacional",
-        items: menuGroupsRaw[0].items.filter((item) =>
-          ["Triagem"].includes(item.title),
-        ),
+        label: "Atendimento Clínico",
+        items: menuGroupsRaw[1].items
+          .map((item) => {
+            if (item.title === "Evoluções") {
+              return {
+                ...item,
+                subItems: item.subItems?.filter(
+                  (sub) => sub.title === "Enfermagem",
+                ),
+              };
+            }
+            return item;
+          })
+          .filter((item) =>
+            [
+              "Painel Enfermagem",
+              "Evoluções",
+              "Listino Internação",
+              "Leitos",
+              "Checagem Leito",
+            ].includes(item.title),
+          ),
       },
+    ];
+  } else if (role === "medico") {
+    menuGroups = [
       {
         label: "Atendimento Clínico",
-        items: menuGroupsRaw[1].items.filter((item) =>
-          ["Painel Enfermagem", "Evoluções", "Checagem Leito"].includes(
-            item.title,
+        items: menuGroupsRaw[1].items
+          .map((item) => {
+            if (item.title === "Evoluções") {
+              return {
+                ...item,
+                subItems: item.subItems?.filter(
+                  (sub) => sub.title === "Médica",
+                ),
+              };
+            }
+            return item;
+          })
+          .filter((item) =>
+            [
+              "Painel Médico",
+              "Fila de Atendimento",
+              "Listino Internação",
+              "Leitos",
+              "Evoluções",
+              "Laboratório",
+              "Regulação (NIR)",
+            ].includes(item.title),
           ),
-        ),
       },
     ];
   }
@@ -395,6 +441,16 @@ export function AppSidebar() {
                               >
                                 {item.title}
                               </span>
+                            )}
+                            
+                            {/* ADMISSION QUEUE BADGE */}
+                            {item.url === "/lista-internacao" && hasPendingAdmissions && (
+                              <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center justify-center">
+                                <span className="absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-75 animate-ping" />
+                                <Badge className="relative h-5 min-w-[20px] px-1.5 flex items-center justify-center rounded-full bg-red-500 text-white border-0 text-[10px] font-black pointer-events-none">
+                                  {admissionQueue.length}
+                                </Badge>
+                              </div>
                             )}
                           </div>
                         </NavLink>
