@@ -363,8 +363,22 @@
 
 @media print {
   /* Base Print Isolation */
-  body > *:not(.print-only):not(#print-area-container):not(:has(#print-area-container)) {
+  body > *:not(.print-only):not(#print-area-container):not(:has(#print-area-container)):not(:has(.print-only)) {
     display: none !important;
+  }
+
+  /* Thermal ticket isolation */
+  body:has(.print-only) *:not(:has(.print-only)):not(.print-only):not(.print-only *) {
+    display: none !important;
+  }
+  
+  /* Un-clip print ticket so it can render fully without being cropped */
+  body:has(.print-only) *:has(.print-only) {
+    overflow: visible !important;
+    transform: none !important;
+    position: static !important;
+    height: auto !important;
+    max-height: none !important;
   }
 
   /* ========================================= */

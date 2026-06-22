@@ -21,7 +21,7 @@ import {
 import { motion, AnimatePresence } from "motion/react";
 import { toast } from "sonner";
 import { usePatients } from "@/hooks/use-patients";
-import { cn } from "@/lib/utils";
+import { cn, validateCPF } from "@/lib/utils";
 
 type Priority = "normal" | "preferential" | "pediatric" | "emergency";
 
@@ -167,8 +167,7 @@ export default function Arrival() {
       return;
     }
 
-    const digits = cpf.replace(/\D/g, "");
-    if (digits.length !== 11) return toast.error("CPF inválido");
+    if (!validateCPF(cpf)) return toast.error("CPF inválido");
     if (!birthDate) return toast.error("Informe a data de nascimento");
     if (!motherName.trim()) return toast.error("Informe o nome da mãe");
 

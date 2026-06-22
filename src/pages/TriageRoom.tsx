@@ -2351,6 +2351,7 @@ export default function TriageRoom() {
                                           </DropdownMenuTrigger>
                                           <DropdownMenuContent
                                             align="end"
+                                            side="top"
                                             className="w-[420px] p-2 rounded-2xl bg-white/95 backdrop-blur-xl border-border/50 shadow-2xl"
                                           >
                                             <div className="px-3 py-2.5 border-b border-border/50 mb-2">
@@ -2556,6 +2557,7 @@ export default function TriageRoom() {
                                               </DropdownMenuTrigger>
                                               <DropdownMenuContent
                                                 align="end"
+                                                side="top"
                                                 className="w-[200px] p-2 rounded-xl bg-white shadow-xl border-border/50"
                                               >
                                                 {[
@@ -2675,6 +2677,7 @@ export default function TriageRoom() {
                                             </DropdownMenuTrigger>
                                             <DropdownMenuContent
                                               align="end"
+                                              side="top"
                                               className="w-[300px] p-2 rounded-2xl bg-white shadow-2xl border-border/50"
                                             >
                                               <div className="grid grid-cols-2 gap-1">
@@ -2789,6 +2792,7 @@ export default function TriageRoom() {
                                             </DropdownMenuTrigger>
                                             <DropdownMenuContent
                                               align="end"
+                                              side="top"
                                               className="w-[200px] p-2 rounded-2xl bg-white shadow-2xl border-border/50"
                                             >
                                               <div className="grid grid-cols-1 gap-1">
