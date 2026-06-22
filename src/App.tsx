@@ -55,7 +55,7 @@ const AppContent = () => {
         {showSidebar && <AppSidebar />}
         <div
           className={cn(
-            "flex-1 flex flex-col",
+            "flex-1 flex flex-col min-w-0",
             !isLogin && !isCleaning && "main-content-bg"
           )}
         >
@@ -107,7 +107,7 @@ const AppContent = () => {
           )}
           <main
             className={cn(
-              "flex-1",
+              "flex-1 min-w-0 w-full",
               !isCallPanel && !isLogin && !isCleaning && "p-6"
             )}
           >
