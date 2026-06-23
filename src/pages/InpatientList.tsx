@@ -8,7 +8,10 @@ import {
   AlertCircle,
   Eye,
   User,
+  Users,
   ArrowRightLeft,
+  ClipboardList,
+  Stethoscope,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -27,6 +30,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { cn, formatWords, formatPatientAge } from "@/lib/utils";
 import { AllocateBedModal } from "@/components/AllocateBedModal";
+import { PatientDetailsModal } from "@/components/PatientDetailsModal";
 import { useBeds } from "@/context/BedsContext";
 import { Patient } from "@/hooks/use-patients";
 import { ActionTooltip } from "@/components/ui/action-tooltip";
@@ -37,6 +41,7 @@ export default function InpatientList() {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [allocatingPatient, setAllocatingPatient] = useState<Patient | null>(null);
+  const [detailsPatient, setDetailsPatient] = useState<Patient | null>(null);
 
   const inpatientWaitlist = patients
     .filter(
@@ -113,8 +118,9 @@ export default function InpatientList() {
       className="space-y-6"
     >
       <div className="flex flex-col gap-1">
-        <h1 className="text-4xl font-black tracking-tight text-[#006699] dark:text-sky-400 uppercase">
-          Listino de Internação
+        <h1 className="text-4xl font-black tracking-tight text-[#006699] dark:text-sky-400 uppercase flex items-center gap-3">
+          <Users className="h-10 w-10" />
+          Lista de Internações
         </h1>
         <p className="text-muted-foreground text-xs font-black uppercase tracking-[0.3em] flex items-center gap-2 mt-1">
           Fila de Espera para Acomodação em Leitos
@@ -271,6 +277,26 @@ export default function InpatientList() {
                               </Button>
                             </ActionTooltip>
                           )}
+                          <ActionTooltip label="Evolução de Enfermagem" side="top" align="end">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8 text-slate-500 hover:text-[#006699] dark:hover:text-sky-400 hover:bg-[#006699]/5 dark:hover:bg-sky-400/5 cursor-pointer"
+                              onClick={() => navigate(`/paciente/${patient.id}/evolucao/enfermagem`)}
+                            >
+                              <ClipboardList className="h-4 w-4" />
+                            </Button>
+                          </ActionTooltip>
+                          <ActionTooltip label="Detalhes da Triagem" side="top" align="end">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8 text-slate-500 hover:text-[#006699] dark:hover:text-sky-400 hover:bg-[#006699]/5 dark:hover:bg-sky-400/5 cursor-pointer"
+                              onClick={() => setDetailsPatient(patient)}
+                            >
+                              <Stethoscope className="h-4 w-4" />
+                            </Button>
+                          </ActionTooltip>
                           <ActionTooltip label="Ver Prontuário" side="top" align="end">
                             <Button
                               variant="ghost"
@@ -280,7 +306,7 @@ export default function InpatientList() {
                                 navigate(`/paciente/${patient.id}`, {
                                   state: {
                                     from: "/lista-internacao",
-                                    label: "Listino de Internação",
+                                    label: "Lista de Internações",
                                   },
                                 })
                               }
@@ -315,6 +341,12 @@ export default function InpatientList() {
         onClose={() => setAllocatingPatient(null)}
         patient={allocatingPatient}
         onAllocate={handleAllocate}
+      />
+      
+      <PatientDetailsModal
+        patient={detailsPatient}
+        isOpen={!!detailsPatient}
+        onClose={() => setDetailsPatient(null)}
       />
     </motion.div>
   );

@@ -10,6 +10,7 @@ import { useRole, Role } from "./context/RoleContext";
 import { cn } from "@/lib/utils";
 import { AppProviders } from "./AppProviders";
 import { AppRoutes } from "./AppRoutes";
+import { ClinicalLayout } from "./components/ClinicalLayout";
 
 const AppContent = () => {
   const location = useLocation();
@@ -17,6 +18,12 @@ const AppContent = () => {
   const isCallPanel = location.pathname === "/painel-chamadas";
   const isCleaning = location.pathname === "/higiene";
   const isLogin = location.pathname === "/login";
+  const isClinicalPanel = 
+    location.pathname.startsWith("/painel-enfermagem") ||
+    location.pathname.startsWith("/paciente") ||
+    location.pathname.startsWith("/lista-internacao") ||
+    location.pathname.startsWith("/leitos");
+  const isClinicalRoom = location.pathname.startsWith("/sala/");
 
   const { user } = useAuth();
   const { role, setRole } = useRole();
@@ -46,10 +53,56 @@ const AppContent = () => {
     !isFullscreen &&
     !isCallPanel &&
     !isLogin &&
-    !isCleaning;
+    !isCleaning &&
+    !isClinicalPanel &&
+    !isClinicalRoom;
+
+  if (isClinicalPanel) {
+    return (
+      <SidebarProvider defaultOpen={false} key="clinical-layout">
+        <CallAnnouncer />
+        <ClinicalLayout>
+          <Suspense
+            fallback={
+              <div className="flex items-center justify-center min-h-[50vh]">
+                <div className="animate-pulse text-[#006699] dark:text-sky-400 font-bold tracking-widest uppercase text-xs">
+                  Carregando Operação Clínica...
+                </div>
+              </div>
+            }
+          >
+            <AppRoutes />
+          </Suspense>
+        </ClinicalLayout>
+      </SidebarProvider>
+    );
+  }
+
+  if (isClinicalRoom) {
+    return (
+      <SidebarProvider defaultOpen={false} key="room-layout">
+        <CallAnnouncer />
+        <div className="min-h-screen flex w-full bg-slate-50 dark:bg-slate-950">
+          <main className="flex-1 min-w-0 w-full relative">
+            <Suspense
+              fallback={
+                <div className="flex items-center justify-center min-h-screen">
+                  <div className="animate-pulse text-[#006699] dark:text-sky-400 font-bold tracking-widest uppercase text-xs">
+                    Iniciando Modo Foco...
+                  </div>
+                </div>
+              }
+            >
+              <AppRoutes />
+            </Suspense>
+          </main>
+        </div>
+      </SidebarProvider>
+    );
+  }
 
   return (
-    <SidebarProvider defaultOpen={true}>
+    <SidebarProvider defaultOpen={true} key="main-layout">
       <CallAnnouncer />
       <div className="min-h-screen flex w-full">
         {showSidebar && <AppSidebar />}

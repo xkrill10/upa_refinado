@@ -154,7 +154,7 @@ export function AppSidebar() {
         },
         { title: "Pediátrico", url: "/atendimentos-pediatricos", icon: Baby },
         { title: "Laboratório", url: "/laboratorio", icon: FlaskConical },
-        { title: "Listino Internação", url: "/lista-internacao", icon: BedDouble },
+        { title: "Lista de Internações", url: "/lista-internacao", icon: BedDouble },
         { title: "Leitos", url: "/leitos", icon: BedDouble },
         { title: "Checagem Leito", url: "/checagem-enfermagem", icon: Syringe },
         { title: "Regulação (NIR)", url: "/nir", icon: Ambulance },
@@ -244,7 +244,7 @@ export function AppSidebar() {
             [
               "Painel Enfermagem",
               "Evoluções",
-              "Listino Internação",
+              "Lista de Internações",
               "Leitos",
               "Checagem Leito",
             ].includes(item.title),
@@ -271,7 +271,7 @@ export function AppSidebar() {
             [
               "Painel Médico",
               "Fila de Atendimento",
-              "Listino Internação",
+              "Lista de Internações",
               "Leitos",
               "Evoluções",
               "Laboratório",
