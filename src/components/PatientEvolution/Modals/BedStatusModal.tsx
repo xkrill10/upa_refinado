@@ -17,6 +17,7 @@ import {
   Bed,
   ActivitySquare,
   CheckCircle2,
+  Sparkles,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";

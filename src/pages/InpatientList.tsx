@@ -28,7 +28,7 @@ import {
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import { cn, formatWords, formatPatientAge } from "@/lib/utils";
+import { cn, formatWords, formatPatientAge, getEvolutionStatus } from "@/lib/utils";
 import { AllocateBedModal } from "@/components/AllocateBedModal";
 import { PatientDetailsModal } from "@/components/PatientDetailsModal";
 import { useBeds } from "@/context/BedsContext";
@@ -111,6 +111,8 @@ export default function InpatientList() {
     navigate("/leitos");
   };
 
+  const overdueEvolutionsCount = inpatientWaitlist.filter(p => getEvolutionStatus(p).status === "overdue").length;
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
@@ -121,6 +123,12 @@ export default function InpatientList() {
         <h1 className="text-4xl font-black tracking-tight text-[#006699] dark:text-sky-400 uppercase flex items-center gap-3">
           <Users className="h-10 w-10" />
           Lista de Internações
+          {overdueEvolutionsCount > 0 && (
+            <Badge variant="destructive" className="ml-4 text-lg py-1 px-4 animate-[pulse_2s_ease-in-out_infinite] shadow-lg shadow-red-500/20 flex items-center bg-red-500 hover:bg-red-600 border-none">
+              <AlertCircle className="w-5 h-5 mr-2" />
+              {overdueEvolutionsCount} {overdueEvolutionsCount === 1 ? 'Evolução Atrasada' : 'Evoluções Atrasadas'}
+            </Badge>
+          )}
         </h1>
         <p className="text-muted-foreground text-xs font-black uppercase tracking-[0.3em] flex items-center gap-2 mt-1">
           Fila de Espera para Acomodação em Leitos
@@ -169,6 +177,7 @@ export default function InpatientList() {
                 {inpatientWaitlist.map((patient) => {
                   const isPending = patient.admissionRequest?.status === "pending";
                   const overTarget = isPending && getWaitTimeInMinutes(patient.admissionRequest?.requestedAt) > 60;
+                  const evoStatus = getEvolutionStatus(patient);
 
                   return (
                     <TableRow
@@ -277,14 +286,37 @@ export default function InpatientList() {
                               </Button>
                             </ActionTooltip>
                           )}
-                          <ActionTooltip label="Evolução de Enfermagem" side="top" align="end">
+                          <ActionTooltip 
+                            label={
+                              evoStatus.status === "overdue" 
+                                ? `Evolução Atrasada! (${Math.abs(evoStatus.minutesLeft)} min)`
+                                : evoStatus.status === "warning"
+                                ? `Atenção: Evolução em ${evoStatus.minutesLeft} min`
+                                : "Evolução de Enfermagem"
+                            } 
+                            side="top" 
+                            align="end"
+                          >
                             <Button
                               variant="ghost"
                               size="icon"
-                              className="h-8 w-8 text-slate-500 hover:text-[#006699] dark:hover:text-sky-400 hover:bg-[#006699]/5 dark:hover:bg-sky-400/5 cursor-pointer"
+                              className={cn(
+                                "h-8 w-8 cursor-pointer relative transition-all duration-300",
+                                evoStatus.status === "overdue"
+                                  ? "text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 animate-[pulse_2s_ease-in-out_infinite]"
+                                  : evoStatus.status === "warning"
+                                  ? "text-orange-500 hover:text-orange-600 hover:bg-orange-50 dark:hover:bg-orange-950/30"
+                                  : "text-slate-500 hover:text-[#006699] dark:hover:text-sky-400 hover:bg-[#006699]/5 dark:hover:bg-sky-400/5"
+                              )}
                               onClick={() => navigate(`/paciente/${patient.id}/evolucao/enfermagem`)}
                             >
                               <ClipboardList className="h-4 w-4" />
+                              {evoStatus.status !== "normal" && (
+                                <span className={cn(
+                                  "absolute top-0 right-0 w-2 h-2 rounded-full ring-2 ring-white dark:ring-slate-900",
+                                  evoStatus.status === "overdue" ? "bg-red-500" : "bg-orange-500"
+                                )} />
+                              )}
                             </Button>
                           </ActionTooltip>
                           <ActionTooltip label="Detalhes da Triagem" side="top" align="end">

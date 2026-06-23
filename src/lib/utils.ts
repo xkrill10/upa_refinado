@@ -225,3 +225,60 @@ export function formatPhone(value: string) {
   if (v.length <= 10) return `(${v.slice(0, 2)}) ${v.slice(2, 6)}-${v.slice(6)}`;
   return `(${v.slice(0, 2)}) ${v.slice(2, 7)}-${v.slice(7)}`;
 }
+
+export function getEvolutionInterval(risk?: string): number {
+  switch (risk) {
+    case "emergency":
+      return 30; // Vermelho
+    case "very-urgent":
+      return 60; // Laranja
+    case "urgent":
+      return 120; // Amarelo
+    case "less-urgent":
+      return 240; // Verde
+    case "not-urgent":
+      return 360; // Azul
+    default:
+      return 240; // Padrão
+  }
+}
+
+export function getEvolutionStatus(patient: any): {
+  status: "normal" | "warning" | "overdue";
+  minutesLeft: number;
+  nextEvolutionTime: Date;
+} {
+  const intervalMinutes = getEvolutionInterval(patient.risk);
+  
+  let lastTimeStr = patient.arrivalTime;
+  if (patient.evolutions && patient.evolutions.length > 0) {
+    const sorted = [...patient.evolutions].sort(
+      (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+    );
+    lastTimeStr = sorted[0].timestamp;
+  }
+
+  if (!lastTimeStr) {
+     return { status: "normal", minutesLeft: 999, nextEvolutionTime: new Date() };
+  }
+
+  const lastTime = new Date(lastTimeStr);
+  const nextTime = new Date(lastTime.getTime() + intervalMinutes * 60000);
+  const now = new Date();
+
+  const diffMs = nextTime.getTime() - now.getTime();
+  const diffMinutes = Math.floor(diffMs / 60000);
+
+  let status: "normal" | "warning" | "overdue" = "normal";
+  if (diffMinutes < 0) {
+    status = "overdue";
+  } else if (diffMinutes <= 15) {
+    status = "warning";
+  }
+
+  return {
+    status,
+    minutesLeft: diffMinutes,
+    nextEvolutionTime: nextTime,
+  };
+}
