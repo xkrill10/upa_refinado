@@ -1718,7 +1718,7 @@ export default function Beds() {
                                 Prontuário
                               </Button>
                               {!patient.transferRequest && (
-                                <ActionTooltip label="Registrar Transferência">
+                                <ActionTooltip label="Registrar Transferência" align="end">
                                   <Button
                                     variant="outline"
                                     size="sm"
@@ -1737,7 +1737,7 @@ export default function Beds() {
                                   </Button>
                                 </ActionTooltip>
                               )}
-                              <ActionTooltip label="Solicitar Insumos">
+                              <ActionTooltip label="Solicitar Insumos" align="end">
                                 <Button
                                   variant="default"
                                   size="sm"
@@ -1751,7 +1751,7 @@ export default function Beds() {
                                   <PackagePlus className="h-3.5 w-3.5" />
                                 </Button>
                               </ActionTooltip>
-                              <ActionTooltip label="Timeline / Auditoria">
+                              <ActionTooltip label="Timeline / Auditoria" align="end">
                                 <Button
                                   variant="outline"
                                   size="sm"

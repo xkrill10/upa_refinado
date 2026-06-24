@@ -42,9 +42,9 @@ export const ClinicalLayout = ({ children }: ClinicalLayoutProps) => {
   const displayName = user?.user_metadata?.full_name || user?.user_metadata?.name || user?.email?.split("@")[0] || localDoctor || "ENFERMAGEM";
 
   return (
-    <div className="min-h-screen flex w-full">
+    <div className="h-screen w-full flex overflow-hidden">
       {/* Navigation Rail */}
-      <div className="w-[72px] flex-shrink-0 flex flex-col items-center py-6 z-30 shadow-[4px_0_24px_-10px_rgba(0,0,0,0.08)] dark:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.5)] relative transition-all duration-300 bg-sky-500/15 dark:bg-gradient-to-b dark:from-[#004466]/95 dark:to-[#001a33]/95 backdrop-blur-2xl border-r border-sky-500/20 dark:border-blue-700/30">
+      <div className="w-[72px] h-full flex-shrink-0 flex flex-col items-center py-6 z-30 shadow-[4px_0_24px_-10px_rgba(0,0,0,0.08)] dark:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.5)] relative transition-all duration-300 bg-sky-500/15 dark:bg-gradient-to-b dark:from-[#004466]/95 dark:to-[#001a33]/95 backdrop-blur-2xl border-r border-sky-500/20 dark:border-blue-700/30">
         
         {/* Logo Minimized */}
         <div 
@@ -131,7 +131,7 @@ export const ClinicalLayout = ({ children }: ClinicalLayoutProps) => {
       </div>
 
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col min-w-0 main-content-bg">
+      <div className="flex-1 flex flex-col min-w-0 h-full overflow-hidden main-content-bg">
         {/* Simplified Header matching the dark blue theme */}
         <header className="h-20 flex items-center justify-between px-8 sticky top-0 z-20 header-premium-glass">
           <div className="flex items-center gap-4">

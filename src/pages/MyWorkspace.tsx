@@ -238,6 +238,7 @@ export default function MyWorkspace() {
   const handleEndShift = () => {
     localStorage.removeItem("upa_active_room");
     localStorage.removeItem("upa_active_doctor");
+    toast.success("Turno encerrado. Bom descanso!");
     navigate("/painel-medico");
   };
 
@@ -1055,10 +1056,7 @@ export default function MyWorkspace() {
               Tem certeza que deseja encerrar os atendimentos nesta sala? A sala
               ficará livre para outro colega.
               <br />
-              <br />
-              <span className="font-bold text-slate-800 dark:text-slate-200">
-                Bom descanso!
-              </span>
+
             </DialogDescription>
           </DialogHeader>
           <div className="flex gap-3 mt-6">

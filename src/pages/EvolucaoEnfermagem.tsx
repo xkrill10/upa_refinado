@@ -1515,7 +1515,6 @@ export default function EvolucaoEnfermagem() {
                           <SelectItem value="Procedimento">
                             Procedimento
                           </SelectItem>
-                          <SelectItem value="Alta">Alta</SelectItem>
                         </SelectGroup>
                       </SelectContent>
                     </Select>

@@ -116,6 +116,7 @@ export function NurseWorkspaceHeader({
     localStorage.removeItem("upa_stamp_number");
     localStorage.removeItem("upa_stamp_state");
     setIsEndShiftModalOpen(false);
+    toast.success("Turno encerrado. Bom descanso!");
     navigate("/painel-enfermagem");
   };
 
@@ -243,11 +244,7 @@ export function NurseWorkspaceHeader({
               <DialogDescription className="text-sm font-medium text-slate-500 dark:text-slate-400">
                 Tem certeza que deseja encerrar os atendimentos nesta sala? A
                 sala ficará livre para outro colega.
-                <br />
-                <br />
-                <strong className="text-slate-700 dark:text-slate-300">
-                  Bom descanso!
-                </strong>
+
               </DialogDescription>
             </div>
 

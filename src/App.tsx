@@ -82,8 +82,8 @@ const AppContent = () => {
     return (
       <SidebarProvider defaultOpen={false} key="room-layout">
         <CallAnnouncer />
-        <div className="min-h-screen flex w-full bg-slate-50 dark:bg-slate-950">
-          <main className="flex-1 min-w-0 w-full relative">
+        <div className="min-h-screen flex w-full transition-all duration-300 relative main-content-bg">
+          <main className="flex-1 flex flex-col min-w-0 w-full relative">
             <Suspense
               fallback={
                 <div className="flex items-center justify-center min-h-screen">

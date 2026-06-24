@@ -1206,7 +1206,8 @@ export default function TriageRoom() {
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className="space-y-6 pb-10"
+      exit={{ opacity: 0, y: -10 }}
+      className="flex flex-col flex-1 p-6 space-y-6"
     >
       <NurseWorkspaceHeader
         activeRoom={selectedTriageRoom}
