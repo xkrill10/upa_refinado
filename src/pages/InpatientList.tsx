@@ -198,8 +198,14 @@ export default function InpatientList() {
                             </div>
                           )}
                           <div className="flex flex-col">
-                            <span className="font-bold text-slate-800 dark:text-slate-150">
+                            <span className="font-bold text-slate-800 dark:text-slate-150 flex items-center gap-1">
                               {formatWords(patient.name)}
+                              {['feminino', 'f'].includes(patient.gender?.toLowerCase() || '') && (
+                                <span className="text-pink-500 text-[14px]" title="Feminino">♀</span>
+                              )}
+                              {['masculino', 'm'].includes(patient.gender?.toLowerCase() || '') && (
+                                <span className="text-blue-500 text-[14px]" title="Masculino">♂</span>
+                              )}
                             </span>
                             <span className="text-xs text-muted-foreground">
                               {formatPatientAge(patient.age, patient.birthDate)}

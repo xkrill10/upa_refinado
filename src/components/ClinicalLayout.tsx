@@ -7,13 +7,19 @@ import {
   Settings,
   Users,
   Stethoscope,
-  ClipboardList
+  ClipboardList,
+  UserSquare2,
+  FlaskConical,
+  UserPlus,
+  FileText,
+  Syringe,
+  Ambulance,
 } from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
+import { useRole } from "@/context/RoleContext";
 import { cn } from "@/lib/utils";
 import { ThemeToggle } from "./ThemeToggle";
 import { GlobalClock } from "./GlobalClock";
-import { useAuth } from "@/context/AuthContext";
-import { useRole } from "@/context/RoleContext";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./ui/tooltip";
 import { motion } from "motion/react";
 import { usePatients } from "@/hooks/use-patients";
@@ -23,17 +29,44 @@ interface ClinicalLayoutProps {
   children: React.ReactNode;
 }
 
-const MENU_ITEMS = [
-  { id: "painel", icon: Activity, label: "Painel Enfermagem", path: "/painel-enfermagem" },
-  { id: "internacao", icon: Users, label: "Lista de Internações", path: "/lista-internacao" },
-  { id: "leitos", icon: BedDouble, label: "Gestão de Leitos", path: "/leitos" },
-];
-
 export const ClinicalLayout = ({ children }: ClinicalLayoutProps) => {
   const location = useLocation();
   const navigate = useNavigate();
   const { user } = useAuth();
   const { patients } = usePatients();
+  const { role } = useRole();
+
+  const currentPatientId = location.pathname.match(/\/paciente\/(\d+)/)
+    ? location.pathname.match(/\/paciente\/(\d+)/)![1]
+    : patients?.find((p) => p.status === "attending")?.id || "3";
+
+  const getMenuItems = () => {
+    if (role === "recepcao") {
+      return [
+        { id: "recepcao", icon: UserPlus, label: "Recepção", path: "/novo-paciente" }
+      ];
+    }
+    if (role === "medico") {
+      return [
+        { id: "painel", icon: UserSquare2, label: "Painel Médico", path: "/painel-medico" },
+        { id: "fila", icon: ClipboardList, label: "Fila de Atendimento", path: "/fila" },
+        { id: "internacao", icon: BedDouble, label: "Lista de Internações", path: "/lista-internacao" },
+        { id: "leitos", icon: BedDouble, label: "Gestão de Leitos", path: "/leitos" },
+        { id: "evolucoes", icon: FileText, label: "Evoluções", path: `/paciente/${currentPatientId}/evolucao/medica` },
+        { id: "lab", icon: FlaskConical, label: "Laboratório", path: "/laboratorio" },
+        { id: "nir", icon: Ambulance, label: "Regulação (NIR)", path: "/nir" },
+      ];
+    }
+    return [
+      { id: "painel", icon: Activity, label: "Painel Enfermagem", path: "/painel-enfermagem" },
+      { id: "evolucoes", icon: FileText, label: "Evoluções", path: `/paciente/${currentPatientId}/evolucao/enfermagem` },
+      { id: "internacao", icon: BedDouble, label: "Lista de Internações", path: "/lista-internacao" },
+      { id: "leitos", icon: BedDouble, label: "Gestão de Leitos", path: "/leitos" },
+      { id: "checagem", icon: Syringe, label: "Checagem Leito", path: "/checagem-enfermagem" },
+    ];
+  };
+
+  const MENU_ITEMS = getMenuItems();
 
   const admissionQueue = patients.filter((p) => p.admissionRequest?.status === "pending");
   const hasPendingAdmissions = admissionQueue.length > 0;

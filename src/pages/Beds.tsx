@@ -30,9 +30,10 @@ import {
   CalendarClock,
   History,
   Ambulance,
+  Lock,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
-import { cn, formatWords } from "@/lib/utils";
+import { cn, formatWords, getEvolutionStatus, formatPatientAge } from "@/lib/utils";
 import { ExamsModal } from "@/components/PatientEvolution/Modals/ExamsModal";
 import PatientRecord from "@/pages/PatientRecord";
 import { PatientIconsBanner } from "@/components/PatientIconsBanner";
@@ -120,7 +121,15 @@ const getBedGenderIcon = (room?: string) => {
   if (!room) return '';
   if (room.toLowerCase().includes('fem')) return '♀';
   if (room.toLowerCase().includes('masc')) return '♂';
-  return '';
+  return false;
+};
+
+const riskConfig: Record<string, { label: string; color: string }> = {
+  "emergency": { label: "Emergência", color: "text-red-500 border-red-500 bg-red-500/10" },
+  "very-urgent": { label: "Muito Urgente", color: "text-orange-500 border-orange-500 bg-orange-500/10" },
+  "urgent": { label: "Urgente", color: "text-yellow-500 border-yellow-500 bg-yellow-500/10" },
+  "less-urgent": { label: "Pouco Urgente", color: "text-green-500 border-green-500 bg-green-500/10" },
+  "not-urgent": { label: "Não Urgente", color: "text-blue-500 border-blue-500 bg-blue-500/10" },
 };
 
 export default function Beds() {
@@ -574,9 +583,15 @@ export default function Beds() {
                             setSummaryPatient(patient);
                           }}
                         >
-                          <UserRound className="h-3.5 w-3.5 text-[#006699] dark:text-sky-400 group-hover/pname:scale-110 transition-transform drop-shadow-sm" />
-                          <span className="text-[12px] font-black truncate group-hover/pname:text-[#006699] dark:group-hover/pname:text-sky-300 text-foreground">
+                          <UserRound className="h-3.5 w-3.5 text-[#006699] dark:text-sky-400 group-hover/pname:scale-110 transition-transform drop-shadow-sm shrink-0" />
+                          <span className="text-[12px] font-black truncate group-hover/pname:text-[#006699] dark:group-hover/pname:text-sky-300 text-foreground flex items-center gap-1">
                             {formatWords(patient?.name || "")}
+                            {['feminino', 'f'].includes(patient?.gender?.toLowerCase() || '') && (
+                              <span className="text-pink-500 text-[14px]" title="Feminino">♀</span>
+                            )}
+                            {['masculino', 'm'].includes(patient?.gender?.toLowerCase() || '') && (
+                              <span className="text-blue-500 text-[14px]" title="Masculino">♂</span>
+                            )}
                           </span>
                         </div>
                         {patient && (
@@ -1080,134 +1095,161 @@ export default function Beds() {
               </CardTitle>
             </CardHeader>
             <CardContent className="p-6 bg-transparent">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                {/* Emergência Zone */}
-                <div className="p-6 rounded-2xl border-2 border-red-500/20 bg-red-500/5 relative">
-                  <div className="absolute -top-3 left-6 px-2 bg-background font-black text-xs text-red-500 uppercase tracking-widest">
-                    Ala de Emergência
-                  </div>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mt-2">
-                    {emergencyBeds.map((bed) => {
-                      const p = getBedPatient(bed);
-                      return (
-                        <div
-                          key={bed.id}
-                          className={cn(
-                            "p-4 rounded-xl border flex flex-col items-center justify-center text-center gap-2 transition-all cursor-pointer hover:scale-105",
-                            bed.status === "occupied"
-                              ? "bg-red-500/10 border-red-500/30"
-                              : bed.status === "available"
-                                ? "bg-emerald-500/10 border-emerald-500/30"
-                                : bed.status === "cleaning"
-                                  ? "bg-orange-500/10 border-orange-500/30 animate-pulse"
-                                  : "bg-yellow-500/10 border-yellow-500/30",
-                          )}
-                          onClick={() => setSelectedBedId(bed.id)}
-                          draggable={bed.status === "occupied"}
-                          onDragStart={(e) => {
-                            e.dataTransfer.setData("sourceBedId", bed.id);
-                          }}
-                          onDragOver={(e) => {
-                            if (bed.status === "available") e.preventDefault();
-                          }}
-                          onDrop={(e) => {
-                            e.preventDefault();
-                            const sourceBedId =
-                              e.dataTransfer.getData("sourceBedId");
-                            if (sourceBedId && sourceBedId !== bed.id) {
-                              transferPatient(sourceBedId, bed.id);
-                            }
-                          }}
-                        >
-                          <BedDouble
-                            className={cn(
-                              "h-6 w-6",
-                              bed.status === "occupied"
-                                ? "text-red-500"
-                                : bed.status === "available"
-                                  ? "text-emerald-500"
-                                  : bed.status === "cleaning"
-                                    ? "text-orange-500"
-                                    : "text-yellow-500",
-                            )}
-                          />
-                          <span className="text-[10px] font-black uppercase tracking-widest text-foreground">
-                            {bed.room}
-                          </span>
-                          {p && (
-                            <span className="text-[9px] font-bold text-muted-foreground truncate w-full pointer-events-none">
-                              {formatWords(p.name)}
-                            </span>
-                          )}
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
+              <div className="flex flex-col gap-8">
+                {[
+                  { 
+                    name: "Emergência", 
+                    beds: filteredBeds.filter(b => b.room === "Emergência"), 
+                    containerClass: "border-red-500/20 bg-red-500/5", 
+                    titleClass: "text-red-500",
+                    icon: null 
+                  },
+                  { 
+                    name: "Observação Feminina", 
+                    beds: filteredBeds.filter(b => b.room === "Observação Feminina"), 
+                    containerClass: "border-pink-500/20 bg-pink-500/5", 
+                    titleClass: "text-pink-500",
+                    icon: "♀"
+                  },
+                  { 
+                    name: "Observação Masculina", 
+                    beds: filteredBeds.filter(b => b.room === "Observação Masculina"), 
+                    containerClass: "border-blue-500/20 bg-blue-500/5", 
+                    titleClass: "text-blue-500",
+                    icon: "♂"
+                  },
+                  { 
+                    name: "Pediatria", 
+                    beds: filteredBeds.filter(b => b.room === "Pediatria"), 
+                    containerClass: "border-amber-500/20 bg-amber-500/5", 
+                    titleClass: "text-amber-500",
+                    icon: null 
+                  },
+                  { 
+                    name: "Isolamento", 
+                    beds: filteredBeds.filter(b => b.room === "Isolamento"), 
+                    containerClass: "border-purple-500/20 bg-purple-500/5", 
+                    titleClass: "text-purple-500",
+                    icon: null 
+                  },
+                ].map((roomLayout, idx) => {
+                  if (roomLayout.beds.length === 0) return null;
+                  return (
+                    <div key={idx} className={cn("p-6 rounded-2xl border-2 relative", roomLayout.containerClass)}>
+                      <div className={cn("absolute -top-3 left-6 px-2 bg-background font-black text-xs uppercase tracking-widest flex items-center gap-1", roomLayout.titleClass)}>
+                        Bloco: {roomLayout.name}
+                        {roomLayout.icon && <span className="text-[14px] leading-none">{roomLayout.icon}</span>}
+                      </div>
+                      <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-4 mt-2">
+                        {roomLayout.beds.map((bed) => {
+                          const p = getBedPatient(bed);
+                          const evoStatus = p ? getEvolutionStatus(p) : null;
+                          
+                          const tooltipContent = p ? (
+                            <div className="flex flex-col gap-2 p-1 min-w-[200px]">
+                              <div className="flex justify-between items-start">
+                                <div className="flex flex-col">
+                                  <span className="font-bold text-sm text-white flex items-center gap-1">
+                                    {formatWords(p.name)}
+                                    {['feminino', 'f'].includes(p.gender?.toLowerCase() || '') && <span className="text-pink-300 font-bold text-base leading-none drop-shadow-sm">♀</span>}
+                                    {['masculino', 'm'].includes(p.gender?.toLowerCase() || '') && <span className="text-sky-300 font-bold text-base leading-none drop-shadow-sm">♂</span>}
+                                  </span>
+                                  <span className="text-xs text-sky-100">{formatPatientAge(p.age, p.birthDate)}</span>
+                                </div>
+                                {p.risk && <Badge variant="outline" className={cn("text-[10px] uppercase font-black ml-2 shadow-sm", riskConfig[p.risk].color)}>{riskConfig[p.risk].label}</Badge>}
+                              </div>
+                              <div className="text-xs text-sky-200 flex items-center gap-1">
+                                <Clock className="w-3 h-3" /> Internado desde {new Date(p.admissionRequest?.requestedAt || p.arrivalTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                              </div>
+                              {p.mainComplaint && (
+                                <div className="text-xs mt-1 border-t pt-2 border-sky-400/30 text-white">
+                                  <span className="font-bold text-sky-200">Queixa:</span> {p.mainComplaint}
+                                </div>
+                              )}
+                              {evoStatus && evoStatus.status !== "normal" && (
+                                <div className={cn("text-[10px] font-bold mt-1 px-2 py-1 rounded-md text-center border", evoStatus.status === "overdue" ? "bg-red-500/20 text-red-200 border-red-500/50" : "bg-orange-500/20 text-orange-200 border-orange-500/50")}>
+                                  {evoStatus.status === "overdue" ? "Evolução Atrasada!" : "Evolução Próxima"}
+                                </div>
+                              )}
+                            </div>
+                          ) : bed.status === "available" && roomLayout.icon ? (
+                            <div className="text-xs font-bold text-center flex flex-col items-center gap-1 text-white">
+                              <Lock className="w-4 h-4 mb-1 text-sky-200" />
+                              Leito restrito ao sexo {roomLayout.name.includes("Feminina") ? "Feminino" : "Masculino"}
+                            </div>
+                          ) : null;
 
-                {/* Observação Zone */}
-                <div className="p-6 rounded-2xl border-2 border-amber-500/20 bg-amber-500/5 relative">
-                  <div className="absolute -top-3 left-6 px-2 bg-background font-black text-xs text-amber-500 uppercase tracking-widest">
-                    Ala de Observação
-                  </div>
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-2">
-                    {observationBeds.map((bed) => {
-                      const p = getBedPatient(bed);
-                      return (
-                        <div
-                          key={bed.id}
-                          className={cn(
-                            "p-4 rounded-xl border flex flex-col items-center justify-center text-center gap-2 transition-all cursor-pointer hover:scale-105",
-                            bed.status === "occupied"
-                              ? "bg-[#006699]/10 border-[#006699]/30"
-                              : bed.status === "available"
-                                ? "bg-emerald-500/10 border-emerald-500/30"
-                                : bed.status === "cleaning"
-                                  ? "bg-orange-500/10 border-orange-500/30 animate-pulse"
-                                  : "bg-yellow-500/10 border-yellow-500/30",
-                          )}
-                          onClick={() => setSelectedBedId(bed.id)}
-                          draggable={bed.status === "occupied"}
-                          onDragStart={(e) => {
-                            e.dataTransfer.setData("sourceBedId", bed.id);
-                          }}
-                          onDragOver={(e) => {
-                            if (bed.status === "available") e.preventDefault();
-                          }}
-                          onDrop={(e) => {
-                            e.preventDefault();
-                            const sourceBedId =
-                              e.dataTransfer.getData("sourceBedId");
-                            if (sourceBedId && sourceBedId !== bed.id) {
-                              transferPatient(sourceBedId, bed.id);
-                            }
-                          }}
-                        >
-                          <BedDouble
-                            className={cn(
-                              "h-6 w-6",
-                              bed.status === "occupied"
-                                ? "text-[#006699]"
-                                : bed.status === "available"
-                                  ? "text-emerald-500"
-                                  : bed.status === "cleaning"
-                                    ? "text-orange-500"
-                                    : "text-yellow-500",
-                            )}
-                          />
-                          <span className="text-[10px] font-black uppercase tracking-widest text-foreground">
-                            {bed.room}
-                          </span>
-                          {p && (
-                            <span className="text-[9px] font-bold text-muted-foreground truncate w-full pointer-events-none">
-                              {formatWords(p.name)}
-                            </span>
-                          )}
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
+                          const bedCard = (
+                            <div
+                              key={bed.id}
+                              className={cn(
+                                "p-4 rounded-xl border flex flex-col items-center justify-center text-center gap-2 transition-all cursor-pointer hover:scale-105 shadow-sm relative",
+                                bed.status === "occupied"
+                                  ? "bg-[#006699]/10 border-[#006699]/30"
+                                  : bed.status === "available"
+                                    ? "bg-emerald-500/10 border-emerald-500/30"
+                                    : bed.status === "cleaning"
+                                      ? "bg-orange-500/10 border-orange-500/30 animate-pulse"
+                                      : "bg-yellow-500/10 border-yellow-500/30",
+                              )}
+                              onClick={() => setSelectedBedId(bed.id)}
+                              draggable={bed.status === "occupied"}
+                              onDragStart={(e) => {
+                                e.dataTransfer.setData("sourceBedId", bed.id);
+                              }}
+                              onDragOver={(e) => {
+                                if (bed.status === "available") e.preventDefault();
+                              }}
+                              onDrop={(e) => {
+                                e.preventDefault();
+                                const sourceBedId =
+                                  e.dataTransfer.getData("sourceBedId");
+                                if (sourceBedId && sourceBedId !== bed.id) {
+                                  transferPatient(sourceBedId, bed.id);
+                                }
+                              }}
+                            >
+                              {bed.status === "available" && roomLayout.icon && (
+                                <Lock className={cn("absolute top-2 right-2 h-3 w-3 opacity-40", roomLayout.titleClass)} />
+                              )}
+                              {p && evoStatus && evoStatus.status === "overdue" && (
+                                <div className="absolute -top-1 -right-1 h-3 w-3 rounded-full bg-red-500 animate-pulse ring-2 ring-background shadow-md"></div>
+                              )}
+                              <BedDouble
+                                className={cn(
+                                  "h-6 w-6",
+                                  bed.status === "occupied"
+                                    ? "text-[#006699]"
+                                    : bed.status === "available"
+                                      ? "text-emerald-500"
+                                      : bed.status === "cleaning"
+                                        ? "text-orange-500"
+                                        : "text-yellow-500",
+                                )}
+                              />
+                              <span className="text-[10px] font-black uppercase tracking-widest text-foreground flex items-center gap-1">
+                                {bed.name}
+                              </span>
+                              {p && (
+                                <span className="text-[9px] font-bold text-muted-foreground truncate w-full pointer-events-none flex justify-center items-center gap-1">
+                                  {formatWords(p.name)}
+                                  {['feminino', 'f'].includes(p.gender?.toLowerCase() || '') && <span className="text-pink-500 font-bold leading-none">♀</span>}
+                                  {['masculino', 'm'].includes(p.gender?.toLowerCase() || '') && <span className="text-blue-500 font-bold leading-none">♂</span>}
+                                </span>
+                              )}
+                            </div>
+                          );
+
+                          return tooltipContent ? (
+                            <ActionTooltip key={bed.id} label={tooltipContent} side="top">
+                              {bedCard}
+                            </ActionTooltip>
+                          ) : bedCard;
+                        })}
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             </CardContent>
           </Card>

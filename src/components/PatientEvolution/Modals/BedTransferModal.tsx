@@ -16,10 +16,12 @@ import {
   BedDouble,
   AlertTriangle,
   CheckCircle2,
+  Lock,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { useBeds } from "@/context/BedsContext";
+import { usePatientsContext } from "@/context/PatientsContext";
 
 interface BedTransferModalProps {
   isOpen: boolean;
@@ -37,11 +39,29 @@ export function BedTransferModal({
   onApply,
 }: BedTransferModalProps) {
   const { beds, assignPatient, transferPatient } = useBeds();
+  const { patients } = usePatientsContext();
   const [selectedBedId, setSelectedBedId] = useState<string>("");
   const [reason, setReason] = useState("");
 
+  const targetPatient = patients.find((p) => p.id === patientId);
+  const patientGender = targetPatient?.gender || "";
+
   const currentBed = beds.find((b) => b.patientId === patientId);
   const availableBeds = beds.filter((b) => b.status === "available");
+
+  const isBedBlockedByGender = (bedRoom: string, gender: string) => {
+    if (!gender) return false;
+    const roomLower = bedRoom.toLowerCase();
+    const genderLower = gender.toLowerCase();
+    
+    if (roomLower.includes("feminina") || roomLower.includes("feminino")) {
+      return genderLower !== "feminino" && genderLower !== "f";
+    }
+    if (roomLower.includes("masculina") || roomLower.includes("masculino")) {
+      return genderLower !== "masculino" && genderLower !== "m";
+    }
+    return false;
+  };
 
   // Agrupar leitos por setor
   const bedsByWard = availableBeds.reduce(
@@ -187,26 +207,38 @@ export function BedTransferModal({
                       </div>
 
                       <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                        {wardBeds.map((bed) => (
+                        {wardBeds.map((bed) => {
+                          const isBlocked = isBedBlockedByGender(bed.room, patientGender);
+                          return (
                           <button
                             key={bed.id}
                             type="button"
+                            disabled={isBlocked}
                             onClick={() => setSelectedBedId(bed.id)}
+                            title={isBlocked ? `Leito restrito ao sexo ${bed.room.toLowerCase().includes('masculin') ? 'Masculino' : 'Feminino'}` : undefined}
                             className={cn(
-                              "flex flex-col items-start p-2.5 rounded-lg border text-left transition-all",
-                              selectedBedId === bed.id
+                              "flex flex-col items-start p-2.5 rounded-lg border text-left transition-all relative overflow-hidden",
+                              isBlocked
+                                ? "bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700 opacity-60 cursor-not-allowed grayscale"
+                                : selectedBedId === bed.id
                                 ? "bg-blue-500/10 border-blue-500 text-blue-700 dark:text-blue-400 ring-1 ring-blue-500 ring-offset-1 ring-offset-background"
                                 : "bg-card hover:bg-muted/50 border-border/60 hover:border-blue-500/30",
                             )}
                           >
-                            <span className="text-xs font-black truncate w-full">
-                              {bed.name}
-                            </span>
-                            <span className="text-[9px] text-muted-foreground mt-0.5">
+                            <div className="flex items-center justify-between w-full gap-2">
+                              <span className="text-xs font-black truncate">
+                                {bed.name}
+                              </span>
+                              {isBlocked && <Lock className="h-3 w-3 text-slate-400 shrink-0" />}
+                            </div>
+                            <span className="text-[9px] text-muted-foreground mt-0.5 w-full truncate flex items-center gap-1">
                               {bed.room}
+                              {bed.room.toLowerCase().includes('masculin') && <span className="text-blue-500 font-black text-[11px] leading-none">♂</span>}
+                              {bed.room.toLowerCase().includes('feminin') && <span className="text-pink-500 font-black text-[11px] leading-none">♀</span>}
                             </span>
                           </button>
-                        ))}
+                          );
+                        })}
                       </div>
                     </div>
                   ))}

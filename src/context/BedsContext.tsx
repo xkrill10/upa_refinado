@@ -129,40 +129,39 @@ const generateBeds = (): Bed[] => {
 
   const beds: Bed[] = [
     // UPA - Emergência
-    createBed("e-1", "Leito 01", "Emergência", "Emergência", "available"),
-    createBed("e-2", "Leito 02", "Emergência", "Emergência", "occupied"),
-    createBed("e-3", "Leito 03", "Emergência", "Emergência", "available"),
-    createBed("e-4", "Leito 04", "Emergência", "Emergência", "occupied"),
-    createBed("e-5", "Leito 05", "Emergência", "Emergência", "cleaning"),
-    createBed("e-6", "Leito 06", "Emergência", "Emergência", "available"),
-    createBed("e-7", "Leito 07", "Emergência", "Emergência", "available"),
-    createBed("e-8", "Maca de Parada", "Emergência", "Emergência", "available"),
+    createBed("e-1", "Leito 1", "Emergência", "Emergência", "available"),
+    createBed("e-2", "Leito 2", "Emergência", "Emergência", "occupied"),
+    createBed("e-3", "Leito 3", "Emergência", "Emergência", "available"),
+    createBed("e-4", "Leito 4", "Emergência", "Emergência", "occupied"),
+    createBed("e-5", "Leito 5", "Emergência", "Emergência", "cleaning"),
+    createBed("e-6", "Leito 6", "Emergência", "Emergência", "available"),
+    createBed("e-7", "Leito 7", "Emergência", "Emergência", "available"),
+    createBed("e-8", "Maca Extra", "Emergência", "Emergência", "available"),
 
     // UPA - Observação Feminina
-    createBed("o-of1", "Leito 01", "Observação", "Observação Feminina", "available"),
-    createBed("o-of2", "Leito 02", "Observação", "Observação Feminina", "occupied"),
-    createBed("o-of3", "Leito 03", "Observação", "Observação Feminina", "available"),
-    createBed("o-of4", "Leito 04", "Observação", "Observação Feminina", "available"),
-    createBed("o-of5", "Leito 05", "Observação", "Observação Feminina", "maintenance"),
+    createBed("o-of1", "Leito 1", "Observação", "Observação Feminina", "available"),
+    createBed("o-of2", "Leito 2", "Observação", "Observação Feminina", "occupied"),
+    createBed("o-of3", "Leito 3", "Observação", "Observação Feminina", "available"),
+    createBed("o-of4", "Leito 4", "Observação", "Observação Feminina", "available"),
+    createBed("o-of5", "Leito 5", "Observação", "Observação Feminina", "maintenance"),
+    createBed("o-of6", "Maca Extra", "Observação", "Observação Feminina", "available"),
 
     // UPA - Observação Masculina
-    createBed("o-om1", "Leito 01", "Observação", "Observação Masculina", "available"),
-    createBed("o-om2", "Leito 02", "Observação", "Observação Masculina", "occupied"),
-    createBed("o-om3", "Leito 03", "Observação", "Observação Masculina", "available"),
-    createBed("o-om4", "Leito 04", "Observação", "Observação Masculina", "available"),
+    createBed("o-om1", "Leito 1", "Observação", "Observação Masculina", "available"),
+    createBed("o-om2", "Leito 2", "Observação", "Observação Masculina", "occupied"),
+    createBed("o-om3", "Leito 3", "Observação", "Observação Masculina", "available"),
+    createBed("o-om4", "Leito 4", "Observação", "Observação Masculina", "available"),
+    createBed("o-om5", "Maca Extra", "Observação", "Observação Masculina", "available"),
 
     // UPA - Pediatria
-    createBed("o-ped1", "Leito 01", "Observação", "Pediatria", "available"),
-    createBed("o-ped2", "Leito 02", "Observação", "Pediatria", "occupied"),
-    createBed("o-ped3", "Leito 03", "Observação", "Pediatria", "available"),
-    createBed("o-ped4", "Leito 04", "Observação", "Pediatria", "cleaning"),
+    createBed("o-ped1", "Leito 1", "Observação", "Pediatria", "available"),
+    createBed("o-ped2", "Leito 2", "Observação", "Pediatria", "occupied"),
+    createBed("o-ped3", "Berço 1", "Observação", "Pediatria", "available"),
+    createBed("o-ped4", "Berço 2", "Observação", "Pediatria", "cleaning"),
 
     // UPA - Isolamento
-    createBed("o-iso1", "Isolamento 01", "Observação", "Isolamento", "available"),
-    createBed("o-iso2", "Isolamento 02", "Observação", "Isolamento", "occupied"),
-
-    // UPA - Retaguarda
-    createBed("o-ret1", "Retaguarda 01", "Observação", "Retaguarda", "available"),
+    createBed("o-iso1", "Leito 1", "Observação", "Isolamento", "available"),
+    createBed("o-iso2", "Leito 2", "Observação", "Isolamento", "occupied"),
   ];
 
   return beds;

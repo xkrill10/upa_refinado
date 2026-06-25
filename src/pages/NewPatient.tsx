@@ -36,6 +36,7 @@ import {
   Volume2,
   VolumeX,
   X,
+  Eraser,
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { toast } from "sonner";
@@ -149,6 +150,7 @@ export default function NewPatient() {
 
   const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isCancelConfirmOpen, setIsCancelConfirmOpen] = useState(false);
   const [showCallControl, setShowCallControl] = useState(false);
   const [callingTicket, setCallingTicket] = useState<{
     ticket: string;
@@ -222,6 +224,68 @@ export default function NewPatient() {
       default:
         return { label: risk, color: "bg-slate-500 text-white" };
     }
+  };
+
+  const handleClearAtendimento = () => {
+    setFormData((prev) => ({
+      ...prev,
+      attendanceType: "clinico",
+    }));
+  };
+
+  const handleClearPessoais = () => {
+    if (!selectedPatient) return;
+    setFormData((prev) => ({
+      ...prev,
+      name: selectedPatient.name.includes("Pré-cadastro") ? "" : selectedPatient.name || "",
+      socialName: "",
+      cpf: selectedPatient.cpf || "",
+      susCard: "",
+      rg: "",
+      organIssuer: "",
+      birthDate: selectedPatient.birthDate || "",
+      gender: selectedPatient.gender || "",
+      motherName: "",
+    }));
+  };
+
+  const handleClearComplementares = () => {
+    setFormData((prev) => ({
+      ...prev,
+      nationality: "Brasileira",
+      birthPlace: "",
+      race: "",
+      maritalStatus: "",
+      profession: "",
+      religion: "",
+      pcd: "nao",
+    }));
+  };
+
+  const handleClearAcompanhante = () => {
+    setFormData((prev) => ({
+      ...prev,
+      companionName: "",
+      companionRelation: "",
+      companionCpf: "",
+      companionPhone: "",
+    }));
+  };
+
+  const handleClearLocalizacao = () => {
+    setFormData((prev) => ({
+      ...prev,
+      cep: "",
+      street: "",
+      number: "",
+      complement: "",
+      neighborhood: "",
+      city: "",
+      state: "",
+      phone1: "",
+      phone2: "",
+      email: "",
+    }));
   };
 
   const handleOpenRegistration = (patient: Patient) => {
@@ -597,8 +661,7 @@ export default function NewPatient() {
                           initial={{ opacity: 0, y: 10 }}
                           animate={{ opacity: 1, y: 0 }}
                           exit={{ opacity: 0, scale: 0.95 }}
-                          className="border-b border-slate-200/40 dark:border-slate-800/40 transition-colors h-16 hover:bg-slate-50/50 dark:hover:bg-slate-900/30 cursor-pointer"
-                          onClick={() => handleOpenRegistration(patient)}
+                          className="border-b border-slate-200/40 dark:border-slate-800/40 transition-colors h-16 hover:bg-slate-50/50 dark:hover:bg-slate-900/30"
                         >
                           <TableCell className="text-center">
                             <Badge variant="outline" className="font-mono text-xs font-black bg-white dark:bg-slate-950 px-2 py-1 shadow-sm">
@@ -632,14 +695,29 @@ export default function NewPatient() {
                             </div>
                           </TableCell>
                           <TableCell className="text-center">
-                            <Button
-                              onClick={(e) => handleCallPatient(e, patient)}
-                              variant="ghost"
-                              className="h-8 px-3 text-[10px] uppercase font-black text-[#006699] hover:bg-[#006699]/10 gap-2 rounded-lg transition-all"
-                            >
-                              <Megaphone className="h-3.5 w-3.5" />
-                              Chamar
-                            </Button>
+                            <div className="flex items-center justify-center gap-2">
+                              <Button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleOpenRegistration(patient);
+                                }}
+                                className="h-8 px-3 text-[10px] uppercase font-black bg-[#006699] hover:bg-[#005580] text-white gap-2 rounded-lg transition-all shadow-sm"
+                              >
+                                <UserPlus className="h-3.5 w-3.5" />
+                                Iniciar Cadastro
+                              </Button>
+                              <Button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleCallPatient(e, patient);
+                                }}
+                                variant="ghost"
+                                className="h-8 px-3 text-[10px] uppercase font-black text-[#006699] hover:bg-[#006699]/10 gap-2 rounded-lg transition-all"
+                              >
+                                <Megaphone className="h-3.5 w-3.5" />
+                                Chamar
+                              </Button>
+                            </div>
                           </TableCell>
                         </motion.tr>
                       );
@@ -681,10 +759,13 @@ export default function NewPatient() {
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* DADOS DO ATENDIMENTO */}
               <Card className="glass-card shadow-sm border-slate-200/50">
-                <CardHeader className="bg-slate-100/50 dark:bg-slate-800/50 py-4 border-b border-slate-200/50">
+                <CardHeader className="bg-slate-100/50 dark:bg-slate-800/50 py-4 border-b border-slate-200/50 flex flex-row items-center justify-between space-y-0">
                   <CardTitle className="text-sm font-black uppercase text-[#006699] flex items-center gap-2">
                     <Activity className="h-4 w-4" /> Dados do Atendimento
                   </CardTitle>
+                  <Button type="button" variant="ghost" size="icon" onClick={handleClearAtendimento} className="h-6 w-6 text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors" title="Limpar Atendimento">
+                    <Eraser className="h-3.5 w-3.5" />
+                  </Button>
                 </CardHeader>
                 <CardContent className="p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-1.5">
@@ -729,10 +810,13 @@ export default function NewPatient() {
 
               {/* DADOS PESSOAIS */}
               <Card className="glass-card shadow-sm border-slate-200/50">
-                <CardHeader className="bg-slate-100/50 dark:bg-slate-800/50 py-4 border-b border-slate-200/50">
+                <CardHeader className="bg-slate-100/50 dark:bg-slate-800/50 py-4 border-b border-slate-200/50 flex flex-row items-center justify-between space-y-0">
                   <CardTitle className="text-sm font-black uppercase text-[#006699] flex items-center gap-2">
                     <User className="h-4 w-4" /> Dados Pessoais e Filiação
                   </CardTitle>
+                  <Button type="button" variant="ghost" size="icon" onClick={handleClearPessoais} className="h-6 w-6 text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors" title="Limpar Dados Pessoais">
+                    <Eraser className="h-3.5 w-3.5" />
+                  </Button>
                 </CardHeader>
                 <CardContent className="p-4 grid grid-cols-1 md:grid-cols-4 gap-4">
                   <div className="space-y-1.5 md:col-span-2">
@@ -855,10 +939,13 @@ export default function NewPatient() {
                     />
                   </div>
 
-                  <div className="col-span-full border-t border-slate-100 dark:border-slate-800 my-2 pt-4">
+                  <div className="col-span-full border-t border-slate-100 dark:border-slate-800 my-2 pt-4 flex items-center justify-between">
                     <p className="text-xs font-black uppercase text-[#006699] mb-4">
                       Informações Complementares
                     </p>
+                    <Button type="button" variant="ghost" size="icon" onClick={handleClearComplementares} className="h-6 w-6 text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors mb-4" title="Limpar Informações Complementares">
+                      <Eraser className="h-3.5 w-3.5" />
+                    </Button>
                   </div>
 
                   <div className="space-y-1.5">
@@ -989,11 +1076,14 @@ export default function NewPatient() {
 
               {/* ACOMPANHANTE */}
               <Card className="glass-card shadow-sm border-slate-200/50">
-                <CardHeader className="bg-slate-100/50 dark:bg-slate-800/50 py-4 border-b border-slate-200/50">
+                <CardHeader className="bg-slate-100/50 dark:bg-slate-800/50 py-4 border-b border-slate-200/50 flex flex-row items-center justify-between space-y-0">
                   <CardTitle className="text-sm font-black uppercase text-[#006699] flex items-center gap-2">
                     <Users className="h-4 w-4" /> Dados do Acompanhante /
                     Responsável
                   </CardTitle>
+                  <Button type="button" variant="ghost" size="icon" onClick={handleClearAcompanhante} className="h-6 w-6 text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors" title="Limpar Acompanhante">
+                    <Eraser className="h-3.5 w-3.5" />
+                  </Button>
                 </CardHeader>
                 <CardContent className="p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-1.5 md:col-span-2">
@@ -1062,10 +1152,13 @@ export default function NewPatient() {
 
               {/* ENDEREÇO E CONTATO */}
               <Card className="glass-card shadow-sm border-slate-200/50">
-                <CardHeader className="bg-slate-100/50 dark:bg-slate-800/50 py-4 border-b border-slate-200/50">
+                <CardHeader className="bg-slate-100/50 dark:bg-slate-800/50 py-4 border-b border-slate-200/50 flex flex-row items-center justify-between space-y-0">
                   <CardTitle className="text-sm font-black uppercase text-[#006699] flex items-center gap-2">
                     <MapPin className="h-4 w-4" /> Localização e Contato
                   </CardTitle>
+                  <Button type="button" variant="ghost" size="icon" onClick={handleClearLocalizacao} className="h-6 w-6 text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors" title="Limpar Localização">
+                    <Eraser className="h-3.5 w-3.5" />
+                  </Button>
                 </CardHeader>
                 <CardContent className="p-4 grid grid-cols-1 md:grid-cols-4 gap-4">
                   <div className="space-y-1.5">
@@ -1173,15 +1266,17 @@ export default function NewPatient() {
                 </CardContent>
               </Card>
 
-              <div className="flex justify-end gap-3 pt-4 sticky bottom-0 bg-slate-50 dark:bg-slate-950 pb-4">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => setIsModalOpen(false)}
-                  className="px-8 h-12 uppercase font-bold text-xs rounded-xl"
-                >
-                  Cancelar
-                </Button>
+              <div className="flex items-center justify-between mt-6 pt-6 border-t border-slate-200/60 dark:border-slate-800/60">
+                <div className="flex gap-3">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setIsCancelConfirmOpen(true)}
+                    className="px-8 h-12 uppercase font-bold text-xs rounded-xl border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800"
+                  >
+                    Cancelar
+                  </Button>
+                </div>
                 <Button
                   type="submit"
                   className="px-10 h-12 gap-2 bg-[#006699] hover:bg-[#005580] text-white uppercase font-black tracking-widest rounded-xl shadow-lg shadow-sky-500/20"
@@ -1194,6 +1289,45 @@ export default function NewPatient() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* CONFIRMATION CANCEL */}
+      <Dialog open={isCancelConfirmOpen} onOpenChange={setIsCancelConfirmOpen}>
+        <DialogContent className="sm:max-w-[400px] p-0 overflow-hidden border border-white/20 dark:border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.3)] rounded-3xl bg-white/70 dark:bg-slate-950/60 backdrop-blur-xl [&>button]:hidden">
+          <div className="p-8 text-center text-slate-800 dark:text-slate-100 relative shadow-lg backdrop-blur-md bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800">
+            <div className="bg-orange-500/10 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4">
+              <AlertTriangle className="h-8 w-8 text-orange-500" />
+            </div>
+            <DialogTitle className="text-2xl font-black uppercase tracking-tight mb-2">
+              Cancelar Cadastro?
+            </DialogTitle>
+            <DialogDescription className="text-muted-foreground font-medium text-sm">
+              Se você cancelar, todos os dados que você digitou até agora serão perdidos. Deseja mesmo sair?
+            </DialogDescription>
+          </div>
+          <div className="p-8 space-y-5 bg-white/50 dark:bg-slate-950/50">
+            <div className="flex gap-3">
+              <Button
+                variant="outline"
+                onClick={() => setIsCancelConfirmOpen(false)}
+                className="flex-1 h-12 rounded-xl text-xs font-black uppercase tracking-widest bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800"
+              >
+                Voltar
+              </Button>
+              <Button
+                onClick={() => {
+                  setIsCancelConfirmOpen(false);
+                  setIsModalOpen(false);
+                }}
+                className="flex-1 h-12 rounded-xl text-xs font-black uppercase tracking-widest bg-orange-500 hover:bg-orange-600 text-white shadow-md shadow-orange-500/20"
+              >
+                Sim, Cancelar
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+    
 
       {/* CALL CONTROL MODAL */}
       <Dialog open={showCallControl} onOpenChange={setShowCallControl}>

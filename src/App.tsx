@@ -18,15 +18,21 @@ const AppContent = () => {
   const isCallPanel = location.pathname === "/painel-chamadas";
   const isCleaning = location.pathname === "/higiene";
   const isLogin = location.pathname === "/login";
-  const isClinicalPanel = 
-    location.pathname.startsWith("/painel-enfermagem") ||
-    location.pathname.startsWith("/paciente") ||
-    location.pathname.startsWith("/lista-internacao") ||
-    location.pathname.startsWith("/leitos");
-  const isClinicalRoom = location.pathname.startsWith("/sala/");
-
   const { user } = useAuth();
   const { role, setRole } = useRole();
+
+  const isClinicalPanel = 
+    (role === "enfermeiro" || role === "medico" || role === "recepcao") && (
+      location.pathname.startsWith("/painel-enfermagem") ||
+      location.pathname.startsWith("/painel-medico") ||
+      location.pathname.startsWith("/fila") ||
+      location.pathname.startsWith("/laboratorio") ||
+      location.pathname.startsWith("/paciente") ||
+      location.pathname.startsWith("/lista-internacao") ||
+      location.pathname.startsWith("/leitos") ||
+      location.pathname.startsWith("/novo-paciente")
+    );
+  const isClinicalRoom = location.pathname.startsWith("/sala/");
   
   const localDoctor =
     typeof window !== "undefined"
@@ -115,7 +121,7 @@ const AppContent = () => {
           {!isCallPanel && !isLogin && !isCleaning && (
             <header className="h-24 flex items-center justify-between px-8 sticky top-0 z-20 header-premium-glass">
               <div className="flex items-center gap-6">
-                <SidebarTrigger className="h-12 w-12 hover:bg-primary/10 hover:text-primary transition-all duration-300 rounded-xl" />
+                {showSidebar && <SidebarTrigger className="h-12 w-12 hover:bg-primary/10 hover:text-primary transition-all duration-300 rounded-xl" />}
                 <div className="flex flex-col">
                   <span className="text-base md:text-[18px] font-black tracking-[0.15em] text-foreground uppercase mission-control-title leading-tight">
                     UPA · Unidade de Pronto Atendimento
@@ -141,6 +147,7 @@ const AppContent = () => {
                     <option value="diretoria">👔 DIRETORIA</option>
                     <option value="enfermeiro">👩‍⚕️ ENFERMAGEM</option>
                     <option value="medico">👨‍⚕️ MÉDICO</option>
+                    <option value="recepcao">🙋‍♀️ RECEPÇÃO</option>
                   </select>
                 </div>
                 <GlobalClock />

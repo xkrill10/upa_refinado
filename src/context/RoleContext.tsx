@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 
-export type Role = "diretoria" | "medico" | "enfermeiro";
+export type Role = "diretoria" | "medico" | "enfermeiro" | "recepcao";
 
 interface RoleContextType {
   role: Role;
@@ -26,6 +26,8 @@ export const RoleProvider: React.FC<{ children: React.ReactNode }> = ({
       window.location.href = "/painel-medico";
     } else if (newRole === "enfermeiro") {
       window.location.href = "/painel-enfermagem";
+    } else if (newRole === "recepcao") {
+      window.location.href = "/novo-paciente";
     } else {
       window.location.href = "/";
     }
