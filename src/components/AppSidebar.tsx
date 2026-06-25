@@ -228,7 +228,7 @@ export function AppSidebar() {
     menuGroups = [
       {
         label: "Atendimento Clínico",
-        items: menuGroupsRaw[1].items
+        items: (menuGroupsRaw[1].items
           .map((item) => {
             if (item.title === "Evoluções") {
               return {
@@ -248,14 +248,14 @@ export function AppSidebar() {
               "Leitos",
               "Checagem Leito",
             ].includes(item.title),
-          ),
+          )) as any,
       },
     ];
   } else if (role === "medico") {
     menuGroups = [
       {
         label: "Atendimento Clínico",
-        items: menuGroupsRaw[1].items
+        items: (menuGroupsRaw[1].items
           .map((item) => {
             if (item.title === "Evoluções") {
               return {
@@ -277,7 +277,7 @@ export function AppSidebar() {
               "Laboratório",
               "Regulação (NIR)",
             ].includes(item.title),
-          ),
+          )) as any,
       },
     ];
   }
