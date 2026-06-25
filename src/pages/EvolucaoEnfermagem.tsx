@@ -1389,8 +1389,10 @@ export default function EvolucaoEnfermagem() {
               <button
                 key={tab.id}
                 onClick={() => {
+                  const newTabId = (isActive && tab.id === "prescriptions") ? "all" : tab.id;
+                  
                   setActiveTab(
-                    tab.id as
+                    newTabId as
                       | "all"
                       | "vitals"
                       | "evolutions"
@@ -1399,18 +1401,18 @@ export default function EvolucaoEnfermagem() {
                       | "discharge",
                   );
                   
-                  if (tab.id === "prescriptions" || tab.id === "all") {
+                  if (newTabId === "prescriptions" || newTabId === "all") {
                     setIsFormOpen(false);
                   } else {
                     setIsFormOpen(true);
-                    if (tab.id === "vitals") {
+                    if (newTabId === "vitals") {
                       handleEvolutionTypeChange("Sinais Vitais");
-                    } else if (tab.id === "discharge") {
+                    } else if (newTabId === "discharge") {
                       handleEvolutionTypeChange("Alta");
-                    } else if (tab.id === "exams") {
+                    } else if (newTabId === "exams") {
                       if (unreadExamsCount > 0 && id) markExamsAsRead(id);
                       handleEvolutionTypeChange("Procedimento");
-                    } else if (tab.id === "evolutions") {
+                    } else if (newTabId === "evolutions") {
                       handleEvolutionTypeChange("Evolução Enfermagem");
                     }
                   }
@@ -1444,17 +1446,6 @@ export default function EvolucaoEnfermagem() {
             );
           })}
           
-          {/* Ação Global de Prescrição alinhada à direita */}
-          <div className="ml-auto">
-            <Button
-              size="sm"
-              onClick={() => setIsAddCareItemModalOpen(true)}
-              className="h-8 rounded-xl bg-[#006699] hover:bg-[#004d73] dark:bg-sky-500 dark:hover:bg-sky-600 text-white text-[10px] font-black uppercase tracking-widest px-4 shadow-md transition-all hover:scale-105 active:scale-95 flex items-center gap-1.5"
-            >
-              <Plus className="h-3.5 w-3.5" />
-              Prescrever Cuidado
-            </Button>
-          </div>
         </div>
 
       <div className="flex items-center justify-start pb-1">

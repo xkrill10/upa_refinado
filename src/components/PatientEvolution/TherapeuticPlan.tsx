@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useLayoutEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -8,7 +8,7 @@ import { usePrescriptions, PrescriptionMedication, AprazamentoHour, Prescription
 import { DoubleCheckModal } from "./Modals/DoubleCheckModal";
 import { AddCareItemModal } from "./Modals/AddCareItemModal";
 import { toast } from "sonner";
-import { format, addDays, subDays, isToday } from "date-fns";
+import { format, addDays, subDays, isToday, differenceInDays } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { usePatients } from "@/hooks/use-patients";
 import {
@@ -59,7 +59,9 @@ export function TherapeuticPlan({ patientId }: TherapeuticPlanProps) {
   const { orders, updateMedicationHours, addCareItem } = usePrescriptions();
   const { addEvolution } = usePatients();
   const scrollRef = useRef<HTMLDivElement>(null);
-  
+  const headerRef = useRef<HTMLTableSectionElement>(null);
+  const isUserScrolling = useRef(false);
+  const previousDateRef = useRef(new Date());
   const activeOrder = orders.find((o) => o.patientId === patientId) || orders[0];
 
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -86,18 +88,95 @@ export function TherapeuticPlan({ patientId }: TherapeuticPlanProps) {
     }))
   );
 
+  const scrollTimeline = (direction: 'left' | 'right') => {
+    if (!scrollRef.current) return;
+    const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
+    const SCROLL_STEP = 50; // Smooth 1-hour jump
+    
+    if (direction === 'right') {
+      if (scrollLeft + clientWidth >= scrollWidth - 10) {
+        isUserScrolling.current = true;
+        setCurrentDate(prev => addDays(prev, 1));
+      } else {
+        scrollRef.current.scrollBy({ left: SCROLL_STEP, behavior: 'smooth' });
+      }
+    } else {
+      if (scrollLeft <= 10) {
+        isUserScrolling.current = true;
+        setCurrentDate(prev => subDays(prev, 1));
+      } else {
+        scrollRef.current.scrollBy({ left: -SCROLL_STEP, behavior: 'smooth' });
+      }
+    }
+  };
+
+  useLayoutEffect(() => {
+    if (scrollRef.current && isUserScrolling.current) {
+      const diff = differenceInDays(currentDate, previousDateRef.current);
+      if (Math.abs(diff) === 1) {
+        const dayWidth = (scrollRef.current.scrollWidth - 250) / 3;
+        if (diff > 0) {
+          scrollRef.current.scrollLeft -= dayWidth;
+        } else {
+          scrollRef.current.scrollLeft += dayWidth;
+        }
+      }
+    }
+    previousDateRef.current = currentDate;
+  }, [currentDate]);
+
   useEffect(() => {
+    const headerEl = headerRef.current;
+    const scrollEl = scrollRef.current;
+    if (!headerEl || !scrollEl) return;
+
+    const handleWheel = (e: WheelEvent) => {
+      // Don't intercept if user is pressing shift (native horizontal) or scrolling horizontally natively
+      if (e.shiftKey || Math.abs(e.deltaX) > Math.abs(e.deltaY)) return;
+      
+      if (e.deltaY !== 0) {
+        e.preventDefault();
+        
+        const { scrollLeft, scrollWidth, clientWidth } = scrollEl;
+        
+        // Edge detection for infinite scroll
+        if (e.deltaY > 0 && scrollLeft + clientWidth >= scrollWidth - 10) {
+          isUserScrolling.current = true;
+          setCurrentDate(prev => addDays(prev, 1));
+        } else if (e.deltaY < 0 && scrollLeft <= 10) {
+          isUserScrolling.current = true;
+          setCurrentDate(prev => subDays(prev, 1));
+        } else {
+          scrollEl.scrollBy({ left: e.deltaY, behavior: 'auto' });
+        }
+      }
+    };
+
+    // passive: false is needed to call preventDefault
+    headerEl.addEventListener('wheel', handleWheel, { passive: false });
+    return () => headerEl.removeEventListener('wheel', handleWheel);
+  }, []);
+
+  useEffect(() => {
+    if (isUserScrolling.current) {
+      setTimeout(() => { isUserScrolling.current = false; }, 50);
+      return;
+    }
+
     if (scrollRef.current) {
-      // Find the column for today's current hour
-      const currentHourEl = document.getElementById(`hour-col-${format(new Date(), "yyyy-MM-dd")}-${currentHourStr}`);
-      if (currentHourEl) {
+      // Find the column for currentDate at the current hour
+      const targetHourEl = document.getElementById(`hour-col-${format(currentDate, "yyyy-MM-dd")}-${currentHourStr}`);
+      const fallbackEl = document.getElementById(`hour-col-${format(currentDate, "yyyy-MM-dd")}-08:00`);
+      
+      const elToScroll = targetHourEl || fallbackEl;
+      if (elToScroll) {
         scrollRef.current.scrollTo({
-          left: currentHourEl.offsetLeft - 300,
+          left: elToScroll.offsetLeft - 300,
           behavior: 'smooth'
         });
       }
     }
-  }, [currentDate]);
+  }, [currentDate, currentHourStr]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -105,9 +184,9 @@ export function TherapeuticPlan({ patientId }: TherapeuticPlanProps) {
       if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
       
       if (e.key === 'ArrowLeft') {
-        scrollRef.current?.scrollBy({ left: -250, behavior: 'smooth' });
+        scrollTimeline('left');
       } else if (e.key === 'ArrowRight') {
-        scrollRef.current?.scrollBy({ left: 250, behavior: 'smooth' });
+        scrollTimeline('right');
       }
     };
 
@@ -234,16 +313,16 @@ export function TherapeuticPlan({ patientId }: TherapeuticPlanProps) {
     return (
       <>
         <tr>
-          <td colSpan={73} className={cn("px-4 py-2 uppercase text-[10px] font-black tracking-widest flex items-center gap-2 sticky left-0 z-20 border-b border-border/20", bgColor, textColor)}>
+          <td colSpan={73} className={cn("px-4 py-2 uppercase text-[10px] font-black tracking-widest flex items-center gap-2 sticky left-0 z-20 border-b border-white/20 dark:border-white/5 backdrop-blur-sm", bgColor, textColor)}>
             {icon} {title}
           </td>
         </tr>
         {meds.map((med) => (
           <tr key={med.id} className={cn(
-            "border-b border-border/40 hover:bg-muted/10 transition-colors",
+            "border-b border-white/20 dark:border-white/5 hover:bg-white/20 dark:hover:bg-slate-800/40 transition-colors",
             med.isHighVigilance && "bg-red-500/5 hover:bg-red-500/10"
           )}>
-            <td className="px-4 py-3 sticky left-0 z-10 bg-background/95 backdrop-blur-md border-r border-b border-border/30 w-[250px]">
+            <td className="px-4 py-3 sticky left-0 z-10 bg-white/40 dark:bg-slate-900/40 backdrop-blur-xl border-r border-b border-white/30 dark:border-white/10 w-[250px] shadow-[2px_0_10px_rgba(0,0,0,0.02)]">
               <div className="flex flex-col gap-1 w-[230px]">
                 <div className="flex items-center gap-2">
                   <span className={cn(
@@ -277,28 +356,90 @@ export function TherapeuticPlan({ patientId }: TherapeuticPlanProps) {
               const hourData = med.hours.find(mh => mh.hour === h.timeStr);
               return (
                 <td key={h.id} className={cn(
-                  "px-1 py-3 text-center align-middle transition-colors border-r border-b border-border/20",
-                  h.isCurrentHour ? "bg-[#006699]/10 dark:bg-sky-500/10 shadow-[inset_0_0_15px_rgba(0,102,153,0.1)]" : (h.isCurrentDay ? "bg-background" : "bg-muted/10")
+                  "px-1 py-3 text-center align-middle transition-colors border-r border-b border-white/20 dark:border-white/5",
+                  h.isCurrentHour ? "bg-[#006699]/15 dark:bg-sky-500/15 shadow-[inset_0_0_20px_rgba(0,102,153,0.15)] backdrop-blur-sm" : (h.isCurrentDay ? "bg-transparent" : "bg-slate-500/5 dark:bg-slate-800/30")
                 )}>
                   {hourData ? (
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <button
-                          className={cn(
-                            "w-6 h-6 mx-auto rounded-full inline-flex items-center justify-center transition-all cursor-pointer relative outline-none ring-0 hover:scale-110",
-                            hourData.status === "pending" && "bg-amber-500/20 text-amber-500 border border-amber-500/50 hover:bg-amber-500 hover:text-white shadow-[0_0_10px_rgba(245,158,11,0.2)]",
-                            hourData.status === "checked" && "bg-emerald-500/20 text-emerald-500 border border-emerald-500/50 shadow-[0_0_10px_rgba(16,185,129,0.2)]",
-                            hourData.status === "refused" && "bg-red-500/20 text-red-500 border border-red-500/50",
-                            hourData.status === "delayed" && "bg-orange-500/20 text-orange-500 border border-orange-500/50",
-                            hourData.status === "suspended" && "bg-slate-500/20 text-slate-500 border border-slate-500/50",
-                          )}
-                        >
-                          {hourData.status === "pending" && <div className="w-2 h-2 rounded-full bg-current animate-pulse" />}
-                          {hourData.status === "checked" && <CheckCircle2 className="h-3 w-3" />}
-                          {hourData.status === "refused" && <XCircle className="h-3 w-3" />}
-                          {hourData.status === "delayed" && <Clock className="h-3 w-3" />}
-                          {hourData.status === "suspended" && <Ban className="h-3 w-3" />}
-                        </button>
+                        <div className="inline-block">
+                          <Tooltip delayDuration={200}>
+                            <TooltipTrigger asChild>
+                              <button
+                                className={cn(
+                                  "w-6 h-6 mx-auto rounded-full inline-flex items-center justify-center transition-all cursor-pointer relative outline-none ring-0 hover:scale-110",
+                                  hourData.status === "pending" && "bg-amber-500/20 text-amber-500 border border-amber-500/50 hover:bg-amber-500 hover:text-white shadow-[0_0_10px_rgba(245,158,11,0.2)]",
+                                  hourData.status === "checked" && "bg-emerald-500/20 text-emerald-500 border border-emerald-500/50 shadow-[0_0_10px_rgba(16,185,129,0.2)]",
+                                  hourData.status === "refused" && "bg-red-500/20 text-red-500 border border-red-500/50",
+                                  hourData.status === "delayed" && "bg-orange-500/20 text-orange-500 border border-orange-500/50",
+                                  hourData.status === "suspended" && "bg-slate-500/20 text-slate-500 border border-slate-500/50",
+                                )}
+                              >
+                                {hourData.status === "pending" && <div className="w-2 h-2 rounded-full bg-current animate-pulse" />}
+                                {hourData.status === "checked" && <CheckCircle2 className="h-3 w-3" />}
+                                {hourData.status === "refused" && <XCircle className="h-3 w-3" />}
+                                {hourData.status === "delayed" && <Clock className="h-3 w-3" />}
+                                {hourData.status === "suspended" && <Ban className="h-3 w-3" />}
+                              </button>
+                            </TooltipTrigger>
+                            <TooltipContent side="top" align="center" className="glass-card-premium border-white/20 dark:border-white/10 p-3 min-w-[220px] shadow-xl z-[60]">
+                              <div className="space-y-2">
+                                <div className="flex items-center justify-between gap-3 border-b border-border/40 pb-2">
+                                  <div className="flex items-center gap-1.5 text-xs font-black text-foreground">
+                                    <Clock className="h-3.5 w-3.5 text-[#006699] dark:text-sky-400" /> 
+                                    {h.timeStr}
+                                  </div>
+                                  <Badge variant="outline" className={cn(
+                                    "text-[9px] uppercase font-black border",
+                                    hourData.status === "pending" && "bg-amber-500/10 text-amber-500 border-amber-500/30",
+                                    hourData.status === "checked" && "bg-emerald-500/10 text-emerald-500 border-emerald-500/30",
+                                    hourData.status === "refused" && "bg-red-500/10 text-red-500 border-red-500/30",
+                                    hourData.status === "delayed" && "bg-orange-500/10 text-orange-500 border-orange-500/30",
+                                    hourData.status === "suspended" && "bg-slate-500/10 text-slate-500 border-slate-500/30"
+                                  )}>
+                                    {hourData.status === "pending" && "Aguardando"}
+                                    {hourData.status === "checked" && "Realizado"}
+                                    {hourData.status === "refused" && "Recusado"}
+                                    {hourData.status === "delayed" && "Adiado"}
+                                    {hourData.status === "suspended" && "Suspenso"}
+                                  </Badge>
+                                </div>
+                                
+                                <div>
+                                  <p className="font-bold text-sm text-foreground leading-tight">
+                                    {med.medication}
+                                  </p>
+                                  <p className="text-[10px] uppercase font-bold text-muted-foreground mt-0.5">
+                                    {med.dosage} &bull; {med.route}
+                                  </p>
+                                </div>
+
+                                {hourData.status === "pending" ? (
+                                  <div className="bg-muted/30 rounded-md p-1.5 mt-2">
+                                    <p className="text-[10px] text-muted-foreground text-center font-medium">
+                                      Clique para registrar ação
+                                    </p>
+                                  </div>
+                                ) : (
+                                  <div className="bg-muted/20 rounded-md p-2 border border-border/30 mt-2 space-y-1">
+                                    <div className="flex items-center gap-1">
+                                      <CheckCircle2 className={cn("h-3 w-3", hourData.status === "checked" ? "text-emerald-500" : "text-muted-foreground")} />
+                                      <span className="text-[10px] font-black uppercase text-muted-foreground">Responsável:</span>
+                                    </div>
+                                    <p className="text-xs font-bold text-foreground pl-4">{hourData.nurseName}</p>
+                                    
+                                    {hourData.justification && (
+                                      <div className="mt-1.5 pl-4 border-l-2 border-orange-500/30">
+                                        <p className="text-[10px] font-black uppercase text-orange-500/70 mb-0.5">Justificativa:</p>
+                                        <p className="text-[10px] italic text-foreground/80 leading-tight">"{hourData.justification}"</p>
+                                      </div>
+                                    )}
+                                  </div>
+                                )}
+                              </div>
+                            </TooltipContent>
+                          </Tooltip>
+                        </div>
                       </DropdownMenuTrigger>
                       {hourData.status === "pending" && (
                         <DropdownMenuContent align="center" className="w-56 glass-card border-border/50">
@@ -415,12 +556,12 @@ export function TherapeuticPlan({ patientId }: TherapeuticPlanProps) {
         </div>
       </div>
 
-      <Card className="glass-card overflow-hidden border-border/40 flex flex-col h-[calc(100vh-220px)] min-h-[500px]">
+      <Card className="glass-card-premium overflow-hidden border-white/30 dark:border-white/10 flex flex-col h-[calc(100vh-220px)] min-h-[500px] shadow-2xl bg-white/30 dark:bg-slate-900/30 backdrop-blur-xl">
         <div className="overflow-auto overscroll-contain custom-scrollbar flex-1 relative" ref={scrollRef}>
           <table className="w-full text-sm text-left min-w-[3600px] border-separate border-spacing-0">
-            <thead className="text-[10px] uppercase font-black tracking-widest text-muted-foreground sticky top-0 z-40">
+            <thead ref={headerRef} className="text-[10px] uppercase font-black tracking-widest text-muted-foreground sticky top-0 z-40">
               <tr>
-                <th rowSpan={2} className="px-4 py-3 min-w-[250px] max-w-[250px] sticky left-0 top-0 z-50 bg-background/95 backdrop-blur-md border-r border-b border-border/30 shadow-[2px_2px_5px_rgba(0,0,0,0.05)] align-bottom">
+                <th rowSpan={2} className="px-4 py-3 min-w-[250px] max-w-[250px] sticky left-0 top-0 z-50 bg-[#006699]/10 dark:bg-sky-500/10 backdrop-blur-xl border-r border-b border-white/30 dark:border-white/10 shadow-[2px_2px_15px_rgba(0,0,0,0.05),inset_0_1px_1px_rgba(255,255,255,0.4)] align-bottom text-[#006699] dark:text-sky-300">
                   Item de Cuidado
                 </th>
                 {timelineDays.map(date => (
@@ -428,11 +569,13 @@ export function TherapeuticPlan({ patientId }: TherapeuticPlanProps) {
                     key={date.toISOString()} 
                     colSpan={24} 
                     className={cn(
-                      "text-center py-2 border-r border-b border-border/50 text-xs font-black uppercase tracking-widest text-muted-foreground bg-background/95 backdrop-blur-md",
-                      isToday(date) ? "text-[#006699] dark:text-sky-400" : ""
+                      "py-2 border-r border-b border-white/20 dark:border-white/5 text-xs font-black uppercase tracking-widest text-[#006699] dark:text-sky-300 bg-[#006699]/10 dark:bg-sky-500/10 backdrop-blur-xl shadow-[inset_0_1px_1px_rgba(255,255,255,0.4)]",
+                      isToday(date) ? "font-extrabold" : ""
                     )}
                   >
-                    {format(date, "EEEE, dd 'de' MMMM", { locale: ptBR })} {isToday(date) && "(Hoje)"}
+                    <div className="sticky left-[280px] right-4 w-fit mx-auto px-4">
+                      {format(date, "EEEE, dd 'de' MMMM", { locale: ptBR })} {isToday(date) && "(Hoje)"}
+                    </div>
                   </th>
                 ))}
               </tr>
@@ -442,9 +585,9 @@ export function TherapeuticPlan({ patientId }: TherapeuticPlanProps) {
                     key={h.id} 
                     id={`hour-col-${h.id}`}
                     className={cn(
-                      "px-1 py-3 text-center min-w-[50px] transition-colors border-r border-b border-border/20 bg-background/95 backdrop-blur-md",
-                      h.isCurrentHour ? "text-[#006699] dark:text-sky-400 font-bold" : "",
-                      !h.isCurrentDay ? "text-muted-foreground/70" : ""
+                      "px-1 py-3 text-center min-w-[50px] transition-colors border-r border-b border-white/20 dark:border-white/5 text-[#006699] dark:text-sky-300",
+                      h.isCurrentHour ? "bg-amber-300/90 text-black font-black animate-pulse shadow-md backdrop-blur-xl" : "bg-[#006699]/5 dark:bg-sky-500/5 backdrop-blur-xl",
+                      !h.isCurrentDay && !h.isCurrentHour ? "opacity-70" : ""
                     )}
                   >
                     {h.timeStr}
@@ -471,7 +614,7 @@ export function TherapeuticPlan({ patientId }: TherapeuticPlanProps) {
               variant="outline" 
               size="sm" 
               className="h-8 rounded-full px-4 text-[10px] font-bold uppercase flex items-center gap-2" 
-              onClick={() => scrollRef.current?.scrollBy({ left: -150, behavior: 'smooth' })}
+              onClick={() => scrollTimeline('left')}
             >
               <ChevronLeft className="h-3 w-3" /> Horários Anteriores
             </Button>
@@ -479,7 +622,7 @@ export function TherapeuticPlan({ patientId }: TherapeuticPlanProps) {
               variant="outline" 
               size="sm" 
               className="h-8 rounded-full px-4 text-[10px] font-bold uppercase flex items-center gap-2" 
-              onClick={() => scrollRef.current?.scrollBy({ left: 150, behavior: 'smooth' })}
+              onClick={() => scrollTimeline('right')}
             >
               Próximos Horários <ChevronRight className="h-3 w-3" />
             </Button>
