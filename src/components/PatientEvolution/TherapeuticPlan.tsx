@@ -794,6 +794,7 @@ export function TherapeuticPlan({ patientId }: TherapeuticPlanProps) {
       </Dialog>
 
       <AddCareItemModal 
+        patientId={patientId}
         isOpen={isAddModalOpen} 
         onClose={() => setIsAddModalOpen(false)} 
         onAdd={(item) => {

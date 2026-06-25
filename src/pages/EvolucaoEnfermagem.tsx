@@ -32,6 +32,7 @@ import {
   Droplet,
   Wind,
   FlaskConical,
+  Syringe,
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { Input } from "@/components/ui/input";
@@ -142,6 +143,7 @@ import { BedRequestModal } from "@/components/PatientEvolution/Modals/BedRequest
 import { ExamsModal } from "@/components/PatientEvolution/Modals/ExamsModal";
 import { AddCareItemModal } from "@/components/PatientEvolution/Modals/AddCareItemModal";
 import { TherapeuticPlan } from "@/components/PatientEvolution/TherapeuticPlan";
+import { VitalsChart } from "@/components/PatientEvolution/VitalsChart";
 
 export default function EvolucaoEnfermagem() {
   const { id } = useParams();
@@ -1380,7 +1382,7 @@ export default function EvolucaoEnfermagem() {
               {
                 id: "prescriptions",
                 label: "Plano Terapêutico",
-                icon: <Pill className="h-3.5 w-3.5" />,
+                icon: <Syringe className="h-3.5 w-3.5" />,
               },
             ] as Array<{ id: string; label: string; icon: any; badge?: any }>
           ).map((tab) => {
@@ -6160,7 +6162,10 @@ export default function EvolucaoEnfermagem() {
         </h2>
 
         {activeTab === "prescriptions" ? (
-          <TherapeuticPlan patientId={id || ""} />
+          <div className="space-y-6">
+            {patient && <VitalsChart patient={patient} />}
+            <TherapeuticPlan patientId={id || ""} />
+          </div>
         ) : filteredEvolutions.length === 0 &&
         !(patient?.exams && patient.exams.length > 0) ? (
           <Card className="glass-card-premium border border-white/40 dark:border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.06)] rounded-xl overflow-hidden transition-all duration-500">
@@ -6171,9 +6176,7 @@ export default function EvolucaoEnfermagem() {
                   : `Nenhum registro de ${
                       activeTab === "evolutions"
                         ? "Evolução"
-                        : activeTab === "prescriptions"
-                          ? "Prescrição"
-                          : activeTab === "vitals"
+                        : activeTab === "vitals"
                             ? "Sinais Vitais"
                             : activeTab === "exams"
                               ? "Exame/Procedimento"

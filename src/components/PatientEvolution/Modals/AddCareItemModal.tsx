@@ -10,14 +10,21 @@ import { Activity, Pill, Stethoscope, Utensils, ShieldAlert, CalendarIcon } from
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { CARE_LIBRARY } from "@/data/careLibrary";
+import { usePatients } from "@/hooks/use-patients";
+import { AlertTriangle } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
 
 interface AddCareItemModalProps {
+  patientId?: string;
   isOpen: boolean;
   onClose: () => void;
   onAdd: (item: PrescriptionMedication) => void;
 }
 
-export function AddCareItemModal({ isOpen, onClose, onAdd }: AddCareItemModalProps) {
+export function AddCareItemModal({ patientId, isOpen, onClose, onAdd }: AddCareItemModalProps) {
+  const { patients } = usePatients();
+  const patient = patientId ? patients.find((p) => p.id === patientId) : null;
+  const allergiesText = patient?.allergies?.toLowerCase() || "";
   const [medication, setMedication] = useState("");
   const [category, setCategory] = useState<"medication" | "diet" | "therapy" | "nursing">("medication");
   const [dosage, setDosage] = useState("");
@@ -29,6 +36,9 @@ export function AddCareItemModal({ isOpen, onClose, onAdd }: AddCareItemModalPro
   const [scheduleType, setScheduleType] = useState<"continuous" | "single">("continuous");
   const [startDate, setStartDate] = useState(format(new Date(), "yyyy-MM-dd"));
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [allergyOverride, setAllergyOverride] = useState(false);
+
+  const isAllergic = medication.length > 2 && allergiesText.includes(medication.toLowerCase());
 
   const filteredLibrary = CARE_LIBRARY.filter(
     item => item.category === category && item.name.toLowerCase().includes(medication.toLowerCase())
@@ -44,6 +54,22 @@ export function AddCareItemModal({ isOpen, onClose, onAdd }: AddCareItemModalPro
       if (found.isHighVigilance !== undefined) setIsHighVigilance(found.isHighVigilance);
     }
   }, [medication, category]);
+
+  useEffect(() => {
+    if (!frequency) return;
+    const freq = frequency.toLowerCase().replace(/\s/g, '');
+    let hours: string[] = [];
+    
+    if (freq === "8/8h" || freq === "8em8h") hours = ["06:00", "14:00", "22:00"];
+    else if (freq === "12/12h" || freq === "12em12h") hours = ["10:00", "22:00"];
+    else if (freq === "6/6h" || freq === "6em6h") hours = ["06:00", "12:00", "18:00", "00:00"];
+    else if (freq === "4/4h" || freq === "4em4h") hours = ["02:00", "06:00", "10:00", "14:00", "18:00", "22:00"];
+    else if (freq === "24/24h" || freq === "24h" || freq === "1xaodia" || freq === "1xdia") hours = ["10:00"];
+    
+    if (hours.length > 0) {
+       setHoursStr(hours.join(", "));
+    }
+  }, [frequency]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -97,6 +123,7 @@ export function AddCareItemModal({ isOpen, onClose, onAdd }: AddCareItemModalPro
     setObservation("");
     setScheduleType("continuous");
     setStartDate(format(new Date(), "yyyy-MM-dd"));
+    setAllergyOverride(false);
     
     onClose();
   };
@@ -257,13 +284,45 @@ export function AddCareItemModal({ isOpen, onClose, onAdd }: AddCareItemModalPro
                 <Switch checked={isHighVigilance} onCheckedChange={setIsHighVigilance} />
               </div>
             )}
+
+            {category === 'medication' && isAllergic && (
+              <div className="col-span-2 flex flex-col p-4 bg-red-600/10 border-2 border-red-500 rounded-xl mt-2 shadow-[0_0_15px_rgba(239,68,68,0.2)] animate-pulse-slow">
+                <div className="flex items-start gap-3">
+                  <AlertTriangle className="h-6 w-6 text-red-500 shrink-0 mt-0.5" />
+                  <div>
+                    <p className="font-black text-sm text-red-600 dark:text-red-400 uppercase tracking-wide">
+                      Alergia Detectada!
+                    </p>
+                    <p className="text-xs text-red-600/80 dark:text-red-400/80 font-bold mt-1">
+                      O paciente possui histórico de alergia que parece corresponder a este medicamento. 
+                      <br />Alergias registradas: <span className="text-foreground bg-background/50 px-1 py-0.5 rounded ml-1">{patient?.allergies}</span>
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 mt-4 pt-3 border-t border-red-500/20">
+                  <Checkbox 
+                    id="allergyOverride" 
+                    checked={allergyOverride} 
+                    onCheckedChange={(checked) => setAllergyOverride(checked === true)} 
+                    className="border-red-500 data-[state=checked]:bg-red-500"
+                  />
+                  <Label htmlFor="allergyOverride" className="text-xs font-bold text-red-600 dark:text-red-400 cursor-pointer">
+                    Estou ciente do risco e autorizo a prescrição sob minha responsabilidade.
+                  </Label>
+                </div>
+              </div>
+            )}
           </div>
 
           <DialogFooter className="mt-4 pt-4 shrink-0 border-t border-border/50">
             <Button type="button" variant="outline" onClick={onClose} className="rounded-xl font-bold uppercase text-[10px] tracking-widest px-6">
               Cancelar
             </Button>
-            <Button type="submit" className="bg-[#006699] hover:bg-[#004d73] dark:bg-sky-500 dark:hover:bg-sky-600 text-white rounded-xl font-bold uppercase text-[10px] tracking-widest px-6">
+            <Button 
+              type="submit" 
+              disabled={isAllergic && !allergyOverride}
+              className="bg-[#006699] hover:bg-[#004d73] dark:bg-sky-500 dark:hover:bg-sky-600 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-xl font-bold uppercase text-[10px] tracking-widest px-6"
+            >
               Adicionar Item
             </Button>
           </DialogFooter>

@@ -50,6 +50,7 @@ import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { TherapeuticPlan } from "@/components/PatientEvolution/TherapeuticPlan";
+import { VitalsChart } from "@/components/PatientEvolution/VitalsChart";
 import { CID10_DATABASE, CID10Item } from "@/data/cid10";
 import { SmartCidSelector } from "@/components/SmartCidSelector";
 import {
@@ -6223,7 +6224,10 @@ export default function PatientEvolution() {
 
       <div className="space-y-6">
         {activeTab === "therapeutic" ? (
-          <TherapeuticPlan patientId={patient.id} />
+          <div className="space-y-6">
+            <VitalsChart patient={patient} />
+            <TherapeuticPlan patientId={patient.id} />
+          </div>
         ) : (
           <>
             <h2 className="text-sm font-black tracking-widest text-[#006699] dark:text-sky-400 uppercase">
