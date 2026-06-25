@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -6,8 +6,10 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { PrescriptionMedication, AprazamentoHour } from "@/context/PrescriptionsContext";
-import { Activity, Pill, Stethoscope, Utensils, ShieldAlert } from "lucide-react";
+import { Activity, Pill, Stethoscope, Utensils, ShieldAlert, CalendarIcon } from "lucide-react";
 import { toast } from "sonner";
+import { format } from "date-fns";
+import { CARE_LIBRARY } from "@/data/careLibrary";
 
 interface AddCareItemModalProps {
   isOpen: boolean;
@@ -23,6 +25,25 @@ export function AddCareItemModal({ isOpen, onClose, onAdd }: AddCareItemModalPro
   const [frequency, setFrequency] = useState("");
   const [isHighVigilance, setIsHighVigilance] = useState(false);
   const [hoursStr, setHoursStr] = useState("");
+  const [observation, setObservation] = useState("");
+  const [scheduleType, setScheduleType] = useState<"continuous" | "single">("continuous");
+  const [startDate, setStartDate] = useState(format(new Date(), "yyyy-MM-dd"));
+  const [showSuggestions, setShowSuggestions] = useState(false);
+
+  const filteredLibrary = CARE_LIBRARY.filter(
+    item => item.category === category && item.name.toLowerCase().includes(medication.toLowerCase())
+  );
+
+  useEffect(() => {
+    if (!medication) return;
+    const found = CARE_LIBRARY.find(item => item.name === medication && item.category === category);
+    if (found) {
+      if (found.dosage && !dosage) setDosage(found.dosage);
+      if (found.route && !route) setRoute(found.route);
+      if (found.frequency && !frequency) setFrequency(found.frequency);
+      if (found.isHighVigilance !== undefined) setIsHighVigilance(found.isHighVigilance);
+    }
+  }, [medication, category]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -31,12 +52,21 @@ export function AddCareItemModal({ isOpen, onClose, onAdd }: AddCareItemModalPro
       return;
     }
 
-    // Parse hours: "08:00, 14:00" -> [{ hour: "08:00", status: "pending" }, ...]
+    // Smart Parse hours: "8" -> "08:00", "8:30" -> "08:30", "14, 20" -> ["14:00", "20:00"]
     const parsedHours: AprazamentoHour[] = hoursStr
       .split(",")
       .map(h => h.trim())
-      .filter(h => h.length === 5 && h.includes(":")) // basic validation
-      .map(h => ({ hour: h, status: "pending" }));
+      .filter(h => h.length > 0)
+      .map(h => {
+        let formatted = h;
+        if (!formatted.includes(':')) {
+           formatted = formatted + ":00";
+        }
+        const parts = formatted.split(':');
+        const hh = parts[0].padStart(2, '0').slice(-2);
+        const mm = (parts[1] || '00').padEnd(2, '0').substring(0, 2);
+        return { hour: `${hh}:${mm}`, status: "pending" };
+      });
 
     const newItem: PrescriptionMedication = {
       id: `item-${Date.now()}`,
@@ -45,6 +75,10 @@ export function AddCareItemModal({ isOpen, onClose, onAdd }: AddCareItemModalPro
       dosage: dosage || "-",
       route: route || "-",
       frequency: frequency || "-",
+      observation: observation || undefined,
+      startDate,
+      scheduleType,
+      executions: {},
       isHighVigilance,
       status: "active",
       hours: parsedHours
@@ -60,14 +94,17 @@ export function AddCareItemModal({ isOpen, onClose, onAdd }: AddCareItemModalPro
     setFrequency("");
     setIsHighVigilance(false);
     setHoursStr("");
+    setObservation("");
+    setScheduleType("continuous");
+    setStartDate(format(new Date(), "yyyy-MM-dd"));
     
     onClose();
   };
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="glass-card-premium border-white/40 dark:border-white/10 sm:max-w-xl rounded-[2rem]">
-        <DialogHeader>
+      <DialogContent className="glass-card-premium border-white/40 dark:border-white/10 sm:max-w-xl rounded-[2rem] max-h-[90vh] flex flex-col overflow-hidden">
+        <DialogHeader className="shrink-0">
           <DialogTitle className="text-xl font-black uppercase text-foreground">
             Adicionar Novo Item de Cuidado
           </DialogTitle>
@@ -76,8 +113,8 @@ export function AddCareItemModal({ isOpen, onClose, onAdd }: AddCareItemModalPro
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-4 mt-4">
-          <div className="grid grid-cols-2 gap-4">
+        <form onSubmit={handleSubmit} className="mt-4 flex flex-col flex-1 overflow-hidden">
+          <div className="grid grid-cols-2 gap-4 overflow-y-auto pr-2 custom-scrollbar pb-2">
             <div className="col-span-2 space-y-2">
               <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Tipo / Categoria</Label>
               <Select value={category} onValueChange={(val: any) => setCategory(val)}>
@@ -101,15 +138,59 @@ export function AddCareItemModal({ isOpen, onClose, onAdd }: AddCareItemModalPro
               </Select>
             </div>
 
-            <div className="col-span-2 space-y-2">
+            <div className="col-span-2 space-y-2 relative">
               <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Nome do Item</Label>
               <Input 
                 className="bg-background/50 border-border/50 rounded-xl h-10 font-bold" 
                 placeholder="Ex: Dipirona, Fisioterapia Motora..."
                 value={medication}
-                onChange={e => setMedication(e.target.value)}
+                onChange={e => {
+                  setMedication(e.target.value);
+                  setShowSuggestions(true);
+                }}
+                onFocus={() => setShowSuggestions(true)}
+                onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
                 autoFocus
               />
+              {showSuggestions && filteredLibrary.length > 0 && (
+                <div className="absolute top-full left-0 w-[55%] mt-1 z-50 bg-white/95 dark:bg-slate-900/95 backdrop-blur-3xl border border-white/40 dark:border-white/10 rounded-xl overflow-hidden shadow-2xl max-h-48 overflow-y-auto">
+                  {filteredLibrary.map(item => (
+                    <div 
+                      key={item.name} 
+                      className="px-4 py-3 text-xs font-bold cursor-pointer hover:bg-[#006699]/10 dark:hover:bg-sky-500/10 transition-colors border-b border-border/50 last:border-0"
+                      onClick={() => {
+                        setMedication(item.name);
+                        setShowSuggestions(false);
+                      }}
+                    >
+                      {item.name}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Data de Início</Label>
+              <Input 
+                type="date"
+                className="bg-background/50 border-border/50 rounded-xl h-10 font-bold" 
+                value={startDate}
+                onChange={e => setStartDate(e.target.value)}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Tipo de Uso</Label>
+              <Select value={scheduleType} onValueChange={(val: any) => setScheduleType(val)}>
+                <SelectTrigger className="bg-background/50 border-border/50 rounded-xl h-10 font-bold">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className="glass-card rounded-xl">
+                  <SelectItem value="continuous">Uso Contínuo</SelectItem>
+                  <SelectItem value="single">Dose Única / Específico</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
             <div className="space-y-2">
@@ -132,7 +213,7 @@ export function AddCareItemModal({ isOpen, onClose, onAdd }: AddCareItemModalPro
               />
             </div>
 
-            <div className="col-span-2 space-y-2">
+            <div className="space-y-2">
               <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Frequência</Label>
               <Input 
                 className="bg-background/50 border-border/50 rounded-xl h-10 font-bold" 
@@ -142,13 +223,23 @@ export function AddCareItemModal({ isOpen, onClose, onAdd }: AddCareItemModalPro
               />
             </div>
 
-            <div className="col-span-2 space-y-2">
+            <div className="space-y-2">
               <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Horários de Aprazamento</Label>
               <Input 
                 className="bg-background/50 border-border/50 rounded-xl h-10 font-bold" 
-                placeholder="Ex: 08:00, 14:00, 20:00 (separados por vírgula)"
+                placeholder="Ex: 8, 14, 20 ou 08:00, 14:30"
                 value={hoursStr}
                 onChange={e => setHoursStr(e.target.value)}
+              />
+            </div>
+
+            <div className="col-span-2 space-y-2">
+              <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Observações / Orientações</Label>
+              <Input 
+                className="bg-background/50 border-border/50 rounded-xl h-10 font-bold" 
+                placeholder="Ex: Diluir em 100ml de SF, Correr em 30 min, Verificar dextro antes..."
+                value={observation}
+                onChange={e => setObservation(e.target.value)}
               />
             </div>
 
@@ -168,7 +259,7 @@ export function AddCareItemModal({ isOpen, onClose, onAdd }: AddCareItemModalPro
             )}
           </div>
 
-          <DialogFooter className="mt-8">
+          <DialogFooter className="mt-4 pt-4 shrink-0 border-t border-border/50">
             <Button type="button" variant="outline" onClick={onClose} className="rounded-xl font-bold uppercase text-[10px] tracking-widest px-6">
               Cancelar
             </Button>

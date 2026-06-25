@@ -8,7 +8,7 @@ import { usePrescriptions, PrescriptionMedication, AprazamentoHour, Prescription
 import { DoubleCheckModal } from "./Modals/DoubleCheckModal";
 import { AddCareItemModal } from "./Modals/AddCareItemModal";
 import { toast } from "sonner";
-import { format, addDays, subDays, isToday, differenceInDays } from "date-fns";
+import { format, addDays, subDays, isToday, differenceInDays, startOfDay, isBefore, isSameDay } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { usePatients } from "@/hooks/use-patients";
 import {
@@ -56,7 +56,7 @@ interface TherapeuticPlanProps {
 }
 
 export function TherapeuticPlan({ patientId }: TherapeuticPlanProps) {
-  const { orders, updateMedicationHours, addCareItem } = usePrescriptions();
+  const { orders, updateMedicationHours, updateMedicationExecution, addCareItem } = usePrescriptions();
   const { addEvolution } = usePatients();
   const scrollRef = useRef<HTMLDivElement>(null);
   const headerRef = useRef<HTMLTableSectionElement>(null);
@@ -65,10 +65,10 @@ export function TherapeuticPlan({ patientId }: TherapeuticPlanProps) {
   const activeOrder = orders.find((o) => o.patientId === patientId) || orders[0];
 
   const [currentDate, setCurrentDate] = useState(new Date());
-  const [selectedMed, setSelectedMed] = useState<{med: PrescriptionMedication, hour: AprazamentoHour} | null>(null);
+  const [selectedMed, setSelectedMed] = useState<{med: PrescriptionMedication, hour: any} | null>(null);
   const [isDoubleCheckOpen, setIsDoubleCheckOpen] = useState(false);
-  const [confirmModalData, setConfirmModalData] = useState<{med: PrescriptionMedication, hour: AprazamentoHour} | null>(null);
-  const [justificationModal, setJustificationModal] = useState<{med: PrescriptionMedication, hour: AprazamentoHour, action: 'delayed' | 'refused'} | null>(null);
+  const [confirmModalData, setConfirmModalData] = useState<{med: PrescriptionMedication, hour: any} | null>(null);
+  const [justificationModal, setJustificationModal] = useState<{med: PrescriptionMedication, hour: any, action: 'delayed' | 'refused'} | null>(null);
   const [justificationText, setJustificationText] = useState("");
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
@@ -208,7 +208,7 @@ export function TherapeuticPlan({ patientId }: TherapeuticPlanProps) {
     );
   }
 
-  const handleHourAction = (med: PrescriptionMedication, hour: AprazamentoHour, action: 'checked' | 'delayed' | 'refused' | 'suspended') => {
+  const handleHourAction = (med: PrescriptionMedication, hour: any, action: 'checked' | 'delayed' | 'refused' | 'suspended') => {
     if (hour.status === "checked") {
       toast.info(`Já administrado por ${hour.nurseName || 'Profissional'}`);
       return;
@@ -239,28 +239,22 @@ export function TherapeuticPlan({ patientId }: TherapeuticPlanProps) {
 
   const executeAction = (
     med: PrescriptionMedication, 
-    hour: AprazamentoHour, 
+    hour: any, 
     action: 'checked' | 'delayed' | 'refused' | 'suspended',
     nurseName: string, 
     doubleCheckedBy?: string,
     justification?: string
   ) => {
-    const updatedHours = med.hours.map(h => {
-      if (h.hour === hour.hour) {
-        return {
-          ...h,
-          status: action,
-          checkedAt: new Date().toISOString(),
-          nurseName,
-          doubleCheckedBy,
-          doubleCheckedAt: doubleCheckedBy ? new Date().toISOString() : undefined,
-          justification
-        };
-      }
-      return h;
-    });
+    const executionData: any = {
+      status: action,
+      checkedAt: new Date().toISOString(),
+      nurseName,
+      doubleCheckedBy,
+      doubleCheckedAt: doubleCheckedBy ? new Date().toISOString() : undefined,
+      justification
+    };
 
-    updateMedicationHours(activeOrder.id, med.id, updatedHours);
+    updateMedicationExecution(activeOrder.id, med.id, hour.executionKey, executionData);
     
     // Auto-generate evolution record
     let actionStr = "";
@@ -342,18 +336,53 @@ export function TherapeuticPlan({ patientId }: TherapeuticPlanProps) {
                     </Tooltip>
                   )}
                 </div>
-                <div className="flex flex-wrap gap-x-2 gap-y-1 text-[10px] font-bold uppercase text-muted-foreground">
-                  <span className="truncate max-w-[100px]" title={med.dosage}>{med.dosage}</span>
-                  <span>&bull;</span>
-                  <span>{med.route}</span>
-                  <span>&bull;</span>
-                  <span>{med.frequency}</span>
+                <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[10px] font-bold uppercase text-muted-foreground">
+                  {[med.dosage, med.route, med.frequency]
+                    .filter(item => item && item !== "-")
+                    .map((item, idx, arr) => (
+                      <React.Fragment key={idx}>
+                        <span className="truncate max-w-[100px]" title={item}>{item}</span>
+                        {idx < arr.length - 1 && <span>&bull;</span>}
+                      </React.Fragment>
+                    ))}
                 </div>
+                {med.observation && (
+                  <p className="text-[9px] uppercase font-bold text-amber-600 dark:text-amber-500 italic mt-0.5 leading-tight truncate" title={med.observation}>
+                    Obs: {med.observation}
+                  </p>
+                )}
               </div>
             </td>
             {HOURS_72.map((h, i) => {
-              // Mock logic: we just match the time string so the prescription repeats daily
-              const hourData = med.hours.find(mh => mh.hour === h.timeStr);
+              const executionKey = h.id;
+              const hasSchedule = med.hours.find(mh => mh.hour === h.timeStr);
+              
+              let showHour = !!hasSchedule;
+              
+              if (showHour && med.startDate) {
+                const medStart = startOfDay(new Date(med.startDate + 'T00:00:00'));
+                const cellDay = startOfDay(h.date);
+                
+                if (isBefore(cellDay, medStart)) {
+                  showHour = false;
+                } else if (med.scheduleType === 'single' && !isSameDay(cellDay, medStart)) {
+                  showHour = false;
+                }
+              }
+
+              let hourData = null;
+              if (showHour) {
+                const exec = med.executions?.[executionKey];
+                hourData = {
+                  hour: h.timeStr,
+                  status: exec ? exec.status : "pending",
+                  checkedAt: exec?.checkedAt,
+                  nurseName: exec?.nurseName,
+                  justification: exec?.justification,
+                  doubleCheckedBy: exec?.doubleCheckedBy,
+                  executionKey: executionKey
+                };
+              }
               return (
                 <td key={h.id} className={cn(
                   "px-1 py-3 text-center align-middle transition-colors border-r border-b border-white/20 dark:border-white/5",
@@ -409,9 +438,21 @@ export function TherapeuticPlan({ patientId }: TherapeuticPlanProps) {
                                   <p className="font-bold text-sm text-foreground leading-tight">
                                     {med.medication}
                                   </p>
-                                  <p className="text-[10px] uppercase font-bold text-muted-foreground mt-0.5">
-                                    {med.dosage} &bull; {med.route}
-                                  </p>
+                                  <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[10px] uppercase font-bold text-muted-foreground mt-0.5">
+                                    {[med.dosage, med.route, med.frequency]
+                                      .filter(item => item && item !== "-")
+                                      .map((item, idx, arr) => (
+                                        <React.Fragment key={idx}>
+                                          <span>{item}</span>
+                                          {idx < arr.length - 1 && <span>&bull;</span>}
+                                        </React.Fragment>
+                                      ))}
+                                  </div>
+                                  {med.observation && (
+                                    <p className="text-[10px] uppercase font-bold text-amber-600 dark:text-amber-500 italic mt-1 leading-tight bg-amber-500/10 p-1.5 rounded-md border border-amber-500/20">
+                                      Obs: {med.observation}
+                                    </p>
+                                  )}
                                 </div>
 
                                 {hourData.status === "pending" ? (

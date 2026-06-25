@@ -23,6 +23,15 @@ export interface AprazamentoHour {
   doubleCheckedAt?: string;
 }
 
+export interface ExecutionRecord {
+  status: "checked" | "refused" | "delayed" | "suspended";
+  checkedAt?: string;
+  nurseName?: string;
+  justification?: string;
+  doubleCheckedBy?: string;
+  doubleCheckedAt?: string;
+}
+
 export interface PrescriptionMedication {
   id: string;
   medication: string;
@@ -32,6 +41,9 @@ export interface PrescriptionMedication {
   observation?: string;
   status: PrescriptionStatus;
   hours: AprazamentoHour[];
+  startDate?: string;
+  scheduleType?: "continuous" | "single";
+  executions?: Record<string, ExecutionRecord>;
   isHighVigilance?: boolean;
   category?: "medication" | "diet" | "therapy" | "nursing";
 }
@@ -60,6 +72,12 @@ interface PrescriptionsContextType {
     orderId: string,
     medId: string,
     hours: AprazamentoHour[],
+  ) => void;
+  updateMedicationExecution: (
+    orderId: string,
+    medId: string,
+    executionKey: string,
+    data: ExecutionRecord,
   ) => void;
   addCareItem: (orderId: string, item: PrescriptionMedication) => void;
 }
@@ -228,6 +246,32 @@ export function PrescriptionsProvider({ children }: { children: ReactNode }) {
     );
   };
 
+  const updateMedicationExecution = (
+    orderId: string,
+    medId: string,
+    executionKey: string,
+    data: ExecutionRecord,
+  ) => {
+    setOrders((prev) =>
+      prev.map((order) => {
+        if (order.id !== orderId) return order;
+        return {
+          ...order,
+          medications: order.medications.map((med) => {
+            if (med.id !== medId) return med;
+            return {
+              ...med,
+              executions: {
+                ...(med.executions || {}),
+                [executionKey]: data,
+              },
+            };
+          }),
+        };
+      }),
+    );
+  };
+
   return (
     <PrescriptionsContext.Provider
       value={{
@@ -235,6 +279,7 @@ export function PrescriptionsProvider({ children }: { children: ReactNode }) {
         addPrescriptionOrder,
         updateMedicationStatus,
         updateMedicationHours,
+        updateMedicationExecution,
         addCareItem,
       }}
     >
