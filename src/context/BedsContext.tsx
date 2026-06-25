@@ -159,100 +159,63 @@ const generateBeds = (): Bed[] => {
     createBed("e-2", "Leito 2", "Emergência", "Emergência", "occupied"),
     createBed("e-3", "Leito 3", "Emergência", "Emergência", "available"),
     createBed("e-4", "Leito 4", "Emergência", "Emergência", "occupied"),
-    createBed("e-5", "Leito 5", "Emergência", "Emergência", "cleaning"),
+    { 
+      ...createBed("e-5", "Leito 5", "Emergência", "Emergência", "cleaning"), 
+      cleaningStatus: "waiting", 
+      requestedAt: new Date(Date.now() - 1000 * 60 * 12), 
+      priority: "urgent", 
+      isIsolation: true 
+    },
     createBed("e-6", "Leito 6", "Emergência", "Emergência", "available"),
-    createBed("e-7", "Leito 7", "Emergência", "Emergência", "available"),
+    { 
+      ...createBed("e-7", "Leito 7", "Emergência", "Emergência", "cleaning"), 
+      cleaningStatus: "in_progress", 
+      requestedAt: new Date(Date.now() - 1000 * 60 * 25), 
+      startedAt: new Date(Date.now() - 1000 * 60 * 10), 
+      assignedCleaner: MOCK_CLEANERS[1] 
+    },
     createBed("e-8", "Maca Extra", "Emergência", "Emergência", "available"),
 
     // UPA - Observação Feminina
-    createBed(
-      "o-of1",
-      "Leito 1",
-      "Observação",
-      "Observação Feminina",
-      "available",
-    ),
-    createBed(
-      "o-of2",
-      "Leito 2",
-      "Observação",
-      "Observação Feminina",
-      "occupied",
-    ),
-    createBed(
-      "o-of3",
-      "Leito 3",
-      "Observação",
-      "Observação Feminina",
-      "available",
-    ),
-    createBed(
-      "o-of4",
-      "Leito 4",
-      "Observação",
-      "Observação Feminina",
-      "available",
-    ),
-    createBed(
-      "o-of5",
-      "Leito 5",
-      "Observação",
-      "Observação Feminina",
-      "maintenance",
-    ),
-    createBed(
-      "o-of6",
-      "Maca Extra",
-      "Observação",
-      "Observação Feminina",
-      "available",
-    ),
+    createBed("o-of1", "Leito 1", "Observação", "Observação Feminina", "available"),
+    createBed("o-of2", "Leito 2", "Observação", "Observação Feminina", "occupied"),
+    createBed("o-of3", "Leito 3", "Observação", "Observação Feminina", "available"),
+    { 
+      ...createBed("o-of4", "Leito 4", "Observação", "Observação Feminina", "cleaning"), 
+      cleaningStatus: "waiting", 
+      requestedAt: new Date(Date.now() - 1000 * 60 * 5), 
+      priority: "high" 
+    },
+    { 
+      ...createBed("o-of5", "Leito 5", "Observação", "Observação Feminina", "maintenance"), 
+      maintenanceReason: "Grade da cama emperrada / quebrada. Aguardando Engenharia Clínica." 
+    },
+    createBed("o-of6", "Maca Extra", "Observação", "Observação Feminina", "available"),
 
     // UPA - Observação Masculina
-    createBed(
-      "o-om1",
-      "Leito 1",
-      "Observação",
-      "Observação Masculina",
-      "available",
-    ),
-    createBed(
-      "o-om2",
-      "Leito 2",
-      "Observação",
-      "Observação Masculina",
-      "occupied",
-    ),
-    createBed(
-      "o-om3",
-      "Leito 3",
-      "Observação",
-      "Observação Masculina",
-      "available",
-    ),
-    createBed(
-      "o-om4",
-      "Leito 4",
-      "Observação",
-      "Observação Masculina",
-      "available",
-    ),
-    createBed(
-      "o-om5",
-      "Maca Extra",
-      "Observação",
-      "Observação Masculina",
-      "available",
-    ),
+    createBed("o-om1", "Leito 1", "Observação", "Observação Masculina", "available"),
+    createBed("o-om2", "Leito 2", "Observação", "Observação Masculina", "occupied"),
+    createBed("o-om3", "Leito 3", "Observação", "Observação Masculina", "available"),
+    createBed("o-om4", "Leito 4", "Observação", "Observação Masculina", "available"),
+    createBed("o-om5", "Maca Extra", "Observação", "Observação Masculina", "available"),
 
     // UPA - Pediatria
     createBed("o-ped1", "Leito 1", "Observação", "Pediatria", "available"),
     createBed("o-ped2", "Leito 2", "Observação", "Pediatria", "occupied"),
     createBed("o-ped3", "Berço 1", "Observação", "Pediatria", "available"),
-    createBed("o-ped4", "Berço 2", "Observação", "Pediatria", "cleaning"),
+    { 
+      ...createBed("o-ped4", "Berço 2", "Observação", "Pediatria", "cleaning"), 
+      cleaningStatus: "in_progress", 
+      requestedAt: new Date(Date.now() - 1000 * 60 * 30), 
+      startedAt: new Date(Date.now() - 1000 * 60 * 5), 
+      assignedCleaner: MOCK_CLEANERS[0] 
+    },
 
     // UPA - Isolamento
-    createBed("o-iso1", "Leito 1", "Observação", "Isolamento", "available"),
+    { 
+      ...createBed("o-iso1", "Leito 1", "Observação", "Isolamento", "maintenance"),
+      maintenanceReason: "Vazamento no painel de gases. O.S. 14502 aberta urgente."
+    },
     createBed("o-iso2", "Leito 2", "Observação", "Isolamento", "occupied"),
   ];
 
@@ -261,7 +224,6 @@ const generateBeds = (): Bed[] => {
 
 const initialBeds: Bed[] = generateBeds();
 
-// Histórico de auditoria fake inicial
 const initialHistory: CleaningLog[] = [
   {
     id: "log-1",
@@ -272,11 +234,47 @@ const initialHistory: CleaningLog[] = [
     cleanerName: "Maria Silva",
     cleanerAvatar: "MS",
     cleanerColor: "bg-pink-500",
-    supplies: ["soap", "towel"],
-    observations: "Limpeza padrão realizada com sucesso.",
+    supplies: ["Álcool Gel", "Papel Toalha"],
+    observations: "Limpeza terminal realizada com sucesso após alta.",
     durationMinutes: 14,
     ccihConfirmed: true,
-    finishedAt: new Date(Date.now() - 1000 * 60 * 60 * 2), // 2 horas atrás
+    finishedAt: new Date(Date.now() - 1000 * 60 * 60 * 1), // 1 hour ago
+    requestedAt: new Date(Date.now() - 1000 * 60 * 85),
+    startedAt: new Date(Date.now() - 1000 * 60 * 74),
+  },
+  {
+    id: "log-2",
+    bedId: "o-om1",
+    bedName: "Leito 1",
+    ward: "Observação",
+    room: "Observação Masculina",
+    cleanerName: "Ana Clara",
+    cleanerAvatar: "AC",
+    cleanerColor: "bg-emerald-500",
+    supplies: ["Sabonete Líquido", "Papel Higiênico"],
+    observations: "Limpeza concorrente padrão. Leito pronto.",
+    durationMinutes: 12,
+    ccihConfirmed: true,
+    finishedAt: new Date(Date.now() - 1000 * 60 * 120), // 2 hours ago
+    requestedAt: new Date(Date.now() - 1000 * 60 * 140),
+    startedAt: new Date(Date.now() - 1000 * 60 * 132),
+  },
+  {
+    id: "log-3",
+    bedId: "o-iso2",
+    bedName: "Leito 2",
+    ward: "Observação",
+    room: "Isolamento",
+    cleanerName: "João Souza",
+    cleanerAvatar: "JS",
+    cleanerColor: "bg-indigo-500",
+    supplies: ["Álcool Gel", "Desinfetante Hospitalar"],
+    observations: "Desinfecção de alto nível concluída rigorosamente.",
+    durationMinutes: 25,
+    ccihConfirmed: true,
+    finishedAt: new Date(Date.now() - 1000 * 60 * 200),
+    requestedAt: new Date(Date.now() - 1000 * 60 * 240),
+    startedAt: new Date(Date.now() - 1000 * 60 * 225),
   },
 ];
 

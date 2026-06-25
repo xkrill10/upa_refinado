@@ -31,6 +31,7 @@ import {
   History,
   Ambulance,
   Lock,
+  Syringe,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import {
@@ -1898,6 +1899,18 @@ export default function Beds() {
                               >
                                 <FileText className="h-3 w-3 mr-1.5" />
                                 Prontuário
+                              </Button>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="h-8 px-2.5 text-[9px] font-black uppercase tracking-widest rounded-lg bg-white/50 dark:bg-slate-800/50 hover:bg-emerald-600 hover:text-white border-emerald-600/30 text-emerald-700 dark:text-emerald-400"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  navigate(`/paciente/${patient.id}/evolucao`);
+                                }}
+                              >
+                                <Syringe className="h-3 w-3 mr-1.5" />
+                                Plano Terap.
                               </Button>
                               {!patient.transferRequest && (
                                 <ActionTooltip

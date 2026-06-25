@@ -24,6 +24,7 @@ import {
   Search,
   Clock,
   ShieldAlert,
+  Pill,
   Heart,
   Baby,
   Brain,
@@ -139,13 +140,15 @@ import { BedStatusModal } from "@/components/PatientEvolution/Modals/BedStatusMo
 import { PatientTimelineModal } from "@/components/PatientEvolution/Modals/PatientTimelineModal";
 import { BedRequestModal } from "@/components/PatientEvolution/Modals/BedRequestModal";
 import { ExamsModal } from "@/components/PatientEvolution/Modals/ExamsModal";
+import { AddCareItemModal } from "@/components/PatientEvolution/Modals/AddCareItemModal";
+import { TherapeuticPlan } from "@/components/PatientEvolution/TherapeuticPlan";
 
 export default function EvolucaoEnfermagem() {
   const { id } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
-  const { patients, addEvolution, updatePatient, markExamsAsRead } =
-    usePatients();
+  const { patients, addEvolution, updatePatient, markExamsAsRead } = usePatients();
+  const { orders, addCareItem } = usePrescriptions();
   const { beds, assignPatient, releaseBed } = useBeds();
   const patient = patients.find((p) => p.id === id);
   const unreadExamsCount =
@@ -181,6 +184,7 @@ export default function EvolucaoEnfermagem() {
   const [isVitalsHistoryOpen, setIsVitalsHistoryOpen] = useState(false);
   const [isBedRequestOpen, setIsBedRequestOpen] = useState(false);
   const [isExamsModalOpen, setIsExamsModalOpen] = useState(false);
+  const [isAddCareItemModalOpen, setIsAddCareItemModalOpen] = useState(false);
   const patientBed = beds.find((b) => b.patientId === id);
   const availableBeds = beds.filter((b) => b.status === "available");
 
@@ -1352,11 +1356,10 @@ export default function EvolucaoEnfermagem() {
       )}
 
       {/* Barra de Sub-Navegação Horizontal Glassmorphic Premium */}
-      {isFormOpen && (
-        <div
-          id="timeline-section"
-          className="glass-card-premium border border-white/40 dark:border-white/10 p-1.5 rounded-2xl flex flex-wrap gap-1.5 items-center bg-white/20 dark:bg-slate-900/20 backdrop-blur-md shadow-sm animate-in fade-in duration-300"
-        >
+      <div
+        id="timeline-section"
+        className="glass-card-premium border border-white/40 dark:border-white/10 p-1.5 rounded-2xl flex flex-wrap gap-1.5 items-center bg-white/20 dark:bg-slate-900/20 backdrop-blur-md shadow-sm animate-in fade-in duration-300"
+      >
           {(
             [
               {
@@ -1374,6 +1377,11 @@ export default function EvolucaoEnfermagem() {
                 label: "Anotações / Evoluções",
                 icon: <MessageSquare className="h-3.5 w-3.5" />,
               },
+              {
+                id: "prescriptions",
+                label: "Plano Terapêutico",
+                icon: <Pill className="h-3.5 w-3.5" />,
+              },
             ] as Array<{ id: string; label: string; icon: any; badge?: any }>
           ).map((tab) => {
             const isActive = activeTab === tab.id;
@@ -1390,10 +1398,12 @@ export default function EvolucaoEnfermagem() {
                       | "exams"
                       | "discharge",
                   );
-                  if (isFormOpen) {
-                    if (tab.id === "prescriptions") {
-                      handleEvolutionTypeChange("Evolução Enfermagem");
-                    } else if (tab.id === "vitals") {
+                  
+                  if (tab.id === "prescriptions" || tab.id === "all") {
+                    setIsFormOpen(false);
+                  } else {
+                    setIsFormOpen(true);
+                    if (tab.id === "vitals") {
                       handleEvolutionTypeChange("Sinais Vitais");
                     } else if (tab.id === "discharge") {
                       handleEvolutionTypeChange("Alta");
@@ -1404,6 +1414,10 @@ export default function EvolucaoEnfermagem() {
                       handleEvolutionTypeChange("Evolução Enfermagem");
                     }
                   }
+
+                  setTimeout(() => {
+                    document.getElementById("timeline-content")?.scrollIntoView({ behavior: "smooth", block: "start" });
+                  }, 150);
                 }}
                 className={cn(
                   "flex items-center gap-2 px-4 py-2 text-xs font-black uppercase tracking-wider rounded-xl transition-all duration-300 relative overflow-hidden active:scale-95",
@@ -1429,8 +1443,19 @@ export default function EvolucaoEnfermagem() {
               </button>
             );
           })}
+          
+          {/* Ação Global de Prescrição alinhada à direita */}
+          <div className="ml-auto">
+            <Button
+              size="sm"
+              onClick={() => setIsAddCareItemModalOpen(true)}
+              className="h-8 rounded-xl bg-[#006699] hover:bg-[#004d73] dark:bg-sky-500 dark:hover:bg-sky-600 text-white text-[10px] font-black uppercase tracking-widest px-4 shadow-md transition-all hover:scale-105 active:scale-95 flex items-center gap-1.5"
+            >
+              <Plus className="h-3.5 w-3.5" />
+              Prescrever Cuidado
+            </Button>
+          </div>
         </div>
-      )}
 
       <div className="flex items-center justify-start pb-1">
         {!isFormOpen && !isExpressMode && (
@@ -1473,14 +1498,16 @@ export default function EvolucaoEnfermagem() {
                   <h2 className="text-xs font-black flex items-center gap-2 text-primary uppercase tracking-wider">
                     <Plus className="h-4 w-4" /> Registrar Evolução Clínica
                   </h2>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => navigate(`/paciente/${id}/evolucao`)}
-                    className="rounded-full h-7 w-7 hover:bg-muted"
-                  >
-                    <X className="h-3.5 w-3.5" />
-                  </Button>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => navigate(`/paciente/${id}/evolucao`)}
+                      className="rounded-full h-7 w-7 hover:bg-muted"
+                    >
+                      <X className="h-3.5 w-3.5" />
+                    </Button>
+                  </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -6136,12 +6163,14 @@ export default function EvolucaoEnfermagem() {
         )}
       </AnimatePresence>
 
-      <div className="space-y-6">
+      <div id="timeline-content" className="space-y-6">
         <h2 className="text-sm font-black tracking-widest text-[#006699] dark:text-sky-400 uppercase">
           Linha do Tempo de Atendimento
         </h2>
 
-        {filteredEvolutions.length === 0 &&
+        {activeTab === "prescriptions" ? (
+          <TherapeuticPlan patientId={id || ""} />
+        ) : filteredEvolutions.length === 0 &&
         !(patient?.exams && patient.exams.length > 0) ? (
           <Card className="glass-card-premium border border-white/40 dark:border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.06)] rounded-xl overflow-hidden transition-all duration-500">
             <CardContent className="h-36 flex items-center justify-center bg-muted/5">
@@ -6584,6 +6613,18 @@ export default function EvolucaoEnfermagem() {
           />
         </>
       )}
+
+      <AddCareItemModal 
+        isOpen={isAddCareItemModalOpen} 
+        onClose={() => setIsAddCareItemModalOpen(false)} 
+        onAdd={(item) => {
+          const activeOrder = orders.find((o) => o.patientId === id) || orders[0];
+          if (activeOrder) {
+            addCareItem(activeOrder.id, item);
+            toast.success("Novo item prescrito adicionado ao plano terapêutico!");
+          }
+        }} 
+      />
     </motion.div>
   );
 }

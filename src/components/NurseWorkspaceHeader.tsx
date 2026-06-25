@@ -124,7 +124,7 @@ export function NurseWorkspaceHeader({
     <>
       <div
         className={cn(
-          "sticky top-0 z-20 flex items-center justify-between px-6 py-4 border-b shadow-[0_4px_32px_0_rgba(0,0,0,0.05)] backdrop-blur-2xl mb-6",
+          "sticky top-6 z-20 flex items-center justify-between px-6 py-4 border-b shadow-[0_4px_32px_0_rgba(0,0,0,0.05)] backdrop-blur-2xl mb-6",
           "bg-white/60 dark:bg-slate-900/40 border-white/50 dark:border-white/10",
         )}
       >

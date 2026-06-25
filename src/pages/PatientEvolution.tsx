@@ -31,6 +31,7 @@ import {
   Droplet,
   Wind,
   FlaskConical,
+  Syringe,
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { Input } from "@/components/ui/input";
@@ -48,6 +49,7 @@ import {
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { TherapeuticPlan } from "@/components/PatientEvolution/TherapeuticPlan";
 import { CID10_DATABASE, CID10Item } from "@/data/cid10";
 import { SmartCidSelector } from "@/components/SmartCidSelector";
 import {
@@ -191,7 +193,7 @@ export default function PatientEvolution() {
 
   const [evolutionType, setEvolutionType] = useState("");
   const [activeTab, setActiveTab] = useState<
-    "all" | "evolutions" | "prescriptions" | "vitals" | "exams" | "discharge"
+    "all" | "evolutions" | "prescriptions" | "therapeutic" | "vitals" | "exams" | "discharge"
   >("all");
   const [professional, setProfessional] = useState(
     () => localStorage.getItem("upa_stamp_name") || "",
@@ -1346,11 +1348,10 @@ export default function PatientEvolution() {
       )}
 
       {/* Barra de Sub-Navegação Horizontal Glassmorphic Premium */}
-      {isFormOpen && (
-        <div
-          id="timeline-section"
-          className="glass-card-premium border border-white/40 dark:border-white/10 p-1.5 rounded-2xl flex flex-wrap gap-1.5 items-center bg-white/20 dark:bg-slate-900/20 backdrop-blur-md shadow-sm animate-in fade-in duration-300"
-        >
+      <div
+        id="timeline-section"
+        className="glass-card-premium border border-white/40 dark:border-white/10 p-1.5 rounded-2xl flex flex-wrap gap-1.5 items-center bg-white/20 dark:bg-slate-900/20 backdrop-blur-md shadow-sm animate-in fade-in duration-300"
+      >
           {[
             {
               id: "all",
@@ -1388,6 +1389,11 @@ export default function PatientEvolution() {
               ),
             },
             {
+              id: "therapeutic",
+              label: "Plano Terapêutico",
+              icon: <Syringe className="h-3.5 w-3.5" />,
+            },
+            {
               id: "exams",
               label: "Exames & Procedimentos",
               icon: <Search className="h-3.5 w-3.5" />,
@@ -1410,6 +1416,7 @@ export default function PatientEvolution() {
                       | "vitals"
                       | "evolutions"
                       | "prescriptions"
+                      | "therapeutic"
                       | "exams"
                       | "discharge",
                   );
@@ -1461,8 +1468,6 @@ export default function PatientEvolution() {
             );
           })}
         </div>
-      )}
-
       <div className="flex items-center justify-start pb-1">
         {!isFormOpen && !isExpressMode && (
           <Button
@@ -6217,12 +6222,16 @@ export default function PatientEvolution() {
       </AnimatePresence>
 
       <div className="space-y-6">
-        <h2 className="text-sm font-black tracking-widest text-[#006699] dark:text-sky-400 uppercase">
-          Linha do Tempo de Atendimento
-        </h2>
-
-        {filteredEvolutions.length === 0 &&
-        !(patient?.exams && patient.exams.length > 0) ? (
+        {activeTab === "therapeutic" ? (
+          <TherapeuticPlan patientId={patient.id} />
+        ) : (
+          <>
+            <h2 className="text-sm font-black tracking-widest text-[#006699] dark:text-sky-400 uppercase">
+              Linha do Tempo de Atendimento
+            </h2>
+    
+            {filteredEvolutions.length === 0 &&
+            !(patient?.exams && patient.exams.length > 0) ? (
           <Card className="glass-card-premium border border-white/40 dark:border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.06)] rounded-xl overflow-hidden transition-all duration-500">
             <CardContent className="h-36 flex items-center justify-center bg-muted/5">
               <p className="text-sm font-bold uppercase tracking-widest text-muted-foreground/30 px-8 text-center leading-relaxed">
@@ -6355,6 +6364,8 @@ export default function PatientEvolution() {
               </motion.div>
             ))}
           </div>
+        )}
+          </>
         )}
       </div>
       <Dialog open={isBedDialogOpen} onOpenChange={setIsBedDialogOpen}>

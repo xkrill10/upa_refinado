@@ -54,6 +54,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { ThemeToggle } from "./ThemeToggle";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 export function AppSidebar() {
   const { state } = useSidebar();
@@ -294,11 +295,13 @@ export function AppSidebar() {
       collapsible="icon"
       className="border-none shadow-[0_20px_60px_-15px_rgba(0,0,0,0.5)] z-30 [&>div[data-sidebar=sidebar]]:bg-gradient-to-b [&>div[data-sidebar=sidebar]]:from-[#004466]/95 [&>div[data-sidebar=sidebar]]:to-[#001a33]/95 [&>div[data-sidebar=sidebar]]:backdrop-blur-xl [&>div[data-sidebar=sidebar]]:border [&>div[data-sidebar=sidebar]]:border-blue-700/30"
     >
-      <SidebarHeader className="p-3 pb-2 bg-transparent border-b border-blue-700/30">
-        <div className="flex items-center gap-3 p-3 rounded-xl bg-gradient-to-br from-white/10 to-white/5 border border-white/20 shadow-[0_8px_30px_rgba(0,0,0,0.2)] backdrop-blur-md relative overflow-hidden group transition-all duration-300 hover:border-white/30 hover:shadow-[0_8px_30px_rgba(14,165,233,0.2)]">
-          <div className="absolute inset-0 bg-gradient-to-r from-sky-500/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-          <div className="h-10 w-10 rounded-lg bg-sky-500/20 flex items-center justify-center shrink-0 border border-sky-400/30 shadow-inner backdrop-blur-md z-10 transition-transform group-hover:scale-105 duration-300">
-            <Activity className="h-5 w-5 text-sky-300 drop-shadow-[0_0_8px_rgba(14,165,233,0.8)] animate-pulse-slow" />
+      <SidebarHeader className={cn("bg-transparent border-b border-blue-700/30", collapsed ? "p-0 py-3 flex items-center justify-center" : "p-3 pb-2")}>
+        <div className={cn("flex items-center relative overflow-hidden group transition-all duration-300", collapsed ? "justify-center p-0" : "gap-3 p-3 rounded-xl bg-gradient-to-br from-white/10 to-white/5 border border-white/20 shadow-[0_8px_30px_rgba(0,0,0,0.2)] backdrop-blur-md hover:border-white/30 hover:shadow-[0_8px_30px_rgba(14,165,233,0.2)]")}>
+          {!collapsed && (
+            <div className="absolute inset-0 bg-gradient-to-r from-sky-500/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+          )}
+          <div className={cn("rounded-lg flex items-center justify-center shrink-0 shadow-inner backdrop-blur-md z-10 transition-transform group-hover:scale-105 duration-300", collapsed ? "h-10 w-10 bg-transparent border-none" : "h-10 w-10 bg-sky-500/20 border border-sky-400/30")}>
+            <Activity className={cn("text-sky-300 drop-shadow-[0_0_8px_rgba(14,165,233,0.8)] animate-pulse-slow", collapsed ? "h-6 w-6" : "h-5 w-5")} />
           </div>
           {!collapsed && (
             <div className="flex flex-col z-10">
@@ -345,122 +348,148 @@ export function AppSidebar() {
                       className="w-full flex flex-col justify-center py-0"
                     >
                       {hasSubItems ? (
-                        <div
-                          className={cn(
-                            "flex items-center cursor-pointer transition-all duration-300 relative group/item rounded-xl w-full",
-                            collapsed
-                              ? "justify-center h-10 w-10 px-0"
-                              : "gap-3 px-3 py-2.5",
-                            isAnySubActive
-                              ? "bg-sky-500/10 text-white font-bold"
-                              : "text-blue-100/70 hover:text-white hover:bg-white/5",
-                          )}
-                          onClick={(e) => toggleSubMenu(item.title, e)}
-                        >
-                          <div
-                            className={cn(
-                              "flex items-center gap-3 relative z-10 w-full",
-                              collapsed && "justify-center",
-                            )}
-                          >
-                            <div
-                              className={cn(
-                                "flex items-center justify-center shrink-0 transition-all duration-300",
-                                isAnySubActive
-                                  ? "text-sky-300"
-                                  : "text-blue-100/70 group-hover/item:text-blue-50",
-                              )}
-                            >
-                              <item.icon
-                                className={cn(
-                                  "h-[22px] w-[22px] transition-all duration-300",
-                                  isAnySubActive
-                                    ? "stroke-[2.5px]"
-                                    : "stroke-[2px]",
-                                )}
-                              />
-                            </div>
-                            {!collapsed && (
-                              <span
-                                className={cn(
-                                  "text-[13px] font-bold tracking-wide transition-all duration-300 whitespace-nowrap flex-1",
-                                  isAnySubActive
-                                    ? "text-white"
-                                    : "text-blue-100/70 group-hover/item:text-blue-50",
-                                )}
-                              >
-                                {item.title}
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                      ) : (
-                        <NavLink
-                          to={item.url!}
-                          end
-                          className={({ isActive: linkActive }) =>
-                            cn(
-                              "flex items-center transition-all duration-300 relative group/item rounded-xl",
-                              collapsed
-                                ? "justify-center h-10 w-10"
-                                : "w-full gap-3 px-3 py-2.5",
-                              linkActive
-                                ? "bg-sky-500/25 backdrop-blur-md border border-sky-400/40 shadow-[0_0_20px_rgba(14,165,233,0.3),inset_0_1px_1px_rgba(255,255,255,0.2)] text-white font-black"
-                                : "text-blue-100/70 hover:text-white hover:bg-white/5 border border-transparent",
-                            )
-                          }
-                        >
-                          <div
-                            className={cn(
-                              "flex items-center gap-3 relative z-10",
-                              collapsed ? "justify-center" : "w-full",
-                            )}
-                          >
-                            <motion.div
-                              animate={active ? { scale: 1.05 } : { scale: 1 }}
-                              whileTap={{ scale: 0.95 }}
-                              className={cn(
-                                "flex items-center justify-center shrink-0 transition-all duration-300",
-                                active
-                                  ? "text-sky-300 drop-shadow-[0_0_8px_rgba(14,165,233,0.8)]"
-                                  : "text-blue-100/70 group-hover/item:text-blue-50",
-                              )}
-                            >
-                              <item.icon
-                                className={cn(
-                                  "h-[22px] w-[22px] transition-all duration-300",
-                                  active
-                                    ? "stroke-[2.5px] animate-pulse-slow"
-                                    : "stroke-[2px]",
-                                )}
-                              />
-                            </motion.div>
-
-                            {!collapsed && (
-                              <span
-                                className={cn(
-                                  "text-[13px] font-bold tracking-wide transition-all duration-300 whitespace-nowrap",
-                                  active
-                                    ? "text-white"
-                                    : "text-blue-100/70 group-hover/item:text-blue-50",
-                                )}
-                              >
-                                {item.title}
-                              </span>
-                            )}
-
-                            {/* ADMISSION QUEUE BADGE */}
-                            {item.url === "/lista-internacao" &&
-                              hasPendingAdmissions && (
-                                <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center justify-center">
-                                  <span className="absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-75 animate-ping" />
-                                  <Badge className="relative h-5 min-w-[20px] px-1.5 flex items-center justify-center rounded-full bg-red-500 text-white border-0 text-[10px] font-black pointer-events-none">
-                                    {admissionQueue.length}
-                                  </Badge>
+                        <TooltipProvider delayDuration={0}>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <div className="w-full">
+                                <div
+                                  className={cn(
+                                    "flex items-center cursor-pointer transition-all duration-300 relative group/item rounded-xl w-full",
+                                    collapsed
+                                      ? "justify-center h-10 w-10 px-0"
+                                      : "gap-3 px-3 py-2.5",
+                                    isAnySubActive
+                                      ? "bg-sky-500/10 text-white font-bold"
+                                      : "text-blue-100/70 hover:text-white hover:bg-white/5",
+                                  )}
+                                  onClick={(e) => toggleSubMenu(item.title, e)}
+                                >
+                                  <div
+                                    className={cn(
+                                      "flex items-center gap-3 relative z-10 w-full",
+                                      collapsed && "justify-center",
+                                    )}
+                                  >
+                                    <div
+                                      className={cn(
+                                        "flex items-center justify-center shrink-0 transition-all duration-300",
+                                        isAnySubActive
+                                          ? "text-sky-300"
+                                          : "text-blue-100/70 group-hover/item:text-blue-50",
+                                      )}
+                                    >
+                                      <item.icon
+                                        className={cn(
+                                          "h-[22px] w-[22px] transition-all duration-300",
+                                          isAnySubActive
+                                            ? "stroke-[2.5px]"
+                                            : "stroke-[2px]",
+                                        )}
+                                      />
+                                    </div>
+                                    {!collapsed && (
+                                      <span
+                                        className={cn(
+                                          "text-[13px] font-bold tracking-wide transition-all duration-300 whitespace-nowrap flex-1",
+                                          isAnySubActive
+                                            ? "text-white"
+                                            : "text-blue-100/70 group-hover/item:text-blue-50",
+                                        )}
+                                      >
+                                        {item.title}
+                                      </span>
+                                    )}
+                                  </div>
                                 </div>
-                              )}
-                          </div>
-                        </NavLink>
+                              </div>
+                            </TooltipTrigger>
+                            {collapsed && (
+                              <TooltipContent side="right" align="center" sideOffset={15} className="bg-slate-900 border-slate-800 text-white font-bold text-xs z-[100]">
+                                {item.title}
+                              </TooltipContent>
+                            )}
+                          </Tooltip>
+                        </TooltipProvider>
+                      ) : (
+                        <TooltipProvider delayDuration={0}>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <div className="w-full">
+                                <NavLink
+                                  to={item.url!}
+                                  end
+                                  className={({ isActive: linkActive }) =>
+                                    cn(
+                                      "flex items-center transition-all duration-300 relative group/item rounded-xl",
+                                      collapsed
+                                        ? "justify-center h-10 w-10"
+                                        : "w-full gap-3 px-3 py-2.5",
+                                      linkActive
+                                        ? "bg-sky-500/25 backdrop-blur-md border border-sky-400/40 shadow-[0_0_20px_rgba(14,165,233,0.3),inset_0_1px_1px_rgba(255,255,255,0.2)] text-white font-black"
+                                        : "text-blue-100/70 hover:text-white hover:bg-white/5 border border-transparent",
+                                    )
+                                  }
+                                >
+                                  <div
+                                    className={cn(
+                                      "flex items-center gap-3 relative z-10",
+                                      collapsed ? "justify-center" : "w-full",
+                                    )}
+                                  >
+                                    <motion.div
+                                      animate={active ? { scale: 1.05 } : { scale: 1 }}
+                                      whileTap={{ scale: 0.95 }}
+                                      className={cn(
+                                        "flex items-center justify-center shrink-0 transition-all duration-300",
+                                        active
+                                          ? "text-sky-300 drop-shadow-[0_0_8px_rgba(14,165,233,0.8)]"
+                                          : "text-blue-100/70 group-hover/item:text-blue-50",
+                                      )}
+                                    >
+                                      <item.icon
+                                        className={cn(
+                                          "h-[22px] w-[22px] transition-all duration-300",
+                                          active
+                                            ? "stroke-[2.5px] animate-pulse-slow"
+                                            : "stroke-[2px]",
+                                        )}
+                                      />
+                                    </motion.div>
+
+                                    {!collapsed && (
+                                      <span
+                                        className={cn(
+                                          "text-[13px] font-bold tracking-wide transition-all duration-300 whitespace-nowrap",
+                                          active
+                                            ? "text-white"
+                                            : "text-blue-100/70 group-hover/item:text-blue-50",
+                                        )}
+                                      >
+                                        {item.title}
+                                      </span>
+                                    )}
+
+                                    {/* ADMISSION QUEUE BADGE */}
+                                    {item.url === "/lista-internacao" &&
+                                      hasPendingAdmissions && (
+                                        <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center justify-center">
+                                          <span className="absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-75 animate-ping" />
+                                          <Badge className="relative h-5 min-w-[20px] px-1.5 flex items-center justify-center rounded-full bg-red-500 text-white border-0 text-[10px] font-black pointer-events-none">
+                                            {admissionQueue.length}
+                                          </Badge>
+                                        </div>
+                                      )}
+                                  </div>
+                                </NavLink>
+                              </div>
+                            </TooltipTrigger>
+                            {collapsed && (
+                              <TooltipContent side="right" align="center" sideOffset={15} className="bg-slate-900 border-slate-800 text-white font-bold text-xs z-[100]">
+                                {item.title}
+                              </TooltipContent>
+                            )}
+                          </Tooltip>
+                        </TooltipProvider>
                       )}
 
                       {!collapsed && hasSubItems && (
