@@ -102,6 +102,7 @@ export function AppSidebar() {
           icon: Activity,
         },
         { title: "Clínico", url: "/atendimentos", icon: HeartPulse },
+        { title: "Pediátrico", url: "/atendimentos-pediatricos", icon: Baby },
         {
           title: "Evoluções",
           icon: FileText,
@@ -152,7 +153,6 @@ export function AppSidebar() {
             },
           ],
         },
-        { title: "Pediátrico", url: "/atendimentos-pediatricos", icon: Baby },
         { title: "Laboratório", url: "/laboratorio", icon: FlaskConical },
         { title: "Lista de Internações", url: "/lista-internacao", icon: BedDouble },
         { title: "Leitos", url: "/leitos", icon: BedDouble },
