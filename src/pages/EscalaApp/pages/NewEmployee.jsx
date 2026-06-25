@@ -84,7 +84,7 @@ export default function NewEmployee() {
       queryClient.invalidateQueries({ queryKey: ["employees"] });
       queryClient.invalidateQueries({ queryKey: ["schedules"] });
       toast.success("Colaborador adicionado com sucesso!");
-      
+
       // Auto-limpa o formulário para o próximo cadastro
       setForm({
         name: "",
@@ -101,7 +101,7 @@ export default function NewEmployee() {
     },
     onError: (error) => {
       toast.error(error.message || "Erro ao adicionar colaborador");
-    }
+    },
   });
 
   const handleSubmit = (e) => {
@@ -144,7 +144,7 @@ export default function NewEmployee() {
         <Card className="glass-card-premium relative">
           <button
             type="button"
-            onClick={() => navigate('/escala/gerenciamento')}
+            onClick={() => navigate("/escala/gerenciamento")}
             className="absolute right-4 top-4 rounded-full p-1.5 text-muted-foreground hover:bg-muted transition-colors"
           >
             <X className="h-4 w-4" />
@@ -162,7 +162,9 @@ export default function NewEmployee() {
                   <Label>Nome Completo</Label>
                   <Input
                     value={form.name}
-                    onChange={(e) => setForm({ ...form, name: formatName(e.target.value) })}
+                    onChange={(e) =>
+                      setForm({ ...form, name: formatName(e.target.value) })
+                    }
                     required
                     placeholder="Nome do colaborador"
                   />
@@ -171,7 +173,9 @@ export default function NewEmployee() {
                   <Label>Telefone / WhatsApp</Label>
                   <Input
                     value={form.phone}
-                    onChange={(e) => setForm({ ...form, phone: formatPhone(e.target.value) })}
+                    onChange={(e) =>
+                      setForm({ ...form, phone: formatPhone(e.target.value) })
+                    }
                     placeholder="(11) 99999-9999"
                   />
                 </div>
@@ -262,26 +266,45 @@ export default function NewEmployee() {
                   <Input
                     value={form.contract_type}
                     onChange={(e) =>
-                      setForm({ ...form, contract_type: formatName(e.target.value) })
+                      setForm({
+                        ...form,
+                        contract_type: formatName(e.target.value),
+                      })
                     }
                     placeholder="CLT, Estatutário..."
                   />
                 </div>
               </div>
-              
+
               <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-border/40 mt-4">
-                <Button type="button" variant="ghost" className="w-full sm:w-auto gap-2 text-muted-foreground" onClick={handleClear}>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  className="w-full sm:w-auto gap-2 text-muted-foreground"
+                  onClick={handleClear}
+                >
                   <Eraser className="h-4 w-4" />
                   Limpar
                 </Button>
                 <div className="flex-1" />
-                <Button type="button" variant="outline" className="w-full sm:w-auto gap-2" onClick={() => navigate('/escala/gerenciamento')}>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full sm:w-auto gap-2"
+                  onClick={() => navigate("/escala/gerenciamento")}
+                >
                   <X className="h-4 w-4" />
                   Fechar
                 </Button>
-                <Button type="submit" className="w-full sm:w-auto gap-2" disabled={createEmployee.isPending}>
+                <Button
+                  type="submit"
+                  className="w-full sm:w-auto gap-2"
+                  disabled={createEmployee.isPending}
+                >
                   <Check className="h-4 w-4" />
-                  {createEmployee.isPending ? 'Salvando...' : 'Adicionar Colaborador'}
+                  {createEmployee.isPending
+                    ? "Salvando..."
+                    : "Adicionar Colaborador"}
                 </Button>
               </div>
             </form>

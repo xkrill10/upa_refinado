@@ -560,7 +560,11 @@ export default function Attendances() {
                           </div>
                         </div>
                         <div className="flex items-center gap-1">
-                          <ActionTooltip label="Ver Jornada do Paciente" side="top" align="end">
+                          <ActionTooltip
+                            label="Ver Jornada do Paciente"
+                            side="top"
+                            align="end"
+                          >
                             <Button
                               size="sm"
                               variant="ghost"
@@ -570,7 +574,11 @@ export default function Attendances() {
                               <Activity className="h-4 w-4" />
                             </Button>
                           </ActionTooltip>
-                          <ActionTooltip label="Registrar Evasão" side="top" align="end">
+                          <ActionTooltip
+                            label="Registrar Evasão"
+                            side="top"
+                            align="end"
+                          >
                             <Button
                               size="sm"
                               variant="ghost"
@@ -586,7 +594,11 @@ export default function Attendances() {
                             </Button>
                           </ActionTooltip>
 
-                          <ActionTooltip label="Ver Prontuário" side="top" align="end">
+                          <ActionTooltip
+                            label="Ver Prontuário"
+                            side="top"
+                            align="end"
+                          >
                             <Button
                               size="sm"
                               variant="ghost"

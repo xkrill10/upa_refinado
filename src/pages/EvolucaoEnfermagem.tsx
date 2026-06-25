@@ -1357,23 +1357,25 @@ export default function EvolucaoEnfermagem() {
           id="timeline-section"
           className="glass-card-premium border border-white/40 dark:border-white/10 p-1.5 rounded-2xl flex flex-wrap gap-1.5 items-center bg-white/20 dark:bg-slate-900/20 backdrop-blur-md shadow-sm animate-in fade-in duration-300"
         >
-          {[
-            {
-              id: "all",
-              label: "Histórico Geral",
-              icon: <History className="h-3.5 w-3.5" />,
-            },
-            {
-              id: "vitals",
-              label: "Sinais Vitais",
-              icon: <Activity className="h-3.5 w-3.5" />,
-            },
-            {
-              id: "evolutions",
-              label: "Anotações / Evoluções",
-              icon: <MessageSquare className="h-3.5 w-3.5" />,
-            },
-          ].map((tab) => {
+          {(
+            [
+              {
+                id: "all",
+                label: "Histórico Geral",
+                icon: <History className="h-3.5 w-3.5" />,
+              },
+              {
+                id: "vitals",
+                label: "Sinais Vitais",
+                icon: <Activity className="h-3.5 w-3.5" />,
+              },
+              {
+                id: "evolutions",
+                label: "Anotações / Evoluções",
+                icon: <MessageSquare className="h-3.5 w-3.5" />,
+              },
+            ] as Array<{ id: string; label: string; icon: any; badge?: any }>
+          ).map((tab) => {
             const isActive = activeTab === tab.id;
             return (
               <button

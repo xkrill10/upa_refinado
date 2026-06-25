@@ -20,7 +20,12 @@ import { useRole } from "@/context/RoleContext";
 import { cn } from "@/lib/utils";
 import { ThemeToggle } from "./ThemeToggle";
 import { GlobalClock } from "./GlobalClock";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./ui/tooltip";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "./ui/tooltip";
 import { motion } from "motion/react";
 import { usePatients } from "@/hooks/use-patients";
 import { Badge } from "@/components/ui/badge";
@@ -43,46 +48,113 @@ export const ClinicalLayout = ({ children }: ClinicalLayoutProps) => {
   const getMenuItems = () => {
     if (role === "recepcao") {
       return [
-        { id: "recepcao", icon: UserPlus, label: "Recepção", path: "/novo-paciente" }
+        {
+          id: "recepcao",
+          icon: UserPlus,
+          label: "Recepção",
+          path: "/novo-paciente",
+        },
       ];
     }
     if (role === "medico") {
       return [
-        { id: "painel", icon: UserSquare2, label: "Painel Médico", path: "/painel-medico" },
-        { id: "fila", icon: ClipboardList, label: "Fila de Atendimento", path: "/fila" },
-        { id: "internacao", icon: BedDouble, label: "Lista de Internações", path: "/lista-internacao" },
-        { id: "leitos", icon: BedDouble, label: "Gestão de Leitos", path: "/leitos" },
-        { id: "evolucoes", icon: FileText, label: "Evoluções", path: `/paciente/${currentPatientId}/evolucao/medica` },
-        { id: "lab", icon: FlaskConical, label: "Laboratório", path: "/laboratorio" },
+        {
+          id: "painel",
+          icon: UserSquare2,
+          label: "Painel Médico",
+          path: "/painel-medico",
+        },
+        {
+          id: "fila",
+          icon: ClipboardList,
+          label: "Fila de Atendimento",
+          path: "/fila",
+        },
+        {
+          id: "internacao",
+          icon: BedDouble,
+          label: "Lista de Internações",
+          path: "/lista-internacao",
+        },
+        {
+          id: "leitos",
+          icon: BedDouble,
+          label: "Gestão de Leitos",
+          path: "/leitos",
+        },
+        {
+          id: "evolucoes",
+          icon: FileText,
+          label: "Evoluções",
+          path: `/paciente/${currentPatientId}/evolucao/medica`,
+        },
+        {
+          id: "lab",
+          icon: FlaskConical,
+          label: "Laboratório",
+          path: "/laboratorio",
+        },
         { id: "nir", icon: Ambulance, label: "Regulação (NIR)", path: "/nir" },
       ];
     }
     return [
-      { id: "painel", icon: Activity, label: "Painel Enfermagem", path: "/painel-enfermagem" },
-      { id: "evolucoes", icon: FileText, label: "Evoluções", path: `/paciente/${currentPatientId}/evolucao/enfermagem` },
-      { id: "internacao", icon: BedDouble, label: "Lista de Internações", path: "/lista-internacao" },
-      { id: "leitos", icon: BedDouble, label: "Gestão de Leitos", path: "/leitos" },
-      { id: "checagem", icon: Syringe, label: "Checagem Leito", path: "/checagem-enfermagem" },
+      {
+        id: "painel",
+        icon: Activity,
+        label: "Painel Enfermagem",
+        path: "/painel-enfermagem",
+      },
+      {
+        id: "evolucoes",
+        icon: FileText,
+        label: "Evoluções",
+        path: `/paciente/${currentPatientId}/evolucao/enfermagem`,
+      },
+      {
+        id: "internacao",
+        icon: BedDouble,
+        label: "Lista de Internações",
+        path: "/lista-internacao",
+      },
+      {
+        id: "leitos",
+        icon: BedDouble,
+        label: "Gestão de Leitos",
+        path: "/leitos",
+      },
+      {
+        id: "checagem",
+        icon: Syringe,
+        label: "Checagem Leito",
+        path: "/checagem-enfermagem",
+      },
     ];
   };
 
   const MENU_ITEMS = getMenuItems();
 
-  const admissionQueue = patients.filter((p) => p.admissionRequest?.status === "pending");
+  const admissionQueue = patients.filter(
+    (p) => p.admissionRequest?.status === "pending",
+  );
   const hasPendingAdmissions = admissionQueue.length > 0;
 
-  const localDoctor = typeof window !== "undefined" ? localStorage.getItem("upa_active_doctor") : null;
-  const displayName = user?.user_metadata?.full_name || user?.user_metadata?.name || user?.email?.split("@")[0] || localDoctor || "ENFERMAGEM";
+  const localDoctor =
+    typeof window !== "undefined"
+      ? localStorage.getItem("upa_active_doctor")
+      : null;
+  const displayName =
+    user?.user_metadata?.full_name ||
+    user?.user_metadata?.name ||
+    user?.email?.split("@")[0] ||
+    localDoctor ||
+    "ENFERMAGEM";
 
   return (
     <div className="h-screen w-full flex overflow-hidden">
       {/* Navigation Rail */}
       <div className="w-[72px] h-full flex-shrink-0 flex flex-col items-center py-6 z-30 shadow-[4px_0_24px_-10px_rgba(0,0,0,0.08)] dark:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.5)] relative transition-all duration-300 bg-sky-500/15 dark:bg-gradient-to-b dark:from-[#004466]/95 dark:to-[#001a33]/95 backdrop-blur-2xl border-r border-sky-500/20 dark:border-blue-700/30">
-        
         {/* Logo Minimized */}
-        <div 
-          className="w-10 h-10 rounded-xl bg-sky-500/10 dark:bg-sky-500/20 flex items-center justify-center mb-8 border border-sky-500/20 dark:border-sky-400/30 shadow-sm backdrop-blur-md" 
-        >
+        <div className="w-10 h-10 rounded-xl bg-sky-500/10 dark:bg-sky-500/20 flex items-center justify-center mb-8 border border-sky-500/20 dark:border-sky-400/30 shadow-sm backdrop-blur-md">
           <Activity className="h-5 w-5 text-[#006699] dark:text-sky-300 drop-shadow-[0_0_8px_rgba(0,102,153,0.3)] dark:drop-shadow-[0_0_8px_rgba(14,165,233,0.8)] animate-pulse-slow" />
         </div>
 
@@ -101,13 +173,13 @@ export const ClinicalLayout = ({ children }: ClinicalLayoutProps) => {
                         "w-11 h-11 rounded-xl flex items-center justify-center transition-all duration-300 group relative",
                         isActive
                           ? "bg-white/80 dark:bg-sky-500/25 backdrop-blur-md border border-white/60 dark:border-sky-400/40 shadow-sm dark:shadow-[0_0_20px_rgba(14,165,233,0.3),inset_0_1px_1px_rgba(255,255,255,0.2)] text-[#006699] dark:text-white font-black"
-                          : "text-slate-500 dark:text-blue-100/70 hover:text-[#006699] dark:hover:text-white hover:bg-white/50 dark:hover:bg-white/5 border border-transparent"
+                          : "text-slate-500 dark:text-blue-100/70 hover:text-[#006699] dark:hover:text-white hover:bg-white/50 dark:hover:bg-white/5 border border-transparent",
                       )}
                     >
                       {isActive && (
-                        <motion.div 
-                           layoutId="activeIndicator"
-                           className="absolute -left-[1px] top-1/2 -translate-y-1/2 w-1 h-6 bg-[#006699] dark:bg-sky-400 rounded-r-full drop-shadow-[0_0_4px_rgba(0,102,153,0.4)] dark:drop-shadow-[0_0_8px_rgba(14,165,233,0.8)]" 
+                        <motion.div
+                          layoutId="activeIndicator"
+                          className="absolute -left-[1px] top-1/2 -translate-y-1/2 w-1 h-6 bg-[#006699] dark:bg-sky-400 rounded-r-full drop-shadow-[0_0_4px_rgba(0,102,153,0.4)] dark:drop-shadow-[0_0_8px_rgba(14,165,233,0.8)]"
                         />
                       )}
                       {item.id === "internacao" && hasPendingAdmissions && (
@@ -118,10 +190,20 @@ export const ClinicalLayout = ({ children }: ClinicalLayoutProps) => {
                           </Badge>
                         </div>
                       )}
-                      <Icon className={cn("h-5 w-5 transition-all duration-300 group-hover:scale-110", isActive ? "scale-110 text-[#006699] dark:text-sky-300 drop-shadow-[0_0_4px_rgba(0,102,153,0.2)] dark:drop-shadow-[0_0_8px_rgba(14,165,233,0.8)] stroke-[2.5px]" : "")} />
+                      <Icon
+                        className={cn(
+                          "h-5 w-5 transition-all duration-300 group-hover:scale-110",
+                          isActive
+                            ? "scale-110 text-[#006699] dark:text-sky-300 drop-shadow-[0_0_4px_rgba(0,102,153,0.2)] dark:drop-shadow-[0_0_8px_rgba(14,165,233,0.8)] stroke-[2.5px]"
+                            : "",
+                        )}
+                      />
                     </button>
                   </TooltipTrigger>
-                  <TooltipContent side="right" className="font-bold text-[10px] uppercase tracking-[0.15em] bg-slate-900 text-white dark:bg-white dark:text-slate-900 border-none ml-2 shadow-xl">
+                  <TooltipContent
+                    side="right"
+                    className="font-bold text-[10px] uppercase tracking-[0.15em] bg-slate-900 text-white dark:bg-white dark:text-slate-900 border-none ml-2 shadow-xl"
+                  >
                     {item.label}
                   </TooltipContent>
                 </Tooltip>
@@ -139,7 +221,10 @@ export const ClinicalLayout = ({ children }: ClinicalLayoutProps) => {
                   <ThemeToggle position="bottom" />
                 </div>
               </TooltipTrigger>
-              <TooltipContent side="right" className="font-bold text-[10px] uppercase tracking-[0.15em] bg-slate-900 text-white dark:bg-white dark:text-slate-900 border-none ml-2">
+              <TooltipContent
+                side="right"
+                className="font-bold text-[10px] uppercase tracking-[0.15em] bg-slate-900 text-white dark:bg-white dark:text-slate-900 border-none ml-2"
+              >
                 Aparência
               </TooltipContent>
             </Tooltip>
@@ -148,14 +233,17 @@ export const ClinicalLayout = ({ children }: ClinicalLayoutProps) => {
           <TooltipProvider delayDuration={0}>
             <Tooltip>
               <TooltipTrigger asChild>
-                <button 
+                <button
                   onClick={() => navigate("/")}
                   className="w-11 h-11 rounded-xl flex items-center justify-center text-slate-500 dark:text-blue-100/70 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-400/10 transition-all group"
                 >
                   <LogOut className="h-5 w-5 group-hover:-translate-x-0.5 transition-transform" />
                 </button>
               </TooltipTrigger>
-              <TooltipContent side="right" className="font-bold text-[10px] uppercase tracking-[0.15em] bg-red-600 text-white border-none ml-2">
+              <TooltipContent
+                side="right"
+                className="font-bold text-[10px] uppercase tracking-[0.15em] bg-red-600 text-white border-none ml-2"
+              >
                 Sair
               </TooltipContent>
             </Tooltip>
@@ -180,10 +268,10 @@ export const ClinicalLayout = ({ children }: ClinicalLayoutProps) => {
               </div>
             </div>
           </div>
-          
+
           <div className="flex items-center gap-6">
             <GlobalClock />
-            
+
             <div className="hidden md:flex items-center gap-3 px-4 py-2 bg-white/50 dark:bg-slate-900/50 p-1.5 pr-3 rounded-xl border border-white/20 dark:border-slate-800 backdrop-blur-md shadow-sm">
               <div className="flex flex-col items-end">
                 <span className="text-[9px] font-black text-muted-foreground uppercase tracking-widest leading-none mb-1">
@@ -194,7 +282,7 @@ export const ClinicalLayout = ({ children }: ClinicalLayoutProps) => {
                 </span>
               </div>
               <div className="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 flex items-center justify-center font-black text-xs uppercase shadow-sm">
-                {displayName.substring(0,2)}
+                {displayName.substring(0, 2)}
               </div>
             </div>
           </div>

@@ -9,7 +9,9 @@ export function useEvolutionPrescriptions() {
     route: "",
     frequency: "",
   });
-  const [prescribedMedications, setPrescribedMedications] = useState<PrescriptionMedication[]>([]);
+  const [prescribedMedications, setPrescribedMedications] = useState<
+    PrescriptionMedication[]
+  >([]);
 
   const handleAddPrescriptionItem = () => {
     if (
@@ -41,9 +43,11 @@ export function useEvolutionPrescriptions() {
   };
 
   return {
-    prescWizard, setPrescWizard,
-    prescribedMedications, setPrescribedMedications,
+    prescWizard,
+    setPrescWizard,
+    prescribedMedications,
+    setPrescribedMedications,
     handleAddPrescriptionItem,
-    handleRemovePrescriptionItem
+    handleRemovePrescriptionItem,
   };
 }

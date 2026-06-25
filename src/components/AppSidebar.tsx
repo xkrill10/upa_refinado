@@ -63,10 +63,12 @@ export function AppSidebar() {
   const location = useLocation();
   const isActive = (path: string) => location.pathname === path;
   const [openMenus, setOpenMenus] = useState<Record<string, boolean>>({
-    "Evoluções": role === "enfermeiro" || role === "medico",
+    Evoluções: role === "enfermeiro" || role === "medico",
   });
 
-  const admissionQueue = patients.filter((p) => p.admissionRequest?.status === "pending");
+  const admissionQueue = patients.filter(
+    (p) => p.admissionRequest?.status === "pending",
+  );
   const hasPendingAdmissions = admissionQueue.length > 0;
 
   const toggleSubMenu = (title: string, e: React.MouseEvent) => {
@@ -154,7 +156,11 @@ export function AppSidebar() {
           ],
         },
         { title: "Laboratório", url: "/laboratorio", icon: FlaskConical },
-        { title: "Lista de Internações", url: "/lista-internacao", icon: BedDouble },
+        {
+          title: "Lista de Internações",
+          url: "/lista-internacao",
+          icon: BedDouble,
+        },
         { title: "Leitos", url: "/leitos", icon: BedDouble },
         { title: "Checagem Leito", url: "/checagem-enfermagem", icon: Syringe },
         { title: "Regulação (NIR)", url: "/nir", icon: Ambulance },
@@ -228,7 +234,7 @@ export function AppSidebar() {
     menuGroups = [
       {
         label: "Atendimento Clínico",
-        items: (menuGroupsRaw[1].items
+        items: menuGroupsRaw[1].items
           .map((item) => {
             if (item.title === "Evoluções") {
               return {
@@ -248,14 +254,14 @@ export function AppSidebar() {
               "Leitos",
               "Checagem Leito",
             ].includes(item.title),
-          )) as any,
+          ) as any,
       },
     ];
   } else if (role === "medico") {
     menuGroups = [
       {
         label: "Atendimento Clínico",
-        items: (menuGroupsRaw[1].items
+        items: menuGroupsRaw[1].items
           .map((item) => {
             if (item.title === "Evoluções") {
               return {
@@ -277,7 +283,7 @@ export function AppSidebar() {
               "Laboratório",
               "Regulação (NIR)",
             ].includes(item.title),
-          )) as any,
+          ) as any,
       },
     ];
   }
@@ -442,16 +448,17 @@ export function AppSidebar() {
                                 {item.title}
                               </span>
                             )}
-                            
+
                             {/* ADMISSION QUEUE BADGE */}
-                            {item.url === "/lista-internacao" && hasPendingAdmissions && (
-                              <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center justify-center">
-                                <span className="absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-75 animate-ping" />
-                                <Badge className="relative h-5 min-w-[20px] px-1.5 flex items-center justify-center rounded-full bg-red-500 text-white border-0 text-[10px] font-black pointer-events-none">
-                                  {admissionQueue.length}
-                                </Badge>
-                              </div>
-                            )}
+                            {item.url === "/lista-internacao" &&
+                              hasPendingAdmissions && (
+                                <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center justify-center">
+                                  <span className="absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-75 animate-ping" />
+                                  <Badge className="relative h-5 min-w-[20px] px-1.5 flex items-center justify-center rounded-full bg-red-500 text-white border-0 text-[10px] font-black pointer-events-none">
+                                    {admissionQueue.length}
+                                  </Badge>
+                                </div>
+                              )}
                           </div>
                         </NavLink>
                       )}

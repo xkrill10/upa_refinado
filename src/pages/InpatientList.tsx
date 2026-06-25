@@ -28,7 +28,12 @@ import {
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import { cn, formatWords, formatPatientAge, getEvolutionStatus } from "@/lib/utils";
+import {
+  cn,
+  formatWords,
+  formatPatientAge,
+  getEvolutionStatus,
+} from "@/lib/utils";
 import { AllocateBedModal } from "@/components/AllocateBedModal";
 import { PatientDetailsModal } from "@/components/PatientDetailsModal";
 import { useBeds } from "@/context/BedsContext";
@@ -40,19 +45,20 @@ export default function InpatientList() {
   const { assignPatient } = useBeds();
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
-  const [allocatingPatient, setAllocatingPatient] = useState<Patient | null>(null);
+  const [allocatingPatient, setAllocatingPatient] = useState<Patient | null>(
+    null,
+  );
   const [detailsPatient, setDetailsPatient] = useState<Patient | null>(null);
 
   const inpatientWaitlist = patients
     .filter(
       (p) =>
-        p.admissionRequest?.status === "pending" ||
-        p.status === "interned" // Show those already allocated or pending
+        p.admissionRequest?.status === "pending" || p.status === "interned", // Show those already allocated or pending
     )
     .filter(
       (p) =>
         p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        p.cpf.includes(searchTerm)
+        p.cpf.includes(searchTerm),
     )
     .sort((a, b) => {
       // Pending first
@@ -66,9 +72,13 @@ export default function InpatientList() {
         a.admissionRequest?.status !== "pending"
       )
         return 1;
-      
-      const timeA = new Date(a.admissionRequest?.requestedAt || a.arrivalTime).getTime();
-      const timeB = new Date(b.admissionRequest?.requestedAt || b.arrivalTime).getTime();
+
+      const timeA = new Date(
+        a.admissionRequest?.requestedAt || a.arrivalTime,
+      ).getTime();
+      const timeB = new Date(
+        b.admissionRequest?.requestedAt || b.arrivalTime,
+      ).getTime();
       return timeB - timeA; // newer first
     });
 
@@ -90,7 +100,7 @@ export default function InpatientList() {
 
   const handleAllocate = (bedId: string) => {
     if (!allocatingPatient) return;
-    
+
     // Aloca o paciente no leito (Contexto de Leitos)
     assignPatient(bedId, allocatingPatient.id);
 
@@ -103,15 +113,20 @@ export default function InpatientList() {
       },
     });
 
-    toast.success(`Paciente ${formatWords(allocatingPatient.name)} acomodado!`, {
-      description: "O paciente foi vinculado ao leito com sucesso.",
-    });
-    
+    toast.success(
+      `Paciente ${formatWords(allocatingPatient.name)} acomodado!`,
+      {
+        description: "O paciente foi vinculado ao leito com sucesso.",
+      },
+    );
+
     setAllocatingPatient(null);
     navigate("/leitos");
   };
 
-  const overdueEvolutionsCount = inpatientWaitlist.filter(p => getEvolutionStatus(p).status === "overdue").length;
+  const overdueEvolutionsCount = inpatientWaitlist.filter(
+    (p) => getEvolutionStatus(p).status === "overdue",
+  ).length;
 
   return (
     <motion.div
@@ -124,9 +139,15 @@ export default function InpatientList() {
           <Users className="h-10 w-10" />
           Lista de Internações
           {overdueEvolutionsCount > 0 && (
-            <Badge variant="destructive" className="ml-4 text-lg py-1 px-4 animate-[pulse_2s_ease-in-out_infinite] shadow-lg shadow-red-500/20 flex items-center bg-red-500 hover:bg-red-600 border-none">
+            <Badge
+              variant="destructive"
+              className="ml-4 text-lg py-1 px-4 animate-[pulse_2s_ease-in-out_infinite] shadow-lg shadow-red-500/20 flex items-center bg-red-500 hover:bg-red-600 border-none"
+            >
               <AlertCircle className="w-5 h-5 mr-2" />
-              {overdueEvolutionsCount} {overdueEvolutionsCount === 1 ? 'Evolução Atrasada' : 'Evoluções Atrasadas'}
+              {overdueEvolutionsCount}{" "}
+              {overdueEvolutionsCount === 1
+                ? "Evolução Atrasada"
+                : "Evoluções Atrasadas"}
             </Badge>
           )}
         </h1>
@@ -175,8 +196,13 @@ export default function InpatientList() {
               </TableHeader>
               <TableBody>
                 {inpatientWaitlist.map((patient) => {
-                  const isPending = patient.admissionRequest?.status === "pending";
-                  const overTarget = isPending && getWaitTimeInMinutes(patient.admissionRequest?.requestedAt) > 60;
+                  const isPending =
+                    patient.admissionRequest?.status === "pending";
+                  const overTarget =
+                    isPending &&
+                    getWaitTimeInMinutes(
+                      patient.admissionRequest?.requestedAt,
+                    ) > 60;
                   const evoStatus = getEvolutionStatus(patient);
 
                   return (
@@ -186,7 +212,7 @@ export default function InpatientList() {
                         "border-b border-slate-200/40 dark:border-slate-800/40 transition-colors h-16",
                         isPending
                           ? "bg-orange-500/5 hover:bg-orange-500/10 dark:bg-orange-950/10 dark:hover:bg-orange-950/20"
-                          : "hover:bg-slate-50/50 dark:hover:bg-slate-900/30"
+                          : "hover:bg-slate-50/50 dark:hover:bg-slate-900/30",
                       )}
                     >
                       <TableCell className="font-medium text-sm text-slate-800 dark:text-slate-100 pl-6">
@@ -200,11 +226,25 @@ export default function InpatientList() {
                           <div className="flex flex-col">
                             <span className="font-bold text-slate-800 dark:text-slate-150 flex items-center gap-1">
                               {formatWords(patient.name)}
-                              {['feminino', 'f'].includes(patient.gender?.toLowerCase() || '') && (
-                                <span className="text-pink-500 text-[14px]" title="Feminino">♀</span>
+                              {["feminino", "f"].includes(
+                                patient.gender?.toLowerCase() || "",
+                              ) && (
+                                <span
+                                  className="text-pink-500 text-[14px]"
+                                  title="Feminino"
+                                >
+                                  ♀
+                                </span>
                               )}
-                              {['masculino', 'm'].includes(patient.gender?.toLowerCase() || '') && (
-                                <span className="text-blue-500 text-[14px]" title="Masculino">♂</span>
+                              {["masculino", "m"].includes(
+                                patient.gender?.toLowerCase() || "",
+                              ) && (
+                                <span
+                                  className="text-blue-500 text-[14px]"
+                                  title="Masculino"
+                                >
+                                  ♂
+                                </span>
                               )}
                             </span>
                             <span className="text-xs text-muted-foreground">
@@ -213,7 +253,7 @@ export default function InpatientList() {
                           </div>
                         </div>
                       </TableCell>
-                      
+
                       <TableCell className="text-center">
                         <Badge
                           variant="outline"
@@ -221,7 +261,7 @@ export default function InpatientList() {
                             "font-bold text-[10px] uppercase",
                             patient.admissionRequest?.bedType === "emergency"
                               ? "text-red-500 border-red-200 bg-red-50 dark:bg-red-950/20"
-                              : "text-blue-500 border-blue-200 bg-blue-50 dark:bg-blue-950/20"
+                              : "text-blue-500 border-blue-200 bg-blue-50 dark:bg-blue-950/20",
                           )}
                         >
                           {patient.admissionRequest?.bedType === "emergency"
@@ -229,7 +269,7 @@ export default function InpatientList() {
                             : "Observação"}
                         </Badge>
                       </TableCell>
-                      
+
                       <TableCell className="text-center">
                         <span className="text-xs font-medium text-slate-600 dark:text-slate-400">
                           {patient.admissionRequest?.doctor || "Não informado"}
@@ -240,7 +280,12 @@ export default function InpatientList() {
                         <div className="flex flex-col">
                           <span className="text-foreground dark:text-slate-200 font-bold text-sm">
                             {patient.admissionRequest?.requestedAt
-                              ? new Date(patient.admissionRequest.requestedAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+                              ? new Date(
+                                  patient.admissionRequest.requestedAt,
+                                ).toLocaleTimeString([], {
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                })
                               : "—"}
                           </span>
                           <div className="flex items-center gap-1">
@@ -252,7 +297,10 @@ export default function InpatientList() {
                                   : "text-muted-foreground dark:text-slate-500",
                               )}
                             >
-                              Há {getTimeElapsed(patient.admissionRequest?.requestedAt)}
+                              Há{" "}
+                              {getTimeElapsed(
+                                patient.admissionRequest?.requestedAt,
+                              )}
                             </span>
                             {overTarget && (
                               <AlertCircle className="h-3 w-3 text-red-555 dark:text-red-400" />
@@ -260,7 +308,7 @@ export default function InpatientList() {
                           </div>
                         </div>
                       </TableCell>
-                      
+
                       <TableCell>
                         <div className="flex justify-center">
                           <Badge
@@ -269,18 +317,22 @@ export default function InpatientList() {
                               "font-bold text-[10px] px-2 py-1 border rounded-lg whitespace-nowrap min-w-[100px] justify-center",
                               isPending
                                 ? "text-orange-500 bg-orange-500/10 border-orange-500/20"
-                                : "text-emerald-500 bg-emerald-500/10 border-emerald-500/20"
+                                : "text-emerald-500 bg-emerald-500/10 border-emerald-500/20",
                             )}
                           >
                             {isPending ? "Aguardando Leito" : "Alocado"}
                           </Badge>
                         </div>
                       </TableCell>
-                      
+
                       <TableCell className="text-right pr-6">
                         <div className="flex items-center justify-end gap-1">
                           {isPending && (
-                            <ActionTooltip label="Acomodar no Leito" side="top" align="end">
+                            <ActionTooltip
+                              label="Acomodar no Leito"
+                              side="top"
+                              align="end"
+                            >
                               <Button
                                 variant="ghost"
                                 size="sm"
@@ -292,15 +344,15 @@ export default function InpatientList() {
                               </Button>
                             </ActionTooltip>
                           )}
-                          <ActionTooltip 
+                          <ActionTooltip
                             label={
-                              evoStatus.status === "overdue" 
+                              evoStatus.status === "overdue"
                                 ? `Evolução Atrasada! (${Math.abs(evoStatus.minutesLeft)} min)`
                                 : evoStatus.status === "warning"
-                                ? `Atenção: Evolução em ${evoStatus.minutesLeft} min`
-                                : "Evolução de Enfermagem"
-                            } 
-                            side="top" 
+                                  ? `Atenção: Evolução em ${evoStatus.minutesLeft} min`
+                                  : "Evolução de Enfermagem"
+                            }
+                            side="top"
                             align="end"
                           >
                             <Button
@@ -311,21 +363,33 @@ export default function InpatientList() {
                                 evoStatus.status === "overdue"
                                   ? "text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 animate-[pulse_2s_ease-in-out_infinite]"
                                   : evoStatus.status === "warning"
-                                  ? "text-orange-500 hover:text-orange-600 hover:bg-orange-50 dark:hover:bg-orange-950/30"
-                                  : "text-slate-500 hover:text-[#006699] dark:hover:text-sky-400 hover:bg-[#006699]/5 dark:hover:bg-sky-400/5"
+                                    ? "text-orange-500 hover:text-orange-600 hover:bg-orange-50 dark:hover:bg-orange-950/30"
+                                    : "text-slate-500 hover:text-[#006699] dark:hover:text-sky-400 hover:bg-[#006699]/5 dark:hover:bg-sky-400/5",
                               )}
-                              onClick={() => navigate(`/paciente/${patient.id}/evolucao/enfermagem`)}
+                              onClick={() =>
+                                navigate(
+                                  `/paciente/${patient.id}/evolucao/enfermagem`,
+                                )
+                              }
                             >
                               <ClipboardList className="h-4 w-4" />
                               {evoStatus.status !== "normal" && (
-                                <span className={cn(
-                                  "absolute top-0 right-0 w-2 h-2 rounded-full ring-2 ring-white dark:ring-slate-900",
-                                  evoStatus.status === "overdue" ? "bg-red-500" : "bg-orange-500"
-                                )} />
+                                <span
+                                  className={cn(
+                                    "absolute top-0 right-0 w-2 h-2 rounded-full ring-2 ring-white dark:ring-slate-900",
+                                    evoStatus.status === "overdue"
+                                      ? "bg-red-500"
+                                      : "bg-orange-500",
+                                  )}
+                                />
                               )}
                             </Button>
                           </ActionTooltip>
-                          <ActionTooltip label="Detalhes da Triagem" side="top" align="end">
+                          <ActionTooltip
+                            label="Detalhes da Triagem"
+                            side="top"
+                            align="end"
+                          >
                             <Button
                               variant="ghost"
                               size="icon"
@@ -335,7 +399,11 @@ export default function InpatientList() {
                               <Stethoscope className="h-4 w-4" />
                             </Button>
                           </ActionTooltip>
-                          <ActionTooltip label="Ver Prontuário" side="top" align="end">
+                          <ActionTooltip
+                            label="Ver Prontuário"
+                            side="top"
+                            align="end"
+                          >
                             <Button
                               variant="ghost"
                               size="icon"
@@ -380,7 +448,7 @@ export default function InpatientList() {
         patient={allocatingPatient}
         onAllocate={handleAllocate}
       />
-      
+
       <PatientDetailsModal
         patient={detailsPatient}
         isOpen={!!detailsPatient}

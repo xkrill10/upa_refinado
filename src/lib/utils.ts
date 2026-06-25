@@ -198,31 +198,36 @@ export function formatPatientAge(
 }
 
 export function formatName(name: string) {
-  if (!name) return '';
-  const lowercasedWords = ['de', 'da', 'do', 'das', 'dos', 'e'];
+  if (!name) return "";
+  const lowercasedWords = ["de", "da", "do", "das", "dos", "e"];
   return name
     .toLowerCase()
-    .split(' ')
+    .split(" ")
     .map((word, index, arr) => {
-      if (!word) return '';
-      if (index === 0 || index === arr.length - 1 || !lowercasedWords.includes(word)) {
+      if (!word) return "";
+      if (
+        index === 0 ||
+        index === arr.length - 1 ||
+        !lowercasedWords.includes(word)
+      ) {
         return word.charAt(0).toUpperCase() + word.slice(1);
       }
       return word;
     })
-    .join(' ');
+    .join(" ");
 }
 
 export function formatPhone(value: string) {
-  if (!value) return '';
-  
-  let v = value.replace(/\D/g, '');
+  if (!value) return "";
+
+  let v = value.replace(/\D/g, "");
   if (v.length > 11) v = v.slice(0, 11);
 
-  if (v.length === 0) return '';
+  if (v.length === 0) return "";
   if (v.length <= 2) return `(${v}`;
   if (v.length <= 6) return `(${v.slice(0, 2)}) ${v.slice(2)}`;
-  if (v.length <= 10) return `(${v.slice(0, 2)}) ${v.slice(2, 6)}-${v.slice(6)}`;
+  if (v.length <= 10)
+    return `(${v.slice(0, 2)}) ${v.slice(2, 6)}-${v.slice(6)}`;
   return `(${v.slice(0, 2)}) ${v.slice(2, 7)}-${v.slice(7)}`;
 }
 
@@ -249,17 +254,22 @@ export function getEvolutionStatus(patient: any): {
   nextEvolutionTime: Date;
 } {
   const intervalMinutes = getEvolutionInterval(patient.risk);
-  
+
   let lastTimeStr = patient.arrivalTime;
   if (patient.evolutions && patient.evolutions.length > 0) {
     const sorted = [...patient.evolutions].sort(
-      (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+      (a, b) =>
+        new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime(),
     );
     lastTimeStr = sorted[0].timestamp;
   }
 
   if (!lastTimeStr) {
-     return { status: "normal", minutesLeft: 999, nextEvolutionTime: new Date() };
+    return {
+      status: "normal",
+      minutesLeft: 999,
+      nextEvolutionTime: new Date(),
+    };
   }
 
   const lastTime = new Date(lastTimeStr);

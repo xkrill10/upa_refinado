@@ -21,24 +21,23 @@ const AppContent = () => {
   const { user } = useAuth();
   const { role, setRole } = useRole();
 
-  const isClinicalPanel = 
-    (role === "enfermeiro" || role === "medico" || role === "recepcao") && (
-      location.pathname.startsWith("/painel-enfermagem") ||
+  const isClinicalPanel =
+    (role === "enfermeiro" || role === "medico" || role === "recepcao") &&
+    (location.pathname.startsWith("/painel-enfermagem") ||
       location.pathname.startsWith("/painel-medico") ||
       location.pathname.startsWith("/fila") ||
       location.pathname.startsWith("/laboratorio") ||
       location.pathname.startsWith("/paciente") ||
       location.pathname.startsWith("/lista-internacao") ||
       location.pathname.startsWith("/leitos") ||
-      location.pathname.startsWith("/novo-paciente")
-    );
+      location.pathname.startsWith("/novo-paciente"));
   const isClinicalRoom = location.pathname.startsWith("/sala/");
-  
+
   const localDoctor =
     typeof window !== "undefined"
       ? localStorage.getItem("upa_active_doctor")
       : null;
-      
+
   const displayName =
     user?.user_metadata?.full_name ||
     user?.user_metadata?.name ||
@@ -115,13 +114,15 @@ const AppContent = () => {
         <div
           className={cn(
             "flex-1 flex flex-col min-w-0",
-            !isLogin && !isCleaning && "main-content-bg"
+            !isLogin && !isCleaning && "main-content-bg",
           )}
         >
           {!isCallPanel && !isLogin && !isCleaning && (
             <header className="h-24 flex items-center justify-between px-8 sticky top-0 z-20 header-premium-glass">
               <div className="flex items-center gap-6">
-                {showSidebar && <SidebarTrigger className="h-12 w-12 hover:bg-primary/10 hover:text-primary transition-all duration-300 rounded-xl" />}
+                {showSidebar && (
+                  <SidebarTrigger className="h-12 w-12 hover:bg-primary/10 hover:text-primary transition-all duration-300 rounded-xl" />
+                )}
                 <div className="flex flex-col">
                   <span className="text-base md:text-[18px] font-black tracking-[0.15em] text-foreground uppercase mission-control-title leading-tight">
                     UPA · Unidade de Pronto Atendimento
@@ -168,7 +169,7 @@ const AppContent = () => {
           <main
             className={cn(
               "flex-1 min-w-0 w-full",
-              !isCallPanel && !isLogin && !isCleaning && "p-6"
+              !isCallPanel && !isLogin && !isCleaning && "p-6",
             )}
           >
             <Suspense

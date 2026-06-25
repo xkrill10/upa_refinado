@@ -53,7 +53,7 @@ export function BedTransferModal({
     if (!gender) return false;
     const roomLower = bedRoom.toLowerCase();
     const genderLower = gender.toLowerCase();
-    
+
     if (roomLower.includes("feminina") || roomLower.includes("feminino")) {
       return genderLower !== "feminino" && genderLower !== "f";
     }
@@ -208,35 +208,54 @@ export function BedTransferModal({
 
                       <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                         {wardBeds.map((bed) => {
-                          const isBlocked = isBedBlockedByGender(bed.room, patientGender);
+                          const isBlocked = isBedBlockedByGender(
+                            bed.room,
+                            patientGender,
+                          );
                           return (
-                          <button
-                            key={bed.id}
-                            type="button"
-                            disabled={isBlocked}
-                            onClick={() => setSelectedBedId(bed.id)}
-                            title={isBlocked ? `Leito restrito ao sexo ${bed.room.toLowerCase().includes('masculin') ? 'Masculino' : 'Feminino'}` : undefined}
-                            className={cn(
-                              "flex flex-col items-start p-2.5 rounded-lg border text-left transition-all relative overflow-hidden",
-                              isBlocked
-                                ? "bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700 opacity-60 cursor-not-allowed grayscale"
-                                : selectedBedId === bed.id
-                                ? "bg-blue-500/10 border-blue-500 text-blue-700 dark:text-blue-400 ring-1 ring-blue-500 ring-offset-1 ring-offset-background"
-                                : "bg-card hover:bg-muted/50 border-border/60 hover:border-blue-500/30",
-                            )}
-                          >
-                            <div className="flex items-center justify-between w-full gap-2">
-                              <span className="text-xs font-black truncate">
-                                {bed.name}
+                            <button
+                              key={bed.id}
+                              type="button"
+                              disabled={isBlocked}
+                              onClick={() => setSelectedBedId(bed.id)}
+                              title={
+                                isBlocked
+                                  ? `Leito restrito ao sexo ${bed.room.toLowerCase().includes("masculin") ? "Masculino" : "Feminino"}`
+                                  : undefined
+                              }
+                              className={cn(
+                                "flex flex-col items-start p-2.5 rounded-lg border text-left transition-all relative overflow-hidden",
+                                isBlocked
+                                  ? "bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700 opacity-60 cursor-not-allowed grayscale"
+                                  : selectedBedId === bed.id
+                                    ? "bg-blue-500/10 border-blue-500 text-blue-700 dark:text-blue-400 ring-1 ring-blue-500 ring-offset-1 ring-offset-background"
+                                    : "bg-card hover:bg-muted/50 border-border/60 hover:border-blue-500/30",
+                              )}
+                            >
+                              <div className="flex items-center justify-between w-full gap-2">
+                                <span className="text-xs font-black truncate">
+                                  {bed.name}
+                                </span>
+                                {isBlocked && (
+                                  <Lock className="h-3 w-3 text-slate-400 shrink-0" />
+                                )}
+                              </div>
+                              <span className="text-[9px] text-muted-foreground mt-0.5 w-full truncate flex items-center gap-1">
+                                {bed.room}
+                                {bed.room
+                                  .toLowerCase()
+                                  .includes("masculin") && (
+                                  <span className="text-blue-500 font-black text-[11px] leading-none">
+                                    ♂
+                                  </span>
+                                )}
+                                {bed.room.toLowerCase().includes("feminin") && (
+                                  <span className="text-pink-500 font-black text-[11px] leading-none">
+                                    ♀
+                                  </span>
+                                )}
                               </span>
-                              {isBlocked && <Lock className="h-3 w-3 text-slate-400 shrink-0" />}
-                            </div>
-                            <span className="text-[9px] text-muted-foreground mt-0.5 w-full truncate flex items-center gap-1">
-                              {bed.room}
-                              {bed.room.toLowerCase().includes('masculin') && <span className="text-blue-500 font-black text-[11px] leading-none">♂</span>}
-                              {bed.room.toLowerCase().includes('feminin') && <span className="text-pink-500 font-black text-[11px] leading-none">♀</span>}
-                            </span>
-                          </button>
+                            </button>
                           );
                         })}
                       </div>

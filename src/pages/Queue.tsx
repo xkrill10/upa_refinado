@@ -627,7 +627,10 @@ export default function Queue() {
                       <TableCell>
                         <div className="flex flex-col">
                           <span className="text-foreground dark:text-slate-200 font-bold text-sm">
-                            {new Date(patient.arrivalTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                            {new Date(patient.arrivalTime).toLocaleTimeString(
+                              [],
+                              { hour: "2-digit", minute: "2-digit" },
+                            )}
                           </span>
                           <div className="flex items-center gap-1">
                             <span
@@ -661,7 +664,11 @@ export default function Queue() {
                       </TableCell>
                       <TableCell className="text-right pr-6 min-w-[280px]">
                         <div className="flex items-center justify-end gap-0.5 flex-nowrap whitespace-nowrap">
-                          <ActionTooltip label="Chamar Senha" side="top" align="end">
+                          <ActionTooltip
+                            label="Chamar Senha"
+                            side="top"
+                            align="end"
+                          >
                             <Button
                               variant="ghost"
                               size="sm"
@@ -688,7 +695,11 @@ export default function Queue() {
                               Chamar
                             </Button>
                           </ActionTooltip>
-                          <ActionTooltip label="Ver Detalhes" side="top" align="end">
+                          <ActionTooltip
+                            label="Ver Detalhes"
+                            side="top"
+                            align="end"
+                          >
                             <Button
                               variant="ghost"
                               size="icon"
@@ -701,7 +712,11 @@ export default function Queue() {
                               <Eye className="h-4 w-4" />
                             </Button>
                           </ActionTooltip>
-                          <ActionTooltip label="Ver Prontuário" side="top" align="end">
+                          <ActionTooltip
+                            label="Ver Prontuário"
+                            side="top"
+                            align="end"
+                          >
                             <Button
                               variant="ghost"
                               size="icon"
@@ -718,7 +733,11 @@ export default function Queue() {
                               <User className="h-4 w-4" />
                             </Button>
                           </ActionTooltip>
-                          <ActionTooltip label="Reclassificar" side="top" align="end">
+                          <ActionTooltip
+                            label="Reclassificar"
+                            side="top"
+                            align="end"
+                          >
                             <Button
                               variant="ghost"
                               size="icon"
@@ -739,7 +758,11 @@ export default function Queue() {
                               <Activity className="h-4 w-4" />
                             </Button>
                           </ActionTooltip>
-                          <ActionTooltip label="Trocar Setor / Encaminhar" side="top" align="end">
+                          <ActionTooltip
+                            label="Trocar Setor / Encaminhar"
+                            side="top"
+                            align="end"
+                          >
                             <Button
                               variant="ghost"
                               size="icon"
@@ -758,7 +781,11 @@ export default function Queue() {
                               <ArrowRightLeft className="h-4 w-4" />
                             </Button>
                           </ActionTooltip>
-                          <ActionTooltip label="Reimprimir Senha" side="top" align="end">
+                          <ActionTooltip
+                            label="Reimprimir Senha"
+                            side="top"
+                            align="end"
+                          >
                             <Button
                               variant="ghost"
                               size="icon"
@@ -773,7 +800,11 @@ export default function Queue() {
                               <Printer className="h-4 w-4" />
                             </Button>
                           </ActionTooltip>
-                          <ActionTooltip label="Registrar Evasão" side="top" align="end">
+                          <ActionTooltip
+                            label="Registrar Evasão"
+                            side="top"
+                            align="end"
+                          >
                             <Button
                               variant="ghost"
                               size="icon"

@@ -1,6 +1,11 @@
 import React, { createContext, useContext, useState, ReactNode } from "react";
 
-export type BedStatus = "available" | "occupied" | "maintenance" | "cleaning" | "reserved";
+export type BedStatus =
+  | "available"
+  | "occupied"
+  | "maintenance"
+  | "cleaning"
+  | "reserved";
 export type CleaningStatus = "waiting" | "in_progress";
 export type PriorityLevel = "normal" | "high" | "urgent";
 
@@ -96,11 +101,30 @@ const MOCK_CLEANERS: Cleaner[] = [
 
 const generateBeds = (): Bed[] => {
   const occupiedPatientIds = [
-    "super-dummy-test", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14"
+    "super-dummy-test",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8",
+    "9",
+    "10",
+    "11",
+    "12",
+    "13",
+    "14",
   ];
   let nextPatientIdx = 0;
 
-  const createBed = (id: string, name: string, ward: string, room: string, defaultStatus: BedStatus = "available"): Bed => {
+  const createBed = (
+    id: string,
+    name: string,
+    ward: string,
+    room: string,
+    defaultStatus: BedStatus = "available",
+  ): Bed => {
     let status = defaultStatus;
     let patientId: string | undefined = undefined;
 
@@ -120,7 +144,9 @@ const generateBeds = (): Bed[] => {
         ? [
             {
               patientId,
-              admittedAt: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(),
+              admittedAt: new Date(
+                Date.now() - 1000 * 60 * 60 * 2,
+              ).toISOString(),
             },
           ]
         : undefined,
@@ -139,19 +165,85 @@ const generateBeds = (): Bed[] => {
     createBed("e-8", "Maca Extra", "Emergência", "Emergência", "available"),
 
     // UPA - Observação Feminina
-    createBed("o-of1", "Leito 1", "Observação", "Observação Feminina", "available"),
-    createBed("o-of2", "Leito 2", "Observação", "Observação Feminina", "occupied"),
-    createBed("o-of3", "Leito 3", "Observação", "Observação Feminina", "available"),
-    createBed("o-of4", "Leito 4", "Observação", "Observação Feminina", "available"),
-    createBed("o-of5", "Leito 5", "Observação", "Observação Feminina", "maintenance"),
-    createBed("o-of6", "Maca Extra", "Observação", "Observação Feminina", "available"),
+    createBed(
+      "o-of1",
+      "Leito 1",
+      "Observação",
+      "Observação Feminina",
+      "available",
+    ),
+    createBed(
+      "o-of2",
+      "Leito 2",
+      "Observação",
+      "Observação Feminina",
+      "occupied",
+    ),
+    createBed(
+      "o-of3",
+      "Leito 3",
+      "Observação",
+      "Observação Feminina",
+      "available",
+    ),
+    createBed(
+      "o-of4",
+      "Leito 4",
+      "Observação",
+      "Observação Feminina",
+      "available",
+    ),
+    createBed(
+      "o-of5",
+      "Leito 5",
+      "Observação",
+      "Observação Feminina",
+      "maintenance",
+    ),
+    createBed(
+      "o-of6",
+      "Maca Extra",
+      "Observação",
+      "Observação Feminina",
+      "available",
+    ),
 
     // UPA - Observação Masculina
-    createBed("o-om1", "Leito 1", "Observação", "Observação Masculina", "available"),
-    createBed("o-om2", "Leito 2", "Observação", "Observação Masculina", "occupied"),
-    createBed("o-om3", "Leito 3", "Observação", "Observação Masculina", "available"),
-    createBed("o-om4", "Leito 4", "Observação", "Observação Masculina", "available"),
-    createBed("o-om5", "Maca Extra", "Observação", "Observação Masculina", "available"),
+    createBed(
+      "o-om1",
+      "Leito 1",
+      "Observação",
+      "Observação Masculina",
+      "available",
+    ),
+    createBed(
+      "o-om2",
+      "Leito 2",
+      "Observação",
+      "Observação Masculina",
+      "occupied",
+    ),
+    createBed(
+      "o-om3",
+      "Leito 3",
+      "Observação",
+      "Observação Masculina",
+      "available",
+    ),
+    createBed(
+      "o-om4",
+      "Leito 4",
+      "Observação",
+      "Observação Masculina",
+      "available",
+    ),
+    createBed(
+      "o-om5",
+      "Maca Extra",
+      "Observação",
+      "Observação Masculina",
+      "available",
+    ),
 
     // UPA - Pediatria
     createBed("o-ped1", "Leito 1", "Observação", "Pediatria", "available"),

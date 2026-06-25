@@ -58,7 +58,6 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-
 const COUNTERS = [
   { id: "GUICHE_1", name: "Guichê 1", type: "standard", icon: User },
   { id: "GUICHE_2", name: "Guichê 2", type: "standard", icon: User },
@@ -66,13 +65,41 @@ const COUNTERS = [
 ];
 
 const CHECKLIST_ITEMS = [
-  { id: "impressora", category: "Preparação", text: "Conferir bobina de papel da impressora" },
-  { id: "leitores", category: "Preparação", text: "Testar leitor de cartão SUS e documentos" },
-  { id: "contingencia", category: "Preparação", text: "Organizar formulários físicos de contingência" },
-  { id: "espera", category: "Operação", text: "Monitorar fila de triados pendentes de cadastro" },
-  { id: "prioridades", category: "Operação", text: "Priorizar atendimento a preferenciais (Lei nº 10.048)" },
-  { id: "fechamento", category: "Fechamento", text: "Conferir pendências de cadastro no fim do turno" },
-  { id: "organizacao", category: "Fechamento", text: "Organizar e higienizar a bancada para a próxima equipe" },
+  {
+    id: "impressora",
+    category: "Preparação",
+    text: "Conferir bobina de papel da impressora",
+  },
+  {
+    id: "leitores",
+    category: "Preparação",
+    text: "Testar leitor de cartão SUS e documentos",
+  },
+  {
+    id: "contingencia",
+    category: "Preparação",
+    text: "Organizar formulários físicos de contingência",
+  },
+  {
+    id: "espera",
+    category: "Operação",
+    text: "Monitorar fila de triados pendentes de cadastro",
+  },
+  {
+    id: "prioridades",
+    category: "Operação",
+    text: "Priorizar atendimento a preferenciais (Lei nº 10.048)",
+  },
+  {
+    id: "fechamento",
+    category: "Fechamento",
+    text: "Conferir pendências de cadastro no fim do turno",
+  },
+  {
+    id: "organizacao",
+    category: "Fechamento",
+    text: "Organizar e higienizar a bancada para a próxima equipe",
+  },
 ];
 
 export default function NewPatient() {
@@ -84,12 +111,14 @@ export default function NewPatient() {
     setIsAudioEnabled,
   } = usePatients();
 
-  
-  
   const [pendingCounter, setPendingCounter] = useState<any>(null);
-  const [receptionistName, setReceptionistName] = useState(() => localStorage.getItem("upa_receptionist_name") || "");
+  const [receptionistName, setReceptionistName] = useState(
+    () => localStorage.getItem("upa_receptionist_name") || "",
+  );
 
-  const [receptionistMatricula, setReceptionistMatricula] = useState(() => localStorage.getItem("upa_receptionist_matricula") || "");
+  const [receptionistMatricula, setReceptionistMatricula] = useState(
+    () => localStorage.getItem("upa_receptionist_matricula") || "",
+  );
   const [isExitModalOpen, setIsExitModalOpen] = useState(false);
   const [isChecklistOpen, setIsChecklistOpen] = useState(false);
   const [checklist, setChecklist] = useState<Record<string, boolean>>(() => {
@@ -110,8 +139,11 @@ export default function NewPatient() {
     localStorage.setItem("upa_receptionist_checklist", JSON.stringify(updated));
   };
 
-
-  const [selectedCounter, setSelectedCounter] = useState<{id: string, name: string, icon?: any} | null>(() => {
+  const [selectedCounter, setSelectedCounter] = useState<{
+    id: string;
+    name: string;
+    icon?: any;
+  } | null>(() => {
     const saved = localStorage.getItem("upa_active_counter");
     if (saved) {
       try {
@@ -128,14 +160,24 @@ export default function NewPatient() {
   };
 
   const handleAssumirGuiche = () => {
-    if (!pendingCounter || !receptionistName.trim() || !receptionistMatricula.trim()) {
+    if (
+      !pendingCounter ||
+      !receptionistName.trim() ||
+      !receptionistMatricula.trim()
+    ) {
       toast.error("Por favor, preencha seu nome e matrícula.");
       return;
     }
     setSelectedCounter(pendingCounter);
-    localStorage.setItem("upa_active_counter", JSON.stringify({id: pendingCounter.id, name: pendingCounter.name}));
+    localStorage.setItem(
+      "upa_active_counter",
+      JSON.stringify({ id: pendingCounter.id, name: pendingCounter.name }),
+    );
     localStorage.setItem("upa_receptionist_name", receptionistName.trim());
-    localStorage.setItem("upa_receptionist_matricula", receptionistMatricula.trim());
+    localStorage.setItem(
+      "upa_receptionist_matricula",
+      receptionistMatricula.trim(),
+    );
     setPendingCounter(null);
   };
 
@@ -237,7 +279,9 @@ export default function NewPatient() {
     if (!selectedPatient) return;
     setFormData((prev) => ({
       ...prev,
-      name: selectedPatient.name.includes("Pré-cadastro") ? "" : selectedPatient.name || "",
+      name: selectedPatient.name.includes("Pré-cadastro")
+        ? ""
+        : selectedPatient.name || "",
       socialName: "",
       cpf: selectedPatient.cpf || "",
       susCard: "",
@@ -478,38 +522,48 @@ export default function NewPatient() {
               Painel da Recepção
             </h1>
             <p className="text-muted-foreground font-bold uppercase tracking-widest text-xs max-w-xl mx-auto opacity-80">
-              Selecione um guichê disponível para iniciar seu turno de atendimento.
+              Selecione um guichê disponível para iniciar seu turno de
+              atendimento.
             </p>
           </div>
-          
+
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 max-w-4xl mx-auto">
-            {COUNTERS.map(counter => (
-              <motion.div key={counter.id} whileHover={{ scale: 1.02, y: -2 }} whileTap={{ scale: 0.98 }}>
-                 <Card
-                   className="relative overflow-hidden cursor-pointer transition-all duration-300 h-full border-2 border-[#006699]/20 dark:border-sky-500/20 hover:border-[#006699]/40 dark:hover:border-sky-500/40 hover:shadow-xl bg-white/40 dark:bg-slate-900/40 backdrop-blur-md"
-                   onClick={() => handleSelectCounter(counter)}
-                 >
-                   <CardContent className="p-6 flex flex-col items-center text-center space-y-4">
-                     <div className="p-4 rounded-2xl bg-[#006699]/10 dark:bg-sky-500/10 text-[#006699] dark:text-sky-400">
-                       <counter.icon className="h-8 w-8" />
-                     </div>
-                     <div className="space-y-1">
-                       <h3 className="font-black text-lg uppercase tracking-wider text-foreground">
-                         {counter.name.split(" ")[0]}
-                         <span className="ml-4 text-[#006699] dark:text-sky-400">
-                           {counter.name.split(" ")[1]}
-                         </span>
-                       </h3>
-                       <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Livre para entrada</p>
-                     </div>
-                   </CardContent>
-                 </Card>
+            {COUNTERS.map((counter) => (
+              <motion.div
+                key={counter.id}
+                whileHover={{ scale: 1.02, y: -2 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                <Card
+                  className="relative overflow-hidden cursor-pointer transition-all duration-300 h-full border-2 border-[#006699]/20 dark:border-sky-500/20 hover:border-[#006699]/40 dark:hover:border-sky-500/40 hover:shadow-xl bg-white/40 dark:bg-slate-900/40 backdrop-blur-md"
+                  onClick={() => handleSelectCounter(counter)}
+                >
+                  <CardContent className="p-6 flex flex-col items-center text-center space-y-4">
+                    <div className="p-4 rounded-2xl bg-[#006699]/10 dark:bg-sky-500/10 text-[#006699] dark:text-sky-400">
+                      <counter.icon className="h-8 w-8" />
+                    </div>
+                    <div className="space-y-1">
+                      <h3 className="font-black text-lg uppercase tracking-wider text-foreground">
+                        {counter.name.split(" ")[0]}
+                        <span className="ml-4 text-[#006699] dark:text-sky-400">
+                          {counter.name.split(" ")[1]}
+                        </span>
+                      </h3>
+                      <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+                        Livre para entrada
+                      </p>
+                    </div>
+                  </CardContent>
+                </Card>
               </motion.div>
             ))}
           </div>
         </div>
 
-        <Dialog open={!!pendingCounter} onOpenChange={(open) => !open && setPendingCounter(null)}>
+        <Dialog
+          open={!!pendingCounter}
+          onOpenChange={(open) => !open && setPendingCounter(null)}
+        >
           <DialogContent className="sm:max-w-[450px] p-0 overflow-hidden border border-white/20 dark:border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.3)] rounded-3xl bg-white/70 dark:bg-slate-950/60 backdrop-blur-xl [&>button]:hidden">
             <div className="p-8 text-center text-white relative shadow-lg backdrop-blur-md transition-colors duration-300 bg-gradient-to-br from-[#006699]/90 to-[#004466]/90 dark:from-sky-600/50 dark:to-sky-900/50">
               <div className="bg-white/20 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4 backdrop-blur-sm">
@@ -519,7 +573,7 @@ export default function NewPatient() {
                 Assumir Guichê
               </DialogTitle>
               <DialogDescription className="text-white/80 font-medium text-sm">
-                Você está prestes a iniciar os atendimentos no <br/>
+                Você está prestes a iniciar os atendimentos no <br />
                 <strong className="text-white">{pendingCounter?.name}</strong>.
               </DialogDescription>
             </div>
@@ -531,7 +585,9 @@ export default function NewPatient() {
                 </label>
                 <Input
                   value={receptionistName}
-                  onChange={(e) => setReceptionistName(formatWords(e.target.value))}
+                  onChange={(e) =>
+                    setReceptionistName(formatWords(e.target.value))
+                  }
                   placeholder="Ex: Maria Santos"
                   className="h-12 rounded-xl px-4 text-sm font-bold border-2 focus-visible:ring-2 border-[#006699]/30 focus-visible:ring-[#006699]/20"
                   autoFocus
@@ -543,7 +599,9 @@ export default function NewPatient() {
                 </label>
                 <Input
                   value={receptionistMatricula}
-                  onChange={(e) => setReceptionistMatricula(e.target.value.toUpperCase())}
+                  onChange={(e) =>
+                    setReceptionistMatricula(e.target.value.toUpperCase())
+                  }
                   placeholder="Ex: 12345"
                   className="h-12 rounded-xl px-4 text-sm font-bold border-2 focus-visible:ring-2 border-[#006699]/30 focus-visible:ring-[#006699]/20"
                 />
@@ -567,7 +625,6 @@ export default function NewPatient() {
             </div>
           </DialogContent>
         </Dialog>
-
       </div>
     );
   }
@@ -581,7 +638,7 @@ export default function NewPatient() {
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 mb-8">
         <div className="col-span-1 lg:col-span-3 bg-white/60 dark:bg-slate-900/40 backdrop-blur-xl border border-white/50 dark:border-white/10 shadow-lg rounded-3xl p-6 relative overflow-hidden flex items-center justify-between">
           <div className="absolute right-0 top-0 w-64 h-64 bg-[#006699]/5 rounded-full blur-[80px] -mr-20 -mt-20 pointer-events-none" />
-          
+
           <div>
             <h1 className="text-3xl font-black tracking-tight text-slate-800 dark:text-white uppercase mb-1">
               Olá, {receptionistName.split(" ")[0]}!
@@ -594,11 +651,20 @@ export default function NewPatient() {
 
           <div className="flex items-center gap-4 z-10">
             <div className="text-right hidden sm:block">
-              <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Matrícula</p>
-              <p className="text-sm font-black text-[#006699] dark:text-sky-400">{receptionistMatricula}</p>
+              <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">
+                Matrícula
+              </p>
+              <p className="text-sm font-black text-[#006699] dark:text-sky-400">
+                {receptionistMatricula}
+              </p>
             </div>
             <div className="h-10 w-px bg-border hidden sm:block" />
-            <Button variant="outline" size="sm" onClick={() => setIsExitModalOpen(true)} className="h-10 px-4 text-xs font-black uppercase text-red-500 border-red-500/20 bg-red-500/5 hover:bg-red-500 hover:text-white rounded-xl transition-all shadow-sm">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setIsExitModalOpen(true)}
+              className="h-10 px-4 text-xs font-black uppercase text-red-500 border-red-500/20 bg-red-500/5 hover:bg-red-500 hover:text-white rounded-xl transition-all shadow-sm"
+            >
               <LogOut className="h-4 w-4 mr-2" />
               Sair da Sala
             </Button>
@@ -607,141 +673,172 @@ export default function NewPatient() {
 
         <div className="col-span-1 bg-[#006699] text-white rounded-3xl p-6 shadow-lg shadow-[#006699]/20 relative overflow-hidden flex flex-col justify-center">
           <div className="absolute right-0 top-0 w-32 h-32 bg-white/10 rounded-full blur-[40px] -mr-10 -mt-10 pointer-events-none" />
-          <p className="text-[10px] font-black uppercase tracking-widest opacity-80 mb-1">Fila Virtual</p>
+          <p className="text-[10px] font-black uppercase tracking-widest opacity-80 mb-1">
+            Fila Virtual
+          </p>
           <div className="flex items-baseline gap-2 z-10">
-            <span className="text-4xl font-black tracking-tighter">{waitingRegistration.length}</span>
-            <span className="text-xs font-bold uppercase tracking-widest opacity-80">Aguardando</span>
+            <span className="text-4xl font-black tracking-tighter">
+              {waitingRegistration.length}
+            </span>
+            <span className="text-xs font-bold uppercase tracking-widest opacity-80">
+              Aguardando
+            </span>
           </div>
         </div>
       </div>
-      
+
       <div className="flex items-center justify-between mt-4 mb-2">
-         <h2 className="text-lg font-black tracking-tight text-[#006699] dark:text-sky-400 uppercase flex items-center gap-2">
-           <ClipboardList className="h-5 w-5" />
-           Pacientes para Chamada
-         </h2>
-          <Button 
-            variant="outline" 
-            size="sm" 
-            onClick={() => setIsChecklistOpen(true)}
-            className="h-8 text-xs font-black uppercase rounded-xl border border-orange-500/30 dark:border-orange-500/30 bg-orange-500/10 dark:bg-orange-500/20 text-orange-600 dark:text-orange-400 hover:bg-orange-500 dark:hover:bg-orange-500 hover:text-white dark:hover:text-slate-950 hover:border-orange-500 dark:hover:border-orange-500 transition-all gap-1.5 shadow-sm shadow-orange-500/5 hover:shadow-md"
-          >
-             <CheckSquare className="h-4 w-4" />
-             Checklist do Turno ({CHECKLIST_ITEMS.filter(item => checklist[item.id]).length}/{CHECKLIST_ITEMS.length})
-          </Button>
+        <h2 className="text-lg font-black tracking-tight text-[#006699] dark:text-sky-400 uppercase flex items-center gap-2">
+          <ClipboardList className="h-5 w-5" />
+          Pacientes para Chamada
+        </h2>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => setIsChecklistOpen(true)}
+          className="h-8 text-xs font-black uppercase rounded-xl border border-orange-500/30 dark:border-orange-500/30 bg-orange-500/10 dark:bg-orange-500/20 text-orange-600 dark:text-orange-400 hover:bg-orange-500 dark:hover:bg-orange-500 hover:text-white dark:hover:text-slate-950 hover:border-orange-500 dark:hover:border-orange-500 transition-all gap-1.5 shadow-sm shadow-orange-500/5 hover:shadow-md"
+        >
+          <CheckSquare className="h-4 w-4" />
+          Checklist do Turno (
+          {CHECKLIST_ITEMS.filter((item) => checklist[item.id]).length}/
+          {CHECKLIST_ITEMS.length})
+        </Button>
       </div>
 
-        <Card className="glass-card border border-slate-200/40 dark:border-slate-800/40 shadow-xl rounded-xl overflow-hidden bg-white/70 dark:bg-slate-900/45 transition-colors duration-500">
-          <CardContent className="p-0">
-            <div className="overflow-x-auto">
-              <Table>
-                <TableHeader className="bg-slate-50/50 dark:bg-slate-950/20 border-b border-slate-200/40 dark:border-slate-800/40">
-                  <TableRow className="hover:bg-transparent border-none">
-                    <TableHead className="text-[#006699] dark:text-sky-400 h-14 text-[10px] font-black uppercase tracking-widest text-center">Senha</TableHead>
-                    <TableHead className="text-[#006699] dark:text-sky-400 h-14 text-[10px] font-black uppercase tracking-widest text-left">Paciente</TableHead>
-                    <TableHead className="text-[#006699] dark:text-sky-400 h-14 text-[10px] font-black uppercase tracking-widest text-center">Idade</TableHead>
-                    <TableHead className="text-[#006699] dark:text-sky-400 h-14 text-[10px] font-black uppercase tracking-widest text-center">Classificação</TableHead>
-                    <TableHead className="text-[#006699] dark:text-sky-400 h-14 text-[10px] font-black uppercase tracking-widest text-left">Queixa</TableHead>
-                    <TableHead className="text-[#006699] dark:text-sky-400 h-14 text-[10px] font-black uppercase tracking-widest text-center">Espera</TableHead>
-                    <TableHead className="text-[#006699] dark:text-sky-400 h-14 text-[10px] font-black uppercase tracking-widest text-center">Ação</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  <AnimatePresence>
-                    {waitingRegistration.map((patient) => {
-                      const risk = getRiskDetails(patient.risk || "not-urgent");
-                      const waitTime = Math.floor(
-                        (new Date().getTime() - new Date(patient.arrivalTime).getTime()) /
-                          60000,
-                      );
-                      return (
-                        <motion.tr
-                          key={patient.id}
-                          layout
-                          initial={{ opacity: 0, y: 10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0, scale: 0.95 }}
-                          className="border-b border-slate-200/40 dark:border-slate-800/40 transition-colors h-16 hover:bg-slate-50/50 dark:hover:bg-slate-900/30"
-                        >
-                          <TableCell className="text-center">
-                            <Badge variant="outline" className="font-mono text-xs font-black bg-white dark:bg-slate-950 px-2 py-1 shadow-sm">
-                              {patient.ticket}
-                            </Badge>
-                          </TableCell>
-                          <TableCell>
-                            <div className="font-bold text-sm text-slate-800 dark:text-slate-100 capitalize truncate max-w-[200px]">
-                              {formatWords(patient.name)}
-                            </div>
-                          </TableCell>
-                          <TableCell className="text-center text-xs font-medium text-slate-500">
-                            {patient.age ? `${patient.age} anos` : "--"}
-                          </TableCell>
-                          <TableCell className="text-center">
-                            <Badge className={cn(risk.color, "font-bold text-[10px] px-2 py-1 rounded-md uppercase tracking-wider")}>
-                              {risk.label}
-                            </Badge>
-                          </TableCell>
-                          <TableCell className="text-xs text-slate-500 dark:text-slate-400 font-medium truncate max-w-[250px]">
-                            {patient.mainComplaint || "Queixa não informada"}
-                          </TableCell>
-                          <TableCell className="text-center">
-                            <div className="flex flex-col items-center justify-center gap-0.5">
-                              <span className="text-xs font-black text-slate-700 dark:text-slate-300">
-                                Há {waitTime}
-                              </span>
-                              <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">
-                                min
-                              </span>
-                            </div>
-                          </TableCell>
-                          <TableCell className="text-center">
-                            <div className="flex items-center justify-center gap-2">
-                              <Button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleOpenRegistration(patient);
-                                }}
-                                className="h-8 px-3 text-[10px] uppercase font-black bg-[#006699] hover:bg-[#005580] text-white gap-2 rounded-lg transition-all shadow-sm"
-                              >
-                                <UserPlus className="h-3.5 w-3.5" />
-                                Iniciar Cadastro
-                              </Button>
-                              <Button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleCallPatient(e, patient);
-                                }}
-                                variant="ghost"
-                                className="h-8 px-3 text-[10px] uppercase font-black text-[#006699] hover:bg-[#006699]/10 gap-2 rounded-lg transition-all"
-                              >
-                                <Megaphone className="h-3.5 w-3.5" />
-                                Chamar
-                              </Button>
-                            </div>
-                          </TableCell>
-                        </motion.tr>
-                      );
-                    })}
-                  </AnimatePresence>
-                </TableBody>
-              </Table>
-            </div>
-          </CardContent>
-        </Card>
-
-        {waitingRegistration.length === 0 && (
-          <div className="col-span-full py-20 flex flex-col items-center justify-center text-center">
-            <div className="h-20 w-20 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mb-4">
-              <CheckCircle2 className="h-10 w-10 text-emerald-500" />
-            </div>
-            <h3 className="text-xl font-black text-slate-700 dark:text-slate-300 uppercase tracking-tight">
-              Fila Vazia
-            </h3>
-            <p className="text-sm text-slate-500 font-medium mt-1">
-              Todos os pacientes triados já foram cadastrados.
-            </p>
+      <Card className="glass-card border border-slate-200/40 dark:border-slate-800/40 shadow-xl rounded-xl overflow-hidden bg-white/70 dark:bg-slate-900/45 transition-colors duration-500">
+        <CardContent className="p-0">
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader className="bg-slate-50/50 dark:bg-slate-950/20 border-b border-slate-200/40 dark:border-slate-800/40">
+                <TableRow className="hover:bg-transparent border-none">
+                  <TableHead className="text-[#006699] dark:text-sky-400 h-14 text-[10px] font-black uppercase tracking-widest text-center">
+                    Senha
+                  </TableHead>
+                  <TableHead className="text-[#006699] dark:text-sky-400 h-14 text-[10px] font-black uppercase tracking-widest text-left">
+                    Paciente
+                  </TableHead>
+                  <TableHead className="text-[#006699] dark:text-sky-400 h-14 text-[10px] font-black uppercase tracking-widest text-center">
+                    Idade
+                  </TableHead>
+                  <TableHead className="text-[#006699] dark:text-sky-400 h-14 text-[10px] font-black uppercase tracking-widest text-center">
+                    Classificação
+                  </TableHead>
+                  <TableHead className="text-[#006699] dark:text-sky-400 h-14 text-[10px] font-black uppercase tracking-widest text-left">
+                    Queixa
+                  </TableHead>
+                  <TableHead className="text-[#006699] dark:text-sky-400 h-14 text-[10px] font-black uppercase tracking-widest text-center">
+                    Espera
+                  </TableHead>
+                  <TableHead className="text-[#006699] dark:text-sky-400 h-14 text-[10px] font-black uppercase tracking-widest text-center">
+                    Ação
+                  </TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                <AnimatePresence>
+                  {waitingRegistration.map((patient) => {
+                    const risk = getRiskDetails(patient.risk || "not-urgent");
+                    const waitTime = Math.floor(
+                      (new Date().getTime() -
+                        new Date(patient.arrivalTime).getTime()) /
+                        60000,
+                    );
+                    return (
+                      <motion.tr
+                        key={patient.id}
+                        layout
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, scale: 0.95 }}
+                        className="border-b border-slate-200/40 dark:border-slate-800/40 transition-colors h-16 hover:bg-slate-50/50 dark:hover:bg-slate-900/30"
+                      >
+                        <TableCell className="text-center">
+                          <Badge
+                            variant="outline"
+                            className="font-mono text-xs font-black bg-white dark:bg-slate-950 px-2 py-1 shadow-sm"
+                          >
+                            {patient.ticket}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <div className="font-bold text-sm text-slate-800 dark:text-slate-100 capitalize truncate max-w-[200px]">
+                            {formatWords(patient.name)}
+                          </div>
+                        </TableCell>
+                        <TableCell className="text-center text-xs font-medium text-slate-500">
+                          {patient.age ? `${patient.age} anos` : "--"}
+                        </TableCell>
+                        <TableCell className="text-center">
+                          <Badge
+                            className={cn(
+                              risk.color,
+                              "font-bold text-[10px] px-2 py-1 rounded-md uppercase tracking-wider",
+                            )}
+                          >
+                            {risk.label}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="text-xs text-slate-500 dark:text-slate-400 font-medium truncate max-w-[250px]">
+                          {patient.mainComplaint || "Queixa não informada"}
+                        </TableCell>
+                        <TableCell className="text-center">
+                          <div className="flex flex-col items-center justify-center gap-0.5">
+                            <span className="text-xs font-black text-slate-700 dark:text-slate-300">
+                              Há {waitTime}
+                            </span>
+                            <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">
+                              min
+                            </span>
+                          </div>
+                        </TableCell>
+                        <TableCell className="text-center">
+                          <div className="flex items-center justify-center gap-2">
+                            <Button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleOpenRegistration(patient);
+                              }}
+                              className="h-8 px-3 text-[10px] uppercase font-black bg-[#006699] hover:bg-[#005580] text-white gap-2 rounded-lg transition-all shadow-sm"
+                            >
+                              <UserPlus className="h-3.5 w-3.5" />
+                              Iniciar Cadastro
+                            </Button>
+                            <Button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleCallPatient(e, patient);
+                              }}
+                              variant="ghost"
+                              className="h-8 px-3 text-[10px] uppercase font-black text-[#006699] hover:bg-[#006699]/10 gap-2 rounded-lg transition-all"
+                            >
+                              <Megaphone className="h-3.5 w-3.5" />
+                              Chamar
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </motion.tr>
+                    );
+                  })}
+                </AnimatePresence>
+              </TableBody>
+            </Table>
           </div>
-        )}
+        </CardContent>
+      </Card>
+
+      {waitingRegistration.length === 0 && (
+        <div className="col-span-full py-20 flex flex-col items-center justify-center text-center">
+          <div className="h-20 w-20 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mb-4">
+            <CheckCircle2 className="h-10 w-10 text-emerald-500" />
+          </div>
+          <h3 className="text-xl font-black text-slate-700 dark:text-slate-300 uppercase tracking-tight">
+            Fila Vazia
+          </h3>
+          <p className="text-sm text-slate-500 font-medium mt-1">
+            Todos os pacientes triados já foram cadastrados.
+          </p>
+        </div>
+      )}
 
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
         <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto p-0 border-none bg-slate-50 dark:bg-slate-950">
@@ -763,7 +860,14 @@ export default function NewPatient() {
                   <CardTitle className="text-sm font-black uppercase text-[#006699] flex items-center gap-2">
                     <Activity className="h-4 w-4" /> Dados do Atendimento
                   </CardTitle>
-                  <Button type="button" variant="ghost" size="icon" onClick={handleClearAtendimento} className="h-6 w-6 text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors" title="Limpar Atendimento">
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    onClick={handleClearAtendimento}
+                    className="h-6 w-6 text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+                    title="Limpar Atendimento"
+                  >
                     <Eraser className="h-3.5 w-3.5" />
                   </Button>
                 </CardHeader>
@@ -814,7 +918,14 @@ export default function NewPatient() {
                   <CardTitle className="text-sm font-black uppercase text-[#006699] flex items-center gap-2">
                     <User className="h-4 w-4" /> Dados Pessoais e Filiação
                   </CardTitle>
-                  <Button type="button" variant="ghost" size="icon" onClick={handleClearPessoais} className="h-6 w-6 text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors" title="Limpar Dados Pessoais">
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    onClick={handleClearPessoais}
+                    className="h-6 w-6 text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+                    title="Limpar Dados Pessoais"
+                  >
                     <Eraser className="h-3.5 w-3.5" />
                   </Button>
                 </CardHeader>
@@ -943,7 +1054,14 @@ export default function NewPatient() {
                     <p className="text-xs font-black uppercase text-[#006699] mb-4">
                       Informações Complementares
                     </p>
-                    <Button type="button" variant="ghost" size="icon" onClick={handleClearComplementares} className="h-6 w-6 text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors mb-4" title="Limpar Informações Complementares">
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      onClick={handleClearComplementares}
+                      className="h-6 w-6 text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors mb-4"
+                      title="Limpar Informações Complementares"
+                    >
                       <Eraser className="h-3.5 w-3.5" />
                     </Button>
                   </div>
@@ -1081,7 +1199,14 @@ export default function NewPatient() {
                     <Users className="h-4 w-4" /> Dados do Acompanhante /
                     Responsável
                   </CardTitle>
-                  <Button type="button" variant="ghost" size="icon" onClick={handleClearAcompanhante} className="h-6 w-6 text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors" title="Limpar Acompanhante">
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    onClick={handleClearAcompanhante}
+                    className="h-6 w-6 text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+                    title="Limpar Acompanhante"
+                  >
                     <Eraser className="h-3.5 w-3.5" />
                   </Button>
                 </CardHeader>
@@ -1156,7 +1281,14 @@ export default function NewPatient() {
                   <CardTitle className="text-sm font-black uppercase text-[#006699] flex items-center gap-2">
                     <MapPin className="h-4 w-4" /> Localização e Contato
                   </CardTitle>
-                  <Button type="button" variant="ghost" size="icon" onClick={handleClearLocalizacao} className="h-6 w-6 text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors" title="Limpar Localização">
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    onClick={handleClearLocalizacao}
+                    className="h-6 w-6 text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+                    title="Limpar Localização"
+                  >
                     <Eraser className="h-3.5 w-3.5" />
                   </Button>
                 </CardHeader>
@@ -1301,7 +1433,8 @@ export default function NewPatient() {
               Cancelar Cadastro?
             </DialogTitle>
             <DialogDescription className="text-muted-foreground font-medium text-sm">
-              Se você cancelar, todos os dados que você digitou até agora serão perdidos. Deseja mesmo sair?
+              Se você cancelar, todos os dados que você digitou até agora serão
+              perdidos. Deseja mesmo sair?
             </DialogDescription>
           </div>
           <div className="p-8 space-y-5 bg-white/50 dark:bg-slate-950/50">
@@ -1326,8 +1459,6 @@ export default function NewPatient() {
           </div>
         </DialogContent>
       </Dialog>
-
-    
 
       {/* CALL CONTROL MODAL */}
       <Dialog open={showCallControl} onOpenChange={setShowCallControl}>
@@ -1489,7 +1620,8 @@ export default function NewPatient() {
               Encerrar Turno?
             </DialogTitle>
             <DialogDescription className="text-white/80 font-medium text-sm">
-              Deseja mesmo sair do <strong className="text-white">{selectedCounter?.name}</strong>?
+              Deseja mesmo sair do{" "}
+              <strong className="text-white">{selectedCounter?.name}</strong>?
             </DialogDescription>
           </div>
           <div className="p-8 space-y-5">
@@ -1533,13 +1665,23 @@ export default function NewPatient() {
               <div className="flex justify-between items-center text-xs font-black uppercase text-muted-foreground tracking-widest">
                 <span>Progresso do Checklist</span>
                 <span className="text-[#006699] dark:text-sky-400 font-mono font-bold">
-                  {Math.round((CHECKLIST_ITEMS.filter(item => checklist[item.id]).length / CHECKLIST_ITEMS.length) * 100) || 0}% ({CHECKLIST_ITEMS.filter(item => checklist[item.id]).length}/{CHECKLIST_ITEMS.length})
+                  {Math.round(
+                    (CHECKLIST_ITEMS.filter((item) => checklist[item.id])
+                      .length /
+                      CHECKLIST_ITEMS.length) *
+                      100,
+                  ) || 0}
+                  % (
+                  {CHECKLIST_ITEMS.filter((item) => checklist[item.id]).length}/
+                  {CHECKLIST_ITEMS.length})
                 </span>
               </div>
               <div className="h-2.5 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden border border-slate-200/30 dark:border-slate-700/30 shadow-inner">
-                <div 
+                <div
                   className="h-full bg-gradient-to-r from-emerald-500 to-teal-500 transition-all duration-500 ease-out rounded-full shadow-[0_0_8px_rgba(16,185,129,0.5)]"
-                  style={{ width: `${(CHECKLIST_ITEMS.filter(item => checklist[item.id]).length / CHECKLIST_ITEMS.length) * 100 || 0}%` }}
+                  style={{
+                    width: `${(CHECKLIST_ITEMS.filter((item) => checklist[item.id]).length / CHECKLIST_ITEMS.length) * 100 || 0}%`,
+                  }}
                 />
               </div>
             </div>
@@ -1547,7 +1689,9 @@ export default function NewPatient() {
             {/* Checklist Groups */}
             <div className="space-y-5">
               {["Preparação", "Operação", "Fechamento"].map((category) => {
-                const categoryItems = CHECKLIST_ITEMS.filter(item => item.category === category);
+                const categoryItems = CHECKLIST_ITEMS.filter(
+                  (item) => item.category === category,
+                );
                 return (
                   <div key={category} className="space-y-2.5">
                     <h4 className="text-[10px] font-black uppercase tracking-widest text-[#006699] dark:text-sky-400 border-b border-slate-100 dark:border-slate-800/60 pb-1 flex items-center gap-1.5">
@@ -1558,28 +1702,35 @@ export default function NewPatient() {
                       {categoryItems.map((item) => {
                         const isChecked = !!checklist[item.id];
                         return (
-                          <div 
+                          <div
                             key={item.id}
                             onClick={() => toggleChecklistItem(item.id)}
                             className={cn(
                               "flex items-center gap-3 p-3 rounded-2xl border cursor-pointer transition-all duration-200 select-none",
                               isChecked
                                 ? "bg-emerald-500/5 border-emerald-500/30 dark:border-emerald-500/25 text-slate-750 dark:text-slate-355 text-emerald-800 dark:text-emerald-400"
-                                : "bg-white/50 dark:bg-slate-900/50 border-slate-200/60 dark:border-slate-800/80 hover:bg-slate-50 dark:hover:bg-slate-800/80 text-slate-600 dark:text-slate-400"
+                                : "bg-white/50 dark:bg-slate-900/50 border-slate-200/60 dark:border-slate-800/80 hover:bg-slate-50 dark:hover:bg-slate-800/80 text-slate-600 dark:text-slate-400",
                             )}
                           >
-                            <div className={cn(
-                              "h-5 w-5 rounded-lg border flex items-center justify-center transition-all shrink-0",
-                              isChecked
-                                ? "bg-emerald-500 border-emerald-500 text-white"
-                                : "border-slate-300 dark:border-slate-750"
-                            )}>
-                              {isChecked && <CheckCircle2 className="h-3.5 w-3.5 stroke-[3px]" />}
+                            <div
+                              className={cn(
+                                "h-5 w-5 rounded-lg border flex items-center justify-center transition-all shrink-0",
+                                isChecked
+                                  ? "bg-emerald-500 border-emerald-500 text-white"
+                                  : "border-slate-300 dark:border-slate-750",
+                              )}
+                            >
+                              {isChecked && (
+                                <CheckCircle2 className="h-3.5 w-3.5 stroke-[3px]" />
+                              )}
                             </div>
-                            <span className={cn(
-                              "text-xs font-bold leading-tight",
-                              isChecked && "line-through text-muted-foreground opacity-60"
-                            )}>
+                            <span
+                              className={cn(
+                                "text-xs font-bold leading-tight",
+                                isChecked &&
+                                  "line-through text-muted-foreground opacity-60",
+                              )}
+                            >
                               {item.text}
                             </span>
                           </div>

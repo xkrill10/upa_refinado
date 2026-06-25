@@ -244,7 +244,6 @@ export function NurseWorkspaceHeader({
               <DialogDescription className="text-sm font-medium text-slate-500 dark:text-slate-400">
                 Tem certeza que deseja encerrar os atendimentos nesta sala? A
                 sala ficará livre para outro colega.
-
               </DialogDescription>
             </div>
 

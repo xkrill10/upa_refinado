@@ -821,7 +821,9 @@ export default function Dashboard() {
               {bedStats.occupied > 0 && (
                 <ActionTooltip label="Ocupados">
                   <div
-                    style={{ width: `${(bedStats.occupied / totalBeds) * 100}%` }}
+                    style={{
+                      width: `${(bedStats.occupied / totalBeds) * 100}%`,
+                    }}
                     className="bg-red-500 flex items-center justify-center text-[10px] font-bold text-white shadow-inner cursor-help"
                   >
                     {bedStats.occupied}
@@ -831,7 +833,9 @@ export default function Dashboard() {
               {bedStats.cleaning > 0 && (
                 <ActionTooltip label="Higienização">
                   <div
-                    style={{ width: `${(bedStats.cleaning / totalBeds) * 100}%` }}
+                    style={{
+                      width: `${(bedStats.cleaning / totalBeds) * 100}%`,
+                    }}
                     className="bg-cyan-500 flex items-center justify-center text-[10px] font-bold text-white shadow-inner cursor-help"
                   >
                     {bedStats.cleaning}

@@ -136,7 +136,7 @@ export default function Same() {
     patientName: string,
   ) => {
     switch (type) {
-      case "view":
+      case "view": {
         const patientToView = patients.find((p) => p.id === patientId);
         if (patientToView) {
           setSelectedPatientForModal(patientToView);
@@ -148,6 +148,7 @@ export default function Same() {
           });
         }
         break;
+      }
       case "print":
         toast.success(
           `Enviando prontuário de ${patientName} para fila de impressão`,

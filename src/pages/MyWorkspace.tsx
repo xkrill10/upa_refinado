@@ -1056,7 +1056,6 @@ export default function MyWorkspace() {
               Tem certeza que deseja encerrar os atendimentos nesta sala? A sala
               ficará livre para outro colega.
               <br />
-
             </DialogDescription>
           </DialogHeader>
           <div className="flex gap-3 mt-6">

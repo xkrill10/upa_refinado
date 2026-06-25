@@ -17,35 +17,57 @@ const Patients = React.lazy(() => import("./pages/Patients"));
 const CallPanel = React.lazy(() => import("./pages/CallPanel"));
 const PatientEvolution = React.lazy(() => import("./pages/PatientEvolution"));
 const EvolucaoMedica = React.lazy(() => import("./pages/EvolucaoMedica"));
-const EvolucaoEnfermagem = React.lazy(() => import("./pages/EvolucaoEnfermagem"));
-const AnotacaoEnfermagem = React.lazy(() => import("./pages/AnotacaoEnfermagem"));
-const EvolucaoFisioterapia = React.lazy(() => import("./pages/EvolucaoFisioterapia"));
+const EvolucaoEnfermagem = React.lazy(
+  () => import("./pages/EvolucaoEnfermagem"),
+);
+const AnotacaoEnfermagem = React.lazy(
+  () => import("./pages/AnotacaoEnfermagem"),
+);
+const EvolucaoFisioterapia = React.lazy(
+  () => import("./pages/EvolucaoFisioterapia"),
+);
 const EvolucaoNutricao = React.lazy(() => import("./pages/EvolucaoNutricao"));
-const EvolucaoPsicologia = React.lazy(() => import("./pages/EvolucaoPsicologia"));
-const EvolucaoServicoSocial = React.lazy(() => import("./pages/EvolucaoServicoSocial"));
-const EvolucaoTerapiaOcupacional = React.lazy(() => import("./pages/EvolucaoTerapiaOcupacional"));
-const EvolucaoFonoaudiologia = React.lazy(() => import("./pages/EvolucaoFonoaudiologia"));
-const EvolucaoFarmaciaClinica = React.lazy(() => import("./pages/EvolucaoFarmaciaClinica"));
+const EvolucaoPsicologia = React.lazy(
+  () => import("./pages/EvolucaoPsicologia"),
+);
+const EvolucaoServicoSocial = React.lazy(
+  () => import("./pages/EvolucaoServicoSocial"),
+);
+const EvolucaoTerapiaOcupacional = React.lazy(
+  () => import("./pages/EvolucaoTerapiaOcupacional"),
+);
+const EvolucaoFonoaudiologia = React.lazy(
+  () => import("./pages/EvolucaoFonoaudiologia"),
+);
+const EvolucaoFarmaciaClinica = React.lazy(
+  () => import("./pages/EvolucaoFarmaciaClinica"),
+);
 const UserManagement = React.lazy(() => import("./pages/Admin/UserManagement"));
 const AuditLogs = React.lazy(() => import("./pages/Admin/AuditLogs"));
 const BackupAdmin = React.lazy(() => import("./pages/Admin/BackupAdmin"));
 const Consentimentos = React.lazy(() => import("./pages/Admin/Consentimentos"));
 const RetencaoDados = React.lazy(() => import("./pages/Admin/RetencaoDados"));
 const Anonimizacao = React.lazy(() => import("./pages/Admin/Anonimizacao"));
-const CentralIntegracoes = React.lazy(() => import("./pages/Admin/CentralIntegracoes"));
+const CentralIntegracoes = React.lazy(
+  () => import("./pages/Admin/CentralIntegracoes"),
+);
 const Reports = React.lazy(() => import("./pages/Reports"));
 const HR = React.lazy(() => import("./pages/HR"));
 const Same = React.lazy(() => import("./pages/Same"));
 const NotFound = React.lazy(() => import("./pages/NotFound"));
 const Pediatria = React.lazy(() => import("./pages/Pediatria"));
-const AtendimentosPediatrico = React.lazy(() => import("./pages/AtendimentosPediatrico"));
+const AtendimentosPediatrico = React.lazy(
+  () => import("./pages/AtendimentosPediatrico"),
+);
 const MyHR = React.lazy(() => import("./pages/MyHR"));
 const DoctorDashboard = React.lazy(() => import("./pages/DoctorDashboard"));
 const NurseDashboard = React.lazy(() => import("./pages/NurseDashboard"));
 const MyWorkspace = React.lazy(() => import("./pages/MyWorkspace"));
 
 // Novas Telas
-const EscalaAppRouting = React.lazy(() => import("./pages/EscalaApp/EscalaAppRouting"));
+const EscalaAppRouting = React.lazy(
+  () => import("./pages/EscalaApp/EscalaAppRouting"),
+);
 const Laboratory = React.lazy(() => import("./pages/Laboratory"));
 const Inventory = React.lazy(() => import("./pages/Inventory"));
 const NursingCheck = React.lazy(() => import("./pages/NursingCheck"));
@@ -83,16 +105,46 @@ export const AppRoutes = () => {
       <Route path="/same" element={<Same />} />
       <Route path="/paciente/:id" element={<PatientRecord />} />
       <Route path="/paciente/:id/evolucao" element={<PatientEvolution />} />
-      <Route path="/paciente/:id/evolucao/medica" element={<EvolucaoMedica />} />
-      <Route path="/paciente/:id/evolucao/enfermagem" element={<EvolucaoEnfermagem />} />
-      <Route path="/paciente/:id/evolucao/anotacao-enfermagem" element={<AnotacaoEnfermagem />} />
-      <Route path="/paciente/:id/evolucao/fisioterapia" element={<EvolucaoFisioterapia />} />
-      <Route path="/paciente/:id/evolucao/nutricao" element={<EvolucaoNutricao />} />
-      <Route path="/paciente/:id/evolucao/psicologia" element={<EvolucaoPsicologia />} />
-      <Route path="/paciente/:id/evolucao/servico-social" element={<EvolucaoServicoSocial />} />
-      <Route path="/paciente/:id/evolucao/terapia-ocupacional" element={<EvolucaoTerapiaOcupacional />} />
-      <Route path="/paciente/:id/evolucao/fonoaudiologia" element={<EvolucaoFonoaudiologia />} />
-      <Route path="/paciente/:id/evolucao/farmacia-clinica" element={<EvolucaoFarmaciaClinica />} />
+      <Route
+        path="/paciente/:id/evolucao/medica"
+        element={<EvolucaoMedica />}
+      />
+      <Route
+        path="/paciente/:id/evolucao/enfermagem"
+        element={<EvolucaoEnfermagem />}
+      />
+      <Route
+        path="/paciente/:id/evolucao/anotacao-enfermagem"
+        element={<AnotacaoEnfermagem />}
+      />
+      <Route
+        path="/paciente/:id/evolucao/fisioterapia"
+        element={<EvolucaoFisioterapia />}
+      />
+      <Route
+        path="/paciente/:id/evolucao/nutricao"
+        element={<EvolucaoNutricao />}
+      />
+      <Route
+        path="/paciente/:id/evolucao/psicologia"
+        element={<EvolucaoPsicologia />}
+      />
+      <Route
+        path="/paciente/:id/evolucao/servico-social"
+        element={<EvolucaoServicoSocial />}
+      />
+      <Route
+        path="/paciente/:id/evolucao/terapia-ocupacional"
+        element={<EvolucaoTerapiaOcupacional />}
+      />
+      <Route
+        path="/paciente/:id/evolucao/fonoaudiologia"
+        element={<EvolucaoFonoaudiologia />}
+      />
+      <Route
+        path="/paciente/:id/evolucao/farmacia-clinica"
+        element={<EvolucaoFarmaciaClinica />}
+      />
       <Route path="/admin/usuarios" element={<UserManagement />} />
       <Route path="/admin/auditoria" element={<AuditLogs />} />
       <Route path="/admin/backups" element={<BackupAdmin />} />
@@ -104,7 +156,10 @@ export const AppRoutes = () => {
       <Route path="/sala/triagem" element={<TriageRoom />} />
       <Route path="/sala/pediatria" element={<PediatriaRoom />} />
       <Route path="/sala/checagem" element={<NursingCheckRoom />} />
-      <Route path="/atendimentos-pediatricos" element={<AtendimentosPediatrico />} />
+      <Route
+        path="/atendimentos-pediatricos"
+        element={<AtendimentosPediatrico />}
+      />
       <Route path="/painel-medico" element={<DoctorDashboard />} />
       <Route path="/painel-enfermagem" element={<NurseDashboard />} />
       <Route path="/meu-consultorio" element={<MyWorkspace />} />
