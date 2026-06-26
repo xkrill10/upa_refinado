@@ -13,8 +13,25 @@ export const RoleProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const [role, setRoleState] = useState<Role>(() => {
+    let initialRole: Role = "diretoria";
     const savedRole = localStorage.getItem("simulated_role");
-    return (savedRole as Role) || "diretoria";
+    
+    // Auto-sync role based on the current URL
+    if (window.location.pathname === "/") {
+      initialRole = "diretoria";
+    } else if (window.location.pathname.startsWith("/painel-enfermagem")) {
+      initialRole = "enfermeiro";
+    } else if (window.location.pathname.startsWith("/painel-medico")) {
+      initialRole = "medico";
+    } else {
+      initialRole = (savedRole as Role) || "diretoria";
+    }
+    
+    if (initialRole !== savedRole) {
+      localStorage.setItem("simulated_role", initialRole);
+    }
+    
+    return initialRole;
   });
 
   const setRole = (newRole: Role) => {

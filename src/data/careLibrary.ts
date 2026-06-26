@@ -42,6 +42,7 @@ export const CARE_LIBRARY: LibraryItem[] = [
   { name: "Banho no Leito", category: "nursing", dosage: "Completo", route: "Leito", frequency: "1x ao dia" },
   { name: "Curativo", category: "nursing", dosage: "-", route: "-", frequency: "1x ao dia" },
   { name: "Glicemia Capilar", category: "nursing", dosage: "-", route: "Dedo", frequency: "6/6h" },
+  { name: "Aferir Sinais Vitais", category: "nursing", dosage: "PA, FC, SpO2, Temp, FR", route: "-", frequency: "4/4h" },
   { name: "Monitoramento de Sinais Vitais", category: "nursing", dosage: "PA, FC, SpO2, Temp, FR", route: "-", frequency: "4/4h" },
 
   // THERAPIES

@@ -100,9 +100,9 @@ export function MewsModal({ isOpen, onClose, onApply }: MewsModalProps) {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[550px] rounded-xl glass-card-premium shadow-2xl max-h-[85vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-[550px] rounded-xl glass-card-premium shadow-2xl">
         <DialogHeader>
-          <DialogTitle className="text-2xl mission-control-title flex items-center gap-2">
+          <DialogTitle className="text-xl mission-control-title flex items-center gap-2">
             <Activity className="h-6 w-6 text-blue-500" />
             Escore MEWS (Alerta Fisiológico)
           </DialogTitle>
@@ -111,14 +111,14 @@ export function MewsModal({ isOpen, onClose, onApply }: MewsModalProps) {
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-4 py-3">
+        <div className="space-y-2.5 py-1">
           {/* 1. PAS (Pressão Arterial Sistólica) */}
           <div className="space-y-1">
             <Label className="text-xs font-black uppercase text-foreground/80">
               1. Pressão Arterial Sistólica (mmHg)
             </Label>
             <Select value={mewsPas} onValueChange={setMewsPas}>
-              <SelectTrigger className="h-10 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
+              <SelectTrigger className="h-9 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
                 <SelectValue placeholder="Selecione a faixa de PAS..." />
               </SelectTrigger>
               <SelectContent className="rounded-xl">
@@ -137,7 +137,7 @@ export function MewsModal({ isOpen, onClose, onApply }: MewsModalProps) {
               2. Frequência Cardíaca (bpm)
             </Label>
             <Select value={mewsFc} onValueChange={setMewsFc}>
-              <SelectTrigger className="h-10 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
+              <SelectTrigger className="h-9 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
                 <SelectValue placeholder="Selecione a faixa de FC..." />
               </SelectTrigger>
               <SelectContent className="rounded-xl">
@@ -157,7 +157,7 @@ export function MewsModal({ isOpen, onClose, onApply }: MewsModalProps) {
               3. Frequência Respiratória (irpm)
             </Label>
             <Select value={mewsFr} onValueChange={setMewsFr}>
-              <SelectTrigger className="h-10 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
+              <SelectTrigger className="h-9 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
                 <SelectValue placeholder="Selecione a faixa de FR..." />
               </SelectTrigger>
               <SelectContent className="rounded-xl">
@@ -176,7 +176,7 @@ export function MewsModal({ isOpen, onClose, onApply }: MewsModalProps) {
               4. Temperatura Corporal (°C)
             </Label>
             <Select value={mewsTemp} onValueChange={setMewsTemp}>
-              <SelectTrigger className="h-10 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
+              <SelectTrigger className="h-9 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
                 <SelectValue placeholder="Selecione a faixa de temperatura..." />
               </SelectTrigger>
               <SelectContent className="rounded-xl">
@@ -193,7 +193,7 @@ export function MewsModal({ isOpen, onClose, onApply }: MewsModalProps) {
               5. Nível de Consciência (Escala AVDI)
             </Label>
             <Select value={mewsAvdi} onValueChange={setMewsAvdi}>
-              <SelectTrigger className="h-10 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
+              <SelectTrigger className="h-9 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
                 <SelectValue placeholder="Selecione o estado neurológico..." />
               </SelectTrigger>
               <SelectContent className="rounded-xl">
@@ -210,7 +210,7 @@ export function MewsModal({ isOpen, onClose, onApply }: MewsModalProps) {
           </div>
 
           {/* Resultado e Ação */}
-          <div className="mt-6 p-4 rounded-xl bg-slate-50/70 dark:bg-slate-900/40 backdrop-blur-md border border-slate-200/60 dark:border-slate-800/50 space-y-3">
+          <div className="mt-3 p-3 rounded-xl bg-slate-50/70 dark:bg-slate-900/40 backdrop-blur-md border border-slate-200/60 dark:border-slate-800/50 space-y-3">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-[10px] font-black uppercase text-muted-foreground tracking-wider">

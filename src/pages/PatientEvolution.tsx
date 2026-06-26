@@ -221,7 +221,7 @@ export default function EvolucaoEnfermagem() {
   const patientBed = beds.find((b) => b.patientId === id);
   const availableBeds = beds.filter((b) => b.status === "available");
 
-  const [isFormOpen, setIsFormOpen] = useState(true);
+  const [isFormOpen, setIsFormOpen] = useState(false);
 
   const [evolutionType, setEvolutionType] = useState("Evolução Enfermagem");
   const [activeTab, setActiveTab] = useState<
@@ -1521,38 +1521,32 @@ export default function EvolucaoEnfermagem() {
                     <Label className="text-[10px] font-black uppercase tracking-wider text-muted-foreground">
                       Tipo de Registro *
                     </Label>
-                    <Select
-                      value={evolutionType}
-                      onValueChange={handleEvolutionTypeChange}
-                    >
-                      <SelectTrigger className="h-9 bg-white/45 dark:bg-slate-900/45 border-white/60 dark:border-white/10 hover:bg-white/60 dark:hover:bg-slate-900/60 text-xs rounded-xl backdrop-blur-sm shadow-sm transition-all focus:ring-1 focus:ring-primary/20">
-                        <SelectValue placeholder="Selecionar tipo" />
-                      </SelectTrigger>
-                      <SelectContent className="max-h-[300px] overflow-y-auto">
-                        <SelectGroup>
-                          <SelectLabel className="pl-3 text-[10px] font-black uppercase tracking-widest bg-sky-500/5 dark:bg-sky-500/10 rounded-md py-1 my-1 text-[#006699] dark:text-sky-400">
-                            Corpo Clínico
-                          </SelectLabel>
-                          <SelectItem value="Evolução Enfermagem">
-                            Evolução Enfermagem (Privativo do Enfermeiro)
-                          </SelectItem>
-                        </SelectGroup>
-
-                        <SelectSeparator className="my-1" />
-
-                        <SelectGroup>
-                          <SelectLabel className="pl-3 text-[10px] font-black uppercase tracking-widest bg-sky-500/5 dark:bg-sky-500/10 rounded-md py-1 my-1 text-[#006699] dark:text-sky-400">
-                            Condutas e Registros
-                          </SelectLabel>
-                          <SelectItem value="Sinais Vitais">
-                            Sinais Vitais
-                          </SelectItem>
-                          <SelectItem value="Procedimento">
-                            Procedimento
-                          </SelectItem>
-                        </SelectGroup>
-                      </SelectContent>
-                    </Select>
+                    <div className="flex bg-slate-200/50 dark:bg-slate-800/50 p-1 rounded-xl w-full h-10 shadow-inner border border-slate-200/50 dark:border-white/5">
+                      <button
+                        type="button"
+                        onClick={() => handleEvolutionTypeChange("Evolução Enfermagem")}
+                        className={cn(
+                          "flex-1 flex items-center justify-center gap-2 text-[11px] font-black uppercase tracking-wider rounded-lg transition-all duration-300",
+                          evolutionType === "Evolução Enfermagem" 
+                            ? "bg-white dark:bg-slate-700 text-[#006699] dark:text-sky-400 shadow-sm" 
+                            : "text-muted-foreground hover:text-foreground"
+                        )}
+                      >
+                        Evolução de Enfermagem
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleEvolutionTypeChange("Procedimento")}
+                        className={cn(
+                          "flex-1 flex items-center justify-center gap-2 text-[11px] font-black uppercase tracking-wider rounded-lg transition-all duration-300",
+                          evolutionType === "Procedimento" 
+                            ? "bg-white dark:bg-slate-700 text-[#006699] dark:text-sky-400 shadow-sm" 
+                            : "text-muted-foreground hover:text-foreground"
+                        )}
+                      >
+                        Procedimento
+                      </button>
+                    </div>
                   </div>
 
                   <div className="space-y-1">
@@ -1627,8 +1621,8 @@ export default function EvolucaoEnfermagem() {
                   </div>
                 )}
 
-                {/* Campos Estruturados de Sinais Vitais & MEWS */}
-                {evolutionType === "Sinais Vitais" && (
+                {/* Campos Estruturados de Sinais Vitais & MEWS ocultados (agora via Plano Terapêutico) */}
+                {false && evolutionType === "Sinais Vitais" && (
                   <motion.div
                     initial={{ opacity: 0, y: -5 }}
                     animate={{ opacity: 1, y: 0 }}

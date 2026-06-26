@@ -217,6 +217,12 @@ export const NURSING_CARE_ITEMS: CareItem[] = [
     toastMsg: "Monitoramento SSVV",
   },
   {
+    id: "aferir_ssvv",
+    label: "📊 Aferir Sinais Vitais",
+    text: "- Prescrito aferição rigorosa de sinais vitais.\n",
+    toastMsg: "Aferir Sinais Vitais",
+  },
+  {
     id: "aspiracao_va",
     label: "🌬️ Aspiração de Vias Aéreas",
     text: "- Realizada aspiração de vias aéreas. Retirada de secreção [fluida / espessa] em moderada quantidade.\n",

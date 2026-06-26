@@ -34,9 +34,19 @@ const DialogContent = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content>
 >(({ className, children, ...props }, ref) => {
+  // Trava o scroll da página enquanto o modal está aberto
+  React.useEffect(() => {
+    const original = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = original;
+    };
+  }, []);
+
   const hasCustomBg =
     className &&
     (className.includes("bg-") || className.includes("backdrop-blur"));
+
   return (
     <DialogPortal>
       <DialogOverlay />

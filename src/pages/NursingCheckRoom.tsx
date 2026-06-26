@@ -139,7 +139,7 @@ const formatArrivalTime = (timeStr?: string): string => {
 };
 
 export default function NursingCheckRoom() {
-  const { patients } = usePatients();
+  const { patients, addEvolution, updatePatient } = usePatients();
   const { orders, updateMedicationHours } = usePrescriptions();
 
   // Filter active hospitalized/triaged patients
@@ -340,6 +340,34 @@ export default function NursingCheckRoom() {
   const [coSigningNurse, setCoSigningNurse] = useState("");
   const [coSignatureSuccess, setCoSignatureSuccess] = useState(false);
 
+  // ─── SCROLL LOCK HOOK FOR CUSTOM MODALS ───
+  useEffect(() => {
+    const isModalOpen =
+      !!activeCheckItem ||
+      !!viewingCheckDetails ||
+      !!viewingPrescription ||
+      showScanner ||
+      showPharmacyModal ||
+      showOccurrenceLogger;
+
+    if (isModalOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, [
+    activeCheckItem,
+    viewingCheckDetails,
+    viewingPrescription,
+    showScanner,
+    showPharmacyModal,
+    showOccurrenceLogger,
+  ]);
+
   // Selected patient entity
   const selectedPatient =
     activePatients.find((p) => p.id === selectedPatientId) || activePatients[0];
@@ -471,6 +499,17 @@ export default function NursingCheckRoom() {
     if (!activeCheckItem || !selectedPatient) return;
     const { prescriptionId, orderId, hourIdx } = activeCheckItem;
 
+    const isVitalsTask = activeCheckItem.medName.toLowerCase().includes("sinais vitais");
+
+    if (checkAction === "check" && isVitalsTask) {
+      if (!vitals.bp || !vitals.hr) {
+        toast.error("Preenchimento Obrigatório", {
+          description: "Você deve preencher pelo menos a PA e FC para este cuidado."
+        });
+        return;
+      }
+    }
+
     let isContextPrescription = false;
 
     const updatedPrescriptions = prescriptions.map((p) => {
@@ -524,6 +563,32 @@ export default function NursingCheckRoom() {
           ...currentSheet,
           prescriptions: updatedPrescriptions,
         },
+      });
+    }
+
+    // AUTOMAÇÃO: Se vitais foram preenchidos no check, injeta na linha do tempo da Enfermeira
+    if (checkAction === "check" && (vitals.bp || vitals.hr || vitals.temp || vitals.glycemia)) {
+      updatePatient(selectedPatient.id, {
+        pa: vitals.bp || undefined,
+        fc: vitals.hr || undefined,
+        spo2: undefined, // se tiver campo
+        temperature: vitals.temp || undefined,
+        fr: undefined,
+      });
+
+      const description = 
+        `REGISTRO DE SINAIS VITAIS BEIRA-LEITO (Checagem):\n` +
+        `- Pressão Arterial (PA): ${vitals.bp || "--"} mmHg\n` +
+        `- Frequência Cardíaca (FC): ${vitals.hr || "--"} bpm\n` +
+        `- Temperatura Corporal: ${vitals.temp || "--"} °C\n` +
+        `- Glicemia Capilar: ${vitals.glycemia ? vitals.glycemia + ' mg/dL' : "--"}\n` +
+        `-----------------------------------------\n` +
+        `Aferido e registrado por: ${nurseName}`;
+
+      addEvolution(selectedPatient.id, {
+        type: "Sinais Vitais",
+        professional: nurseName,
+        description,
       });
     }
 
@@ -1773,7 +1838,9 @@ export default function NursingCheckRoom() {
                     <div className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400 mb-2">
                       <Activity className="h-4 w-4" />
                       <span className="text-[10px] font-black uppercase tracking-widest">
-                        Sinais Vitais Recomendados
+                        {activeCheckItem.medName.toLowerCase().includes("sinais vitais") 
+                          ? "Sinais Vitais Obrigatórios" 
+                          : "Sinais Vitais Recomendados"}
                       </span>
                     </div>
 

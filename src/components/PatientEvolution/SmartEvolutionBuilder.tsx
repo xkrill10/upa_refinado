@@ -70,7 +70,9 @@ export function SmartEvolutionBuilder({ role, value, onChange }: SmartEvolutionB
       <div className="flex items-center gap-2 mb-2">
         <Zap className="w-4 h-4 text-amber-500" />
         <h3 className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
-          Construtor Inteligente de Evolução (Fast Track)
+          {role.toLowerCase().includes("medico")
+            ? "Construtor Inteligente de Evolução"
+            : "SAE - Sistematização da Assistência de Enfermagem"}
         </h3>
         <Badge variant="secondary" className="ml-auto text-[10px] bg-[#006699]/10 text-[#006699]">
           Perfil: {role.toLowerCase().includes("medico") ? "Médico" : "Enfermagem"}
@@ -121,7 +123,7 @@ export function SmartEvolutionBuilder({ role, value, onChange }: SmartEvolutionB
           placeholder="A evolução montada aparecerá aqui. Você pode digitar livremente..."
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          className="min-h-[160px] text-sm resize-y font-medium text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800 focus-visible:ring-[#006699]"
+          className="min-h-[160px] text-sm resize-y font-medium text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800 focus-visible:ring-[#006699] overscroll-contain"
         />
       </div>
     </div>
