@@ -1,4 +1,8 @@
 import { useState, useRef, useEffect } from "react";
+import { MedicalEvolutionForm } from "@/components/PatientEvolution/Forms/MedicalEvolutionForm";
+import { EvolutionFeed, MockEvolution } from "@/components/PatientEvolution/EvolutionFeed";
+import { useRole } from "@/context/RoleContext";
+
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { usePatients } from "@/hooks/use-patients";
 import { EvolutionRecord } from "@/context/PatientsContext";
@@ -24,6 +28,7 @@ import {
   Search,
   Clock,
   ShieldAlert,
+  Pill,
   Heart,
   Baby,
   Brain,
@@ -49,8 +54,6 @@ import {
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
-import { TherapeuticPlan } from "@/components/PatientEvolution/TherapeuticPlan";
-import { VitalsChart } from "@/components/PatientEvolution/VitalsChart";
 import { CID10_DATABASE, CID10Item } from "@/data/cid10";
 import { SmartCidSelector } from "@/components/SmartCidSelector";
 import {
@@ -61,9 +64,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Link } from "react-router-dom";
-import { useEvolutionDropdowns } from "@/hooks/useEvolutionDropdowns";
-import { useEvolutionCalculators } from "@/hooks/useEvolutionCalculators";
-import { useEvolutionPrescriptions } from "@/hooks/useEvolutionPrescriptions";
 
 import {
   EVOLUTION_TEMPLATES,
@@ -118,6 +118,7 @@ import {
   DISCHARGE_CONDUCT_ITEMS,
 } from "@/data/evolutionTemplates";
 import { NANDA_DIAGNOSES, NandaDiagnosis } from "@/data/nanda";
+import { SmartEvolutionBuilder } from "@/components/PatientEvolution/SmartEvolutionBuilder";
 
 import { MorseModal } from "@/components/PatientEvolution/Modals/MorseModal";
 import { BradenModal } from "@/components/PatientEvolution/Modals/BradenModal";
@@ -145,15 +146,44 @@ import { BedStatusModal } from "@/components/PatientEvolution/Modals/BedStatusMo
 import { PatientTimelineModal } from "@/components/PatientEvolution/Modals/PatientTimelineModal";
 import { BedRequestModal } from "@/components/PatientEvolution/Modals/BedRequestModal";
 import { ExamsModal } from "@/components/PatientEvolution/Modals/ExamsModal";
+import { AddCareItemModal } from "@/components/PatientEvolution/Modals/AddCareItemModal";
+import { TherapeuticPlan } from "@/components/PatientEvolution/TherapeuticPlan";
+import { VitalsChart } from "@/components/PatientEvolution/VitalsChart";
 
-export default function PatientEvolution() {
+export default function EvolucaoEnfermagem() {
+  const { role } = useRole();
+  const [isMedicalModalOpen, setIsMedicalModalOpen] = useState(false);
+  const [isNursingModalOpen, setIsNursingModalOpen] = useState(false);
+
   const { id } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
-  const { patients, addEvolution, updatePatient, markExamsAsRead } =
-    usePatients();
+  const { patients, addEvolution, updatePatient, markExamsAsRead } = usePatients();
+  const { orders, addCareItem } = usePrescriptions();
   const { beds, assignPatient, releaseBed } = useBeds();
   const patient = patients.find((p) => p.id === id);
+
+  const feed: MockEvolution[] = (patient?.evolutions || []).map(ev => ({
+    id: ev.id,
+    timestamp: new Date(ev.timestamp),
+    role: ev.professional?.toLowerCase().includes('dr') ? 'medico' : 'enfermeiro',
+    professionalName: ev.professional || 'Profissional',
+    content: ev.description,
+    type: ev.type,
+  })).sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
+
+  const handleSaveUnifiedEvolution = (content: string, type: string) => {
+    if (id) {
+      addEvolution(id, {
+        type: type,
+        professional: role === "medico" ? "Dra. Maria (Teste)" : "Enf. João (Teste)",
+        description: content,
+      });
+    }
+    setIsMedicalModalOpen(false);
+    setIsNursingModalOpen(false);
+  };
+
   const unreadExamsCount =
     patient?.exams?.filter((e) => e.status === "completed" && !e.readAt)
       .length || 0;
@@ -187,14 +217,15 @@ export default function PatientEvolution() {
   const [isVitalsHistoryOpen, setIsVitalsHistoryOpen] = useState(false);
   const [isBedRequestOpen, setIsBedRequestOpen] = useState(false);
   const [isExamsModalOpen, setIsExamsModalOpen] = useState(false);
+  const [isAddCareItemModalOpen, setIsAddCareItemModalOpen] = useState(false);
   const patientBed = beds.find((b) => b.patientId === id);
   const availableBeds = beds.filter((b) => b.status === "available");
 
-  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [isFormOpen, setIsFormOpen] = useState(true);
 
-  const [evolutionType, setEvolutionType] = useState("");
+  const [evolutionType, setEvolutionType] = useState("Evolução Enfermagem");
   const [activeTab, setActiveTab] = useState<
-    "all" | "evolutions" | "prescriptions" | "therapeutic" | "vitals" | "exams" | "discharge"
+    "all" | "evolutions" | "prescriptions" | "vitals" | "exams" | "discharge"
   >("all");
   const [professional, setProfessional] = useState(
     () => localStorage.getItem("upa_stamp_name") || "",
@@ -208,9 +239,7 @@ export default function PatientEvolution() {
     if (isExpressMode && !isFormOpen) {
       setIsFormOpen(true);
       setActiveTab("prescriptions");
-      setEvolutionType(
-        isChild ? "Evolução Médica (Pediátrica)" : "Evolução Médica",
-      );
+      setEvolutionType("Evolução Enfermagem");
     }
   }, [isExpressMode, isChild, isFormOpen]);
 
@@ -265,147 +294,155 @@ export default function PatientEvolution() {
     };
   }, []);
 
-  const {
-    isMedicationDropdownOpen,
-    setIsMedicationDropdownOpen,
-    isCareDropdownOpen,
-    setIsCareDropdownOpen,
-    isComfortDropdownOpen,
-    setIsComfortDropdownOpen,
-    isMovementDropdownOpen,
-    setIsMovementDropdownOpen,
-    isSaeAdmissionDropdownOpen,
-    setIsSaeAdmissionDropdownOpen,
-    isSaeCareDropdownOpen,
-    setIsSaeCareDropdownOpen,
-    isPrescMedicationDropdownOpen,
-    setIsPrescMedicationDropdownOpen,
-    isPrescDietDropdownOpen,
-    setIsPrescDietDropdownOpen,
-    isDischargeTypeDropdownOpen,
-    setIsDischargeTypeDropdownOpen,
-    isDischargeConductDropdownOpen,
-    setIsDischargeConductDropdownOpen,
-    isMedicalNeuroDropdownOpen,
-    setIsMedicalNeuroDropdownOpen,
-    isMedicalSyndromeDropdownOpen,
-    setIsMedicalSyndromeDropdownOpen,
-    isMedicalConductDropdownOpen,
-    setIsMedicalConductDropdownOpen,
-    isPediatricNeuroDropdownOpen,
-    setIsPediatricNeuroDropdownOpen,
-    isPediatricSyndromeDropdownOpen,
-    setIsPediatricSyndromeDropdownOpen,
-    isPediatricConductDropdownOpen,
-    setIsPediatricConductDropdownOpen,
-    isFisioEvalDropdownOpen,
-    setIsFisioEvalDropdownOpen,
-    isFisioProcDropdownOpen,
-    setIsFisioProcDropdownOpen,
-    isNutriEvalDropdownOpen,
-    setIsNutriEvalDropdownOpen,
-    isNutriProcDropdownOpen,
-    setIsNutriProcDropdownOpen,
-    isPsicoEvalDropdownOpen,
-    setIsPsicoEvalDropdownOpen,
-    isPsicoProcDropdownOpen,
-    setIsPsicoProcDropdownOpen,
-    isSocialEvalDropdownOpen,
-    setIsSocialEvalDropdownOpen,
-    isSocialProcDropdownOpen,
-    setIsSocialProcDropdownOpen,
-    isToEvalDropdownOpen,
-    setIsToEvalDropdownOpen,
-    isToProcDropdownOpen,
-    setIsToProcDropdownOpen,
-    isFonoEvalDropdownOpen,
-    setIsFonoEvalDropdownOpen,
-    isFonoProcDropdownOpen,
-    setIsFonoProcDropdownOpen,
-    isFarmaEvalDropdownOpen,
-    setIsFarmaEvalDropdownOpen,
-    isFarmaProcDropdownOpen,
-    setIsFarmaProcDropdownOpen,
-  } = useEvolutionDropdowns();
+  // Estados para os Dropdowns da Equipe Técnica
+  const [isMedicationDropdownOpen, setIsMedicationDropdownOpen] =
+    useState(false);
+  const [isCareDropdownOpen, setIsCareDropdownOpen] = useState(false);
+  const [isComfortDropdownOpen, setIsComfortDropdownOpen] = useState(false);
+  const [isMovementDropdownOpen, setIsMovementDropdownOpen] = useState(false);
 
-  const {
-    openMorseCalc,
-    setOpenMorseCalc,
-    selectedMorse,
-    setSelectedMorse,
-    openBradenCalc,
-    setOpenBradenCalc,
-    selectedBraden,
-    setSelectedBraden,
-    openEvaCalc,
-    setOpenEvaCalc,
-    selectedEva,
-    setSelectedEva,
-    openMewsCalc,
-    setOpenMewsCalc,
-    selectedMews,
-    setSelectedMews,
-    openNews2Calc,
-    setOpenNews2Calc,
-    selectedNews2,
-    setSelectedNews2,
-    openQsofaCalc,
-    setOpenQsofaCalc,
-    selectedQsofa,
-    setSelectedQsofa,
-    openPewsCalc,
-    setOpenPewsCalc,
-    selectedPews,
-    setSelectedPews,
-    openGlasgowCalc,
-    setOpenGlasgowCalc,
-    selectedGlasgow,
-    setSelectedGlasgow,
-    openMentalCalc,
-    setOpenMentalCalc,
-    selectedMentalSummary,
-    setSelectedMentalSummary,
-    openUrgencyCalc,
-    setOpenUrgencyCalc,
-    selectedUrgencySummary,
-    setSelectedUrgencySummary,
-    openNandaCalc,
-    setOpenNandaCalc,
-    activeNandaPlan,
-    setActiveNandaPlan,
-    openNursingCalc,
-    setOpenNursingCalc,
-    selectedNursingSummary,
-    setSelectedNursingSummary,
-    openHeartCalc,
-    setOpenHeartCalc,
-    openCurb65Calc,
-    setOpenCurb65Calc,
-    openWellsCalc,
-    setOpenWellsCalc,
-    openNihssCalc,
-    setOpenNihssCalc,
-    openDehydrationCalc,
-    setOpenDehydrationCalc,
-    openWoodDownesCalc,
-    setOpenWoodDownesCalc,
-    openParklandCalc,
-    setOpenParklandCalc,
-  } = useEvolutionCalculators();
+  // Estados para as calculadoras clínicas (Enfermagem)
+  const [openMorseCalc, setOpenMorseCalc] = useState(false);
+  const [selectedMorse, setSelectedMorse] = useState("");
 
-  const {
-    prescWizard,
-    setPrescWizard,
-    prescribedMedications,
-    setPrescribedMedications,
-    handleAddPrescriptionItem,
-    handleRemovePrescriptionItem,
-  } = useEvolutionPrescriptions();
+  const [openBradenCalc, setOpenBradenCalc] = useState(false);
+  const [selectedBraden, setSelectedBraden] = useState("");
 
+  const [openEvaCalc, setOpenEvaCalc] = useState(false);
+  const [selectedEva, setSelectedEva] = useState("");
+
+  const [openMewsCalc, setOpenMewsCalc] = useState(false);
+  const [selectedMews, setSelectedMews] = useState("");
+
+  const [openNews2Calc, setOpenNews2Calc] = useState(false);
+  const [selectedNews2, setSelectedNews2] = useState("");
+
+  const [openQsofaCalc, setOpenQsofaCalc] = useState(false);
+  const [selectedQsofa, setSelectedQsofa] = useState("");
+
+  const [openPewsCalc, setOpenPewsCalc] = useState(false);
+  const [selectedPews, setSelectedPews] = useState("");
+
+  const [openGlasgowCalc, setOpenGlasgowCalc] = useState(false);
+  const [selectedGlasgow, setSelectedGlasgow] = useState("");
+
+  const [openMentalCalc, setOpenMentalCalc] = useState(false);
+  const [selectedMentalSummary, setSelectedMentalSummary] = useState("");
+
+  const [openUrgencyCalc, setOpenUrgencyCalc] = useState(false);
+  const [selectedUrgencySummary, setSelectedUrgencySummary] = useState("");
+
+  const [openNandaCalc, setOpenNandaCalc] = useState(false);
+  const [activeNandaPlan, setActiveNandaPlan] = useState("");
+
+  const [openNursingCalc, setOpenNursingCalc] = useState(false);
+  const [selectedNursingSummary, setSelectedNursingSummary] = useState("");
+
+  // Estados para os Dropdowns do Super Painel SAE (Enfermagem)
+  const [isSaeAdmissionDropdownOpen, setIsSaeAdmissionDropdownOpen] =
+    useState(false);
+  const [isSaeCareDropdownOpen, setIsSaeCareDropdownOpen] = useState(false);
+
+  // Estados para o Super Painel de Prescrição Médica
+  const [prescWizard, setPrescWizard] = useState({
+    medication: "",
+    dosage: "",
+    route: "",
+    frequency: "",
+  });
+  const [prescribedMedications, setPrescribedMedications] = useState<
+    PrescriptionMedication[]
+  >([]);
   const { addPrescriptionOrder } = usePrescriptions();
+
+  const handleAddPrescriptionItem = () => {
+    if (
+      !prescWizard.medication ||
+      !prescWizard.dosage ||
+      !prescWizard.route ||
+      !prescWizard.frequency
+    ) {
+      toast.error("Preencha todos os campos do medicamento!");
+      return;
+    }
+    const newItem: PrescriptionMedication = {
+      id: `med-${Date.now()}`,
+      medication: prescWizard.medication,
+      dosage: prescWizard.dosage,
+      route: prescWizard.route,
+      frequency: prescWizard.frequency,
+      status: "awaiting_pharmacy",
+      hours: [],
+    };
+    setPrescribedMedications([...prescribedMedications, newItem]);
+    setPrescWizard({ medication: "", dosage: "", route: "", frequency: "" });
+  };
+
+  const handleRemovePrescriptionItem = (idx: number) => {
+    const arr = [...prescribedMedications];
+    arr.splice(idx, 1);
+    setPrescribedMedications(arr);
+  };
+
+  // Estados para os Dropdowns do Super Painel de Prescrição Médica
+  const [isPrescMedicationDropdownOpen, setIsPrescMedicationDropdownOpen] =
+    useState(false);
+  const [isPrescDietDropdownOpen, setIsPrescDietDropdownOpen] = useState(false);
+
+  // Estados para os Dropdowns do Super Painel de Alta
+  const [isDischargeTypeDropdownOpen, setIsDischargeTypeDropdownOpen] =
+    useState(false);
+  const [isDischargeConductDropdownOpen, setIsDischargeConductDropdownOpen] =
+    useState(false);
+  // Estados para os Dropdowns do Super Painel Médico (Evolução Médica)
+  const [isMedicalNeuroDropdownOpen, setIsMedicalNeuroDropdownOpen] =
+    useState(false);
+  const [isMedicalSyndromeDropdownOpen, setIsMedicalSyndromeDropdownOpen] =
+    useState(false);
+  const [isMedicalConductDropdownOpen, setIsMedicalConductDropdownOpen] =
+    useState(false);
+
+  // Estados para os Dropdowns do Super Painel Médico Pediátrico
+  const [isPediatricNeuroDropdownOpen, setIsPediatricNeuroDropdownOpen] =
+    useState(false);
+  const [isPediatricSyndromeDropdownOpen, setIsPediatricSyndromeDropdownOpen] =
+    useState(false);
+  const [isPediatricConductDropdownOpen, setIsPediatricConductDropdownOpen] =
+    useState(false);
+
+  // Estados Calculadoras Médicas Extras
+  const [openHeartCalc, setOpenHeartCalc] = useState(false);
+  const [openCurb65Calc, setOpenCurb65Calc] = useState(false);
+  const [openWellsCalc, setOpenWellsCalc] = useState(false);
+  const [openNihssCalc, setOpenNihssCalc] = useState(false);
+  const [openDehydrationCalc, setOpenDehydrationCalc] = useState(false);
+  const [openWoodDownesCalc, setOpenWoodDownesCalc] = useState(false);
+  const [openParklandCalc, setOpenParklandCalc] = useState(false);
+
+  // Estados Gestão de Leitos
   const [openBedTransfer, setOpenBedTransfer] = useState(false);
   const [openBedStatus, setOpenBedStatus] = useState(false);
+
+  // Estado Linha do Tempo
   const [isTimelineOpen, setIsTimelineOpen] = useState(false);
+
+  // Estados para os Dropdowns da Equipe Multidisciplinar
+  const [isFisioEvalDropdownOpen, setIsFisioEvalDropdownOpen] = useState(false);
+  const [isFisioProcDropdownOpen, setIsFisioProcDropdownOpen] = useState(false);
+  const [isNutriEvalDropdownOpen, setIsNutriEvalDropdownOpen] = useState(false);
+  const [isNutriProcDropdownOpen, setIsNutriProcDropdownOpen] = useState(false);
+  const [isPsicoEvalDropdownOpen, setIsPsicoEvalDropdownOpen] = useState(false);
+  const [isPsicoProcDropdownOpen, setIsPsicoProcDropdownOpen] = useState(false);
+  const [isSocialEvalDropdownOpen, setIsSocialEvalDropdownOpen] =
+    useState(false);
+  const [isSocialProcDropdownOpen, setIsSocialProcDropdownOpen] =
+    useState(false);
+  const [isToEvalDropdownOpen, setIsToEvalDropdownOpen] = useState(false);
+  const [isToProcDropdownOpen, setIsToProcDropdownOpen] = useState(false);
+  const [isFonoEvalDropdownOpen, setIsFonoEvalDropdownOpen] = useState(false);
+  const [isFonoProcDropdownOpen, setIsFonoProcDropdownOpen] = useState(false);
+  const [isFarmaEvalDropdownOpen, setIsFarmaEvalDropdownOpen] = useState(false);
+  const [isFarmaProcDropdownOpen, setIsFarmaProcDropdownOpen] = useState(false);
 
   const normalizeText = (text: string) => {
     return text
@@ -1122,6 +1159,9 @@ export default function PatientEvolution() {
                   ? "PACIENTE NÃO IDENTIFICADO"
                   : patient.name}
               </h1>
+              <span className="text-[10px] font-black uppercase bg-emerald-500/10 text-emerald-600 px-2 py-1 rounded-md border border-emerald-500/20">
+                Enfermagem
+              </span>
               <Badge
                 className={`${risk.color} border-0 text-[10px] uppercase font-bold px-3 py-1 rounded-full shadow-sm`}
               >
@@ -1353,96 +1393,59 @@ export default function PatientEvolution() {
         id="timeline-section"
         className="glass-card-premium border border-white/40 dark:border-white/10 p-1.5 rounded-2xl flex flex-wrap gap-1.5 items-center bg-white/20 dark:bg-slate-900/20 backdrop-blur-md shadow-sm animate-in fade-in duration-300"
       >
-          {[
-            {
-              id: "all",
-              label: "Histórico Geral",
-              icon: <History className="h-3.5 w-3.5" />,
-            },
-            {
-              id: "vitals",
-              label: "Sinais Vitais",
-              icon: <Activity className="h-3.5 w-3.5" />,
-            },
-            {
-              id: "evolutions",
-              label: "Evoluções",
-              icon: <MessageSquare className="h-3.5 w-3.5" />,
-            },
-            {
-              id: "prescriptions",
-              label: "Prescrições",
-              icon: (
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="14"
-                  height="14"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z" />
-                  <path d="m8.5 8.5 7 7" />
-                </svg>
-              ),
-            },
-            {
-              id: "therapeutic",
-              label: "Plano Terapêutico",
-              icon: <Syringe className="h-3.5 w-3.5" />,
-            },
-            {
-              id: "exams",
-              label: "Exames & Procedimentos",
-              icon: <Search className="h-3.5 w-3.5" />,
-              badge: unreadExamsCount,
-            },
-            {
-              id: "discharge",
-              label: "Alta & Desfecho",
-              icon: <CheckCircle2 className="h-3.5 w-3.5" />,
-            },
-          ].map((tab) => {
+          {(
+            [
+              {
+                id: "all",
+                label: "Histórico Geral",
+                icon: <History className="h-3.5 w-3.5" />,
+              },
+              {
+                id: "evolutions",
+                label: "Anotações / Evoluções",
+                icon: <MessageSquare className="h-3.5 w-3.5" />,
+              },
+              {
+                id: "prescriptions",
+                label: "Plano Terapêutico",
+                icon: <Syringe className="h-3.5 w-3.5" />,
+              },
+            ] as Array<{ id: string; label: string; icon: any; badge?: any }>
+          ).map((tab) => {
             const isActive = activeTab === tab.id;
             return (
               <button
                 key={tab.id}
                 onClick={() => {
+                  const newTabId = (isActive && tab.id === "prescriptions") ? "all" : tab.id;
+                  
                   setActiveTab(
-                    tab.id as
+                    newTabId as
                       | "all"
                       | "vitals"
                       | "evolutions"
                       | "prescriptions"
-                      | "therapeutic"
                       | "exams"
                       | "discharge",
                   );
-                  if (isFormOpen) {
-                    if (tab.id === "prescriptions") {
-                      handleEvolutionTypeChange(
-                        isChild
-                          ? "Evolução Médica (Pediátrica)"
-                          : "Evolução Médica",
-                      );
-                    } else if (tab.id === "vitals") {
+                  
+                  if (newTabId === "prescriptions" || newTabId === "all" || newTabId === "evolutions") {
+                    setIsFormOpen(false);
+                  } else {
+                    setIsFormOpen(true);
+                    if (newTabId === "vitals") {
                       handleEvolutionTypeChange("Sinais Vitais");
-                    } else if (tab.id === "discharge") {
+                    } else if (newTabId === "discharge") {
                       handleEvolutionTypeChange("Alta");
-                    } else if (tab.id === "exams") {
+                    } else if (newTabId === "exams") {
                       if (unreadExamsCount > 0 && id) markExamsAsRead(id);
                       handleEvolutionTypeChange("Procedimento");
-                    } else if (tab.id === "evolutions") {
-                      handleEvolutionTypeChange(
-                        isChild
-                          ? "Evolução Médica (Pediátrica)"
-                          : "Evolução Médica",
-                      );
                     }
                   }
+
+                  setTimeout(() => {
+                    document.getElementById("timeline-content")?.scrollIntoView({ behavior: "smooth", block: "start" });
+                  }, 150);
                 }}
                 className={cn(
                   "flex items-center gap-2 px-4 py-2 text-xs font-black uppercase tracking-wider rounded-xl transition-all duration-300 relative overflow-hidden active:scale-95",
@@ -1468,32 +1471,17 @@ export default function PatientEvolution() {
               </button>
             );
           })}
+          
         </div>
+
       <div className="flex items-center justify-start pb-1">
         {!isFormOpen && !isExpressMode && (
-          <Button
-            onClick={() => {
-              setIsFormOpen(true);
-              if (activeTab === "prescriptions") {
-                handleEvolutionTypeChange(
-                  isChild ? "Evolução Médica (Pediátrica)" : "Evolução Médica",
-                );
-              } else if (activeTab === "vitals") {
-                handleEvolutionTypeChange("Sinais Vitais");
-              } else if (activeTab === "discharge") {
-                handleEvolutionTypeChange("Alta");
-              } else if (activeTab === "exams") {
-                handleEvolutionTypeChange("Procedimento");
-              } else if (activeTab === "evolutions") {
-                handleEvolutionTypeChange(
-                  isChild ? "Evolução Médica (Pediátrica)" : "Evolução Médica",
-                );
-              } else {
-                handleEvolutionTypeChange(
-                  isChild ? "Evolução Médica (Pediátrica)" : "Evolução Médica",
-                );
-              }
-            }}
+                      <Button
+              onClick={() => {
+                setIsFormOpen(true);
+                setEvolutionType(role === "medico" ? "Evolução Médica" : "Evolução Enfermagem");
+                setTimeout(() => window.scrollTo({ top: 300, behavior: 'smooth' }), 100);
+              }}
             className="bg-[#006699] hover:bg-[#005580] text-white gap-2 px-5 rounded-lg h-9 shadow-sm transition-all active:scale-95 text-xs font-bold uppercase tracking-wider"
           >
             <Plus className="h-4 w-4" />
@@ -1516,14 +1504,16 @@ export default function PatientEvolution() {
                   <h2 className="text-xs font-black flex items-center gap-2 text-primary uppercase tracking-wider">
                     <Plus className="h-4 w-4" /> Registrar Evolução Clínica
                   </h2>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => setIsFormOpen(false)}
-                    className="rounded-full h-7 w-7 hover:bg-muted"
-                  >
-                    <X className="h-3.5 w-3.5" />
-                  </Button>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => navigate(`/paciente/${id}/evolucao`)}
+                      className="rounded-full h-7 w-7 hover:bg-muted"
+                    >
+                      <X className="h-3.5 w-3.5" />
+                    </Button>
+                  </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -1543,50 +1533,8 @@ export default function PatientEvolution() {
                           <SelectLabel className="pl-3 text-[10px] font-black uppercase tracking-widest bg-sky-500/5 dark:bg-sky-500/10 rounded-md py-1 my-1 text-[#006699] dark:text-sky-400">
                             Corpo Clínico
                           </SelectLabel>
-                          {!isChild && (
-                            <SelectItem value="Evolução Médica">
-                              Evolução Médica
-                            </SelectItem>
-                          )}
-                          {isChild && (
-                            <SelectItem value="Evolução Médica (Pediátrica)">
-                              Evolução Médica (Pediátrica)
-                            </SelectItem>
-                          )}
                           <SelectItem value="Evolução Enfermagem">
                             Evolução Enfermagem (Privativo do Enfermeiro)
-                          </SelectItem>
-                          <SelectItem value="Anotação de Enfermagem">
-                            Anotação de Enfermagem (Técnicos e Equipe)
-                          </SelectItem>
-                        </SelectGroup>
-
-                        <SelectSeparator className="my-1" />
-
-                        <SelectGroup>
-                          <SelectLabel className="pl-3 text-[10px] font-black uppercase tracking-widest bg-sky-500/5 dark:bg-sky-500/10 rounded-md py-1 my-1 text-[#006699] dark:text-sky-400">
-                            Equipe Multidisciplinar
-                          </SelectLabel>
-                          <SelectItem value="Evolução da Fisioterapia">
-                            Evolução da Fisioterapia
-                          </SelectItem>
-                          <SelectItem value="Evolução da Nutrição">
-                            Evolução da Nutrição
-                          </SelectItem>
-                          <SelectItem value="Evolução da Psicologia">
-                            Evolução da Psicologia
-                          </SelectItem>
-                          <SelectItem value="Evolução do Serviço Social">
-                            Evolução do Serviço Social
-                          </SelectItem>
-                          <SelectItem value="Evolução da Terapia Ocupacional">
-                            Evolução da Terapia Ocupacional
-                          </SelectItem>
-                          <SelectItem value="Evolução da Fonoaudiologia">
-                            Evolução da Fonoaudiologia
-                          </SelectItem>
-                          <SelectItem value="Evolução da Farmácia Clínica">
-                            Evolução da Farmácia Clínica
                           </SelectItem>
                         </SelectGroup>
 
@@ -1602,7 +1550,6 @@ export default function PatientEvolution() {
                           <SelectItem value="Procedimento">
                             Procedimento
                           </SelectItem>
-                          <SelectItem value="Alta">Alta</SelectItem>
                         </SelectGroup>
                       </SelectContent>
                     </Select>
@@ -5097,1014 +5044,36 @@ export default function PatientEvolution() {
                   </motion.div>
                 )}
 
-                {/* Super Painel SAE Enfermagem */}
-                {evolutionType === "Evolução Enfermagem" && (
-                  <motion.div
-                    initial={{ opacity: 0, y: -5 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="p-5 rounded-xl border border-white/40 dark:border-white/10 bg-white/35 dark:bg-slate-900/35 backdrop-blur-md shadow-sm space-y-4 relative z-20"
-                  >
-                    <div className="flex items-center justify-between border-b border-slate-500/20 pb-2">
-                      <span className="font-extrabold text-[#006699] uppercase tracking-wider text-[11px]">
-                        📋 Super Painel SAE - Processo de Enfermagem (UPA 24h)
-                      </span>
-                    </div>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      {/* 1. Rotinas de Admissão por Setor */}
-                      <div
-                        className={cn(
-                          "space-y-2 relative",
-                          isSaeAdmissionDropdownOpen ? "z-30" : "z-10",
-                        )}
-                      >
-                        <span className="text-[9px] font-black uppercase text-muted-foreground block">
-                          1. Rotinas de Admissão por Setor
-                        </span>
-
-                        <div className="relative clinical-dropdown-container">
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setIsSaeAdmissionDropdownOpen(
-                                !isSaeAdmissionDropdownOpen,
-                              );
-                              setIsSaeCareDropdownOpen(false);
-                            }}
-                            className={cn(
-                              "flex items-center justify-between w-full px-4 py-2.5 rounded-xl border bg-white/45 dark:bg-slate-900/45 hover:bg-white/60 dark:hover:bg-slate-900/60 backdrop-blur-sm text-xs font-semibold shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-red-500/20",
-                              isSaeAdmissionDropdownOpen
-                                ? "border-red-500 text-foreground"
-                                : "border-white/60 dark:border-white/10 text-muted-foreground",
-                            )}
-                          >
-                            <div className="flex items-center gap-2">
-                              <span className="p-1 rounded-lg bg-red-500/10 text-red-600">
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  width="14"
-                                  height="14"
-                                  viewBox="0 0 24 24"
-                                  fill="none"
-                                  stroke="currentColor"
-                                  strokeWidth="2.5"
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  className="lucide lucide-door-open"
-                                >
-                                  <path d="M13 4h3a2 2 0 0 1 2 2v14" />
-                                  <path d="M2 20h20" />
-                                  <path d="M13 20V4a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v16" />
-                                  <path d="M6 12a1 1 0 1 0 0-2 1 1 0 0 0 0 2Z" />
-                                </svg>
-                              </span>
-                              <span>Selecionar Rotinas...</span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                              {(() => {
-                                const count = admissionItems.filter((item) =>
-                                  normalizeText(description).includes(
-                                    normalizeText(item.text).trim(),
-                                  ),
-                                ).length;
-                                return count > 0 ? (
-                                  <Badge className="bg-red-500 text-white font-black text-[9px] px-1.5 py-0.5 rounded-full border-none shadow-sm animate-in zoom-in-50 duration-200">
-                                    {count}
-                                  </Badge>
-                                ) : null;
-                              })()}
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                width="14"
-                                height="14"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                strokeWidth="2"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                className={cn(
-                                  "lucide lucide-chevron-down text-muted-foreground/60 transition-transform duration-200",
-                                  isSaeAdmissionDropdownOpen &&
-                                    "transform rotate-180",
-                                )}
-                              >
-                                <path d="m6 9 6 6 6-6" />
-                              </svg>
-                            </div>
-                          </button>
-
-                          <AnimatePresence>
-                            {isSaeAdmissionDropdownOpen && (
-                              <>
-                                <motion.div
-                                  initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                                  exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                                  transition={{
-                                    duration: 0.15,
-                                    ease: "easeOut",
-                                  }}
-                                  className="absolute left-0 right-0 mt-2 p-1.5 rounded-xl border border-red-500/20 bg-white/95 dark:bg-slate-950/95 text-popover-foreground shadow-xl z-50 max-h-[280px] overflow-y-auto overflow-x-hidden space-y-1 backdrop-blur-md"
-                                >
-                                  {admissionItems.map((item) => {
-                                    const isActive = normalizeText(
-                                      description,
-                                    ).includes(normalizeText(item.text).trim());
-                                    return (
-                                      <button
-                                        key={item.id}
-                                        type="button"
-                                        onClick={() =>
-                                          toggleCareItem(
-                                            item.text,
-                                            item.toastMsg,
-                                          )
-                                        }
-                                        className={cn(
-                                          "group flex items-center justify-between w-full px-3 py-2 rounded-lg text-left text-xs transition-all",
-                                          isActive
-                                            ? "bg-red-500/5 text-red-700 dark:text-red-400 font-bold border border-red-500/20"
-                                            : "hover:bg-muted/70 text-slate-700 dark:text-slate-200 border border-transparent",
-                                        )}
-                                      >
-                                        <span className="truncate">
-                                          {item.label}
-                                        </span>
-                                        {isActive ? (
-                                          <span className="text-[10px] font-black text-red-600 dark:text-red-400 flex items-center gap-1">
-                                            Adicionado ✓
-                                          </span>
-                                        ) : (
-                                          <span className="text-[10px] text-slate-400 dark:text-slate-500 group-hover:text-[#006699] dark:group-hover:text-sky-400 font-bold transition-all">
-                                            + Inserir
-                                          </span>
-                                        )}
-                                      </button>
-                                    );
-                                  })}
-                                </motion.div>
-                              </>
-                            )}
-                          </AnimatePresence>
-                        </div>
-                      </div>
-
-                      {/* 2. Checklist de Cuidados de Enfermagem */}
-                      <div
-                        className={cn(
-                          "space-y-2 relative",
-                          isSaeCareDropdownOpen ? "z-30" : "z-10",
-                        )}
-                      >
-                        <span className="text-[9px] font-black uppercase text-muted-foreground block">
-                          2. Checklist de Cuidados de Enfermagem (Inserir no
-                          text)
-                        </span>
-
-                        <div className="relative clinical-dropdown-container">
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setIsSaeCareDropdownOpen(!isSaeCareDropdownOpen);
-                              setIsSaeAdmissionDropdownOpen(false);
-                            }}
-                            className={cn(
-                              "flex items-center justify-between w-full px-4 py-2.5 rounded-xl border bg-white/45 dark:bg-slate-900/45 hover:bg-white/60 dark:hover:bg-slate-900/60 backdrop-blur-sm text-xs font-semibold shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-blue-500/20",
-                              isSaeCareDropdownOpen
-                                ? "border-blue-500 text-foreground"
-                                : "border-white/60 dark:border-white/10 text-muted-foreground",
-                            )}
-                          >
-                            <div className="flex items-center gap-2">
-                              <span className="p-1 rounded-lg bg-blue-500/10 text-blue-600">
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  width="14"
-                                  height="14"
-                                  viewBox="0 0 24 24"
-                                  fill="none"
-                                  stroke="currentColor"
-                                  strokeWidth="2.5"
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  className="lucide lucide-heart-pulse"
-                                >
-                                  <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
-                                  <path d="M3.22 12H9.5l1.5-3 2 6 1.5-3h3.16" />
-                                </svg>
-                              </span>
-                              <span>Selecionar Cuidados...</span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                              {(() => {
-                                const count = careItems.filter((item) =>
-                                  normalizeText(description).includes(
-                                    normalizeText(item.text).trim(),
-                                  ),
-                                ).length;
-                                return count > 0 ? (
-                                  <Badge className="bg-blue-600 text-white font-black text-[9px] px-1.5 py-0.5 rounded-full border-none shadow-sm animate-in zoom-in-50 duration-200">
-                                    {count}
-                                  </Badge>
-                                ) : null;
-                              })()}
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                width="14"
-                                height="14"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                strokeWidth="2"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                className={cn(
-                                  "lucide lucide-chevron-down text-muted-foreground/60 transition-transform duration-200",
-                                  isSaeCareDropdownOpen &&
-                                    "transform rotate-180",
-                                )}
-                              >
-                                <path d="m6 9 6 6 6-6" />
-                              </svg>
-                            </div>
-                          </button>
-
-                          <AnimatePresence>
-                            {isSaeCareDropdownOpen && (
-                              <>
-                                <motion.div
-                                  initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                                  exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                                  transition={{
-                                    duration: 0.15,
-                                    ease: "easeOut",
-                                  }}
-                                  className="absolute left-0 right-0 mt-2 p-1.5 rounded-xl border border-blue-500/20 bg-white/95 dark:bg-slate-950/95 text-popover-foreground shadow-xl z-50 max-h-[280px] overflow-y-auto overflow-x-hidden space-y-1 backdrop-blur-md"
-                                >
-                                  {careItems.map((item) => {
-                                    const isActive = normalizeText(
-                                      description,
-                                    ).includes(normalizeText(item.text).trim());
-                                    return (
-                                      <button
-                                        key={item.id}
-                                        type="button"
-                                        onClick={() =>
-                                          toggleCareItem(
-                                            item.text,
-                                            item.toastMsg,
-                                          )
-                                        }
-                                        className={cn(
-                                          "group flex items-center justify-between w-full px-3 py-2 rounded-lg text-left text-xs transition-all",
-                                          isActive
-                                            ? "bg-blue-500/5 text-blue-700 dark:text-blue-400 font-bold border border-blue-500/20"
-                                            : "hover:bg-muted/70 text-slate-700 dark:text-slate-200 border border-transparent",
-                                        )}
-                                      >
-                                        <span className="truncate">
-                                          {item.label}
-                                        </span>
-                                        {isActive ? (
-                                          <span className="text-[10px] font-black text-blue-600 dark:text-blue-400 flex items-center gap-1">
-                                            Adicionado ✓
-                                          </span>
-                                        ) : (
-                                          <span className="text-[10px] text-slate-400 dark:text-slate-500 group-hover:text-[#006699] dark:group-hover:text-sky-400 font-bold transition-all">
-                                            + Inserir
-                                          </span>
-                                        )}
-                                      </button>
-                                    );
-                                  })}
-                                </motion.div>
-                              </>
-                            )}
-                          </AnimatePresence>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* 3. Escalas Clínicas */}
-                    <div className="space-y-3">
-                      <div className="flex items-center justify-between">
-                        <span className="text-[9px] font-black uppercase text-muted-foreground">
-                          3. Escalas Clínicas e de Risco
-                        </span>
-                        <Badge
-                          variant="outline"
-                          className="text-[8px] uppercase tracking-wider bg-primary/5 text-primary border-primary/20"
-                        >
-                          Adaptativas
-                        </Badge>
-                      </div>
-
-                      {/* Adult Scales (!isChild) */}
-                      {!isChild && (
-                        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-10 gap-2">
-                          {/* Card Morse */}
-                          <button
-                            type="button"
-                            onClick={() => setOpenMorseCalc(true)}
-                            className={cn(
-                              "flex flex-col items-start p-2.5 rounded-xl border text-left transition-all relative overflow-hidden group",
-                              selectedMorse
-                                ? "bg-amber-500/5 border-amber-500/30 dark:bg-amber-500/10"
-                                : "bg-white/45 dark:bg-slate-900/45 border-white/60 dark:border-white/10 hover:border-amber-500/40 hover:bg-amber-500/5 backdrop-blur-sm shadow-sm",
-                            )}
-                          >
-                            <div className="flex items-center justify-between w-full mb-1.5">
-                              <span
-                                className={cn(
-                                  "text-[9px] font-black uppercase tracking-wider transition-colors",
-                                  selectedMorse
-                                    ? "text-amber-600 dark:text-amber-400"
-                                    : "text-foreground/80 group-hover:text-amber-600 dark:group-hover:text-amber-400",
-                                )}
-                              >
-                                Morse (Quedas)
-                              </span>
-                              <div
-                                className={cn(
-                                  "w-5 h-5 rounded flex items-center justify-center flex-shrink-0 transition-colors",
-                                  selectedMorse
-                                    ? "bg-amber-500"
-                                    : "bg-amber-500/15",
-                                )}
-                              >
-                                <ShieldAlert
-                                  className={cn(
-                                    "h-3 w-3",
-                                    selectedMorse
-                                      ? "text-white"
-                                      : "text-amber-600",
-                                  )}
-                                />
-                              </div>
-                            </div>
-                            {selectedMorse ? (
-                              <Badge className="h-4 text-[9px] font-bold bg-amber-500 hover:bg-amber-600 border-none text-white px-1.5 rounded truncate max-w-full">
-                                {selectedMorse}
-                              </Badge>
-                            ) : (
-                              <span className="text-[9px] font-bold text-muted-foreground/60">
-                                Não Avaliado
-                              </span>
-                            )}
-                          </button>
-
-                          {/* Card Braden */}
-                          <button
-                            type="button"
-                            onClick={() => setOpenBradenCalc(true)}
-                            className={cn(
-                              "flex flex-col items-start p-2.5 rounded-xl border text-left transition-all relative overflow-hidden group",
-                              selectedBraden
-                                ? "bg-orange-500/5 border-orange-500/30 dark:bg-orange-500/10"
-                                : "bg-white/45 dark:bg-slate-900/45 border-white/60 dark:border-white/10 hover:border-orange-500/40 hover:bg-orange-500/5 backdrop-blur-sm shadow-sm",
-                            )}
-                          >
-                            <div className="flex items-center justify-between w-full mb-1.5">
-                              <span
-                                className={cn(
-                                  "text-[9px] font-black uppercase tracking-wider transition-colors",
-                                  selectedBraden
-                                    ? "text-orange-600 dark:text-orange-400"
-                                    : "text-foreground/80 group-hover:text-orange-600 dark:group-hover:text-orange-400",
-                                )}
-                              >
-                                Braden (LPP)
-                              </span>
-                              <div
-                                className={cn(
-                                  "w-5 h-5 rounded flex items-center justify-center flex-shrink-0 transition-colors",
-                                  selectedBraden
-                                    ? "bg-orange-500"
-                                    : "bg-orange-500/15",
-                                )}
-                              >
-                                <Activity
-                                  className={cn(
-                                    "h-3 w-3",
-                                    selectedBraden
-                                      ? "text-white"
-                                      : "text-orange-600",
-                                  )}
-                                />
-                              </div>
-                            </div>
-                            {selectedBraden ? (
-                              <Badge className="h-4 text-[9px] font-bold bg-orange-500 hover:bg-orange-600 border-none text-white px-1.5 rounded truncate max-w-full">
-                                {selectedBraden}
-                              </Badge>
-                            ) : (
-                              <span className="text-[9px] font-bold text-muted-foreground/60">
-                                Não Avaliado
-                              </span>
-                            )}
-                          </button>
-
-                          {/* Card EVA */}
-                          <button
-                            type="button"
-                            onClick={() => setOpenEvaCalc(true)}
-                            className={cn(
-                              "flex flex-col items-start p-2.5 rounded-xl border text-left transition-all relative overflow-hidden group",
-                              selectedEva
-                                ? "bg-red-500/5 border-red-500/30 dark:bg-red-500/10"
-                                : "bg-white/45 dark:bg-slate-900/45 border-white/60 dark:border-white/10 hover:border-red-500/40 hover:bg-red-500/5 backdrop-blur-sm shadow-sm",
-                            )}
-                          >
-                            <div className="flex items-center justify-between w-full mb-1.5">
-                              <span
-                                className={cn(
-                                  "text-[9px] font-black uppercase tracking-wider transition-colors",
-                                  selectedEva
-                                    ? "text-red-600 dark:text-red-400"
-                                    : "text-foreground/80 group-hover:text-red-600 dark:group-hover:text-red-400",
-                                )}
-                              >
-                                Dor (EVA)
-                              </span>
-                              <div
-                                className={cn(
-                                  "w-5 h-5 rounded flex items-center justify-center flex-shrink-0 transition-colors",
-                                  selectedEva ? "bg-red-500" : "bg-red-500/15",
-                                )}
-                              >
-                                <Heart
-                                  className={cn(
-                                    "h-3 w-3",
-                                    selectedEva ? "text-white" : "text-red-600",
-                                  )}
-                                />
-                              </div>
-                            </div>
-                            {selectedEva ? (
-                              <Badge className="h-4 text-[9px] font-bold bg-red-500 hover:bg-red-600 border-none text-white px-1.5 rounded truncate max-w-full">
-                                {selectedEva}
-                              </Badge>
-                            ) : (
-                              <span className="text-[9px] font-bold text-muted-foreground/60">
-                                Não Avaliado
-                              </span>
-                            )}
-                          </button>
-
-                          {/* Card MEWS */}
-                          <button
-                            type="button"
-                            onClick={() => setOpenMewsCalc(true)}
-                            className={cn(
-                              "flex flex-col items-start p-2.5 rounded-xl border text-left transition-all relative overflow-hidden group",
-                              selectedMews
-                                ? "bg-blue-500/5 border-blue-500/30 dark:bg-blue-500/10"
-                                : "bg-white/45 dark:bg-slate-900/45 border-white/60 dark:border-white/10 hover:border-blue-500/40 hover:bg-blue-500/5 backdrop-blur-sm shadow-sm",
-                            )}
-                          >
-                            <div className="flex items-center justify-between w-full mb-1.5">
-                              <span
-                                className={cn(
-                                  "text-[9px] font-black uppercase tracking-wider transition-colors",
-                                  selectedMews
-                                    ? "text-blue-600 dark:text-blue-400"
-                                    : "text-foreground/80 group-hover:text-blue-600 dark:group-hover:text-blue-400",
-                                )}
-                              >
-                                MEWS (Alerta)
-                              </span>
-                              <div
-                                className={cn(
-                                  "w-5 h-5 rounded flex items-center justify-center flex-shrink-0 transition-colors",
-                                  selectedMews
-                                    ? "bg-blue-500"
-                                    : "bg-blue-500/15",
-                                )}
-                              >
-                                <Activity
-                                  className={cn(
-                                    "h-3 w-3",
-                                    selectedMews
-                                      ? "text-white"
-                                      : "text-blue-600",
-                                  )}
-                                />
-                              </div>
-                            </div>
-                            {selectedMews ? (
-                              <Badge className="h-4 text-[9px] font-bold bg-blue-600 hover:bg-blue-700 border-none text-white px-1.5 rounded truncate max-w-full">
-                                {selectedMews}
-                              </Badge>
-                            ) : (
-                              <span className="text-[9px] font-bold text-muted-foreground/60">
-                                Não Avaliado
-                              </span>
-                            )}
-                          </button>
-
-                          {/* Card NEWS2 */}
-                          <button
-                            type="button"
-                            onClick={() => setOpenNews2Calc(true)}
-                            className={cn(
-                              "flex flex-col items-start p-2.5 rounded-xl border text-left transition-all relative overflow-hidden group",
-                              selectedNews2
-                                ? "bg-emerald-500/5 border-emerald-500/30 dark:bg-emerald-500/10"
-                                : "bg-white/45 dark:bg-slate-900/45 border-white/60 dark:border-white/10 hover:border-emerald-500/40 hover:bg-emerald-500/5 backdrop-blur-sm shadow-sm",
-                            )}
-                          >
-                            <div className="flex items-center justify-between w-full mb-1.5">
-                              <span
-                                className={cn(
-                                  "text-[9px] font-black uppercase tracking-wider transition-colors",
-                                  selectedNews2
-                                    ? "text-emerald-600 dark:text-emerald-400"
-                                    : "text-foreground/80 group-hover:text-emerald-600 dark:group-hover:text-emerald-400",
-                                )}
-                              >
-                                NEWS2
-                              </span>
-                              <div
-                                className={cn(
-                                  "w-5 h-5 rounded flex items-center justify-center flex-shrink-0 transition-colors",
-                                  selectedNews2
-                                    ? "bg-emerald-500"
-                                    : "bg-emerald-500/15",
-                                )}
-                              >
-                                <Activity
-                                  className={cn(
-                                    "h-3 w-3",
-                                    selectedNews2
-                                      ? "text-white"
-                                      : "text-emerald-600",
-                                  )}
-                                />
-                              </div>
-                            </div>
-                            {selectedNews2 ? (
-                              <Badge className="h-4 text-[9px] font-bold bg-emerald-500 hover:bg-emerald-600 border-none text-white px-1.5 rounded truncate max-w-full">
-                                {selectedNews2}
-                              </Badge>
-                            ) : (
-                              <span className="text-[9px] font-bold text-muted-foreground/60">
-                                Não Avaliado
-                              </span>
-                            )}
-                          </button>
-
-                          {/* Card qSOFA */}
-                          <button
-                            type="button"
-                            onClick={() => setOpenQsofaCalc(true)}
-                            className={cn(
-                              "flex flex-col items-start p-2.5 rounded-xl border text-left transition-all relative overflow-hidden group",
-                              selectedQsofa
-                                ? "bg-purple-500/5 border-purple-500/30 dark:bg-purple-500/10"
-                                : "bg-white/45 dark:bg-slate-900/45 border-white/60 dark:border-white/10 hover:border-purple-500/40 hover:bg-purple-500/5 backdrop-blur-sm shadow-sm",
-                            )}
-                          >
-                            <div className="flex items-center justify-between w-full mb-1.5">
-                              <span
-                                className={cn(
-                                  "text-[9px] font-black uppercase tracking-wider transition-colors",
-                                  selectedQsofa
-                                    ? "text-purple-600 dark:text-purple-400"
-                                    : "text-foreground/80 group-hover:text-purple-600 dark:group-hover:text-purple-400",
-                                )}
-                              >
-                                qSOFA (Sepse)
-                              </span>
-                              <div
-                                className={cn(
-                                  "w-5 h-5 rounded flex items-center justify-center flex-shrink-0 transition-colors",
-                                  selectedQsofa
-                                    ? "bg-purple-500"
-                                    : "bg-purple-500/15",
-                                )}
-                              >
-                                <ShieldAlert
-                                  className={cn(
-                                    "h-3 w-3",
-                                    selectedQsofa
-                                      ? "text-white"
-                                      : "text-purple-600",
-                                  )}
-                                />
-                              </div>
-                            </div>
-                            {selectedQsofa ? (
-                              <Badge className="h-4 text-[9px] font-bold bg-purple-600 hover:bg-purple-700 border-none text-white px-1.5 rounded truncate max-w-full">
-                                {selectedQsofa}
-                              </Badge>
-                            ) : (
-                              <span className="text-[9px] font-bold text-muted-foreground/60">
-                                Não Avaliado
-                              </span>
-                            )}
-                          </button>
-
-                          {/* Card Glasgow */}
-                          <button
-                            type="button"
-                            onClick={() => setOpenGlasgowCalc(true)}
-                            className={cn(
-                              "flex flex-col items-start p-2.5 rounded-xl border text-left transition-all relative overflow-hidden group",
-                              selectedGlasgow
-                                ? "bg-indigo-500/5 border-indigo-500/30 dark:bg-indigo-500/10"
-                                : "bg-white/45 dark:bg-slate-900/45 border-white/60 dark:border-white/10 hover:border-indigo-500/40 hover:bg-indigo-500/5 backdrop-blur-sm shadow-sm",
-                            )}
-                          >
-                            <div className="flex items-center justify-between w-full mb-1.5">
-                              <span
-                                className={cn(
-                                  "text-[9px] font-black uppercase tracking-wider transition-colors",
-                                  selectedGlasgow
-                                    ? "text-indigo-600 dark:text-indigo-400"
-                                    : "text-foreground/80 group-hover:text-indigo-600 dark:group-hover:text-indigo-400",
-                                )}
-                              >
-                                Glasgow (GCS)
-                              </span>
-                              <div
-                                className={cn(
-                                  "w-5 h-5 rounded flex items-center justify-center flex-shrink-0 transition-colors",
-                                  selectedGlasgow
-                                    ? "bg-indigo-500"
-                                    : "bg-indigo-500/15",
-                                )}
-                              >
-                                <Brain
-                                  className={cn(
-                                    "h-3 w-3",
-                                    selectedGlasgow
-                                      ? "text-white"
-                                      : "text-indigo-600",
-                                  )}
-                                />
-                              </div>
-                            </div>
-                            {selectedGlasgow ? (
-                              <Badge className="h-4 text-[9px] font-bold bg-indigo-600 hover:bg-indigo-700 border-none text-white px-1.5 rounded truncate max-w-full">
-                                {selectedGlasgow}
-                              </Badge>
-                            ) : (
-                              <span className="text-[9px] font-bold text-muted-foreground/60">
-                                Não Avaliado
-                              </span>
-                            )}
-                          </button>
-
-                          {/* Card Saúde Mental */}
-                          <button
-                            type="button"
-                            onClick={() => setOpenMentalCalc(true)}
-                            className={cn(
-                              "flex flex-col items-start p-2.5 rounded-xl border text-left transition-all relative overflow-hidden group",
-                              selectedMentalSummary
-                                ? "bg-violet-500/5 border-violet-500/30 dark:bg-violet-500/10"
-                                : "bg-white/45 dark:bg-slate-900/45 border-white/60 dark:border-white/10 hover:border-violet-500/40 hover:bg-violet-500/5 backdrop-blur-sm shadow-sm",
-                            )}
-                          >
-                            <div className="flex items-center justify-between w-full mb-1.5">
-                              <span
-                                className={cn(
-                                  "text-[9px] font-black uppercase tracking-wider transition-colors",
-                                  selectedMentalSummary
-                                    ? "text-violet-600 dark:text-violet-400"
-                                    : "text-foreground/80 group-hover:text-violet-600 dark:group-hover:text-violet-400",
-                                )}
-                              >
-                                Saúde Mental
-                              </span>
-                              <div
-                                className={cn(
-                                  "w-5 h-5 rounded flex items-center justify-center flex-shrink-0 transition-colors",
-                                  selectedMentalSummary
-                                    ? "bg-violet-500"
-                                    : "bg-violet-500/15",
-                                )}
-                              >
-                                <Brain
-                                  className={cn(
-                                    "h-3 w-3",
-                                    selectedMentalSummary
-                                      ? "text-white"
-                                      : "text-violet-600",
-                                  )}
-                                />
-                              </div>
-                            </div>
-                            {selectedMentalSummary ? (
-                              <Badge className="h-4 text-[9px] font-bold bg-violet-600 hover:bg-violet-700 border-none text-white px-1.5 rounded truncate max-w-full">
-                                {selectedMentalSummary}
-                              </Badge>
-                            ) : (
-                              <span className="text-[9px] font-bold text-muted-foreground/60">
-                                Não Avaliado
-                              </span>
-                            )}
-                          </button>
-
-                          {/* Card Urgências Clínicas */}
-                          <button
-                            type="button"
-                            onClick={() => setOpenUrgencyCalc(true)}
-                            className={cn(
-                              "flex flex-col items-start p-2.5 rounded-xl border text-left transition-all relative overflow-hidden group",
-                              selectedUrgencySummary
-                                ? "bg-rose-500/5 border-rose-500/30 dark:bg-rose-500/10"
-                                : "bg-white/45 dark:bg-slate-900/45 border-white/60 dark:border-white/10 hover:border-rose-500/40 hover:bg-rose-500/5 backdrop-blur-sm shadow-sm",
-                            )}
-                          >
-                            <div className="flex items-center justify-between w-full mb-1.5">
-                              <span
-                                className={cn(
-                                  "text-[9px] font-black uppercase tracking-wider transition-colors",
-                                  selectedUrgencySummary
-                                    ? "text-rose-600 dark:text-rose-400"
-                                    : "text-foreground/80 group-hover:text-rose-600 dark:group-hover:text-rose-400",
-                                )}
-                              >
-                                Urgências
-                              </span>
-                              <div
-                                className={cn(
-                                  "w-5 h-5 rounded flex items-center justify-center flex-shrink-0 transition-colors",
-                                  selectedUrgencySummary
-                                    ? "bg-rose-500"
-                                    : "bg-rose-500/15",
-                                )}
-                              >
-                                <ShieldAlert
-                                  className={cn(
-                                    "h-3 w-3",
-                                    selectedUrgencySummary
-                                      ? "text-white"
-                                      : "text-rose-600",
-                                  )}
-                                />
-                              </div>
-                            </div>
-                            {selectedUrgencySummary ? (
-                              <Badge className="h-4 text-[9px] font-bold bg-rose-600 hover:bg-rose-700 border-none text-white px-1.5 rounded truncate max-w-full">
-                                {selectedUrgencySummary}
-                              </Badge>
-                            ) : (
-                              <span className="text-[9px] font-bold text-muted-foreground/60">
-                                Não Avaliado
-                              </span>
-                            )}
-                          </button>
-
-                          {/* Card Escalas de Enfermagem */}
-                          <button
-                            type="button"
-                            onClick={() => setOpenNursingCalc(true)}
-                            className={cn(
-                              "flex flex-col items-start p-2.5 rounded-xl border text-left transition-all relative overflow-hidden group",
-                              selectedNursingSummary
-                                ? "bg-cyan-500/5 border-cyan-500/30 dark:bg-cyan-500/10"
-                                : "bg-white/45 dark:bg-slate-900/45 border-white/60 dark:border-white/10 hover:border-cyan-500/40 hover:bg-cyan-500/5 backdrop-blur-sm shadow-sm",
-                            )}
-                          >
-                            <div className="flex items-center justify-between w-full mb-1.5">
-                              <span
-                                className={cn(
-                                  "text-[9px] font-black uppercase tracking-wider transition-colors",
-                                  selectedNursingSummary
-                                    ? "text-cyan-600 dark:text-cyan-400"
-                                    : "text-foreground/80 group-hover:text-cyan-600 dark:group-hover:text-cyan-400",
-                                )}
-                              >
-                                Enfermagem
-                              </span>
-                              <div
-                                className={cn(
-                                  "w-5 h-5 rounded flex items-center justify-center flex-shrink-0 transition-colors",
-                                  selectedNursingSummary
-                                    ? "bg-cyan-500"
-                                    : "bg-cyan-500/15",
-                                )}
-                              >
-                                <Activity
-                                  className={cn(
-                                    "h-3 w-3",
-                                    selectedNursingSummary
-                                      ? "text-white"
-                                      : "text-cyan-600",
-                                  )}
-                                />
-                              </div>
-                            </div>
-                            {selectedNursingSummary ? (
-                              <Badge className="h-4 text-[9px] font-bold bg-cyan-600 hover:bg-cyan-700 border-none text-white px-1.5 rounded truncate max-w-full">
-                                {selectedNursingSummary}
-                              </Badge>
-                            ) : (
-                              <span className="text-[9px] font-bold text-muted-foreground/60">
-                                Não Avaliado
-                              </span>
-                            )}
-                          </button>
-                        </div>
-                      )}
-
-                      {/* Pediatric Scales (isChild) */}
-                      {isChild && (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                          {/* Card PEWS */}
-                          <button
-                            type="button"
-                            onClick={() => setOpenPewsCalc(true)}
-                            className={cn(
-                              "flex flex-col items-start p-3 rounded-xl border text-left transition-all relative overflow-hidden group",
-                              selectedPews
-                                ? "bg-teal-500/5 border-teal-500/30 dark:bg-teal-500/10"
-                                : "bg-white/45 dark:bg-slate-900/45 border-white/60 dark:border-white/10 hover:border-teal-500/40 hover:bg-teal-500/5 backdrop-blur-sm shadow-sm",
-                            )}
-                          >
-                            <div className="flex items-center justify-between w-full mb-1.5">
-                              <span
-                                className={cn(
-                                  "text-[11px] font-black uppercase tracking-wider transition-colors",
-                                  selectedPews
-                                    ? "text-teal-600 dark:text-teal-400"
-                                    : "text-foreground/80 group-hover:text-teal-600 dark:group-hover:text-teal-400",
-                                )}
-                              >
-                                PEWS (Alerta Pediátrico)
-                              </span>
-                              <div
-                                className={cn(
-                                  "w-6 h-6 rounded flex items-center justify-center flex-shrink-0 transition-colors",
-                                  selectedPews
-                                    ? "bg-teal-500"
-                                    : "bg-teal-500/15",
-                                )}
-                              >
-                                <Baby
-                                  className={cn(
-                                    "h-3.5 w-3.5",
-                                    selectedPews
-                                      ? "text-white"
-                                      : "text-teal-600",
-                                  )}
-                                />
-                              </div>
-                            </div>
-                            {selectedPews ? (
-                              <Badge className="h-5 text-[10px] font-bold bg-teal-600 hover:bg-teal-700 border-none text-white px-2 rounded truncate max-w-full">
-                                {selectedPews}
-                              </Badge>
-                            ) : (
-                              <span className="text-[10px] font-bold text-muted-foreground/60">
-                                Não Avaliado
-                              </span>
-                            )}
-                          </button>
-
-                          {/* Card EVA */}
-                          <button
-                            type="button"
-                            onClick={() => setOpenEvaCalc(true)}
-                            className={cn(
-                              "flex flex-col items-start p-3 rounded-xl border text-left transition-all relative overflow-hidden group",
-                              selectedEva
-                                ? "bg-red-500/5 border-red-500/30 dark:bg-red-500/10"
-                                : "bg-white/45 dark:bg-slate-900/45 border-white/60 dark:border-white/10 hover:border-red-500/40 hover:bg-red-500/5 backdrop-blur-sm shadow-sm",
-                            )}
-                          >
-                            <div className="flex items-center justify-between w-full mb-1.5">
-                              <span
-                                className={cn(
-                                  "text-[11px] font-black uppercase tracking-wider transition-colors",
-                                  selectedEva
-                                    ? "text-red-600 dark:text-red-400"
-                                    : "text-foreground/80 group-hover:text-red-600 dark:group-hover:text-red-400",
-                                )}
-                              >
-                                Escala de Dor (EVA)
-                              </span>
-                              <div
-                                className={cn(
-                                  "w-6 h-6 rounded flex items-center justify-center flex-shrink-0 transition-colors",
-                                  selectedEva ? "bg-red-500" : "bg-red-500/15",
-                                )}
-                              >
-                                <Heart
-                                  className={cn(
-                                    "h-4 w-4",
-                                    selectedEva ? "text-white" : "text-red-600",
-                                  )}
-                                />
-                              </div>
-                            </div>
-                            {selectedEva ? (
-                              <Badge className="h-5 text-[10px] font-bold bg-red-500 hover:bg-red-600 border-none text-white px-2 rounded">
-                                {selectedEva}
-                              </Badge>
-                            ) : (
-                              <span className="text-[10px] font-bold text-muted-foreground/60">
-                                Não Avaliado
-                              </span>
-                            )}
-                          </button>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* 4. Diagnósticos NANDA/NIC/NOC */}
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between">
-                        <span className="text-[9px] font-black uppercase text-muted-foreground">
-                          4. Diagnósticos e Planejamento de Enfermagem (NANDA,
-                          NOC, NIC)
-                        </span>
-                        <Badge
-                          variant="outline"
-                          className="text-[8px] uppercase tracking-wider bg-primary/5 text-primary border-primary/20"
-                        >
-                          Taxonomia Oficial
-                        </Badge>
-                      </div>
-
-                      <div className="flex flex-wrap gap-2.5">
-                        <button
-                          type="button"
-                          onClick={() => setOpenNandaCalc(true)}
-                          className={cn(
-                            "flex items-center gap-2.5 px-3 py-2 rounded-xl border text-left transition-all hover:border-primary/40 hover:bg-muted/30 group w-full sm:w-auto",
-                            activeNandaPlan
-                              ? "bg-primary/5 border-primary/30 text-primary"
-                              : "bg-white/45 dark:bg-slate-900/45 border-white/60 dark:border-white/10 backdrop-blur-sm shadow-sm",
-                          )}
-                        >
-                          <Activity className="h-4 w-4 text-primary group-hover:animate-pulse" />
-                          <div className="flex flex-col">
-                            <span className="text-[10px] font-black uppercase tracking-wider text-muted-foreground group-hover:text-foreground">
-                              Abrir Planejador NANDA-NOC-NIC
-                            </span>
-                            {activeNandaPlan ? (
-                              <span className="text-[9px] font-bold text-primary">
-                                {activeNandaPlan}
-                              </span>
-                            ) : (
-                              <span className="text-[9px] font-bold text-muted-foreground/60">
-                                Planejar cuidados integrados do paciente
-                              </span>
-                            )}
-                          </div>
-                        </button>
-                      </div>
-                    </div>
-                  </motion.div>
-                )}
-
-                <div className="space-y-1 relative z-10">
-                  <div className="flex items-center justify-between">
-                    <Label className="text-[10px] font-black uppercase tracking-wider text-muted-foreground">
-                      {evolutionType === "Sinais Vitais"
-                        ? "Observações Clínicas Adicionais (opcional)"
-                        : "Descrição *"}
-                    </Label>
-                    <div className="flex items-center gap-2">
-                      {description && (
-                        <button
-                          type="button"
-                          onClick={() => setDescription("")}
-                          className="text-[9px] font-extrabold text-red-500 hover:underline uppercase tracking-wider bg-red-500/5 px-2 py-0.5 rounded border border-red-500/15 transition-all"
-                        >
-                          Limpar Texto
-                        </button>
-                      )}
-                      {evolutionType && EVOLUTION_TEMPLATES[evolutionType] && (
-                        <button
-                          type="button"
-                          onClick={() =>
-                            setDescription(EVOLUTION_TEMPLATES[evolutionType])
-                          }
-                          className="text-[9px] font-extrabold text-[#006699] hover:underline uppercase tracking-wider bg-[#006699]/5 px-2 py-0.5 rounded border border-[#006699]/15 transition-all"
-                        >
-                          Carregar Modelo Padrão
-                        </button>
-                      )}
-                    </div>
+                
+                <SmartEvolutionBuilder 
+                  role={professional?.toLowerCase().includes("dr") ? "medico" : "enfermeiro"}
+                  value={description}
+                  onChange={setDescription}
+                />
+                
+                {/* Ferramentas Clínicas Extras */}
+                <div className="mt-4 pt-4 mb-4 border-t border-slate-200 dark:border-slate-800">
+                  <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2 block">
+                    Ferramentas Opcionais
+                  </span>
+                  <div className="flex flex-wrap gap-2">
+                    <button type="button" onClick={() => setOpenBradenCalc(true)} className="px-3 py-1.5 text-[10px] font-semibold bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded shadow-sm text-orange-600 hover:bg-orange-50">
+                      Braden (LPP)
+                    </button>
+                    <button type="button" onClick={() => setOpenMorseCalc(true)} className="px-3 py-1.5 text-[10px] font-semibold bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded shadow-sm text-amber-600 hover:bg-amber-50">
+                      Morse (Queda)
+                    </button>
+                    <button type="button" onClick={() => setOpenEvaCalc(true)} className="px-3 py-1.5 text-[10px] font-semibold bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded shadow-sm text-red-600 hover:bg-red-50">
+                      Dor (EVA)
+                    </button>
+                    <button type="button" onClick={() => setOpenMewsCalc(true)} className="px-3 py-1.5 text-[10px] font-semibold bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded shadow-sm text-blue-600 hover:bg-blue-50">
+                      MEWS (Alerta)
+                    </button>
+                    <button type="button" onClick={() => setOpenNandaCalc(true)} className="px-3 py-1.5 text-[10px] font-semibold bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded shadow-sm text-indigo-600 hover:bg-indigo-50">
+                      NANDA/NIC
+                    </button>
                   </div>
-                  <Textarea
-                    placeholder={
-                      evolutionType === "Sinais Vitais"
-                        ? "Observações clínicas, aspecto geral do paciente, queixas, etc."
-                        : "Descreva a evolução do paciente..."
-                    }
-                    className="min-h-[140px] bg-white/45 dark:bg-slate-900/45 border-white/60 dark:border-white/10 focus:bg-white/60 dark:focus:bg-slate-900/60 resize-none text-xs leading-relaxed rounded-xl backdrop-blur-sm transition-all shadow-sm focus:ring-1 focus:ring-primary/20"
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                  />
                 </div>
-
                 {/* Carimbo Digital persistent configuration section */}
                 <div className="border border-white/40 dark:border-white/10 rounded-xl bg-white/35 dark:bg-slate-900/35 backdrop-blur-md shadow-sm overflow-hidden">
                   <button
@@ -6204,7 +5173,7 @@ export default function PatientEvolution() {
                 <div className="flex justify-end gap-2.5 pt-1">
                   <Button
                     variant="ghost"
-                    onClick={() => setIsFormOpen(false)}
+                    onClick={() => navigate(`/paciente/${id}/evolucao`)}
                     className="font-bold uppercase text-[9px] tracking-widest h-8 px-4"
                   >
                     Cancelar
@@ -6222,19 +5191,17 @@ export default function PatientEvolution() {
         )}
       </AnimatePresence>
 
-      <div className="space-y-6">
-        {activeTab === "therapeutic" ? (
+      <div id="timeline-content" className="space-y-6">
+        <h2 className="text-sm font-black tracking-widest text-[#006699] dark:text-sky-400 uppercase">
+          Linha do Tempo de Atendimento
+        </h2>
+
+        {activeTab === "prescriptions" ? (
           <div className="space-y-6">
-            <TherapeuticPlan patientId={patient.id} />
+            <TherapeuticPlan patientId={id || ""} />
           </div>
-        ) : (
-          <>
-            <h2 className="text-sm font-black tracking-widest text-[#006699] dark:text-sky-400 uppercase">
-              Linha do Tempo de Atendimento
-            </h2>
-    
-            {filteredEvolutions.length === 0 &&
-            !(patient?.exams && patient.exams.length > 0) ? (
+        ) : filteredEvolutions.length === 0 &&
+        !(patient?.exams && patient.exams.length > 0) ? (
           <Card className="glass-card-premium border border-white/40 dark:border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.06)] rounded-xl overflow-hidden transition-all duration-500">
             <CardContent className="h-36 flex items-center justify-center bg-muted/5">
               <p className="text-sm font-bold uppercase tracking-widest text-muted-foreground/30 px-8 text-center leading-relaxed">
@@ -6243,9 +5210,7 @@ export default function PatientEvolution() {
                   : `Nenhum registro de ${
                       activeTab === "evolutions"
                         ? "Evolução"
-                        : activeTab === "prescriptions"
-                          ? "Prescrição"
-                          : activeTab === "vitals"
+                        : activeTab === "vitals"
                             ? "Sinais Vitais"
                             : activeTab === "exams"
                               ? "Exame/Procedimento"
@@ -6367,8 +5332,6 @@ export default function PatientEvolution() {
               </motion.div>
             ))}
           </div>
-        )}
-          </>
         )}
       </div>
       <Dialog open={isBedDialogOpen} onOpenChange={setIsBedDialogOpen}>
@@ -6678,6 +5641,28 @@ export default function PatientEvolution() {
           />
         </>
       )}
-    </motion.div>
+
+      <AddCareItemModal 
+        isOpen={isAddCareItemModalOpen} 
+        onClose={() => setIsAddCareItemModalOpen(false)} 
+        onAdd={(item) => {
+          const activeOrder = orders.find((o) => o.patientId === id) || orders[0];
+          if (activeOrder) {
+            addCareItem(activeOrder.id, item);
+            toast.success("Novo item prescrito adicionado ao plano terapêutico!");
+          }
+        }} 
+      />
+    
+      <MedicalEvolutionForm 
+        isOpen={isMedicalModalOpen} 
+        onClose={() => setIsMedicalModalOpen(false)}
+        onSave={(content) => handleSaveUnifiedEvolution(content, "Evolução Médica")}
+        patientName={patient?.name || ""}
+      />
+      
+      
+
+</motion.div>
   );
 }
