@@ -72,12 +72,12 @@ export default function MyHR() {
       className="space-y-8"
     >
       {/* Header Profile */}
-      <div className="relative rounded-[2rem] overflow-hidden glass-card-premium border-white/40 dark:border-white/10 shadow-xl">
+      <div className="relative rounded-xl overflow-hidden glass-card-premium border-white/40 dark:border-white/10 shadow-xl">
         <div className="absolute inset-0 bg-gradient-to-r from-blue-600/90 to-sky-500/90 dark:from-blue-900/90 dark:to-sky-800/90 backdrop-blur-md z-0" />
         <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl pointer-events-none z-0 translate-x-1/3 -translate-y-1/3" />
 
         <div className="relative z-10 p-8 md:p-10 flex flex-col md:flex-row items-center md:items-start gap-6">
-          <div className="h-24 w-24 rounded-3xl bg-white/20 border-2 border-white/30 backdrop-blur-md flex items-center justify-center text-white shadow-inner shrink-0 overflow-hidden relative group cursor-pointer">
+          <div className="h-24 w-24 rounded-xl bg-white/20 border-2 border-white/30 backdrop-blur-md flex items-center justify-center text-white shadow-inner shrink-0 overflow-hidden relative group cursor-pointer">
             <UserSquare2 className="h-10 w-10 opacity-80 group-hover:scale-110 transition-transform" />
             <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
               <span className="text-[9px] font-black uppercase tracking-widest text-white">
@@ -174,7 +174,7 @@ export default function MyHR() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Left Column: Schedule */}
         <div className="lg:col-span-2 space-y-6">
-          <Card className="glass-card-premium rounded-2xl overflow-hidden border-white/40 dark:border-white/10 shadow-lg">
+          <Card className="glass-card-premium rounded-xl overflow-hidden border-white/40 dark:border-white/10 shadow-lg">
             <CardHeader className="p-6 border-b border-border/50 flex flex-row items-center justify-between bg-black/[0.02] dark:bg-white/[0.02]">
               <div>
                 <CardTitle className="text-lg font-black uppercase tracking-tight flex items-center gap-2">
@@ -202,7 +202,7 @@ export default function MyHR() {
                     className="p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 hover:bg-black/[0.02] dark:hover:bg-white/[0.02] transition-colors group"
                   >
                     <div className="flex items-center gap-4">
-                      <div className="h-14 w-14 rounded-2xl bg-primary/10 border border-primary/20 flex flex-col items-center justify-center shadow-inner group-hover:scale-105 transition-transform">
+                      <div className="h-14 w-14 rounded-xl bg-primary/10 border border-primary/20 flex flex-col items-center justify-center shadow-inner group-hover:scale-105 transition-transform">
                         <span className="text-[10px] font-black uppercase text-primary/70">
                           {shift.day.slice(0, 3)}
                         </span>
@@ -250,7 +250,7 @@ export default function MyHR() {
 
           {/* Quick Actions Grid */}
           <div className="grid grid-cols-2 gap-4">
-            <Card className="glass-card-premium rounded-2xl border-border/50 group">
+            <Card className="glass-card-premium rounded-xl border-border/50 group">
               <CardContent className="p-6 flex flex-col items-center text-center gap-4">
                 <div className="h-12 w-12 rounded-full bg-blue-500/10 flex items-center justify-center text-blue-600 transition-transform">
                   <FileText className="h-6 w-6" />
@@ -276,7 +276,7 @@ export default function MyHR() {
                 </Button>
               </CardContent>
             </Card>
-            <Card className="glass-card-premium rounded-2xl border-border/50 group">
+            <Card className="glass-card-premium rounded-xl border-border/50 group">
               <CardContent className="p-6 flex flex-col items-center text-center gap-4">
                 <div className="h-12 w-12 rounded-full bg-emerald-500/10 flex items-center justify-center text-emerald-600 transition-transform">
                   <CheckCircle2 className="h-6 w-6" />
@@ -304,7 +304,7 @@ export default function MyHR() {
 
         {/* Right Column: Docs & Notifications */}
         <div className="space-y-6">
-          <Card className="glass-card-premium rounded-2xl overflow-hidden border-white/40 dark:border-white/10 shadow-lg">
+          <Card className="glass-card-premium rounded-xl overflow-hidden border-white/40 dark:border-white/10 shadow-lg">
             <CardHeader className="p-6 border-b border-border/50 bg-black/[0.02] dark:bg-white/[0.02] flex flex-row items-center justify-between">
               <CardTitle className="text-xs font-black uppercase tracking-widest flex items-center gap-2">
                 <FileText className="h-4 w-4 text-amber-500" />
@@ -369,7 +369,7 @@ export default function MyHR() {
             </CardContent>
           </Card>
 
-          <Card className="glass-card-premium rounded-2xl overflow-hidden border-white/40 dark:border-white/10 shadow-lg relative">
+          <Card className="glass-card-premium rounded-xl overflow-hidden border-white/40 dark:border-white/10 shadow-lg relative">
             <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-2xl pointer-events-none" />
             <CardHeader className="p-6 pb-2 relative z-10">
               <CardTitle className="text-xs font-black uppercase tracking-widest flex items-center gap-2">

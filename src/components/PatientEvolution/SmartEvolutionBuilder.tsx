@@ -2,9 +2,20 @@ import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
-import { Activity, Beaker, ClipboardList, Stethoscope, Syringe, Zap } from "lucide-react";
+import { Activity, Beaker, ClipboardList, Stethoscope, Syringe, Zap, Eraser, Undo2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 interface SmartEvolutionBuilderProps {
   role: "medico" | "enfermeiro" | "diretoria" | string;
@@ -65,6 +76,13 @@ export function SmartEvolutionBuilder({ role, value, onChange }: SmartEvolutionB
     onChange(newText);
   };
 
+  const handleUndoLast = () => {
+    if (!value) return;
+    const lines = value.split("\n");
+    lines.pop(); // Remove a última linha
+    onChange(lines.join("\n").trim());
+  };
+
   return (
     <div className="space-y-4 border border-slate-200 dark:border-slate-800 rounded-xl p-4 bg-slate-50/50 dark:bg-slate-900/50">
       <div className="flex items-center gap-2 mb-2">
@@ -118,7 +136,51 @@ export function SmartEvolutionBuilder({ role, value, onChange }: SmartEvolutionB
         ))}
       </div>
 
-      <div className="mt-4">
+      <div className="mt-4 relative group">
+        {value && (
+          <div className="absolute top-2 right-2 z-10 opacity-0 group-hover:opacity-100 transition-opacity flex gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={handleUndoLast}
+              className="h-7 text-[10px] uppercase font-bold text-slate-500 border-slate-200 hover:bg-slate-100 hover:text-slate-700 dark:border-slate-800 dark:hover:bg-slate-800"
+            >
+              <Undo2 className="w-3 h-3 mr-1" />
+              Desfazer
+            </Button>
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="h-7 text-[10px] uppercase font-bold text-red-500 border-red-200 hover:bg-red-50 hover:text-red-600 dark:border-red-900/50 dark:hover:bg-red-900/20"
+                >
+                  <Eraser className="w-3 h-3 mr-1" />
+                  Limpar
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Limpar Evolução?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Isso apagará todo o texto que você montou. Esta ação não pode ser desfeita.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={() => onChange("")}
+                    className="bg-red-600 hover:bg-red-700 text-white"
+                  >
+                    Sim, Limpar Tudo
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </div>
+        )}
         <Textarea
           placeholder="A evolução montada aparecerá aqui. Você pode digitar livremente..."
           value={value}

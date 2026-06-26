@@ -120,7 +120,7 @@ export default function SatellitePharmacy() {
   };
 
   return (
-    <div className="flex flex-col h-[calc(100vh-6rem)] relative">
+    <div className="flex flex-col h-[calc(100vh-7rem)] relative overflow-hidden">
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[80%] h-[300px] bg-sky-500/10 blur-[120px] rounded-full pointer-events-none -z-10" />
 
       {/* Critical Alert Banner */}
@@ -128,7 +128,7 @@ export default function SatellitePharmacy() {
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mb-4 mx-6 rounded-xl bg-rose-500/10 border border-rose-500/30 p-4 flex items-center justify-between shadow-[0_0_20px_rgba(225,29,72,0.1)] relative overflow-hidden"
+          className="mb-4 mx-2 rounded-xl bg-rose-500/10 border border-rose-500/30 p-4 flex items-center justify-between shadow-[0_0_20px_rgba(225,29,72,0.1)] relative overflow-hidden"
         >
           <div className="absolute inset-0 bg-gradient-to-r from-rose-500/5 to-transparent animate-pulse" />
           <div className="flex items-center gap-3 relative z-10">
@@ -157,7 +157,7 @@ export default function SatellitePharmacy() {
       {/* Header */}
       <div className="flex items-center justify-between mb-6 px-6 shrink-0">
         <div className="flex items-center gap-4">
-          <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-sky-500/20 to-blue-600/20 flex items-center justify-center border border-sky-500/30 shadow-[0_0_20px_rgba(14,165,233,0.15)] relative overflow-hidden group">
+          <div className="h-14 w-14 rounded-xl bg-gradient-to-br from-sky-500/20 to-blue-600/20 flex items-center justify-center border border-sky-500/30 shadow-[0_0_20px_rgba(14,165,233,0.15)] relative overflow-hidden group">
             <div className="absolute inset-0 bg-gradient-to-br from-sky-400/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
             <Pill className="h-7 w-7 text-sky-500 drop-shadow-[0_0_10px_rgba(14,165,233,0.5)]" />
           </div>
@@ -190,7 +190,7 @@ export default function SatellitePharmacy() {
       </div>
 
       {/* Main Content Layout */}
-      <div className="flex gap-6 flex-1 min-h-0 px-6 pb-6">
+      <div className="flex gap-4 flex-1 min-h-0 px-2 pb-2">
         {/* Sidebar Tabs */}
         <div className="w-64 flex flex-col gap-2 shrink-0">
           {[
@@ -270,7 +270,7 @@ export default function SatellitePharmacy() {
         </div>
 
         {/* Content Area */}
-        <div className="flex-1 rounded-2xl border glass-card-premium overflow-hidden flex flex-col min-w-0 shadow-lg">
+        <div className="flex-1 rounded-xl border glass-card-premium overflow-hidden flex flex-col min-w-0 shadow-lg">
           {/* Header Bar */}
           <div className="h-16 border-b border-border/50 bg-muted/30 flex items-center justify-between px-6 shrink-0">
             <h2 className="text-lg font-black tracking-wide flex items-center gap-2">
@@ -293,7 +293,7 @@ export default function SatellitePharmacy() {
           </div>
 
           {/* List Area */}
-          <div className="flex-1 overflow-auto p-6 flex flex-col gap-4 custom-scrollbar">
+          <div className="flex-1 overflow-auto p-3 flex flex-col gap-4 custom-scrollbar">
             {activeTab === "estoque" && (
               <>
                 {/* Summary Cards */}
@@ -422,7 +422,7 @@ export default function SatellitePharmacy() {
                         </div>
                       </div>
 
-                      <div className="flex items-center gap-6 w-1/3 justify-end pl-6">
+                      <div className="flex items-center gap-4 w-1/3 justify-end pl-6">
                         <div className="flex flex-col items-end">
                           <span
                             className={cn(
@@ -585,9 +585,9 @@ export default function SatellitePharmacy() {
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-lg glass-card-premium border-border/50 rounded-2xl shadow-2xl z-50 overflow-hidden"
+              className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-lg glass-card-premium border-border/50 rounded-xl shadow-2xl z-50 overflow-hidden"
             >
-              <div className="p-6 border-b border-border/50 flex items-center justify-between bg-muted/30">
+              <div className="p-3 border-b border-border/50 flex items-center justify-between bg-muted/30">
                 <h3 className="text-xl font-black tracking-wide text-foreground flex items-center gap-2">
                   <Plus className="h-5 w-5 text-sky-500" />
                   Nova Solicitação
@@ -599,7 +599,7 @@ export default function SatellitePharmacy() {
                   <X className="h-5 w-5" />
                 </button>
               </div>
-              <div className="p-6 flex flex-col gap-4">
+              <div className="p-3 flex flex-col gap-4">
                 <div>
                   <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-1.5 block">
                     Medicamento / Material
@@ -634,7 +634,7 @@ export default function SatellitePharmacy() {
                   </div>
                 </div>
               </div>
-              <div className="p-6 border-t border-border/50 bg-muted/10 flex justify-end gap-3">
+              <div className="p-3 border-t border-border/50 bg-muted/10 flex justify-end gap-3">
                 <button
                   onClick={() => setIsRequestModalOpen(false)}
                   className="px-5 py-2.5 rounded-xl font-bold text-sm text-muted-foreground hover:text-foreground hover:bg-muted/30 transition-colors"
@@ -668,9 +668,9 @@ export default function SatellitePharmacy() {
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-lg glass-card-premium border-border/50 rounded-2xl shadow-2xl z-50 overflow-hidden"
+              className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-lg glass-card-premium border-border/50 rounded-xl shadow-2xl z-50 overflow-hidden"
             >
-              <div className="p-6 border-b border-border/50 flex items-center justify-between bg-muted/30">
+              <div className="p-3 border-b border-border/50 flex items-center justify-between bg-muted/30">
                 <h3 className="text-xl font-black tracking-wide text-foreground flex items-center gap-2">
                   <Activity className="h-5 w-5 text-rose-500" />
                   Registrar Consumo
@@ -682,7 +682,7 @@ export default function SatellitePharmacy() {
                   <X className="h-5 w-5" />
                 </button>
               </div>
-              <div className="p-6 flex flex-col gap-4">
+              <div className="p-3 flex flex-col gap-4">
                 <div className="p-4 rounded-xl bg-muted/30 border border-border/50 mb-2">
                   <span className="text-xs font-bold text-muted-foreground uppercase tracking-widest block mb-1">
                     Item Selecionado
@@ -712,7 +712,7 @@ export default function SatellitePharmacy() {
                   />
                 </div>
               </div>
-              <div className="p-6 border-t border-border/50 bg-muted/10 flex justify-end gap-3">
+              <div className="p-3 border-t border-border/50 bg-muted/10 flex justify-end gap-3">
                 <button
                   onClick={() => setDispenseItem(null)}
                   className="px-5 py-2.5 rounded-xl font-bold text-sm text-muted-foreground hover:text-foreground hover:bg-muted/30 transition-colors"

@@ -868,7 +868,7 @@ export default function NursingCheck() {
       </div>
 
       {/* MAIN CONTAINER */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
         {/* PATIENT LIST (COL-SPAN-4) */}
         <div className="lg:col-span-4 space-y-4">
           <Card className="glass-card-premium border-white/40 dark:border-white/10 shadow-xl overflow-hidden rounded-xl">

@@ -205,7 +205,7 @@ export default function Pharmacy() {
   });
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h1 className="text-4xl mission-control-title bg-gradient-to-r from-foreground to-foreground/60 bg-clip-text text-transparent">
@@ -419,7 +419,7 @@ export default function Pharmacy() {
         onValueChange={setActiveTab}
         className="space-y-4"
       >
-        <TabsList className="glass-card-premium p-1 h-14 rounded-2xl border border-white/40 dark:border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.12)] overflow-x-auto flex-nowrap shrink-0">
+        <TabsList className="glass-card-premium p-1 h-14 rounded-xl border border-white/40 dark:border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.12)] overflow-x-auto flex-nowrap shrink-0">
           <TabsTrigger value="stock" className="gap-2">
             <Package className="h-4 w-4" />
             Estoque
@@ -577,7 +577,7 @@ export default function Pharmacy() {
             {orders.flatMap((o) =>
               o.medications.filter((m) => m.status === "awaiting_pharmacy"),
             ).length === 0 && (
-              <div className="col-span-full py-12 flex flex-col items-center justify-center text-muted-foreground bg-white/5 rounded-2xl border border-dashed border-white/20">
+              <div className="col-span-full py-12 flex flex-col items-center justify-center text-muted-foreground bg-white/5 rounded-xl border border-dashed border-white/20">
                 <CheckCircle2 className="h-12 w-12 opacity-20 mb-2" />
                 <p className="font-black uppercase tracking-widest text-xs">
                   Fila Vazia
@@ -722,7 +722,7 @@ export default function Pharmacy() {
         open={!!selectedMedDetails}
         onOpenChange={(open) => !open && setSelectedMedDetails(null)}
       >
-        <DialogContent className="max-w-2xl p-0 overflow-hidden rounded-[2rem] glass-card-premium shadow-[0_30px_60px_-15px_rgba(0,0,0,0.3)]">
+        <DialogContent className="max-w-2xl p-0 overflow-hidden rounded-xl glass-card-premium shadow-[0_30px_60px_-15px_rgba(0,0,0,0.3)]">
           <DialogHeader
             className={cn(
               "p-8 text-white transition-colors duration-500",
@@ -775,10 +775,10 @@ export default function Pharmacy() {
             </div>
           </DialogHeader>
 
-          <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div className="space-y-6">
+          <div className="p-3 grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
-                <div className="p-4 bg-muted/50 rounded-2xl">
+                <div className="p-4 bg-muted/50 rounded-xl">
                   <p className="text-[10px] font-black uppercase text-muted-foreground mb-1">
                     Estoque Atual
                   </p>
@@ -789,7 +789,7 @@ export default function Pharmacy() {
                     </span>
                   </div>
                 </div>
-                <div className="p-4 bg-muted/50 rounded-2xl">
+                <div className="p-4 bg-muted/50 rounded-xl">
                   <p className="text-[10px] font-black uppercase text-muted-foreground mb-1">
                     Lote Atual
                   </p>
@@ -880,8 +880,8 @@ export default function Pharmacy() {
         open={!!medForStockEntry}
         onOpenChange={(open) => !open && setMedForStockEntry(null)}
       >
-        <DialogContent className="max-w-md p-0 overflow-hidden rounded-[2rem] glass-card-premium shadow-[0_30px_60px_-15px_rgba(0,0,0,0.3)]">
-          <DialogHeader className="p-8 bg-green-600 text-white">
+        <DialogContent className="max-w-md p-0 overflow-hidden rounded-xl glass-card-premium shadow-[0_30px_60px_-15px_rgba(0,0,0,0.3)]">
+          <DialogHeader className="p-3 bg-green-600 text-white">
             <DialogTitle className="text-2xl font-black uppercase tracking-tight flex items-center gap-2">
               <Plus className="h-6 w-6" />
               Entrada de Estoque
@@ -889,7 +889,7 @@ export default function Pharmacy() {
             <p className="opacity-80 text-sm">{medForStockEntry?.name}</p>
           </DialogHeader>
 
-          <div className="p-8 space-y-6">
+          <div className="p-3 space-y-4">
             <div className="space-y-3">
               <Label className="text-xs font-black uppercase tracking-widest text-muted-foreground">
                 Quantidade a Adicionar
@@ -940,8 +940,8 @@ export default function Pharmacy() {
         open={!!medForQuickDispense}
         onOpenChange={(open) => !open && setMedForQuickDispense(null)}
       >
-        <DialogContent className="max-w-md p-0 overflow-hidden rounded-[2rem] glass-card-premium shadow-[0_30px_60px_-15px_rgba(0,0,0,0.3)]">
-          <DialogHeader className="p-8 bg-primary text-white">
+        <DialogContent className="max-w-md p-0 overflow-hidden rounded-xl glass-card-premium shadow-[0_30px_60px_-15px_rgba(0,0,0,0.3)]">
+          <DialogHeader className="p-3 bg-primary text-white">
             <DialogTitle className="text-2xl font-black uppercase tracking-tight flex items-center gap-2">
               <Pill className="h-6 w-6" />
               Dispensação Rápida
@@ -949,7 +949,7 @@ export default function Pharmacy() {
             <p className="opacity-80 text-sm">{medForQuickDispense?.name}</p>
           </DialogHeader>
 
-          <div className="p-8 space-y-4">
+          <div className="p-3 space-y-4">
             <div className="space-y-2">
               <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">
                 Paciente
@@ -1078,8 +1078,8 @@ export default function Pharmacy() {
         open={!!medForControlledDispatch}
         onOpenChange={(open) => !open && setMedForControlledDispatch(null)}
       >
-        <DialogContent className="max-w-md p-0 overflow-hidden rounded-[2rem] glass-card-premium shadow-[0_30px_60px_-15px_rgba(0,0,0,0.3)] border-4 border-slate-950 dark:border-slate-800">
-          <DialogHeader className="p-8 bg-slate-950 text-white relative">
+        <DialogContent className="max-w-md p-0 overflow-hidden rounded-xl glass-card-premium shadow-[0_30px_60px_-15px_rgba(0,0,0,0.3)] border-4 border-slate-950 dark:border-slate-800">
+          <DialogHeader className="p-3 bg-slate-950 text-white relative">
             <div className="absolute top-4 right-4 bg-white/10 p-2 rounded-full backdrop-blur-sm">
               <ShieldAlert className="h-6 w-6 text-white" />
             </div>
@@ -1095,7 +1095,7 @@ export default function Pharmacy() {
             </div>
           </DialogHeader>
 
-          <div className="p-8 space-y-5">
+          <div className="p-3 space-y-5">
             <div className="space-y-2">
               <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground flex items-center justify-between">
                 <span>Paciente Destino</span>
@@ -1298,7 +1298,7 @@ function MedicationTable({
   onStockEntry: (m: Medication) => void;
 }) {
   return (
-    <Card className="glass-card overflow-hidden">
+    <Card className="glass-card-premium overflow-hidden">
       <CardContent className="p-0">
         <Table>
           <TableHeader className="bg-muted/10">
@@ -1496,7 +1496,7 @@ function DispensingForm({
   };
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
       <Card className="lg:col-span-2 glass-card">
         <CardHeader className="bg-primary/5 border-b mb-6">
           <CardTitle className="text-xl font-black uppercase tracking-tight flex items-center gap-2">
@@ -1504,8 +1504,8 @@ function DispensingForm({
             Registro de Dispensação
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="grid gap-6 md:grid-cols-2">
+        <CardContent className="space-y-4">
+          <div className="grid gap-4 md:grid-cols-2">
             <div className="space-y-3">
               <Label className="text-xs font-black uppercase tracking-widest text-muted-foreground mr-1">
                 Medicamento <span className="text-destructive">*</span>
@@ -1612,7 +1612,7 @@ function DispensingForm({
         </CardContent>
       </Card>
 
-      <div className="space-y-6">
+      <div className="space-y-4">
         <Card className="glass-card">
           <CardHeader>
             <CardTitle className="text-sm font-bold uppercase tracking-widest text-muted-foreground">
@@ -1621,7 +1621,7 @@ function DispensingForm({
           </CardHeader>
           <CardContent className="space-y-4">
             {selectedMed ? (
-              <div className="p-4 rounded-2xl bg-primary/5 space-y-3 border border-primary/10">
+              <div className="p-4 rounded-xl bg-primary/5 space-y-3 border border-primary/10">
                 <div className="flex items-center gap-3">
                   <div className="h-10 w-10 rounded-xl bg-primary/20 flex items-center justify-center">
                     <Pill className="h-6 w-6 text-primary" />
@@ -1662,7 +1662,7 @@ function DispensingForm({
                 </div>
               </div>
             ) : (
-              <div className="p-8 border-2 border-dashed rounded-2xl text-center text-muted-foreground">
+              <div className="p-3 border-2 border-dashed rounded-xl text-center text-muted-foreground">
                 <p className="text-xs">
                   Selecione um medicamento para ver detalhes
                 </p>
@@ -1670,7 +1670,7 @@ function DispensingForm({
             )}
 
             {selectedPatient ? (
-              <div className="p-4 rounded-2xl bg-secondary/20 space-y-3 border border-border">
+              <div className="p-4 rounded-xl bg-secondary/20 space-y-3 border border-border">
                 <div className="flex items-center gap-3">
                   <div className="h-10 w-10 rounded-xl bg-secondary flex items-center justify-center">
                     <User className="h-6 w-6 text-foreground/70" />
@@ -1692,14 +1692,14 @@ function DispensingForm({
                 </div>
               </div>
             ) : (
-              <div className="p-8 border-2 border-dashed rounded-2xl text-center text-muted-foreground">
+              <div className="p-3 border-2 border-dashed rounded-xl text-center text-muted-foreground">
                 <p className="text-xs">Selecione um paciente</p>
               </div>
             )}
           </CardContent>
         </Card>
 
-        <Card className="glass-card bg-orange-500/5 border-dashed border-orange-500/20">
+        <Card className="glass-card-premium bg-orange-500/5 border-dashed border-orange-500/20">
           <CardContent className="pt-6">
             <div className="flex items-center gap-3 text-orange-600">
               <ShieldAlert className="h-5 w-5" />
@@ -1862,8 +1862,8 @@ function RegisterMedicationForm({
           </Badge>
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-6">
-        <div className="grid gap-6 md:grid-cols-3">
+      <CardContent className="space-y-4">
+        <div className="grid gap-4 md:grid-cols-3">
           <div className="space-y-2 relative">
             <Label className="text-xs font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-2">
               Nome Comercial *
@@ -2072,7 +2072,7 @@ function RegisterMedicationForm({
               className="h-10 border-primary/20"
             />
           </div>
-          <div className="md:col-span-2 flex items-center gap-4 p-5 bg-slate-950/5 dark:bg-white/5 rounded-2xl border-2 border-dashed border-slate-950/20 dark:border-white/20 self-end transition-all hover:bg-slate-950/10 dark:hover:bg-white/10 group">
+          <div className="md:col-span-2 flex items-center gap-4 p-5 bg-slate-950/5 dark:bg-white/5 rounded-xl border-2 border-dashed border-slate-950/20 dark:border-white/20 self-end transition-all hover:bg-slate-950/10 dark:hover:bg-white/10 group">
             <div className="flex items-center justify-center h-10 w-10 rounded-full bg-slate-950 dark:bg-slate-800 text-white shadow-lg group-hover:scale-110 transition-transform">
               <ShieldAlert className="h-6 w-6" />
             </div>

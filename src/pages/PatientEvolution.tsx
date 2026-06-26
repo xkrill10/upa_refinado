@@ -38,6 +38,17 @@ import {
   FlaskConical,
   Syringe,
 } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { motion, AnimatePresence } from "motion/react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -5165,13 +5176,37 @@ export default function EvolucaoEnfermagem() {
                 </div>
 
                 <div className="flex justify-end gap-2.5 pt-1">
-                  <Button
-                    variant="ghost"
-                    onClick={() => navigate(`/paciente/${id}/evolucao`)}
-                    className="font-bold uppercase text-[9px] tracking-widest h-8 px-4"
-                  >
-                    Cancelar
-                  </Button>
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        className="font-bold uppercase text-[9px] tracking-widest h-8 px-4"
+                      >
+                        Cancelar
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Deseja realmente cancelar?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          Todo o progresso não salvo será perdido. Deseja sair desta tela?
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Não</AlertDialogCancel>
+                        <AlertDialogAction
+                          onClick={() => {
+                            setIsFormOpen(false);
+                            setDescription("");
+                            setEvolutionType("");
+                          }}
+                          className="bg-red-600 hover:bg-red-700 text-white"
+                        >
+                          Sim, Cancelar
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
                   <Button
                     onClick={handleSaveEvolution}
                     className="bg-[#006699] hover:bg-[#005580] text-white font-bold uppercase text-[9px] tracking-widest h-8 px-5 rounded-md shadow-sm active:scale-95"

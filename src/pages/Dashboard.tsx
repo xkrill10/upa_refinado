@@ -441,7 +441,7 @@ export default function Dashboard() {
           </motion.div>
 
           {/* Área Principal de Trabalho: Fila (Esquerda) e Hub de Recursos (Direita) */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
             {/* Esquerda: Fila de Atendimento */}
             <motion.div variants={item} className="lg:col-span-8">
               <Card className="glass-card-premium overflow-hidden h-full rounded-xl border border-white/20 dark:border-white/5 shadow-lg">

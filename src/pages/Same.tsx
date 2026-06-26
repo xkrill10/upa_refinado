@@ -175,7 +175,7 @@ export default function Same() {
 
   return (
     <div className="space-y-8 max-w-[1600px] mx-auto animate-in fade-in slide-in-from-bottom-4 duration-700">
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 glass-card-premium p-8 rounded-[2rem] border border-white/40 dark:border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.12)]">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 glass-card-premium p-8 rounded-xl border border-white/40 dark:border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.12)]">
         <div>
           <div className="flex items-center gap-3 mb-2">
             <div className="h-10 w-10 rounded-2xl bg-primary/10 flex items-center justify-center border border-primary/20 shadow-inner">
@@ -324,7 +324,7 @@ export default function Same() {
             transition={{ duration: 0.2 }}
           >
             <TabsContent value="files" className="mt-0 outline-none">
-              <Card className="glass-card-premium border-white/40 dark:border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.12)] overflow-hidden rounded-[2rem]">
+              <Card className="glass-card-premium border-white/40 dark:border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.12)] overflow-hidden rounded-xl">
                 <CardHeader className="p-8 border-b border-border/50 flex flex-col md:flex-row md:items-center justify-between gap-4">
                   <div>
                     <CardTitle className="text-xl font-black uppercase tracking-tight mission-control-title">
@@ -360,7 +360,7 @@ export default function Same() {
                           Novo Registro
                         </Button>
                       </DialogTrigger>
-                      <DialogContent className="sm:max-w-[500px] rounded-[2rem] p-0 overflow-hidden border-none shadow-2xl">
+                      <DialogContent className="sm:max-w-[500px] rounded-xl p-0 overflow-hidden border-none shadow-2xl">
                         <form onSubmit={handleCreateRecord}>
                           <DialogHeader className="p-8 bg-primary text-white">
                             <div className="flex items-center justify-between">
@@ -643,7 +643,7 @@ export default function Same() {
 
             <TabsContent value="requests" className="mt-0 outline-none">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <Card className="md:col-span-2 glass-card-premium border-white/40 dark:border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.12)] overflow-hidden rounded-[2rem]">
+                <Card className="md:col-span-2 glass-card-premium border-white/40 dark:border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.12)] overflow-hidden rounded-xl">
                   <CardHeader className="p-8 border-b border-border/50">
                     <CardTitle className="text-xl font-black uppercase tracking-tight mission-control-title">
                       Fila de Solicitações
@@ -758,7 +758,7 @@ export default function Same() {
                   </CardContent>
                 </Card>
 
-                <Card className="border-none shadow-xl bg-primary text-white overflow-hidden rounded-[2rem] flex flex-col justify-between relative h-full">
+                <Card className="border-none shadow-xl bg-primary text-white overflow-hidden rounded-xl flex flex-col justify-between relative h-full">
                   <div className="absolute top-0 right-0 p-8 opacity-10">
                     <Library className="h-40 w-40" />
                   </div>
@@ -814,7 +814,7 @@ export default function Same() {
                           Nova Solicitação
                         </Button>
                       </DialogTrigger>
-                      <DialogContent className="sm:max-w-[400px] rounded-[2rem] p-0 overflow-hidden border-none shadow-2xl">
+                      <DialogContent className="sm:max-w-[400px] rounded-xl p-0 overflow-hidden border-none shadow-2xl">
                         <form
                           onSubmit={(e) => {
                             e.preventDefault();
@@ -900,8 +900,8 @@ export default function Same() {
 
             <TabsContent value="digital" className="mt-0 outline-none">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <Card className="glass-card-premium border-white/40 dark:border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.12)] overflow-hidden rounded-[2rem] p-10 flex flex-col items-center justify-center text-center gap-6 group">
-                  <div className="h-24 w-24 rounded-[2rem] bg-emerald-100 flex items-center justify-center text-emerald-600 transition-all group-hover:scale-110 group-hover:rotate-3 shadow-lg shadow-emerald-500/10">
+                <Card className="glass-card-premium border-white/40 dark:border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.12)] overflow-hidden rounded-xl p-10 flex flex-col items-center justify-center text-center gap-6 group">
+                  <div className="h-24 w-24 rounded-xl bg-emerald-100 flex items-center justify-center text-emerald-600 transition-all group-hover:scale-110 group-hover:rotate-3 shadow-lg shadow-emerald-500/10">
                     <Upload className="h-10 w-10" />
                   </div>
                   <div>
@@ -957,7 +957,7 @@ export default function Same() {
                   </div>
                 </Card>
 
-                <Card className="glass-card-premium border-white/40 dark:border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.12)] overflow-hidden rounded-[2rem]">
+                <Card className="glass-card-premium border-white/40 dark:border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.12)] overflow-hidden rounded-xl">
                   <CardHeader className="p-8 border-b border-border/50">
                     <CardTitle className="text-xl font-black uppercase tracking-tight mission-control-title">
                       Uploads Recentes
@@ -1006,7 +1006,7 @@ export default function Same() {
 
             <TabsContent value="stats" className="mt-0 outline-none space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <Card className="md:col-span-2 glass-card-premium border-white/40 dark:border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.12)] overflow-hidden rounded-[2rem] p-8">
+                <Card className="md:col-span-2 glass-card-premium border-white/40 dark:border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.12)] overflow-hidden rounded-xl p-8">
                   <div className="flex items-center justify-between mb-8">
                     <div>
                       <CardTitle className="text-xl font-black uppercase tracking-tight mission-control-title">
@@ -1117,7 +1117,7 @@ export default function Same() {
                 </Card>
 
                 <div className="space-y-6">
-                  <Card className="border-none shadow-xl bg-primary text-white overflow-hidden rounded-[2rem] p-8">
+                  <Card className="border-none shadow-xl bg-primary text-white overflow-hidden rounded-xl p-8">
                     <TrendingUp className="h-8 w-8 mb-4 opacity-50" />
                     <p className="text-sm font-black uppercase tracking-widest opacity-80 mb-2">
                       Previsão Mensal
@@ -1131,7 +1131,7 @@ export default function Same() {
                     </p>
                   </Card>
 
-                  <Card className="glass-card-premium border-white/40 dark:border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.12)] overflow-hidden rounded-[2rem] p-8">
+                  <Card className="glass-card-premium border-white/40 dark:border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.12)] overflow-hidden rounded-xl p-8">
                     <CardTitle className="text-sm font-black uppercase tracking-tight mb-6">
                       Eficiência de Entrega
                     </CardTitle>
@@ -1171,7 +1171,7 @@ export default function Same() {
                 {storageUnits.map((unit, i) => (
                   <Card
                     key={i}
-                    className="glass-card-premium border-white/40 dark:border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.12)] overflow-hidden rounded-[2rem] p-6"
+                    className="glass-card-premium border-white/40 dark:border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.12)] overflow-hidden rounded-xl p-6"
                   >
                     <div className="flex items-center justify-between mb-4">
                       <div className="p-2 rounded-xl bg-muted/30">
@@ -1207,7 +1207,7 @@ export default function Same() {
               className="mt-0 outline-none pb-1"
             >
               <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-                <Card className="md:col-span-3 glass-card-premium border-white/40 dark:border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.12)] overflow-hidden rounded-[2rem]">
+                <Card className="md:col-span-3 glass-card-premium border-white/40 dark:border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.12)] overflow-hidden rounded-xl">
                   <CardHeader className="p-8 border-b border-border/50 flex flex-row items-center justify-between">
                     <div>
                       <CardTitle className="text-xl font-black uppercase tracking-tight mission-control-title">
@@ -1309,7 +1309,7 @@ export default function Same() {
                 </Card>
 
                 <div className="space-y-6">
-                  <Card className="glass-card-premium border-white/40 dark:border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.12)] overflow-hidden rounded-[2rem] p-8">
+                  <Card className="glass-card-premium border-white/40 dark:border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.12)] overflow-hidden rounded-xl p-8">
                     <div className="flex items-center gap-3 mb-6">
                       <ShieldAlert className="h-5 w-5 text-red-500" />
                       <CardTitle className="text-sm font-black uppercase tracking-tight">
@@ -1347,7 +1347,7 @@ export default function Same() {
                     </div>
                   </Card>
 
-                  <Card className="glass-card-premium border-white/40 dark:border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.12)] overflow-hidden rounded-[2rem] p-8">
+                  <Card className="glass-card-premium border-white/40 dark:border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.12)] overflow-hidden rounded-xl p-8">
                     <CardTitle className="text-sm font-black uppercase tracking-tight mb-6">
                       Controle de Privacidade
                     </CardTitle>
@@ -1439,7 +1439,7 @@ export default function Same() {
 
       {/* Modal de Exportação via API */}
       <Dialog open={isExportModalOpen} onOpenChange={setIsExportModalOpen}>
-        <DialogContent className="sm:max-w-[450px] rounded-[2rem] p-0 overflow-hidden border-none shadow-2xl">
+        <DialogContent className="sm:max-w-[450px] rounded-xl p-0 overflow-hidden border-none shadow-2xl">
           <form
             onSubmit={(e) => {
               e.preventDefault();

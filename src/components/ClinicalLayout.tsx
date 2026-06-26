@@ -289,7 +289,7 @@ export const ClinicalLayout = ({ children }: ClinicalLayoutProps) => {
         </header>
 
         {/* Page Content */}
-        <main className="flex-1 w-full overflow-y-auto relative p-6">
+        <main className="flex-1 w-full overflow-y-auto relative p-2">
           {children}
         </main>
       </div>

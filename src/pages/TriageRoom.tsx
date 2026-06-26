@@ -1207,7 +1207,7 @@ export default function TriageRoom() {
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -10 }}
-      className="flex flex-col flex-1 p-6 space-y-6"
+      className="flex flex-col flex-1 p-2 space-y-4"
     >
       <NurseWorkspaceHeader
         activeRoom={selectedTriageRoom}
@@ -1216,7 +1216,7 @@ export default function TriageRoom() {
         corenState={localStorage.getItem("upa_stamp_state") || ""}
       />
 
-      <div className="flex items-center gap-3 bg-white/70 dark:bg-slate-900/45 p-2 rounded-2xl border border-slate-200/40 dark:border-slate-800/40 shadow-sm self-start md:self-auto transition-colors duration-500">
+      <div className="flex items-center gap-3 bg-white/70 dark:bg-slate-900/45 p-2 rounded-xl border border-slate-200/40 dark:border-slate-800/40 shadow-sm self-start md:self-auto transition-colors duration-500">
         <div className="hidden lg:flex items-center gap-4 px-4 border-r border-slate-200 dark:border-slate-800/60 mr-2">
           <div className="flex gap-4">
             {["TRIAGEM 1", "TRIAGEM 2", "TRIAGEM 3"].map((roomName) => {
@@ -1278,11 +1278,11 @@ export default function TriageRoom() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-        <Card className="glass-card border-none shadow-xl hover:shadow-2xl hover:-translate-y-1 rounded-xl overflow-hidden transition-all duration-300 relative">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <Card className="glass-card-premium border-white/40 dark:border-white/10 shadow-xl hover:shadow-2xl hover:-translate-y-1 rounded-xl overflow-hidden transition-all duration-300 relative">
           <CardContent className="p-6">
             <div className="flex flex-col items-center text-center gap-3">
-              <div className="p-3 bg-red-500/10 dark:bg-red-500/20 rounded-2xl">
+              <div className="p-3 bg-red-500/10 dark:bg-red-500/20 rounded-xl">
                 <AlertCircle className="h-6 w-6 text-red-650 dark:text-red-400" />
               </div>
               <div>
@@ -1314,10 +1314,10 @@ export default function TriageRoom() {
           </CardContent>
         </Card>
 
-        <Card className="glass-card border-none shadow-xl hover:shadow-2xl hover:-translate-y-1 rounded-xl overflow-hidden transition-all duration-300 relative">
+        <Card className="glass-card-premium border-white/40 dark:border-white/10 shadow-xl hover:shadow-2xl hover:-translate-y-1 rounded-xl overflow-hidden transition-all duration-300 relative">
           <CardContent className="p-6">
             <div className="flex flex-col items-center text-center gap-3">
-              <div className="p-3 bg-amber-500/10 dark:bg-amber-500/20 rounded-2xl">
+              <div className="p-3 bg-amber-500/10 dark:bg-amber-500/20 rounded-xl">
                 <Clock className="h-6 w-6 text-amber-600 dark:text-amber-400" />
               </div>
               <div>
@@ -1349,10 +1349,10 @@ export default function TriageRoom() {
           </CardContent>
         </Card>
 
-        <Card className="glass-card border-none shadow-xl hover:shadow-2xl hover:-translate-y-1 rounded-xl overflow-hidden transition-all duration-300 relative">
+        <Card className="glass-card-premium border-white/40 dark:border-white/10 shadow-xl hover:shadow-2xl hover:-translate-y-1 rounded-xl overflow-hidden transition-all duration-300 relative">
           <CardContent className="p-6">
             <div className="flex flex-col items-center text-center gap-3">
-              <div className="p-3 bg-blue-500/10 dark:bg-blue-500/20 rounded-2xl">
+              <div className="p-3 bg-blue-500/10 dark:bg-blue-500/20 rounded-xl">
                 <Users className="h-6 w-6 text-[#006699] dark:text-sky-400" />
               </div>
               <div>
@@ -1380,9 +1380,9 @@ export default function TriageRoom() {
         </Card>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
         <div className="lg:col-span-3 space-y-6">
-          <Card className="glass-card border-none shadow-xl rounded-xl overflow-hidden transition-all duration-500">
+          <Card className="glass-card-premium border-white/40 dark:border-white/10 shadow-xl rounded-xl overflow-hidden transition-all duration-500">
             <CardHeader className="pb-4 border-b border-slate-200/40 dark:border-slate-800/40">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
@@ -1522,7 +1522,7 @@ export default function TriageRoom() {
           </Card>
 
           {inTriage.length > 0 && (
-            <Card className="glass-card border-none shadow-xl rounded-xl overflow-hidden transition-all duration-500">
+            <Card className="glass-card-premium border-white/40 dark:border-white/10 shadow-xl rounded-xl overflow-hidden transition-all duration-500">
               <CardHeader className="pb-4 border-b border-emerald-100/20 dark:border-emerald-800/20 bg-emerald-500/5 dark:bg-emerald-950/10">
                 <div className="flex items-center gap-2">
                   <Activity className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
@@ -1606,7 +1606,7 @@ export default function TriageRoom() {
         </div>
 
         <div className="space-y-6">
-          <Card className="glass-card border-none shadow-xl rounded-xl overflow-hidden transition-all duration-500">
+          <Card className="glass-card-premium border-white/40 dark:border-white/10 shadow-xl rounded-xl overflow-hidden transition-all duration-500">
             <CardHeader className="pb-3 border-b border-slate-200/40 dark:border-slate-800/40">
               <div className="flex items-center gap-2">
                 <Settings2 className="h-4 w-4 text-[#006699] dark:text-sky-400" />
@@ -1674,7 +1674,7 @@ export default function TriageRoom() {
             </CardContent>
           </Card>
 
-          <Card className="glass-card border-none shadow-xl rounded-xl overflow-hidden transition-all duration-500">
+          <Card className="glass-card-premium border-white/40 dark:border-white/10 shadow-xl rounded-xl overflow-hidden transition-all duration-500">
             <CardHeader className="pb-3 border-b border-slate-200/40 dark:border-slate-800/40">
               <div className="flex items-center gap-2">
                 <History className="h-4 w-4 text-[#006699] dark:text-sky-400" />
@@ -1754,7 +1754,7 @@ export default function TriageRoom() {
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.95, y: 20 }}
               >
-                <Card className="glass-card shadow-2xl border-primary/20 overflow-hidden h-[90vh] md:h-auto md:max-h-[85vh] flex flex-col">
+                <Card className="glass-card-premium shadow-2xl border-primary/20 overflow-hidden h-[90vh] md:h-auto md:max-h-[85vh] flex flex-col">
                   <CardHeader className="bg-[#006699]/5 p-8 md:p-10 pb-6 md:pb-8 shrink-0">
                     <div className="flex items-center justify-between">
                       <div className="space-y-1">
@@ -1834,7 +1834,7 @@ export default function TriageRoom() {
                             exit={{ opacity: 0, x: 20 }}
                             className="space-y-6"
                           >
-                            <div className="bg-muted/30 rounded-2xl p-6 border border-border/50 grid grid-cols-1 md:grid-cols-3 gap-x-6 gap-y-4">
+                            <div className="bg-muted/30 rounded-xl p-6 border border-border/50 grid grid-cols-1 md:grid-cols-3 gap-x-6 gap-y-4">
                               <div className="space-y-2 md:col-span-2">
                                 <Label className="text-xs font-black uppercase tracking-widest text-[#006699]">
                                   Nome Completo *
@@ -2006,11 +2006,11 @@ export default function TriageRoom() {
                             className="space-y-10"
                           >
                             {/* Header Card Premium */}
-                            <div className="bg-gradient-to-r from-[#006699] to-[#004466] rounded-2xl p-8 md:p-10 text-white shadow-2xl shadow-[#006699]/20 relative overflow-hidden group">
+                            <div className="bg-gradient-to-r from-[#006699] to-[#004466] rounded-xl p-8 md:p-10 text-white shadow-2xl shadow-[#006699]/20 relative overflow-hidden group">
                               <div className="absolute top-0 right-0 p-12 bg-white/5 rounded-full blur-3xl -translate-y-12 translate-x-12" />
-                              <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+                              <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
                                 <div className="flex items-center gap-5">
-                                  <div className="h-14 w-14 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center border border-white/20 shadow-inner">
+                                  <div className="h-14 w-14 rounded-xl bg-white/10 backdrop-blur-md flex items-center justify-center border border-white/20 shadow-inner">
                                     <Stethoscope className="h-7 w-7 text-white" />
                                   </div>
                                   <div>
@@ -2047,7 +2047,7 @@ export default function TriageRoom() {
                                   )}
                                 </div>
 
-                                <div className="flex items-center gap-4 bg-black/15 p-1 rounded-2xl backdrop-blur-md border border-white/10 shadow-inner">
+                                <div className="flex items-center gap-4 bg-black/15 p-1 rounded-xl backdrop-blur-md border border-white/10 shadow-inner">
                                   <div className="text-right px-4 py-1">
                                     <p className="text-[9px] font-black uppercase tracking-[0.2em] text-white/40 mb-0.5 whitespace-nowrap">
                                       Status da Sessão
@@ -2072,11 +2072,11 @@ export default function TriageRoom() {
                               </div>
                             </div>
 
-                            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                            <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
                               {/* Sinais Vitais + Peso lado a lado */}
                               <div className="lg:col-span-12">
                                 {/* Sinais Vitais */}
-                                <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-border shadow-soft relative overflow-hidden flex flex-col h-full">
+                                <div className="bg-white dark:bg-slate-900 rounded-xl p-6 border border-border shadow-soft relative overflow-hidden flex flex-col h-full">
                                   <div className="flex items-center justify-between mb-6 shrink-0">
                                     <div className="flex items-center gap-3">
                                       <div className="h-10 w-10 rounded-[1.25rem] bg-[#006699]/10 flex items-center justify-center text-[#006699]">
@@ -2307,7 +2307,7 @@ export default function TriageRoom() {
 
                               {/* Coluna Esquerda: Medicamentos, Glasgow */}
                               <div className="lg:col-span-4 space-y-4 flex flex-col">
-                                <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-border shadow-soft flex flex-col flex-1">
+                                <div className="bg-white dark:bg-slate-900 rounded-xl p-6 border border-border shadow-soft flex flex-col flex-1">
                                   <div className="flex items-center justify-between mb-4">
                                     <div className="flex items-center gap-3">
                                       <div className="h-10 w-10 rounded-[1.25rem] bg-sky-500/10 flex items-center justify-center text-sky-500">
@@ -2328,7 +2328,7 @@ export default function TriageRoom() {
                                     <div className="relative group grow flex flex-col">
                                       <Textarea
                                         placeholder="Descreva detalhadamente os sintomas que trouxeram o paciente..."
-                                        className="min-h-[140px] grow rounded-2xl border-none bg-muted/30 focus:bg-white focus:ring-4 focus:ring-sky-500/5 transition-all text-sm font-medium tracking-tight p-5 resize-none shadow-inner leading-relaxed"
+                                        className="min-h-[140px] grow rounded-xl border-none bg-muted/30 focus:bg-white focus:ring-4 focus:ring-sky-500/5 transition-all text-sm font-medium tracking-tight p-5 resize-none shadow-inner leading-relaxed"
                                         value={clinicalData.mainComplaint}
                                         onChange={(e) =>
                                           setClinicalData((prev) => ({
@@ -2345,7 +2345,7 @@ export default function TriageRoom() {
                                             <Button
                                               size="icon"
                                               variant="outline"
-                                              className="h-12 w-12 rounded-2xl bg-white shadow-xl shadow-sky-100 border-none text-sky-600 hover:bg-sky-600 hover:text-white transition-all"
+                                              className="h-12 w-12 rounded-xl bg-white shadow-xl shadow-sky-100 border-none text-sky-600 hover:bg-sky-600 hover:text-white transition-all"
                                             >
                                               <Plus className="h-5 w-5" />
                                             </Button>
@@ -2353,7 +2353,7 @@ export default function TriageRoom() {
                                           <DropdownMenuContent
                                             align="end"
                                             side="top"
-                                            className="w-[420px] p-2 rounded-2xl bg-white/95 backdrop-blur-xl border-border/50 shadow-2xl"
+                                            className="w-[420px] p-2 rounded-xl bg-white/95 backdrop-blur-xl border-border/50 shadow-2xl"
                                           >
                                             <div className="px-3 py-2.5 border-b border-border/50 mb-2">
                                               <h5 className="text-[10px] font-black uppercase tracking-[0.2em] text-[#006699]">
@@ -2440,13 +2440,13 @@ export default function TriageRoom() {
                                 {/* Card Glasgow Premium */}
                                 <div
                                   onClick={() => setOpenGlasgowCalc(true)}
-                                  className="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-border shadow-soft relative overflow-hidden group cursor-pointer hover:border-[#006699]/30 transition-all active:scale-[0.98] flex flex-col justify-center h-[300px]"
+                                  className="bg-white dark:bg-slate-900 rounded-xl p-6 border border-border shadow-soft relative overflow-hidden group cursor-pointer hover:border-[#006699]/30 transition-all active:scale-[0.98] flex flex-col justify-center h-[300px]"
                                 >
                                   <div className="absolute top-0 right-0 p-4 opacity-[0.03] group-hover:opacity-[0.05] transition-opacity">
                                     <Brain className="h-24 w-24 -mr-8 -mt-8" />
                                   </div>
                                   <div className="flex items-center gap-4 relative z-10">
-                                    <div className="h-14 w-14 rounded-2xl bg-[#006699]/10 flex items-center justify-center text-[#006699] shadow-inner group-hover:scale-110 transition-transform">
+                                    <div className="h-14 w-14 rounded-xl bg-[#006699]/10 flex items-center justify-center text-[#006699] shadow-inner group-hover:scale-110 transition-transform">
                                       <Brain className="h-7 w-7" />
                                     </div>
                                     <div className="flex flex-col grow">
@@ -2538,9 +2538,9 @@ export default function TriageRoom() {
                                 {/* Queixa e Perfil Clínico */}
                                 <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
                                   {/* Medicamentos */}
-                                  <div className="md:col-span-12 lg:col-span-7 bg-white dark:bg-slate-900 rounded-2xl p-6 border border-border shadow-soft flex flex-col justify-center gap-4 grow">
+                                  <div className="md:col-span-12 lg:col-span-7 bg-white dark:bg-slate-900 rounded-xl p-6 border border-border shadow-soft flex flex-col justify-center gap-4 grow">
                                     <div className="flex items-center gap-4">
-                                      <div className="h-12 w-12 rounded-2xl bg-sky-500/10 flex items-center justify-center text-sky-500 shrink-0">
+                                      <div className="h-12 w-12 rounded-xl bg-sky-500/10 flex items-center justify-center text-sky-500 shrink-0">
                                         <Pill className="h-6 w-6" />
                                       </div>
                                       <div className="grow min-w-0 space-y-2">
@@ -2658,7 +2658,7 @@ export default function TriageRoom() {
                                   </div>
 
                                   <div className="md:col-span-12 lg:col-span-5 flex flex-col gap-4">
-                                    <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-border shadow-soft grow flex flex-col justify-center">
+                                    <div className="bg-white dark:bg-slate-900 rounded-xl p-5 border border-border shadow-soft grow flex flex-col justify-center">
                                       <div className="space-y-3">
                                         <div className="flex items-center justify-between px-1">
                                           <div className="flex items-center gap-2.5">
@@ -2679,7 +2679,7 @@ export default function TriageRoom() {
                                             <DropdownMenuContent
                                               align="end"
                                               side="top"
-                                              className="w-[300px] p-2 rounded-2xl bg-white shadow-2xl border-border/50"
+                                              className="w-[300px] p-2 rounded-xl bg-white shadow-2xl border-border/50"
                                             >
                                               <div className="grid grid-cols-2 gap-1">
                                                 {HISTORY_OPTIONS.map((opt) => {
@@ -2760,7 +2760,7 @@ export default function TriageRoom() {
                                         </div>
                                         <Input
                                           placeholder="Ex: HAS, DM, Asma..."
-                                          className="h-[60px] rounded-2xl border-none bg-muted/40 font-bold px-5"
+                                          className="h-[60px] rounded-xl border-none bg-muted/40 font-bold px-5"
                                           value={clinicalData.comorbidities}
                                           onChange={(e) =>
                                             setClinicalData((prev) => ({
@@ -2773,7 +2773,7 @@ export default function TriageRoom() {
                                         />
                                       </div>
                                     </div>
-                                    <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-border shadow-soft grow flex flex-col justify-center">
+                                    <div className="bg-white dark:bg-slate-900 rounded-xl p-5 border border-border shadow-soft grow flex flex-col justify-center">
                                       <div className="space-y-3">
                                         <div className="flex items-center justify-between px-1">
                                           <div className="flex items-center gap-2.5">
@@ -2794,7 +2794,7 @@ export default function TriageRoom() {
                                             <DropdownMenuContent
                                               align="end"
                                               side="top"
-                                              className="w-[200px] p-2 rounded-2xl bg-white shadow-2xl border-border/50"
+                                              className="w-[200px] p-2 rounded-xl bg-white shadow-2xl border-border/50"
                                             >
                                               <div className="grid grid-cols-1 gap-1">
                                                 {ALLERGY_OPTIONS.map((opt) => {
@@ -2875,7 +2875,7 @@ export default function TriageRoom() {
                                         </div>
                                         <Input
                                           placeholder="Ex: Alimentos, Medicamentos..."
-                                          className="h-[60px] rounded-2xl border-none bg-red-500/5 font-bold px-5 focus-visible:bg-white text-red-700 placeholder:text-red-200"
+                                          className="h-[60px] rounded-xl border-none bg-red-500/5 font-bold px-5 focus-visible:bg-white text-red-700 placeholder:text-red-200"
                                           value={clinicalData.allergies}
                                           onChange={(e) =>
                                             setClinicalData((prev) => ({
@@ -2892,7 +2892,7 @@ export default function TriageRoom() {
                                 </div>
 
                                 {/* Classificação Final */}
-                                <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-border shadow-soft space-y-6">
+                                <div className="bg-white dark:bg-slate-900 rounded-xl p-6 border border-border shadow-soft space-y-6">
                                   <div className="flex items-center justify-between">
                                     <div className="flex items-center gap-3">
                                       <div className="h-10 w-10 rounded-[1.25rem] bg-rose-500/10 flex items-center justify-center text-rose-500">
@@ -2907,7 +2907,7 @@ export default function TriageRoom() {
                                       <motion.div
                                         initial={{ opacity: 0, x: 20 }}
                                         animate={{ opacity: 1, x: 0 }}
-                                        className="flex items-center gap-3 bg-muted/30 px-5 py-2 rounded-2xl border border-border/50 relative"
+                                        className="flex items-center gap-3 bg-muted/30 px-5 py-2 rounded-xl border border-border/50 relative"
                                       >
                                         {/* Efeito de brilho sincronizado se for urgente */}
                                         {lastCalculatedRisk !==
@@ -3122,7 +3122,7 @@ export default function TriageRoom() {
                                           )
                                         }
                                         className={cn(
-                                          "flex flex-col items-center gap-2 p-3 rounded-2xl border-2 transition-all group relative overflow-hidden",
+                                          "flex flex-col items-center gap-2 p-3 rounded-xl border-2 transition-all group relative overflow-hidden",
                                           selectedRisk === risk.id
                                             ? `${risk.color} border-transparent ${risk.iconColor || "text-white"} ${risk.shadow} scale-[1.04] z-10 shadow-2xl`
                                             : lastCalculatedRisk === risk.id
@@ -3213,7 +3213,7 @@ export default function TriageRoom() {
                                         Justificativa da Decisão Clínica
                                       </span>
                                     </div>
-                                    <div className="grid grid-cols-1 gap-6">
+                                    <div className="grid grid-cols-1 gap-4">
                                       <div className="col-span-full">
                                         <Textarea
                                           placeholder="Descreva fundamentadamente os critérios que definiram esta classificação..."
@@ -3236,7 +3236,7 @@ export default function TriageRoom() {
                             </div>
 
                             {/* Footer Actions Premium */}
-                            <div className="flex flex-col sm:flex-row items-center justify-between gap-6 pt-10 border-t border-border/40">
+                            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-10 border-t border-border/40">
                               <div className="flex gap-4">
                                 <Button
                                   variant="ghost"
@@ -3244,7 +3244,7 @@ export default function TriageRoom() {
                                     setIsIdentifying(true);
                                     setIsFillingClinical(false);
                                   }}
-                                  className="h-16 px-8 rounded-2xl font-black text-xs uppercase tracking-widest bg-muted/30 hover:bg-muted text-muted-foreground transition-all group"
+                                  className="h-16 px-8 rounded-xl font-black text-xs uppercase tracking-widest bg-muted/30 hover:bg-muted text-muted-foreground transition-all group"
                                 >
                                   <ArrowLeft className="h-4 w-4 mr-3 group-hover:-translate-x-1 transition-transform" />
                                   Dados do Paciente
@@ -3258,7 +3258,7 @@ export default function TriageRoom() {
                                     setShowFlowcharts(false);
                                     setSelectedPatient(null);
                                   }}
-                                  className="h-16 px-8 rounded-2xl font-black text-xs uppercase tracking-widest text-muted-foreground hover:text-red-500 hover:bg-red-50/50 transition-all flex-1 sm:flex-none"
+                                  className="h-16 px-8 rounded-xl font-black text-xs uppercase tracking-widest text-muted-foreground hover:text-red-500 hover:bg-red-50/50 transition-all flex-1 sm:flex-none"
                                 >
                                   Descartar
                                 </Button>
@@ -3278,7 +3278,7 @@ export default function TriageRoom() {
                                     }
                                     completeTriage(selectedRisk);
                                   }}
-                                  className="h-16 px-12 rounded-2xl font-black text-xs uppercase tracking-[0.2em] bg-[#006699] hover:bg-[#005580] text-white shadow-2xl transition-all hover:scale-[1.02] active:scale-95 flex-1 sm:flex-none shadow-blue-200"
+                                  className="h-16 px-12 rounded-xl font-black text-xs uppercase tracking-[0.2em] bg-[#006699] hover:bg-[#005580] text-white shadow-2xl transition-all hover:scale-[1.02] active:scale-95 flex-1 sm:flex-none shadow-blue-200"
                                 >
                                   <CheckCircle2 className="h-5 w-5 mr-3" />
                                   Finalizar Atendimento
@@ -3316,7 +3316,7 @@ export default function TriageRoom() {
 
           <form onSubmit={handleNewPatientSubmit} className="space-y-6 p-8">
             {/* DADOS PESSOAIS */}
-            <Card className="glass-card border-0 shadow-xl rounded-[2rem] overflow-hidden">
+            <Card className="glass-card-premium border-0 shadow-xl rounded-xl overflow-hidden">
               <CardHeader className="bg-primary/5 border-b border-primary/10 p-8">
                 <CardTitle className="text-xl mission-control-title flex items-center gap-3">
                   <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center border border-primary/20">
@@ -3328,7 +3328,7 @@ export default function TriageRoom() {
                   REGISTRO OBRIGAT\xD3RIO PARA TRIAGEM
                 </CardDescription>
               </CardHeader>
-              <CardContent className="p-8 grid grid-cols-1 md:grid-cols-3 gap-6">
+              <CardContent className="p-8 grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="space-y-2 md:col-span-2">
                   <Label className="text-xs font-black uppercase tracking-widest text-muted-foreground">
                     Nome Completo *
@@ -3445,7 +3445,7 @@ export default function TriageRoom() {
             </Card>
 
             {/* ENDERE\xC7O */}
-            <Card className="glass-card border-0 shadow-xl rounded-[2rem] overflow-hidden">
+            <Card className="glass-card-premium border-0 shadow-xl rounded-xl overflow-hidden">
               <CardHeader className="bg-muted/30 border-b border-border p-8">
                 <CardTitle className="text-xl mission-control-title flex items-center gap-3">
                   <div className="h-10 w-10 rounded-xl bg-muted flex items-center justify-center border border-border">
@@ -3454,7 +3454,7 @@ export default function TriageRoom() {
                   LOCALIZA\xC7\xC3O E CONTATO
                 </CardTitle>
               </CardHeader>
-              <CardContent className="p-8 grid grid-cols-1 md:grid-cols-4 gap-6">
+              <CardContent className="p-8 grid grid-cols-1 md:grid-cols-4 gap-4">
                 <div className="space-y-2">
                   <Label className="text-xs font-black uppercase tracking-widest text-muted-foreground">
                     CEP
@@ -3579,7 +3579,7 @@ export default function TriageRoom() {
 
       {/* Glasgow Calculator Dialog */}
       <Dialog open={openGlasgowCalc} onOpenChange={setOpenGlasgowCalc}>
-        <DialogContent className="max-w-md p-0 overflow-hidden rounded-2xl border-none shadow-2xl [&>button]:hidden">
+        <DialogContent className="max-w-md p-0 overflow-hidden rounded-xl border-none shadow-2xl [&>button]:hidden">
           <DialogHeader className="bg-[#006699] p-6 text-white relative">
             <div className="absolute top-0 right-0 p-8 opacity-10 pointer-events-none">
               <Brain className="h-24 w-24 rotate-12" />
@@ -3622,10 +3622,10 @@ export default function TriageRoom() {
                     setGlasgowValues((prev) => ({ ...prev, eye: parseInt(v) }))
                   }
                 >
-                  <SelectTrigger className="h-14 rounded-2xl border-2 border-[#006699]/10 bg-white shadow-sm font-bold text-sm focus:ring-[#006699]/10">
+                  <SelectTrigger className="h-14 rounded-xl border-2 border-[#006699]/10 bg-white shadow-sm font-bold text-sm focus:ring-[#006699]/10">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent className="rounded-2xl border-[#006699]/10 shadow-xl p-2">
+                  <SelectContent className="rounded-xl border-[#006699]/10 shadow-xl p-2">
                     {GLASGOW_EYE.map((item) => (
                       <SelectItem
                         key={item.value}
@@ -3652,10 +3652,10 @@ export default function TriageRoom() {
                     }))
                   }
                 >
-                  <SelectTrigger className="h-14 rounded-2xl border-2 border-[#006699]/10 bg-white shadow-sm font-bold text-sm focus:ring-[#006699]/10">
+                  <SelectTrigger className="h-14 rounded-xl border-2 border-[#006699]/10 bg-white shadow-sm font-bold text-sm focus:ring-[#006699]/10">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent className="rounded-2xl border-[#006699]/10 shadow-xl p-2">
+                  <SelectContent className="rounded-xl border-[#006699]/10 shadow-xl p-2">
                     {GLASGOW_VERBAL.map((item) => (
                       <SelectItem
                         key={item.value}
@@ -3682,10 +3682,10 @@ export default function TriageRoom() {
                     }))
                   }
                 >
-                  <SelectTrigger className="h-14 rounded-2xl border-2 border-[#006699]/10 bg-white shadow-sm font-bold text-sm focus:ring-[#006699]/10">
+                  <SelectTrigger className="h-14 rounded-xl border-2 border-[#006699]/10 bg-white shadow-sm font-bold text-sm focus:ring-[#006699]/10">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent className="rounded-2xl border-[#006699]/10 shadow-xl p-2">
+                  <SelectContent className="rounded-xl border-[#006699]/10 shadow-xl p-2">
                     {GLASGOW_MOTOR.map((item) => (
                       <SelectItem
                         key={item.value}
@@ -3731,7 +3731,7 @@ export default function TriageRoom() {
                           ? "#f59e0b"
                           : "#10b981",
                 }}
-                className="h-14 px-6 rounded-2xl font-black text-xs uppercase tracking-widest border-none shadow-xl text-white"
+                className="h-14 px-6 rounded-xl font-black text-xs uppercase tracking-widest border-none shadow-xl text-white"
               >
                 {glasgowValues.eye +
                   glasgowValues.verbal +
@@ -3782,7 +3782,7 @@ export default function TriageRoom() {
         open={openMedicationSelector}
         onOpenChange={setOpenMedicationSelector}
       >
-        <DialogContent className="max-w-3xl p-0 overflow-hidden rounded-2xl border-none shadow-3xl bg-slate-50 dark:bg-slate-950 max-h-[90vh] flex flex-col [&>button]:hidden">
+        <DialogContent className="max-w-3xl p-0 overflow-hidden rounded-xl border-none shadow-3xl bg-slate-50 dark:bg-slate-950 max-h-[90vh] flex flex-col [&>button]:hidden">
           <div className="bg-[#006699] p-6 text-white relative shrink-0">
             <div className="absolute top-0 right-0 p-8 opacity-10 pointer-events-none">
               <Pill className="h-32 w-32 rotate-12" />
@@ -3998,7 +3998,7 @@ export default function TriageRoom() {
               </div>
 
               <Button
-                className="h-16 flex-1 sm:flex-none sm:w-80 rounded-2xl bg-[#006699] hover:bg-[#005580] text-white font-black uppercase tracking-[0.2em] text-lg shadow-xl shadow-[#006699]/30 transition-all active:scale-[0.98] group flex items-center justify-center p-0 overflow-hidden"
+                className="h-16 flex-1 sm:flex-none sm:w-80 rounded-xl bg-[#006699] hover:bg-[#005580] text-white font-black uppercase tracking-[0.2em] text-lg shadow-xl shadow-[#006699]/30 transition-all active:scale-[0.98] group flex items-center justify-center p-0 overflow-hidden"
                 onClick={() => {
                   setOpenMedicationSelector(false);
                   toast.success("Medicamentos atualizados");
@@ -4016,7 +4016,7 @@ export default function TriageRoom() {
       </Dialog>
       {/* Call Control Dialog */}
       <Dialog open={showCallControl} onOpenChange={setShowCallControl}>
-        <DialogContent className="max-w-md p-0 overflow-hidden rounded-[2rem] border-none shadow-2xl [&>button]:hidden">
+        <DialogContent className="max-w-md p-0 overflow-hidden rounded-xl border-none shadow-2xl [&>button]:hidden">
           <DialogHeader
             className={cn(
               "p-6 text-white transition-colors duration-500",
@@ -4136,7 +4136,7 @@ export default function TriageRoom() {
                   }
                 }}
                 className={cn(
-                  "h-16 rounded-2xl text-white font-black uppercase tracking-widest text-sm shadow-xl gap-3 transition-all duration-300",
+                  "h-16 rounded-xl text-white font-black uppercase tracking-widest text-sm shadow-xl gap-3 transition-all duration-300",
                   callingTicket?.risk === "emergency"
                     ? "bg-red-600 hover:bg-red-700 shadow-red-600/20"
                     : callingTicket?.risk === "very-urgent"
@@ -4153,7 +4153,7 @@ export default function TriageRoom() {
               </Button>
 
               <div
-                className="flex items-center justify-between p-4 rounded-2xl bg-muted/50 border border-border cursor-pointer hover:bg-muted/70 transition-colors"
+                className="flex items-center justify-between p-4 rounded-xl bg-muted/50 border border-border cursor-pointer hover:bg-muted/70 transition-colors"
                 onClick={() => setIsAudioEnabled(!isAudioEnabled)}
               >
                 <div className="flex items-center gap-3 text-left">
@@ -4309,7 +4309,7 @@ export default function TriageRoom() {
       />
       {/* Exams Modal Dialog */}
       <Dialog open={isExamsModalOpen} onOpenChange={setIsExamsModalOpen}>
-        <DialogContent className="max-w-2xl bg-white dark:bg-slate-900 rounded-2xl border-0 shadow-2xl p-6">
+        <DialogContent className="max-w-2xl bg-white dark:bg-slate-900 rounded-xl border-0 shadow-2xl p-6">
           <DialogHeader>
             <DialogTitle className="text-xl font-black uppercase tracking-tight flex items-center gap-2">
               <FlaskConical className="w-5 h-5 text-blue-600" /> Solicitar
