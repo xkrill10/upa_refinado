@@ -110,7 +110,7 @@ export function SmartMedicationSelector({
                 {Object.entries(grouped).map(([category, meds]) => (
                   <div key={category} className="mb-4 last:mb-0">
                     <div className="sticky top-0 bg-white/95 dark:bg-slate-950/95 backdrop-blur-sm z-10 px-3 py-1.5 mb-1 flex items-center gap-2">
-                      <div className="h-2 w-2 rounded-full bg-emerald-500" />
+                      <div className="h-1 w-1 rounded-full bg-emerald-500" />
                       <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">
                         {category}
                       </h4>

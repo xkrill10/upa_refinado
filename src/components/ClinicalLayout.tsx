@@ -254,7 +254,7 @@ export const ClinicalLayout = ({ children }: ClinicalLayoutProps) => {
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col min-w-0 h-full overflow-hidden main-content-bg">
         {/* Simplified Header matching the dark blue theme */}
-        <header className="h-20 flex items-center justify-between px-8 sticky top-0 z-20 header-premium-glass">
+        <header className="h-20 flex items-center justify-between px-2 sticky top-0 z-20 header-premium-glass">
           <div className="flex items-center gap-4">
             <div className="flex flex-col">
               <span className="text-sm font-black tracking-[0.15em] text-foreground uppercase mission-control-title leading-tight">

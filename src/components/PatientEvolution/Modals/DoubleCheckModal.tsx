@@ -44,8 +44,8 @@ export function DoubleCheckModal({
   const [pin, setPin] = useState("");
 
   const handleAuthenticate = () => {
-    if (!selectedNurse) {
-      toast.error("Selecione o profissional que está realizando a conferência.");
+    if (!selectedNurse.trim()) {
+      toast.error("Digite o COREN ou Usuário do profissional.");
       return;
     }
     if (pin.length < 4) {
@@ -55,12 +55,9 @@ export function DoubleCheckModal({
     
     // In a real app, verify the PIN against the database
     // Here we just accept anything >= 4 chars for the mock
-    const nurse = MOCK_NURSES.find((n) => n.id === selectedNurse);
-    if (nurse) {
-      onSuccess(nurse.name);
-      setPin("");
-      setSelectedNurse("");
-    }
+    onSuccess(`COREN: ${selectedNurse}`);
+    setPin("");
+    setSelectedNurse("");
   };
 
   return (
@@ -90,20 +87,15 @@ export function DoubleCheckModal({
           <div className="grid gap-2">
             <Label htmlFor="nurse" className="flex items-center gap-2">
               <UserCheck className="h-4 w-4 text-cyan-500" />
-              Enfermeiro Conferente (Colega)
+              COREN / Usuário do Conferente
             </Label>
-            <Select value={selectedNurse} onValueChange={setSelectedNurse}>
-              <SelectTrigger id="nurse">
-                <SelectValue placeholder="Selecione o profissional" />
-              </SelectTrigger>
-              <SelectContent>
-                {MOCK_NURSES.map((nurse) => (
-                  <SelectItem key={nurse.id} value={nurse.id}>
-                    {nurse.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <Input
+              id="nurse"
+              placeholder="Ex: 123456"
+              value={selectedNurse}
+              onChange={(e) => setSelectedNurse(e.target.value)}
+              autoComplete="off"
+            />
           </div>
 
           <div className="grid gap-2">

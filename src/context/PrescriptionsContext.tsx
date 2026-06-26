@@ -17,6 +17,10 @@ export interface AprazamentoHour {
     hr?: string;
     temp?: string;
     glycemia?: string;
+    spo2?: string;
+    fr?: string;
+    pain?: string;
+    consciousness?: string;
   };
   justification?: string;
   doubleCheckedBy?: string;
@@ -30,6 +34,15 @@ export interface ExecutionRecord {
   justification?: string;
   doubleCheckedBy?: string;
   doubleCheckedAt?: string;
+  vitalSigns?: {
+    bp?: string;
+    hr?: string;
+    temp?: string;
+    spo2?: string;
+    fr?: string;
+    pain?: string;
+    consciousness?: string;
+  };
 }
 
 export interface PrescriptionMedication {
@@ -45,6 +58,7 @@ export interface PrescriptionMedication {
   scheduleType?: "continuous" | "single";
   executions?: Record<string, ExecutionRecord>;
   isHighVigilance?: boolean;
+  isDoubleCheckRequired?: boolean;
   category?: "medication" | "diet" | "therapy" | "nursing";
 }
 
@@ -80,6 +94,7 @@ interface PrescriptionsContextType {
     data: ExecutionRecord,
   ) => void;
   addCareItem: (orderId: string, item: PrescriptionMedication) => void;
+  removeCareItem: (orderId: string, medId: string) => void;
 }
 
 const PrescriptionsContext = createContext<
@@ -246,6 +261,18 @@ export function PrescriptionsProvider({ children }: { children: ReactNode }) {
     );
   };
 
+  const removeCareItem = (orderId: string, medId: string) => {
+    setOrders((prev) =>
+      prev.map((order) => {
+        if (order.id !== orderId) return order;
+        return {
+          ...order,
+          medications: order.medications.filter((med) => med.id !== medId),
+        };
+      }),
+    );
+  };
+
   const updateMedicationExecution = (
     orderId: string,
     medId: string,
@@ -281,6 +308,7 @@ export function PrescriptionsProvider({ children }: { children: ReactNode }) {
         updateMedicationHours,
         updateMedicationExecution,
         addCareItem,
+        removeCareItem,
       }}
     >
       {children}

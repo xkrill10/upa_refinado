@@ -1370,11 +1370,6 @@ export default function EvolucaoEnfermagem() {
                 icon: <History className="h-3.5 w-3.5" />,
               },
               {
-                id: "vitals",
-                label: "Sinais Vitais",
-                icon: <Activity className="h-3.5 w-3.5" />,
-              },
-              {
                 id: "evolutions",
                 label: "Anotações / Evoluções",
                 icon: <MessageSquare className="h-3.5 w-3.5" />,
@@ -6163,7 +6158,6 @@ export default function EvolucaoEnfermagem() {
 
         {activeTab === "prescriptions" ? (
           <div className="space-y-6">
-            {patient && <VitalsChart patient={patient} />}
             <TherapeuticPlan patientId={id || ""} />
           </div>
         ) : filteredEvolutions.length === 0 &&

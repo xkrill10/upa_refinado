@@ -2,11 +2,12 @@ import React, { useState, useEffect, useRef, useLayoutEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ShieldAlert, Clock, CheckCircle2, XCircle, ChevronLeft, ChevronRight, Calendar as CalendarIcon, Pill, Utensils, Activity, Stethoscope, Ban } from "lucide-react";
+import { ShieldAlert, Clock, CheckCircle2, XCircle, ChevronLeft, ChevronRight, Calendar as CalendarIcon, Pill, Utensils, Activity, Stethoscope, Ban, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { usePrescriptions, PrescriptionMedication, AprazamentoHour, PrescriptionStatus } from "@/context/PrescriptionsContext";
 import { DoubleCheckModal } from "./Modals/DoubleCheckModal";
 import { AddCareItemModal } from "./Modals/AddCareItemModal";
+import { VitalSignsModal } from "./Modals/VitalSignsModal";
 import { toast } from "sonner";
 import { format, addDays, subDays, isToday, differenceInDays, startOfDay, isBefore, isSameDay } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -56,8 +57,8 @@ interface TherapeuticPlanProps {
 }
 
 export function TherapeuticPlan({ patientId }: TherapeuticPlanProps) {
-  const { orders, updateMedicationHours, updateMedicationExecution, addCareItem } = usePrescriptions();
-  const { addEvolution } = usePatients();
+  const { orders, updateMedicationHours, updateMedicationExecution, addCareItem, removeCareItem } = usePrescriptions();
+  const { addEvolution, updatePatient } = usePatients();
   const scrollRef = useRef<HTMLDivElement>(null);
   const headerRef = useRef<HTMLTableSectionElement>(null);
   const isUserScrolling = useRef(false);
@@ -70,7 +71,9 @@ export function TherapeuticPlan({ patientId }: TherapeuticPlanProps) {
   const [confirmModalData, setConfirmModalData] = useState<{med: PrescriptionMedication, hour: any} | null>(null);
   const [justificationModal, setJustificationModal] = useState<{med: PrescriptionMedication, hour: any, action: 'delayed' | 'refused'} | null>(null);
   const [justificationText, setJustificationText] = useState("");
+  const [itemToRemove, setItemToRemove] = useState<PrescriptionMedication | null>(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [vitalSignsModal, setVitalSignsModal] = useState<{med: PrescriptionMedication, hour: any} | null>(null);
 
   const currentHourNum = new Date().getHours();
   const currentHourStr = currentHourNum.toString().padStart(2, "0") + ":00";
@@ -215,7 +218,9 @@ export function TherapeuticPlan({ patientId }: TherapeuticPlanProps) {
     }
 
     if (action === 'checked') {
-      if (med.isHighVigilance) {
+      if (med.medication.toLowerCase().includes("sinais vitais")) {
+        setVitalSignsModal({ med, hour });
+      } else if (med.isDoubleCheckRequired || med.isHighVigilance) {
         setSelectedMed({ med, hour });
         setIsDoubleCheckOpen(true);
       } else {
@@ -237,13 +242,83 @@ export function TherapeuticPlan({ patientId }: TherapeuticPlanProps) {
     }
   };
 
+  const getMEWS = (data: any) => {
+    let score = 0;
+    const hr = parseInt(data.hr) || 0;
+    if (hr > 0) {
+      if (hr <= 40 || hr >= 130) score += 3;
+      else if (hr >= 111 || hr <= 50) score += 2;
+      else if (hr >= 101) score += 1;
+    }
+
+    const sys = parseInt(data.bp.split('/')[0]) || 0;
+    if (sys > 0) {
+      if (sys <= 70) score += 3;
+      else if (sys <= 80 || sys >= 200) score += 2;
+      else if (sys <= 100) score += 1;
+    }
+
+    const temp = parseFloat(data.temp) || 0;
+    if (temp > 0) {
+      if (temp < 35) score += 2;
+      else if (temp >= 38.5) score += 2;
+      else if (temp >= 38.1) score += 1;
+    }
+
+    const fr = parseInt(data.fr) || 0;
+    if (fr > 0) {
+      if (fr <= 8 || fr >= 30) score += 3;
+      else if (fr >= 21) score += 2;
+      else if (fr >= 15) score += 1;
+    }
+
+    return score;
+  };
+
+  const getRiskFromMEWS = (score: number) => {
+    if (score >= 5) return "emergency";
+    if (score >= 4) return "very-urgent";
+    if (score >= 3) return "urgent";
+    if (score >= 1) return "less-urgent";
+    return "not-urgent";
+  };
+
+  const handleVitalSignsSuccess = (data: any) => {
+    if (vitalSignsModal) {
+      const mews = getMEWS(data);
+      const risk = getRiskFromMEWS(mews);
+
+      // Update patient vital signs in global context
+      updatePatient(patientId, {
+        fc: data.hr,
+        pa: data.bp,
+        spo2: data.spo2,
+        temperature: data.temp,
+        fr: data.fr,
+        risk: risk as any,
+      });
+
+      // Add to patient evolutions
+      addEvolution(patientId, {
+        type: "Sinais Vitais",
+        professional: localStorage.getItem("upa_stamp_name") || "Profissional Assistente",
+        description: `REGISTRO DE SINAIS VITAIS (LINHA DO TEMPO):\n- Pressão Arterial (PA): ${data.bp || '--'} mmHg\n- Frequência Cardíaca (FC): ${data.hr || '--'} bpm\n- Saturação de O2 (SpO2): ${data.spo2 || '--'}%\n- Temperatura Corporal: ${data.temp || '--'} °C\n- Frequência Respiratória (FR): ${data.fr || '--'} irpm\n-----------------------------------------\nEscore MEWS calculado: ${mews} pontos\nRisco atualizado para: ${risk.toUpperCase()}`,
+      });
+
+      // Continue with normal execution flow
+      executeAction(vitalSignsModal.med, vitalSignsModal.hour, 'checked', "Enf. Principal", undefined, undefined, data);
+      setVitalSignsModal(null);
+    }
+  };
+
   const executeAction = (
     med: PrescriptionMedication, 
     hour: any, 
     action: 'checked' | 'delayed' | 'refused' | 'suspended',
     nurseName: string, 
     doubleCheckedBy?: string,
-    justification?: string
+    justification?: string,
+    vitalSigns?: any
   ) => {
     const executionData: any = {
       status: action,
@@ -251,7 +326,8 @@ export function TherapeuticPlan({ patientId }: TherapeuticPlanProps) {
       nurseName,
       doubleCheckedBy,
       doubleCheckedAt: doubleCheckedBy ? new Date().toISOString() : undefined,
-      justification
+      justification,
+      vitalSigns
     };
 
     updateMedicationExecution(activeOrder.id, med.id, hour.executionKey, executionData);
@@ -295,6 +371,14 @@ export function TherapeuticPlan({ patientId }: TherapeuticPlanProps) {
     }
   };
 
+  const handleRemoveItem = () => {
+    if (itemToRemove && activeOrder) {
+      removeCareItem(activeOrder.id, itemToRemove.id);
+      toast.success("Item removido com sucesso.");
+      setItemToRemove(null);
+    }
+  };
+
   const groupedMeds = {
     medication: activeOrder.medications.filter(m => !m.category || m.category === 'medication'),
     diet: activeOrder.medications.filter(m => m.category === 'diet'),
@@ -316,7 +400,7 @@ export function TherapeuticPlan({ patientId }: TherapeuticPlanProps) {
             "border-b border-white/20 dark:border-white/5 hover:bg-white/20 dark:hover:bg-slate-800/40 transition-colors",
             med.isHighVigilance && "bg-red-500/5 hover:bg-red-500/10"
           )}>
-            <td className="px-4 py-3 sticky left-0 z-10 bg-white/40 dark:bg-slate-900/40 backdrop-blur-xl border-r border-b border-white/30 dark:border-white/10 w-[250px] shadow-[2px_0_10px_rgba(0,0,0,0.02)]">
+            <td className="px-4 py-3 sticky left-0 z-10 bg-white/40 dark:bg-slate-900/40 backdrop-blur-xl border-r border-b border-white/30 dark:border-white/10 w-[250px] shadow-[2px_0_10px_rgba(0,0,0,0.02)] group">
               <div className="flex flex-col gap-1 w-[230px]">
                 <div className="flex items-center gap-2">
                   <span className={cn(
@@ -335,6 +419,12 @@ export function TherapeuticPlan({ patientId }: TherapeuticPlanProps) {
                       </TooltipContent>
                     </Tooltip>
                   )}
+                  <button
+                    onClick={() => setItemToRemove(med)}
+                    className="ml-auto opacity-0 group-hover:opacity-100 transition-opacity text-slate-400 hover:text-red-500"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </button>
                 </div>
                 <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[10px] font-bold uppercase text-muted-foreground">
                   {[med.dosage, med.route, med.frequency]
@@ -710,6 +800,15 @@ export function TherapeuticPlan({ patientId }: TherapeuticPlanProps) {
         />
       )}
 
+      {vitalSignsModal && (
+        <VitalSignsModal
+          isOpen={!!vitalSignsModal}
+          onClose={() => setVitalSignsModal(null)}
+          onSave={handleVitalSignsSuccess}
+          timeStr={vitalSignsModal.hour.hour}
+        />
+      )}
+
       {/* Simple Confirmation Modal */}
       <AlertDialog open={!!confirmModalData} onOpenChange={(open) => !open && setConfirmModalData(null)}>
         <AlertDialogContent className="glass-card-premium border-white/40 dark:border-white/10 sm:max-w-md rounded-[2rem]">
@@ -792,6 +891,23 @@ export function TherapeuticPlan({ patientId }: TherapeuticPlanProps) {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <AlertDialog open={!!itemToRemove} onOpenChange={(open) => !open && setItemToRemove(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Tem certeza que deseja remover este item?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Você está removendo o cuidado <strong>{itemToRemove?.medication}</strong> do plano terapêutico atual. Esta ação não poderá ser desfeita.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={handleRemoveItem} className="bg-red-500 hover:bg-red-600 text-white">
+              Sim, Remover Cuidado
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       <AddCareItemModal 
         patientId={patientId}

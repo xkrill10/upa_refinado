@@ -193,6 +193,7 @@ export default function Beds() {
     bloodPressure: "",
     saturation: "",
     temperature: "",
+    respiratoryRate: "",
   });
 
   /* ─── Satellite Pharmacy Flow State ─── */
@@ -668,6 +669,7 @@ export default function Beds() {
                                 bloodPressure: "",
                                 saturation: "",
                                 temperature: "",
+                                respiratoryRate: "",
                               });
                             }}
                           >
@@ -709,7 +711,7 @@ export default function Beds() {
                       </div>
 
                       <div
-                        className="grid grid-cols-4 gap-2 cursor-pointer group/vitals"
+                        className="grid grid-cols-5 gap-2 cursor-pointer group/vitals"
                         onClick={(e) => {
                           e.stopPropagation();
                           setEditingVitalsPatient(patient);
@@ -719,6 +721,7 @@ export default function Beds() {
                             bloodPressure: patient.pa || "",
                             saturation: patient.spo2 || "",
                             temperature: patient.temperature || "",
+                            respiratoryRate: patient.fr || "",
                           });
                         }}
                       >
@@ -756,6 +759,15 @@ export default function Beds() {
                           </span>
                           <span className="text-[7px] font-black uppercase text-slate-500 dark:text-slate-400 mt-0.5">
                             TEMP
+                          </span>
+                        </div>
+                        <div className="flex flex-col items-center justify-center p-2 rounded-xl bg-white/40 dark:bg-slate-900/40 border border-white/50 dark:border-white/5 shadow-sm group-hover/vitals:bg-white/60 dark:group-hover/vitals:bg-slate-800/50 transition-colors">
+                          <Timer className="h-3.5 w-3.5 text-sky-500 mb-1 drop-shadow-[0_0_5px_rgba(14,165,233,0.5)]" />
+                          <span className="text-[11px] font-black text-foreground leading-none">
+                            {patient.fr || "16"}
+                          </span>
+                          <span className="text-[7px] font-black uppercase text-slate-500 dark:text-slate-400 mt-0.5">
+                            FR
                           </span>
                         </div>
                       </div>
@@ -844,7 +856,7 @@ export default function Beds() {
   );
 
   const getParameterRisk = (
-    type: "hr" | "bp" | "sat" | "temp",
+    type: "hr" | "bp" | "sat" | "temp" | "fr",
     value: string,
   ) => {
     if (!value) return null;
@@ -902,6 +914,17 @@ export default function Beds() {
         return "not-urgent";
       return "less-urgent";
     }
+
+    if (type === "fr") {
+      const fr = parseInt(value);
+      if (isNaN(fr)) return null;
+      if (fr > 30 || fr < 10) return "emergency";
+      if (fr >= 25 && fr <= 30) return "very-urgent";
+      if (fr >= 21 && fr <= 24) return "urgent";
+      if (fr >= 12 && fr <= 20) return "not-urgent";
+      return "less-urgent";
+    }
+
     return null;
   };
 
@@ -2399,26 +2422,84 @@ export default function Beds() {
         open={!!editingVitalsPatient}
         onOpenChange={(open) => !open && setEditingVitalsPatient(null)}
       >
-        <DialogContent className="sm:max-w-[420px] rounded-xl p-0 overflow-hidden border border-slate-200/40 dark:border-slate-800/40 bg-white dark:bg-slate-950 shadow-2xl">
-          {editingVitalsPatient && (
-            <div>
-              <div className="p-8 border-b border-slate-200/40 dark:border-slate-800/40 flex items-center gap-4 bg-slate-50/30 dark:bg-slate-950/30">
-                <div className="h-12 w-12 rounded-xl bg-red-500/10 flex items-center justify-center text-red-500">
-                  <Activity className="h-6 w-6" />
+        <DialogContent className="sm:max-w-[420px] rounded-xl p-0 overflow-y-auto custom-scrollbar max-h-[90vh] border border-slate-200/40 dark:border-slate-800/40 bg-white dark:bg-slate-950 shadow-2xl">
+          {(() => {
+            if (!editingVitalsPatient) return null;
+
+            const parsePtBrDate = (str: string) => {
+              if (!str) return 0;
+              try {
+                if (str.includes('/')) {
+                  const [datePart, timePart] = str.split(', ');
+                  if (datePart && timePart) {
+                    const [day, month, year] = datePart.split('/');
+                    const [hour, minute, second] = timePart.split(':');
+                    return new Date(Number(year), Number(month) - 1, Number(day), Number(hour), Number(minute), Number(second) || 0).getTime();
+                  }
+                }
+                return new Date(str).getTime();
+              } catch (e) {
+                return 0;
+              }
+            };
+
+            const formatTime = (str: string) => {
+               try {
+                 if (str.includes('/')) {
+                    const timePart = str.split(', ')[1];
+                    return timePart ? timePart.substring(0, 5) : ""; 
+                 }
+                 return new Date(str).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+               } catch (e) { return "" }
+            };
+
+            const lastVitalsUpdate = editingVitalsPatient.evolutions
+              ?.filter((e) => e.type === "Sinais Vitais")
+              .sort((a, b) => parsePtBrDate(b.timestamp) - parsePtBrDate(a.timestamp))?.[0];
+
+            const isRecent =
+              lastVitalsUpdate &&
+              (new Date().getTime() - parsePtBrDate(lastVitalsUpdate.timestamp)) / (1000 * 60 * 60) < 6;
+
+            return (
+              <div>
+                <div className="p-8 border-b border-slate-200/40 dark:border-slate-800/40 flex items-center gap-4 bg-slate-50/30 dark:bg-slate-950/30">
+                  <div className="h-12 w-12 rounded-xl bg-red-500/10 flex items-center justify-center text-red-500">
+                    <Activity className="h-6 w-6" />
+                  </div>
+                  <div>
+                    <DialogTitle className="text-xl font-black uppercase tracking-tight text-foreground">
+                      Atualizar Sinais
+                    </DialogTitle>
+                    <DialogDescription className="text-[10px] font-bold uppercase tracking-widest opacity-60">
+                      {editingVitalsPatient.name.toUpperCase() ===
+                      editingVitalsPatient.name
+                        ? formatWords(editingVitalsPatient.name)
+                        : editingVitalsPatient.name}{" "}
+                      • Ticket: {editingVitalsPatient.ticket}
+                    </DialogDescription>
+                  </div>
                 </div>
-                <div>
-                  <DialogTitle className="text-xl font-black uppercase tracking-tight text-foreground">
-                    Atualizar Sinais
-                  </DialogTitle>
-                  <DialogDescription className="text-[10px] font-bold uppercase tracking-widest opacity-60">
-                    {editingVitalsPatient.name.toUpperCase() ===
-                    editingVitalsPatient.name
-                      ? formatWords(editingVitalsPatient.name)
-                      : editingVitalsPatient.name}{" "}
-                    • Ticket: {editingVitalsPatient.ticket}
-                  </DialogDescription>
-                </div>
-              </div>
+
+                {isRecent && (
+                  <div className="px-8 pt-6 pb-0">
+                    <div className="p-3.5 rounded-xl bg-sky-500/10 border border-sky-500/20 flex gap-3">
+                      <Info className="h-5 w-5 text-sky-600 dark:text-sky-400 mt-0.5 shrink-0" />
+                      <div>
+                        <p className="text-[11px] font-black uppercase text-sky-700 dark:text-sky-400">
+                          Monitoramento Automático Ativo
+                        </p>
+                        <p className="text-[10px] font-bold text-muted-foreground mt-0.5 leading-tight">
+                          Os sinais foram atualizados pelo Plano Terapêutico às{" "}
+                          <span className="text-sky-600 dark:text-sky-400 font-black">
+                            {formatTime(lastVitalsUpdate.timestamp)}
+                          </span>
+                          . Uma alteração manual agora irá sobrepor o sistema automático.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
 
               <div className="p-8 space-y-6">
                 <div className="grid grid-cols-2 gap-4">
@@ -2438,19 +2519,23 @@ export default function Beds() {
                       <input
                         type="text"
                         placeholder="Ex: 88"
+                        disabled={!!isRecent}
                         className={cn(
                           "w-full h-12 border rounded-xl pl-10 pr-4 text-sm font-black text-foreground placeholder:text-muted-foreground/50 focus:ring-2 transition-all outline-none",
                           getStylesForRisk(
                             getParameterRisk("hr", vitalsForm.heartRate),
                           ).borderColor,
+                          isRecent && "opacity-50 cursor-not-allowed bg-slate-50 dark:bg-slate-900",
                         )}
                         value={vitalsForm.heartRate}
-                        onChange={(e) =>
+                        onChange={(e) => {
+                          let val = e.target.value.replace(/\D/g, "").slice(0, 3);
+                          if (parseInt(val) > 300) val = "300";
                           setVitalsForm({
                             ...vitalsForm,
-                            heartRate: e.target.value,
-                          })
-                        }
+                            heartRate: val,
+                          });
+                        }}
                       />
                     </div>
                   </div>
@@ -2470,11 +2555,13 @@ export default function Beds() {
                       <input
                         type="text"
                         placeholder="Ex: 120/80"
+                        disabled={!!isRecent}
                         className={cn(
                           "w-full h-12 border rounded-xl pl-10 pr-4 text-sm font-black text-foreground placeholder:text-muted-foreground/50 focus:ring-2 transition-all outline-none",
                           getStylesForRisk(
                             getParameterRisk("bp", vitalsForm.bloodPressure),
                           ).borderColor,
+                          isRecent && "opacity-50 cursor-not-allowed bg-slate-50 dark:bg-slate-900",
                         )}
                         value={vitalsForm.bloodPressure}
                         onChange={(e) => {
@@ -2489,8 +2576,8 @@ export default function Beds() {
                             return;
                           }
 
-                          // Remove tudo que não for número
-                          let v = val.replace(/\D/g, "");
+                          // Remove tudo que não for número e limita a 6 digitos (ex: 300/200)
+                          let v = val.replace(/\D/g, "").slice(0, 6);
 
                           // Aplica a máscara dinâmica
                           if (v.length === 3) {
@@ -2498,9 +2585,7 @@ export default function Beds() {
                           } else if (v.length === 4) {
                             v = v.replace(/(\d{3})(\d{1})/, "$1/$2"); // 1208 -> 120/8
                           } else if (v.length >= 5) {
-                            v = v
-                              .slice(0, 6)
-                              .replace(/(\d{3})(\d{2,3})/, "$1/$2"); // 12080 -> 120/80
+                            v = v.replace(/(\d{3})(\d{2,3})/, "$1/$2"); // 12080 -> 120/80
                           }
 
                           // Se o usuário digitou a barra manualmente no final, a gente respeita
@@ -2529,19 +2614,23 @@ export default function Beds() {
                       <input
                         type="text"
                         placeholder="Ex: 98"
+                        disabled={!!isRecent}
                         className={cn(
                           "w-full h-12 border rounded-xl pl-10 pr-4 text-sm font-black text-foreground placeholder:text-muted-foreground/50 focus:ring-2 transition-all outline-none",
                           getStylesForRisk(
                             getParameterRisk("sat", vitalsForm.saturation),
                           ).borderColor,
+                          isRecent && "opacity-50 cursor-not-allowed bg-slate-50 dark:bg-slate-900",
                         )}
                         value={vitalsForm.saturation}
-                        onChange={(e) =>
+                        onChange={(e) => {
+                          let val = e.target.value.replace(/\D/g, "").slice(0, 3);
+                          if (parseInt(val) > 100) val = "100";
                           setVitalsForm({
                             ...vitalsForm,
-                            saturation: e.target.value,
-                          })
-                        }
+                            saturation: val,
+                          });
+                        }}
                       />
                     </div>
                   </div>
@@ -2561,19 +2650,70 @@ export default function Beds() {
                       <input
                         type="text"
                         placeholder="Ex: 36.5"
+                        disabled={!!isRecent}
                         className={cn(
                           "w-full h-12 border rounded-xl pl-10 pr-4 text-sm font-black text-foreground placeholder:text-muted-foreground/50 focus:ring-2 transition-all outline-none",
                           getStylesForRisk(
                             getParameterRisk("temp", vitalsForm.temperature),
                           ).borderColor,
+                          isRecent && "opacity-50 cursor-not-allowed bg-slate-50 dark:bg-slate-900",
                         )}
                         value={vitalsForm.temperature}
-                        onChange={(e) =>
+                        onChange={(e) => {
+                          let val = e.target.value.replace(/[^0-9.,]/g, "").replace(",", ".");
+                          // Prevent multiple dots
+                          const dots = val.match(/\./g);
+                          if (dots && dots.length > 1) {
+                            val = val.slice(0, val.lastIndexOf("."));
+                          }
+                          // Limit digits (max 2 before dot, 1 after dot)
+                          if (val.includes(".")) {
+                            const parts = val.split(".");
+                            val = parts[0].slice(0, 2) + "." + parts[1].slice(0, 1);
+                          } else {
+                            val = val.slice(0, 2);
+                          }
                           setVitalsForm({
                             ...vitalsForm,
-                            temperature: e.target.value,
-                          })
-                        }
+                            temperature: val,
+                          });
+                        }}
+                      />
+                    </div>
+                  </div>
+                  <div className="space-y-2 col-span-2">
+                    <label className="text-[10px] font-black uppercase tracking-widest text-[#006699] dark:text-sky-450 ml-1">
+                      Freq. Respiratória
+                    </label>
+                    <div className="relative">
+                      <Timer
+                        className={cn(
+                          "absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 transition-colors",
+                          getStylesForRisk(
+                            getParameterRisk("fr", vitalsForm.respiratoryRate),
+                          ).iconColor,
+                        )}
+                      />
+                      <input
+                        type="text"
+                        placeholder="Ex: 16 irpm"
+                        disabled={!!isRecent}
+                        className={cn(
+                          "w-full h-12 border rounded-xl pl-10 pr-4 text-sm font-black text-foreground placeholder:text-muted-foreground/50 focus:ring-2 transition-all outline-none",
+                          getStylesForRisk(
+                            getParameterRisk("fr", vitalsForm.respiratoryRate),
+                          ).borderColor,
+                          isRecent && "opacity-50 cursor-not-allowed bg-slate-50 dark:bg-slate-900",
+                        )}
+                        value={vitalsForm.respiratoryRate}
+                        onChange={(e) => {
+                          let val = e.target.value.replace(/\D/g, "").slice(0, 3);
+                          if (parseInt(val) > 100) val = "100";
+                          setVitalsForm({
+                            ...vitalsForm,
+                            respiratoryRate: val,
+                          });
+                        }}
                       />
                     </div>
                   </div>
@@ -2635,12 +2775,15 @@ export default function Beds() {
                         onClick={() => {
                           setLocalRisk(r.id);
                         }}
+                        disabled={!!isRecent}
                         className={cn(
-                          "flex-1 h-8 rounded-lg text-[8px] font-black uppercase transition-all hover:scale-105 flex items-center justify-center px-0.5 leading-none text-center",
+                          "flex-1 h-8 rounded-lg text-[8px] font-black uppercase transition-all flex items-center justify-center px-0.5 leading-none text-center",
                           r.color,
+                          !isRecent && "hover:scale-105",
                           localRisk === r.id
                             ? "ring-2 ring-offset-2 ring-slate-400 scale-105 shadow-lg"
                             : "opacity-45",
+                          isRecent && "opacity-20 cursor-not-allowed",
                         )}
                       >
                         {r.label}
@@ -2658,7 +2801,8 @@ export default function Beds() {
                     Cancelar
                   </Button>
                   <Button
-                    className="flex-1 h-12 rounded-xl font-black uppercase tracking-widest text-[10px] bg-[#006699] hover:bg-[#006699]/95 dark:bg-sky-500 dark:hover:bg-sky-400 text-white dark:text-slate-950"
+                    className="flex-1 h-12 rounded-xl font-black uppercase tracking-widest text-[10px] bg-[#006699] hover:bg-[#006699]/95 dark:bg-sky-500 dark:hover:bg-sky-400 text-white dark:text-slate-950 disabled:opacity-50 disabled:cursor-not-allowed"
+                    disabled={!!isRecent}
                     onClick={() => {
                       if (!editingVitalsPatient) return;
                       updatePatient(editingVitalsPatient.id, {
@@ -2667,6 +2811,7 @@ export default function Beds() {
                         pa: vitalsForm.bloodPressure,
                         spo2: vitalsForm.saturation,
                         temperature: vitalsForm.temperature,
+                        fr: vitalsForm.respiratoryRate,
                       });
                       toast.success("Dados Sincronizados!", {
                         description: `Risco e sinais de ${editingVitalsPatient.name} atualizados com sucesso.`,
@@ -2675,12 +2820,13 @@ export default function Beds() {
                       setLocalRisk(null);
                     }}
                   >
-                    Confirmar e Salvar
+                    {isRecent ? "Monitoramento Ativo" : "Confirmar e Salvar"}
                   </Button>
                 </div>
               </div>
             </div>
-          )}
+            );
+          })()}
         </DialogContent>
       </Dialog>
       <Dialog

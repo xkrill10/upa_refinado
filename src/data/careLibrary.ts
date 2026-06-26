@@ -5,6 +5,7 @@ export interface LibraryItem {
   route?: string;
   frequency?: string;
   isHighVigilance?: boolean;
+  isDoubleCheckRequired?: boolean;
 }
 
 export const CARE_LIBRARY: LibraryItem[] = [
@@ -22,7 +23,7 @@ export const CARE_LIBRARY: LibraryItem[] = [
   { name: "Plasil (Metoclopramida)", category: "medication", dosage: "10mg (2ml)", route: "EV", frequency: "8/8h" },
   { name: "Bromoprida", category: "medication", dosage: "10mg (2ml)", route: "EV", frequency: "8/8h" },
   { name: "Cetoprofeno", category: "medication", dosage: "100mg", route: "EV", frequency: "12/12h" },
-  { name: "Tramadol", category: "medication", dosage: "50mg", route: "EV", frequency: "8/8h", isHighVigilance: true },
+  { name: "Tramadol", category: "medication", dosage: "50mg", route: "EV", frequency: "8/8h", isHighVigilance: true, isDoubleCheckRequired: true },
   { name: "Dexametasona", category: "medication", dosage: "4mg (1ml)", route: "EV", frequency: "1x ao dia" },
   { name: "Hioscina (Buscopan)", category: "medication", dosage: "20mg (1ml)", route: "EV", frequency: "8/8h" },
   { name: "Captopril", category: "medication", dosage: "25mg", route: "Sublingual", frequency: "S/N (Pico Hipertensivo)" },
@@ -41,7 +42,7 @@ export const CARE_LIBRARY: LibraryItem[] = [
   { name: "Banho no Leito", category: "nursing", dosage: "Completo", route: "Leito", frequency: "1x ao dia" },
   { name: "Curativo", category: "nursing", dosage: "-", route: "-", frequency: "1x ao dia" },
   { name: "Glicemia Capilar", category: "nursing", dosage: "-", route: "Dedo", frequency: "6/6h" },
-  { name: "Sinais Vitais", category: "nursing", dosage: "Pressão, Pulso, Temp, Sat", route: "-", frequency: "4/4h" },
+  { name: "Monitoramento de Sinais Vitais", category: "nursing", dosage: "PA, FC, SpO2, Temp, FR", route: "-", frequency: "4/4h" },
 
   // THERAPIES
   { name: "Fisioterapia Motora", category: "therapy", dosage: "1 Sessão", route: "Leito", frequency: "1x ao dia" },

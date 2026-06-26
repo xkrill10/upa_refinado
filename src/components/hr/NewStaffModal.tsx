@@ -444,7 +444,7 @@ export function NewStaffModal({
             <Button
               type="submit"
               disabled={isSubmitting}
-              className="rounded-xl h-12 px-8 font-black uppercase tracking-widest text-[10px] bg-blue-600 hover:bg-blue-700 shadow-lg shadow-blue-500/30 flex-1"
+              className="rounded-xl h-12 px-2 font-black uppercase tracking-widest text-[10px] bg-blue-600 hover:bg-blue-700 shadow-lg shadow-blue-500/30 flex-1"
             >
               {isSubmitting ? "Cadastrando..." : "Confirmar Admissão"}
             </Button>

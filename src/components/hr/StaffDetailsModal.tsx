@@ -81,7 +81,7 @@ export function StaffDetailsModal({
           </div>
         </DialogHeader>
 
-        <div className="bg-muted/30 border-b border-border/50 flex px-8 pt-4 gap-6">
+        <div className="bg-muted/30 border-b border-border/50 flex px-2 pt-4 gap-6">
           <button
             onClick={() => setActiveTab("details")}
             className={cn(

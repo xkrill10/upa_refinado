@@ -6225,7 +6225,6 @@ export default function PatientEvolution() {
       <div className="space-y-6">
         {activeTab === "therapeutic" ? (
           <div className="space-y-6">
-            <VitalsChart patient={patient} />
             <TherapeuticPlan patientId={patient.id} />
           </div>
         ) : (

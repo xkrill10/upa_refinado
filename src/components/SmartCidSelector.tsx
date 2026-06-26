@@ -570,7 +570,7 @@ export function SmartCidSelector({
               Limpar
             </Button>
             <Button
-              className="h-10 px-8 rounded-xl font-black uppercase tracking-widest text-[10px] bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg shadow-primary/20"
+              className="h-10 px-2 rounded-xl font-black uppercase tracking-widest text-[10px] bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg shadow-primary/20"
               onClick={handleConfirm}
             >
               Confirmar
