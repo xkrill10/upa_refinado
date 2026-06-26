@@ -105,10 +105,10 @@ export const ClinicalLayout = ({ children }: ClinicalLayoutProps) => {
         path: "/painel-enfermagem",
       },
       {
-        id: "evolucoes",
+        id: "evolucao-enfermagem",
         icon: FileText,
         label: "Evoluções",
-        path: `/paciente/${currentPatientId}/evolucao/enfermagem`,
+        path: `/paciente/${currentPatientId}/perfil-enfermagem`,
       },
       {
         id: "internacao",

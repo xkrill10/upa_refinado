@@ -16,16 +16,16 @@ const SUSIntegration = React.lazy(() => import("./pages/SUSIntegration"));
 const Patients = React.lazy(() => import("./pages/Patients"));
 const CallPanel = React.lazy(() => import("./pages/CallPanel"));
 const PatientEvolution = React.lazy(() => import("./pages/PatientEvolution"));
-const EvolucaoMedica = React.lazy(() => import("./pages/PatientEvolution"));
-const EvolucaoEnfermagem = React.lazy(() => import("./pages/PatientEvolution"));
-const AnotacaoEnfermagem = React.lazy(() => import("./pages/PatientEvolution"));
-const EvolucaoFisioterapia = React.lazy(() => import("./pages/PatientEvolution"));
-const EvolucaoNutricao = React.lazy(() => import("./pages/PatientEvolution"));
-const EvolucaoPsicologia = React.lazy(() => import("./pages/PatientEvolution"));
-const EvolucaoServicoSocial = React.lazy(() => import("./pages/PatientEvolution"));
-const EvolucaoTerapiaOcupacional = React.lazy(() => import("./pages/PatientEvolution"));
-const EvolucaoFonoaudiologia = React.lazy(() => import("./pages/PatientEvolution"));
-const EvolucaoFarmaciaClinica = React.lazy(() => import("./pages/PatientEvolution"));
+const EvolucaoMedica = React.lazy(() => import("./pages/EvolucaoMedica"));
+const EvolucaoEnfermagem = React.lazy(() => import("./pages/EvolucaoEnfermagem"));
+const AnotacaoEnfermagem = React.lazy(() => import("./pages/AnotacaoEnfermagem"));
+const EvolucaoFisioterapia = React.lazy(() => import("./pages/EvolucaoFisioterapia"));
+const EvolucaoNutricao = React.lazy(() => import("./pages/EvolucaoNutricao"));
+const EvolucaoPsicologia = React.lazy(() => import("./pages/EvolucaoPsicologia"));
+const EvolucaoServicoSocial = React.lazy(() => import("./pages/EvolucaoServicoSocial"));
+const EvolucaoTerapiaOcupacional = React.lazy(() => import("./pages/EvolucaoTerapiaOcupacional"));
+const EvolucaoFonoaudiologia = React.lazy(() => import("./pages/EvolucaoFonoaudiologia"));
+const EvolucaoFarmaciaClinica = React.lazy(() => import("./pages/EvolucaoFarmaciaClinica"));
 const UserManagement = React.lazy(() => import("./pages/Admin/UserManagement"));
 const AuditLogs = React.lazy(() => import("./pages/Admin/AuditLogs"));
 const BackupAdmin = React.lazy(() => import("./pages/Admin/BackupAdmin"));
@@ -92,6 +92,10 @@ export const AppRoutes = () => {
       <Route
         path="/paciente/:id/evolucao/medica"
         element={<EvolucaoMedica />}
+      />
+      <Route
+        path="/paciente/:id/perfil-enfermagem"
+        element={<PatientEvolution />}
       />
       <Route
         path="/paciente/:id/evolucao/enfermagem"
