@@ -806,24 +806,60 @@ export default function Beds() {
                   )}
 
                   <div className="flex gap-2 pt-2 mt-auto">
-                    <Button
-                      variant="outline"
-                      className="flex-1 px-1 text-[9px] font-black uppercase tracking-widest h-10 rounded-xl bg-gradient-to-b from-white/60 to-white/30 dark:from-slate-800/60 dark:to-slate-900/60 border border-white/60 dark:border-white/10 hover:from-[#006699] hover:to-[#004d73] hover:text-white dark:hover:from-sky-500 dark:hover:to-sky-600 dark:hover:text-slate-950 transition-all shadow-sm text-foreground hover:shadow-lg"
-                      onClick={() => setSelectedBedId(bed.id)}
-                    >
-                      Gerenciar
-                    </Button>
-                    {bed.status === "occupied" && (
+                    {bed.status === "occupied" ? (
                       <Button
                         variant="default"
-                        className="flex-1 px-1 text-[9px] font-black uppercase tracking-widest h-10 rounded-xl shadow-lg transition-all"
+                        className="flex-1 px-1 text-[9px] font-black uppercase tracking-widest h-10 rounded-xl bg-[#006699] hover:bg-[#004d73] dark:bg-sky-600 dark:hover:bg-sky-700 text-white transition-all shadow-lg"
                         onClick={(e) => {
                           e.stopPropagation();
-                          setShowBedManagementModal(bed.id);
+                          if (patient) {
+                            if (role === 'medico') {
+                                navigate(`/paciente/${patient.id}/evolucao/medica`);
+                            } else {
+                                navigate(`/paciente/${patient.id}/perfil-enfermagem`);
+                            }
+                          }
                         }}
                       >
-                        <FileText className="h-3.5 w-3.5 mr-1" /> Ficha
+                        <Activity className="h-3.5 w-3.5 mr-1" /> Evoluções
                       </Button>
+                    ) : (
+                      <Button
+                        variant="outline"
+                        className="flex-1 px-1 text-[9px] font-black uppercase tracking-widest h-10 rounded-xl bg-gradient-to-b from-white/60 to-white/30 dark:from-slate-800/60 dark:to-slate-900/60 border border-white/60 dark:border-white/10 hover:from-[#006699] hover:to-[#004d73] hover:text-white dark:hover:from-sky-500 dark:hover:to-sky-600 dark:hover:text-slate-950 transition-all shadow-sm text-foreground hover:shadow-lg"
+                        onClick={(e) => {
+                           e.stopPropagation();
+                           setSelectedBedId(bed.id);
+                        }}
+                      >
+                        Gerenciar
+                      </Button>
+                    )}
+                    {bed.status === "occupied" && (
+                      <div className="flex gap-2 w-1/2 shrink-0">
+                        <Button
+                          variant="outline"
+                          className="flex-1 px-1 text-[9px] font-black uppercase tracking-widest h-10 rounded-xl shadow-lg transition-all"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setShowBedManagementModal(bed.id);
+                          }}
+                        >
+                          <FileText className="h-3.5 w-3.5 mr-1" /> Ficha
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          className="w-10 h-10 shrink-0 rounded-xl shadow-sm bg-gradient-to-b from-white/60 to-white/30 dark:from-slate-800/60 dark:to-slate-900/60 border border-white/60 dark:border-white/10 text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-all"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedBedId(bed.id);
+                          }}
+                          title="Gerenciar Leito"
+                        >
+                          <Settings2 className="h-4 w-4" />
+                        </Button>
+                      </div>
                     )}
                     {bed.status === "available" && role !== "medico" && (
                       <Button

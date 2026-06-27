@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { MedicalEvolutionForm } from "@/components/PatientEvolution/Forms/MedicalEvolutionForm";
 import { EvolutionFeed, MockEvolution } from "@/components/PatientEvolution/EvolutionFeed";
 import { useRole } from "@/context/RoleContext";
+import { PatientSwitcherSidebar } from "@/components/PatientSwitcherSidebar";
 
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { usePatients } from "@/hooks/use-patients";
@@ -1310,11 +1311,14 @@ export default function EvolucaoEnfermagem() {
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="space-y-8"
-    >
+    <div className="flex h-full w-full -m-2">
+      <PatientSwitcherSidebar />
+      <div className="flex-1 overflow-y-auto p-4 md:p-6 bg-slate-50/50 dark:bg-slate-900/50">
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="space-y-8 max-w-7xl mx-auto"
+        >
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex items-center gap-6">
           <Button
@@ -5941,6 +5945,8 @@ export default function EvolucaoEnfermagem() {
         </DialogContent>
       </Dialog>
 
-</motion.div>
+        </motion.div>
+      </div>
+    </div>
   );
 }
