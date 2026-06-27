@@ -160,6 +160,11 @@ import { ExamsModal } from "@/components/PatientEvolution/Modals/ExamsModal";
 import { AddCareItemModal } from "@/components/PatientEvolution/Modals/AddCareItemModal";
 import { TherapeuticPlan } from "@/components/PatientEvolution/TherapeuticPlan";
 import { VitalsChart } from "@/components/PatientEvolution/VitalsChart";
+import { HumptyDumptyModal } from "@/components/PatientEvolution/Modals/HumptyDumptyModal";
+import { BradenQModal } from "@/components/PatientEvolution/Modals/BradenQModal";
+import { FlaccModal } from "@/components/PatientEvolution/Modals/FlaccModal";
+import { WongBakerModal } from "@/components/PatientEvolution/Modals/WongBakerModal";
+import { GlasgowPediatricModal } from "@/components/PatientEvolution/Modals/GlasgowPediatricModal";
 
 export default function EvolucaoEnfermagem() {
   const { role } = useRole();
@@ -315,6 +320,21 @@ export default function EvolucaoEnfermagem() {
   // Estados para as calculadoras clínicas (Enfermagem)
   const [openMorseCalc, setOpenMorseCalc] = useState(false);
   const [selectedMorse, setSelectedMorse] = useState("");
+
+  const [openHumptyDumptyCalc, setOpenHumptyDumptyCalc] = useState(false);
+  const [selectedHumptyDumpty, setSelectedHumptyDumpty] = useState("");
+
+  const [openBradenQCalc, setOpenBradenQCalc] = useState(false);
+  const [selectedBradenQ, setSelectedBradenQ] = useState("");
+
+  const [openFlaccCalc, setOpenFlaccCalc] = useState(false);
+  const [selectedFlacc, setSelectedFlacc] = useState("");
+
+  const [openWongBakerCalc, setOpenWongBakerCalc] = useState(false);
+  const [selectedWongBaker, setSelectedWongBaker] = useState("");
+
+  const [openGlasgowPedCalc, setOpenGlasgowPedCalc] = useState(false);
+  const [selectedGlasgowPed, setSelectedGlasgowPed] = useState("");
 
   const [openBradenCalc, setOpenBradenCalc] = useState(false);
   const [selectedBraden, setSelectedBraden] = useState("");
@@ -5059,24 +5079,55 @@ export default function EvolucaoEnfermagem() {
                 {/* Ferramentas Clínicas Extras */}
                 <div className="mt-4 pt-4 mb-4 border-t border-slate-200 dark:border-slate-800">
                   <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2 block">
-                    Ferramentas Opcionais
+                    Ferramentas Opcionais {isChild ? "(Pediátricas)" : "(Adulto)"}
                   </span>
                   <div className="flex flex-wrap gap-2">
-                    <button type="button" onClick={() => setOpenBradenCalc(true)} className="px-3 py-1.5 text-[10px] font-semibold bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded shadow-sm text-orange-600 hover:bg-orange-50">
-                      Braden (LPP)
-                    </button>
-                    <button type="button" onClick={() => setOpenMorseCalc(true)} className="px-3 py-1.5 text-[10px] font-semibold bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded shadow-sm text-amber-600 hover:bg-amber-50">
-                      Morse (Queda)
-                    </button>
-                    <button type="button" onClick={() => setOpenEvaCalc(true)} className="px-3 py-1.5 text-[10px] font-semibold bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded shadow-sm text-red-600 hover:bg-red-50">
-                      Dor (EVA)
-                    </button>
-                    <button type="button" onClick={() => setOpenMewsCalc(true)} className="px-3 py-1.5 text-[10px] font-semibold bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded shadow-sm text-blue-600 hover:bg-blue-50">
-                      MEWS (Alerta)
-                    </button>
-                    <button type="button" onClick={() => setOpenNandaCalc(true)} className="px-3 py-1.5 text-[10px] font-semibold bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded shadow-sm text-indigo-600 hover:bg-indigo-50">
-                      NANDA/NIC
-                    </button>
+                    {!isChild ? (
+                      <>
+                        <button type="button" onClick={() => setOpenBradenCalc(true)} className="px-3 py-1.5 text-[10px] font-semibold bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded shadow-sm text-orange-600 hover:bg-orange-50">
+                          Braden (LPP)
+                        </button>
+                        <button type="button" onClick={() => setOpenMorseCalc(true)} className="px-3 py-1.5 text-[10px] font-semibold bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded shadow-sm text-amber-600 hover:bg-amber-50">
+                          Morse (Queda)
+                        </button>
+                        <button type="button" onClick={() => setOpenEvaCalc(true)} className="px-3 py-1.5 text-[10px] font-semibold bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded shadow-sm text-red-600 hover:bg-red-50">
+                          Dor (EVA)
+                        </button>
+                        <button type="button" onClick={() => setOpenMewsCalc(true)} className="px-3 py-1.5 text-[10px] font-semibold bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded shadow-sm text-blue-600 hover:bg-blue-50">
+                          MEWS (Alerta)
+                        </button>
+                        <button type="button" onClick={() => setOpenNandaCalc(true)} className="px-3 py-1.5 text-[10px] font-semibold bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded shadow-sm text-indigo-600 hover:bg-indigo-50">
+                          NANDA/NIC
+                        </button>
+                      </>
+                    ) : (
+                      <>
+                        <button type="button" onClick={() => setOpenPewsCalc(true)} className="px-3 py-1.5 text-[10px] font-semibold bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded shadow-sm text-teal-600 hover:bg-teal-50">
+                          PEWS (Alerta)
+                        </button>
+                        <button type="button" onClick={() => setOpenHumptyDumptyCalc(true)} className="px-3 py-1.5 text-[10px] font-semibold bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded shadow-sm text-violet-600 hover:bg-violet-50">
+                          Humpty-Dumpty
+                        </button>
+                        <button type="button" onClick={() => setOpenBradenQCalc(true)} className="px-3 py-1.5 text-[10px] font-semibold bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded shadow-sm text-orange-600 hover:bg-orange-50">
+                          Braden-Q (LPP)
+                        </button>
+                        <button type="button" onClick={() => setOpenFlaccCalc(true)} className="px-3 py-1.5 text-[10px] font-semibold bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded shadow-sm text-pink-600 hover:bg-pink-50">
+                          FLACC (Dor)
+                        </button>
+                        <button type="button" onClick={() => setOpenWongBakerCalc(true)} className="px-3 py-1.5 text-[10px] font-semibold bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded shadow-sm text-rose-600 hover:bg-rose-50">
+                          Wong-Baker
+                        </button>
+                        <button type="button" onClick={() => setOpenGlasgowPedCalc(true)} className="px-3 py-1.5 text-[10px] font-semibold bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded shadow-sm text-indigo-600 hover:bg-indigo-50">
+                          Glasgow Ped.
+                        </button>
+                        <button type="button" onClick={() => setOpenEvaCalc(true)} className="px-3 py-1.5 text-[10px] font-semibold bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded shadow-sm text-red-600 hover:bg-red-50">
+                          Dor (EVA)
+                        </button>
+                        <button type="button" onClick={() => setOpenNandaCalc(true)} className="px-3 py-1.5 text-[10px] font-semibold bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded shadow-sm text-indigo-600 hover:bg-indigo-50">
+                          NANDA/NIC
+                        </button>
+                      </>
+                    )}
                   </div>
                 </div>
                 {/* Carimbo Digital persistent configuration section */}
@@ -5597,11 +5648,54 @@ export default function EvolucaoEnfermagem() {
         }}
       />
       <NandaModal
+        isChild={isChild}
         isOpen={openNandaCalc}
         onClose={setOpenNandaCalc}
         onApply={(desc, sum) => {
           setDescription((p) => (p ? `${p}\n${desc}` : desc));
           setActiveNandaPlan(sum);
+        }}
+      />
+
+      {/* Pediatric Modals */}
+      <HumptyDumptyModal
+        isOpen={openHumptyDumptyCalc}
+        onClose={setOpenHumptyDumptyCalc}
+        onApply={(desc, sum) => {
+          setDescription((p) => (p ? `${p}\n${desc}` : desc));
+          setSelectedHumptyDumpty(sum);
+        }}
+      />
+      <BradenQModal
+        isOpen={openBradenQCalc}
+        onClose={setOpenBradenQCalc}
+        onApply={(desc, sum) => {
+          setDescription((p) => (p ? `${p}\n${desc}` : desc));
+          setSelectedBradenQ(sum);
+        }}
+      />
+      <FlaccModal
+        isOpen={openFlaccCalc}
+        onClose={setOpenFlaccCalc}
+        onApply={(desc, sum) => {
+          setDescription((p) => (p ? `${p}\n${desc}` : desc));
+          setSelectedFlacc(sum);
+        }}
+      />
+      <WongBakerModal
+        isOpen={openWongBakerCalc}
+        onClose={setOpenWongBakerCalc}
+        onApply={(desc, sum) => {
+          setDescription((p) => (p ? `${p}\n${desc}` : desc));
+          setSelectedWongBaker(sum);
+        }}
+      />
+      <GlasgowPediatricModal
+        isOpen={openGlasgowPedCalc}
+        onClose={setOpenGlasgowPedCalc}
+        onApply={(desc, sum) => {
+          setDescription((p) => (p ? `${p}\n${desc}` : desc));
+          setSelectedGlasgowPed(sum);
         }}
       />
 

@@ -9,7 +9,7 @@ export interface NandaDiagnosis {
 export const NANDA_DIAGNOSES: NandaDiagnosis[] = [
   {
     id: "dor_aguda",
-    title: "⚡ Dor Aguda",
+    title: "🩹 Dor Aguda",
     definition:
       "Relacionada a agentes lesivos (químicos, físicos ou biológicos) evidenciada por relato verbal, expressão facial ou comportamento protetor.",
     nocs: [
@@ -100,4 +100,87 @@ export const NANDA_DIAGNOSES: NandaDiagnosis[] = [
       "NIC: Cuidados com Feridas: Realizar curativos prescritos com técnica asséptica",
     ],
   },
+];
+
+export const NANDA_PEDIATRIC_DIAGNOSES: NandaDiagnosis[] = [
+  {
+    id: "ped_respiratorio",
+    title: "🫁 Padrão Respiratório Ineficaz (Pediátrico)",
+    definition:
+      "Relacionado a imaturidade pulmonar, infecção (bronquiolite/asma) ou fadiga muscular, evidenciado por tiragem subcostal, gemência, batimento de asa de nariz ou taquipneia.",
+    nocs: [
+      "Meta: Padrão respiratório estável com FR adequada para a idade",
+      "Meta: Ausência de tiragens, gemência ou cianose central",
+      "Meta: Saturação de O2 >= 94% em ar ambiente",
+    ],
+    nics: [
+      "NIC: Monitorar FR, esforço respiratório, coloração da pele e saturação",
+      "NIC: Realizar aspiração de vias aéreas e lavagem nasal se necessário",
+      "NIC: Manter cabeceira elevada (fowler/semi-fowler) e administrar O2 se prescrito",
+    ],
+  },
+  {
+    id: "ped_desidratacao",
+    title: "💧 Risco de Volume de Líquidos Deficiente",
+    definition:
+      "Relacionado a perdas ativas (vômitos/diarreia) e ingestão insuficiente (recusa alimentar/hídrica).",
+    nocs: [
+      "Meta: Hidratação adequada (mucosas úmidas, turgor elástico)",
+      "Meta: Débito urinário normal para a idade (fraldas pesadas)",
+      "Meta: Fontanela normotensa (se lactente)",
+    ],
+    nics: [
+      "NIC: Pesar fraldas para controle rigoroso de diurese (Balanço Hídrico)",
+      "NIC: Oferecer SRO (Soro de Rehidratação Oral) em pequenas montas e frequente",
+      "NIC: Iniciar e manter hidratação venosa contínua se prescrito",
+    ],
+  },
+  {
+    id: "ped_hipertermia",
+    title: "🌡️ Hipertermia",
+    definition:
+      "Relacionada a processo infeccioso/inflamatório, evidenciada por temperatura axilar aumentada, taquicardia, pele quente ao toque ou irritabilidade.",
+    nocs: [
+      "Meta: Temperatura axilar mantida em níveis normais (36,5 - 37,2°C)",
+      "Meta: Conforto restaurado sem agitação ou calafrios",
+      "Meta: Ausência de episódios de convulsão febril",
+    ],
+    nics: [
+      "NIC: Monitorar temperatura axilar a cada 1-2 horas rigorosamente",
+      "NIC: Administrar antitérmicos conforme prescrição médica e orientar os pais",
+      "NIC: Promover resfriamento mecânico (banho morno, retirar excesso de roupas)",
+    ],
+  },
+  {
+    id: "ped_ansiedade",
+    title: "🧸 Medo / Ansiedade Infantil",
+    definition:
+      "Relacionado à separação do ambiente familiar, procedimentos dolorosos ou pessoas estranhas, evidenciado por choro inconsolável, agitação ou agressividade.",
+    nocs: [
+      "Meta: Ansiedade reduzida: Criança permite aproximação e exame",
+      "Meta: Pais/responsáveis demonstram segurança no cuidado",
+      "Meta: Ausência de trauma psicológico relacionado à internação",
+    ],
+    nics: [
+      "NIC: Permitir e encorajar a presença do acompanhante em tempo integral",
+      "NIC: Utilizar técnicas de distração (brinquedos, telas) durante procedimentos",
+      "NIC: Explicar os procedimentos à criança de forma simples e lúdica antes de tocar",
+    ],
+  },
+  {
+    id: "ped_dor",
+    title: "🩹 Dor Aguda (Pediátrica)",
+    definition:
+      "Relacionada a processo inflamatório ou procedimentos invasivos, evidenciada por choro persistente, expressão facial contraída e agitação motora.",
+    nocs: [
+      "Meta: Escala de dor pediátrica (FLACC/Wong-Baker) <= 3",
+      "Meta: Sinais vitais normalizados após analgesia",
+      "Meta: Criança calma e capaz de dormir/brincar",
+    ],
+    nics: [
+      "NIC: Avaliar dor usando escalas pediátricas validadas (FLACC ou Wong-Baker)",
+      "NIC: Administrar analgésicos sob prescrição médica rigorosamente por peso",
+      "NIC: Promover medidas não farmacológicas (colo, sucção não nutritiva, ambiente calmo)",
+    ],
+  }
 ];

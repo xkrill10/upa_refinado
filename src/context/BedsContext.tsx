@@ -101,20 +101,15 @@ const MOCK_CLEANERS: Cleaner[] = [
 
 const generateBeds = (): Bed[] => {
   const occupiedPatientIds = [
-    "super-dummy-test",
-    "2",
-    "3",
-    "4",
-    "5",
-    "6",
-    "7",
-    "8",
-    "9",
-    "10",
-    "11",
-    "12",
-    "13",
-    "14",
+    "super-dummy-test", // e-2
+    "2",                // e-4
+    "3",                // o-of2
+    "4",                // o-om2
+    "baby-1",           // o-ped1
+    "baby-2",           // o-ped2
+    "12",               // o-iso2
+    "blue-1",
+    "blue-2",
   ];
   let nextPatientIdx = 0;
 
@@ -200,7 +195,7 @@ const generateBeds = (): Bed[] => {
     createBed("o-om5", "Maca Extra", "Observação", "Observação Masculina", "available"),
 
     // UPA - Pediatria
-    createBed("o-ped1", "Leito 1", "Observação", "Pediatria", "available"),
+    createBed("o-ped1", "Leito 1", "Observação", "Pediatria", "occupied"),
     createBed("o-ped2", "Leito 2", "Observação", "Pediatria", "occupied"),
     createBed("o-ped3", "Berço 1", "Observação", "Pediatria", "available"),
     { 

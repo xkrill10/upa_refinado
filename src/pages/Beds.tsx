@@ -333,7 +333,10 @@ export default function Beds() {
     }
 
     if (bed.id.startsWith("o-")) {
-      const position = Number(bed.id.replace("o-", "")) + 4;
+      const replaced = bed.id.replace("o-", "");
+      const position = isNaN(Number(replaced)) 
+        ? replaced.charCodeAt(0) + 4 
+        : Number(replaced) + 4;
       return patients[position % patients.length];
     }
 
@@ -676,12 +679,12 @@ export default function Beds() {
                             <AlertCircle
                               className={cn(
                                 "h-3 w-3 drop-shadow-[0_0_5px_currentColor]",
-                                patient.risk === "emergency"
+                                patient?.risk === "emergency"
                                   ? "text-red-500 animate-pulse-slow"
                                   : "text-emerald-500",
                               )}
                             />{" "}
-                            {patient.risk === "emergency"
+                            {patient?.risk === "emergency"
                               ? "Crítico"
                               : "Estável"}
                           </div>

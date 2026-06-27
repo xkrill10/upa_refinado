@@ -90,24 +90,33 @@ export function MentalModal({ isOpen, onClose, onApply }: MentalModalProps) {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[800px] rounded-xl glass-card-premium shadow-2xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="text-2xl mission-control-title flex items-center gap-2">
-            <Brain className="h-6 w-6 text-violet-500 animate-pulse" />
-            Avaliação de Saúde Mental e Triagem Psiquiátrica
-          </DialogTitle>
-          <DialogDescription className="font-bold uppercase text-[10px] tracking-widest text-muted-foreground">
-            Consolidação de Escalas Clínicas de Risco e Dependência Química
-          </DialogDescription>
-        </DialogHeader>
+      <DialogContent className="sm:max-w-[800px] rounded-xl glass-card-premium shadow-2xl max-h-[90vh] flex flex-col !p-0 overflow-hidden gap-0">
+        {/* Cabeçalho atua como área de arrasto (drag handle) */}
+        <div className="p-6 shrink-0 border-b border-border/50 bg-slate-50/30 dark:bg-slate-900/30 cursor-grab active:cursor-grabbing">
+          <DialogHeader>
+            <DialogTitle className="text-2xl mission-control-title flex items-center gap-2">
+              <Brain className="h-6 w-6 text-violet-500 animate-pulse" />
+              Avaliação de Saúde Mental e Triagem Psiquiátrica
+            </DialogTitle>
+            <DialogDescription className="font-bold uppercase text-[10px] tracking-widest text-muted-foreground">
+              Consolidação de Escalas Clínicas de Risco e Dependência Química
+            </DialogDescription>
+          </DialogHeader>
+        </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-6 py-4">
-          {/* Coluna Esquerda: Menu Vertical */}
-          <div className="md:col-span-4 space-y-3 border-r border-border/60 pr-4">
-            <Label className="text-xs font-black uppercase text-foreground/80 flex items-center gap-1.5 mb-2">
-              <span>Escalas Clínicas</span>
-            </Label>
-            <div className="space-y-2">
+        {/* Área de conteúdo isolada do evento de arrasto */}
+        <div 
+          className="flex-1 flex flex-col overflow-hidden"
+          onPointerDown={(e) => e.stopPropagation()}
+          style={{ touchAction: "pan-y" }}
+        >
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-6 p-6 h-full min-h-0">
+            {/* Coluna Esquerda: Menu Vertical */}
+            <div className="md:col-span-4 space-y-3 border-r border-border/60 pr-4 overflow-y-auto custom-scrollbar pb-10">
+              <Label className="text-xs font-black uppercase text-foreground/80 flex items-center gap-1.5 mb-2">
+                <span>Escalas Clínicas</span>
+              </Label>
+              <div className="space-y-2">
               {/* RASS */}
               <button
                 type="button"
@@ -426,7 +435,7 @@ export function MentalModal({ isOpen, onClose, onApply }: MentalModalProps) {
           </div>
 
           {/* Coluna Direita: Formulários */}
-          <div className="md:col-span-8 flex flex-col min-h-[400px]">
+          <div className="md:col-span-8 flex flex-col overflow-y-auto custom-scrollbar pr-4 pb-10">
             {/* RASS Tab */}
             {activeMentalTab === "rass" && (
               <div className="space-y-4 animate-in fade-in duration-200">
@@ -1898,6 +1907,7 @@ export function MentalModal({ isOpen, onClose, onApply }: MentalModalProps) {
               </div>
             )}
           </div>
+        </div>
         </div>
       </DialogContent>
     </Dialog>

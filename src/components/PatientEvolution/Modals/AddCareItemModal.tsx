@@ -73,10 +73,20 @@ export function AddCareItemModal({ patientId, isOpen, onClose, onAdd }: AddCareI
     setRequiresDoubleCheck(false);
   }, [category]);
 
-  // Library: shows items based on category and search text
+  const isChild = !!(patient && patient.age < 12);
+
+  // Library: shows items based on category and search text, sorted by pediatric relevance if isChild
   const filteredLibrary = CARE_LIBRARY.filter(
     item => item.category === category && item.name.toLowerCase().includes(medication.toLowerCase())
-  );
+  ).sort((a, b) => {
+    if (isChild) {
+      const aIsPed = a.name.includes("👶");
+      const bIsPed = b.name.includes("👶");
+      if (aIsPed && !bIsPed) return -1;
+      if (!aIsPed && bIsPed) return 1;
+    }
+    return a.name.localeCompare(b.name);
+  });
 
   // Auto-fill fields when a library item is selected
   useEffect(() => {

@@ -53,7 +53,6 @@ const DialogContent = React.forwardRef<
           style={{
             x: "-50%",
             y: "-50%",
-            touchAction: "none",
             transitionProperty: "none",
           }}
           className={cn(

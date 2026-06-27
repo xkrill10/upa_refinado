@@ -11,15 +11,18 @@ import { Button } from "@/components/ui/button";
 import { CheckCircle2, Activity } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
-import { NANDA_DIAGNOSES } from "@/data/nanda";
+import { NANDA_DIAGNOSES, NANDA_PEDIATRIC_DIAGNOSES } from "@/data/nanda";
 
 interface NandaModalProps {
+  isChild?: boolean;
   isOpen: boolean;
   onClose: (open: boolean) => void;
   onApply: (descText: string, activePlan: string) => void;
 }
 
-export function NandaModal({ isOpen, onClose, onApply }: NandaModalProps) {
+export function NandaModal({ isChild = false, isOpen, onClose, onApply }: NandaModalProps) {
+  const diagnosesList = isChild ? NANDA_PEDIATRIC_DIAGNOSES : NANDA_DIAGNOSES;
+  
   const [viewedNanda, setViewedNanda] = useState<string | null>(null);
   const [activePlans, setActivePlans] = useState<
     Record<string, { nocs: string[]; nics: string[] }>
@@ -72,7 +75,7 @@ export function NandaModal({ isOpen, onClose, onApply }: NandaModalProps) {
     for (const [diagId, plan] of Object.entries(activePlans)) {
       if (plan.nocs.length === 0 && plan.nics.length === 0) continue;
 
-      const matchedDiag = NANDA_DIAGNOSES.find((d) => d.id === diagId);
+      const matchedDiag = diagnosesList.find((d) => d.id === diagId);
       if (matchedDiag) {
         hasAny = true;
         summaryTitles.push(matchedDiag.title);
@@ -98,10 +101,10 @@ export function NandaModal({ isOpen, onClose, onApply }: NandaModalProps) {
 
     onApply(finalDesc, activePlanSummary);
     onClose(false);
-    toast.success("Plano NANDA-NOC-NIC inserido no prontuário!");
+    toast.success("Plano de Cuidados (SAE) adicionado à evolução.");
   };
 
-  const viewedDiag = NANDA_DIAGNOSES.find((d) => d.id === viewedNanda);
+  const viewedDiag = diagnosesList.find((d) => d.id === viewedNanda);
   const currentPlan = viewedNanda
     ? activePlans[viewedNanda] || { nocs: [], nics: [] }
     : null;
@@ -120,7 +123,6 @@ export function NandaModal({ isOpen, onClose, onApply }: NandaModalProps) {
         </DialogHeader>
 
         <div className="grid grid-cols-1 md:grid-cols-12 gap-6 py-4">
-          {/* Coluna 1: Diagnósticos NANDA (5 cols) */}
           <div className="md:col-span-5 space-y-3 border-r border-border/60 pr-4">
             <Label className="text-xs font-black uppercase text-foreground/80 flex items-center justify-between mb-2">
               <span>1. Diagnósticos (NANDA)</span>
@@ -133,21 +135,26 @@ export function NandaModal({ isOpen, onClose, onApply }: NandaModalProps) {
                 Ativos
               </span>
             </Label>
+            <div className="text-xs text-muted-foreground font-medium uppercase tracking-wider mb-3">
+              {isChild ? "Diagnósticos Pediátricos (NANDA)" : "Diagnósticos Sugeridos (NANDA)"}
+            </div>
             <div className="space-y-2 max-h-[380px] overflow-y-auto pr-1">
-              {NANDA_DIAGNOSES.map((diag) => {
+              {diagnosesList.map((diag) => {
                 const isViewed = viewedNanda === diag.id;
                 const plan = activePlans[diag.id];
                 const isActive =
                   plan && (plan.nocs.length > 0 || plan.nics.length > 0);
 
-                let btnClass = "bg-card border-border hover:bg-muted/40";
+                let btnClass = "bg-white dark:bg-slate-900 border-slate-200/60 dark:border-slate-800/60 hover:bg-slate-50 dark:hover:bg-slate-800/50 shadow-sm";
                 if (isViewed) {
-                  btnClass =
-                    "bg-primary/5 border-primary text-primary animate-pulse";
+                  btnClass = "bg-indigo-50/80 dark:bg-indigo-900/20 border-indigo-200 dark:border-indigo-800/50 ring-1 ring-indigo-500/20";
                 } else if (isActive) {
-                  btnClass =
-                    "bg-emerald-500/5 border-emerald-500/40 text-foreground hover:bg-emerald-500/10";
+                  btnClass = "bg-emerald-50 dark:bg-emerald-900/10 border-emerald-200 dark:border-emerald-800/50";
                 }
+
+                const firstSpace = diag.title.indexOf(' ');
+                const iconOrEmoji = firstSpace > -1 ? diag.title.substring(0, firstSpace) : "🩺";
+                const cleanTitle = firstSpace > -1 ? diag.title.substring(firstSpace + 1) : diag.title;
 
                 return (
                   <button
@@ -163,28 +170,40 @@ export function NandaModal({ isOpen, onClose, onApply }: NandaModalProps) {
                       }
                     }}
                     className={cn(
-                      "w-full p-3 rounded-xl border text-left transition-all relative",
+                      "w-full p-3 rounded-xl border text-left transition-all relative flex gap-3 items-start",
                       btnClass,
                     )}
                   >
-                    {isActive && !isViewed && (
-                      <CheckCircle2 className="absolute top-3 right-3 h-4 w-4 text-emerald-500" />
-                    )}
-                    <p
-                      className={cn(
-                        "font-bold text-xs pr-6",
-                        isViewed
-                          ? "text-primary"
-                          : isActive
-                            ? "text-emerald-600 dark:text-emerald-400"
-                            : "",
+                    <div className={cn(
+                      "flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center text-lg shadow-sm border",
+                      isViewed
+                        ? "bg-indigo-100 dark:bg-indigo-900/40 border-indigo-200 dark:border-indigo-800 text-indigo-700"
+                        : isActive
+                          ? "bg-emerald-100 dark:bg-emerald-900/40 border-emerald-200 dark:border-emerald-800 text-emerald-700"
+                          : "bg-slate-100 dark:bg-slate-800 border-black/5 dark:border-white/5 text-slate-700"
+                    )}>
+                      {iconOrEmoji}
+                    </div>
+                    <div className="flex-1 pr-4 pt-1">
+                      {isActive && !isViewed && (
+                        <CheckCircle2 className="absolute top-3 right-3 h-4 w-4 text-emerald-500" />
                       )}
-                    >
-                      {diag.title}
-                    </p>
-                    <p className="text-[10px] text-muted-foreground mt-1 line-clamp-2 leading-relaxed">
-                      {diag.definition}
-                    </p>
+                      <p
+                        className={cn(
+                          "font-bold text-[11px] uppercase tracking-wide",
+                          isViewed
+                            ? "text-indigo-700 dark:text-indigo-400"
+                            : isActive
+                              ? "text-emerald-700 dark:text-emerald-400"
+                              : "text-slate-700 dark:text-slate-300",
+                        )}
+                      >
+                        {cleanTitle}
+                      </p>
+                      <p className="text-[10px] text-muted-foreground mt-1 line-clamp-2 leading-relaxed">
+                        {diag.definition}
+                      </p>
+                    </div>
                   </button>
                 );
               })}

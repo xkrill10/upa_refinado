@@ -122,6 +122,11 @@ import { MewsModal } from "@/components/PatientEvolution/Modals/MewsModal";
 import { News2Modal } from "@/components/PatientEvolution/Modals/News2Modal";
 import { QsofaModal } from "@/components/PatientEvolution/Modals/QsofaModal";
 import { PewsModal } from "@/components/PatientEvolution/Modals/PewsModal";
+import { HumptyDumptyModal } from "@/components/PatientEvolution/Modals/HumptyDumptyModal";
+import { BradenQModal } from "@/components/PatientEvolution/Modals/BradenQModal";
+import { FlaccModal } from "@/components/PatientEvolution/Modals/FlaccModal";
+import { WongBakerModal } from "@/components/PatientEvolution/Modals/WongBakerModal";
+import { GlasgowPediatricModal } from "@/components/PatientEvolution/Modals/GlasgowPediatricModal";
 import { GlasgowModal } from "@/components/PatientEvolution/Modals/GlasgowModal";
 import { MentalModal } from "@/components/PatientEvolution/Modals/MentalModal";
 import { UrgencyModal } from "@/components/PatientEvolution/Modals/UrgencyModal";
@@ -291,6 +296,21 @@ export default function EvolucaoEnfermagem() {
 
   const [openPewsCalc, setOpenPewsCalc] = useState(false);
   const [selectedPews, setSelectedPews] = useState("");
+
+  const [openHumptyDumptyCalc, setOpenHumptyDumptyCalc] = useState(false);
+  const [selectedHumptyDumpty, setSelectedHumptyDumpty] = useState("");
+
+  const [openBradenQCalc, setOpenBradenQCalc] = useState(false);
+  const [selectedBradenQ, setSelectedBradenQ] = useState("");
+
+  const [openFlaccCalc, setOpenFlaccCalc] = useState(false);
+  const [selectedFlacc, setSelectedFlacc] = useState("");
+
+  const [openWongBakerCalc, setOpenWongBakerCalc] = useState(false);
+  const [selectedWongBaker, setSelectedWongBaker] = useState("");
+
+  const [openGlasgowPedCalc, setOpenGlasgowPedCalc] = useState(false);
+  const [selectedGlasgowPed, setSelectedGlasgowPed] = useState("");
 
   const [openGlasgowCalc, setOpenGlasgowCalc] = useState(false);
   const [selectedGlasgow, setSelectedGlasgow] = useState("");
@@ -5843,13 +5863,13 @@ export default function EvolucaoEnfermagem() {
 
                       {/* Pediatric Scales (isChild) */}
                       {isChild && (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
                           {/* Card PEWS */}
                           <button
                             type="button"
                             onClick={() => setOpenPewsCalc(true)}
                             className={cn(
-                              "flex flex-col items-start p-3 rounded-xl border text-left transition-all relative overflow-hidden group",
+                              "flex flex-col items-start p-2.5 rounded-xl border text-left transition-all relative overflow-hidden group",
                               selectedPews
                                 ? "bg-teal-500/5 border-teal-500/30 dark:bg-teal-500/10"
                                 : "bg-white/45 dark:bg-slate-900/45 border-white/60 dark:border-white/10 hover:border-teal-500/40 hover:bg-teal-500/5 backdrop-blur-sm shadow-sm",
@@ -5858,49 +5878,250 @@ export default function EvolucaoEnfermagem() {
                             <div className="flex items-center justify-between w-full mb-1.5">
                               <span
                                 className={cn(
-                                  "text-[11px] font-black uppercase tracking-wider transition-colors",
+                                  "text-[9px] font-black uppercase tracking-wider transition-colors",
                                   selectedPews
                                     ? "text-teal-600 dark:text-teal-400"
                                     : "text-foreground/80 group-hover:text-teal-600 dark:group-hover:text-teal-400",
                                 )}
                               >
-                                PEWS (Alerta Pediátrico)
+                                PEWS (Alerta)
                               </span>
                               <div
                                 className={cn(
-                                  "w-6 h-6 rounded flex items-center justify-center flex-shrink-0 transition-colors",
-                                  selectedPews
-                                    ? "bg-teal-500"
-                                    : "bg-teal-500/15",
+                                  "w-5 h-5 rounded flex items-center justify-center flex-shrink-0 transition-colors",
+                                  selectedPews ? "bg-teal-500" : "bg-teal-500/15",
                                 )}
                               >
                                 <Baby
-                                  className={cn(
-                                    "h-3.5 w-3.5",
-                                    selectedPews
-                                      ? "text-white"
-                                      : "text-teal-600",
-                                  )}
+                                  className={cn("h-3 w-3", selectedPews ? "text-white" : "text-teal-600")}
                                 />
                               </div>
                             </div>
                             {selectedPews ? (
-                              <Badge className="h-5 text-[10px] font-bold bg-teal-600 hover:bg-teal-700 border-none text-white px-2 rounded truncate max-w-full">
+                              <Badge className="h-4 text-[9px] font-bold bg-teal-600 hover:bg-teal-700 border-none text-white px-1.5 rounded truncate max-w-full">
                                 {selectedPews}
                               </Badge>
                             ) : (
-                              <span className="text-[10px] font-bold text-muted-foreground/60">
-                                Não Avaliado
-                              </span>
+                              <span className="text-[9px] font-bold text-muted-foreground/60">Não Avaliado</span>
                             )}
                           </button>
 
-                          {/* Card EVA */}
+                          {/* Card Humpty-Dumpty */}
+                          <button
+                            type="button"
+                            onClick={() => setOpenHumptyDumptyCalc(true)}
+                            className={cn(
+                              "flex flex-col items-start p-2.5 rounded-xl border text-left transition-all relative overflow-hidden group",
+                              selectedHumptyDumpty
+                                ? "bg-violet-500/5 border-violet-500/30 dark:bg-violet-500/10"
+                                : "bg-white/45 dark:bg-slate-900/45 border-white/60 dark:border-white/10 hover:border-violet-500/40 hover:bg-violet-500/5 backdrop-blur-sm shadow-sm",
+                            )}
+                          >
+                            <div className="flex items-center justify-between w-full mb-1.5">
+                              <span
+                                className={cn(
+                                  "text-[9px] font-black uppercase tracking-wider transition-colors",
+                                  selectedHumptyDumpty
+                                    ? "text-violet-600 dark:text-violet-400"
+                                    : "text-foreground/80 group-hover:text-violet-600 dark:group-hover:text-violet-400",
+                                )}
+                              >
+                                Humpty-Dumpty
+                              </span>
+                              <div
+                                className={cn(
+                                  "w-5 h-5 rounded flex items-center justify-center flex-shrink-0 transition-colors",
+                                  selectedHumptyDumpty ? "bg-violet-500" : "bg-violet-500/15",
+                                )}
+                              >
+                                <ShieldAlert
+                                  className={cn("h-3 w-3", selectedHumptyDumpty ? "text-white" : "text-violet-600")}
+                                />
+                              </div>
+                            </div>
+                            {selectedHumptyDumpty ? (
+                              <Badge className="h-4 text-[9px] font-bold bg-violet-500 hover:bg-violet-600 border-none text-white px-1.5 rounded truncate max-w-full">
+                                {selectedHumptyDumpty}
+                              </Badge>
+                            ) : (
+                              <span className="text-[9px] font-bold text-muted-foreground/60">Não Avaliado</span>
+                            )}
+                          </button>
+
+                          {/* Card Braden-Q */}
+                          <button
+                            type="button"
+                            onClick={() => setOpenBradenQCalc(true)}
+                            className={cn(
+                              "flex flex-col items-start p-2.5 rounded-xl border text-left transition-all relative overflow-hidden group",
+                              selectedBradenQ
+                                ? "bg-orange-500/5 border-orange-500/30 dark:bg-orange-500/10"
+                                : "bg-white/45 dark:bg-slate-900/45 border-white/60 dark:border-white/10 hover:border-orange-500/40 hover:bg-orange-500/5 backdrop-blur-sm shadow-sm",
+                            )}
+                          >
+                            <div className="flex items-center justify-between w-full mb-1.5">
+                              <span
+                                className={cn(
+                                  "text-[9px] font-black uppercase tracking-wider transition-colors",
+                                  selectedBradenQ
+                                    ? "text-orange-600 dark:text-orange-400"
+                                    : "text-foreground/80 group-hover:text-orange-600 dark:group-hover:text-orange-400",
+                                )}
+                              >
+                                Braden-Q (LPP)
+                              </span>
+                              <div
+                                className={cn(
+                                  "w-5 h-5 rounded flex items-center justify-center flex-shrink-0 transition-colors",
+                                  selectedBradenQ ? "bg-orange-500" : "bg-orange-500/15",
+                                )}
+                              >
+                                <Activity
+                                  className={cn("h-3 w-3", selectedBradenQ ? "text-white" : "text-orange-600")}
+                                />
+                              </div>
+                            </div>
+                            {selectedBradenQ ? (
+                              <Badge className="h-4 text-[9px] font-bold bg-orange-500 hover:bg-orange-600 border-none text-white px-1.5 rounded truncate max-w-full">
+                                {selectedBradenQ}
+                              </Badge>
+                            ) : (
+                              <span className="text-[9px] font-bold text-muted-foreground/60">Não Avaliado</span>
+                            )}
+                          </button>
+
+                          {/* Card FLACC */}
+                          <button
+                            type="button"
+                            onClick={() => setOpenFlaccCalc(true)}
+                            className={cn(
+                              "flex flex-col items-start p-2.5 rounded-xl border text-left transition-all relative overflow-hidden group",
+                              selectedFlacc
+                                ? "bg-pink-500/5 border-pink-500/30 dark:bg-pink-500/10"
+                                : "bg-white/45 dark:bg-slate-900/45 border-white/60 dark:border-white/10 hover:border-pink-500/40 hover:bg-pink-500/5 backdrop-blur-sm shadow-sm",
+                            )}
+                          >
+                            <div className="flex items-center justify-between w-full mb-1.5">
+                              <span
+                                className={cn(
+                                  "text-[9px] font-black uppercase tracking-wider transition-colors",
+                                  selectedFlacc
+                                    ? "text-pink-600 dark:text-pink-400"
+                                    : "text-foreground/80 group-hover:text-pink-600 dark:group-hover:text-pink-400",
+                                )}
+                              >
+                                FLACC (Dor)
+                              </span>
+                              <div
+                                className={cn(
+                                  "w-5 h-5 rounded flex items-center justify-center flex-shrink-0 transition-colors",
+                                  selectedFlacc ? "bg-pink-500" : "bg-pink-500/15",
+                                )}
+                              >
+                                <Heart
+                                  className={cn("h-3 w-3", selectedFlacc ? "text-white" : "text-pink-600")}
+                                />
+                              </div>
+                            </div>
+                            {selectedFlacc ? (
+                              <Badge className="h-4 text-[9px] font-bold bg-pink-500 hover:bg-pink-600 border-none text-white px-1.5 rounded truncate max-w-full">
+                                {selectedFlacc}
+                              </Badge>
+                            ) : (
+                              <span className="text-[9px] font-bold text-muted-foreground/60">Não Avaliado</span>
+                            )}
+                          </button>
+
+                          {/* Card Wong-Baker */}
+                          <button
+                            type="button"
+                            onClick={() => setOpenWongBakerCalc(true)}
+                            className={cn(
+                              "flex flex-col items-start p-2.5 rounded-xl border text-left transition-all relative overflow-hidden group",
+                              selectedWongBaker
+                                ? "bg-rose-500/5 border-rose-500/30 dark:bg-rose-500/10"
+                                : "bg-white/45 dark:bg-slate-900/45 border-white/60 dark:border-white/10 hover:border-rose-500/40 hover:bg-rose-500/5 backdrop-blur-sm shadow-sm",
+                            )}
+                          >
+                            <div className="flex items-center justify-between w-full mb-1.5">
+                              <span
+                                className={cn(
+                                  "text-[9px] font-black uppercase tracking-wider transition-colors",
+                                  selectedWongBaker
+                                    ? "text-rose-600 dark:text-rose-400"
+                                    : "text-foreground/80 group-hover:text-rose-600 dark:group-hover:text-rose-400",
+                                )}
+                              >
+                                Wong-Baker
+                              </span>
+                              <div
+                                className={cn(
+                                  "w-5 h-5 rounded flex items-center justify-center flex-shrink-0 transition-colors",
+                                  selectedWongBaker ? "bg-rose-500" : "bg-rose-500/15",
+                                )}
+                              >
+                                <Heart
+                                  className={cn("h-3 w-3", selectedWongBaker ? "text-white" : "text-rose-600")}
+                                />
+                              </div>
+                            </div>
+                            {selectedWongBaker ? (
+                              <Badge className="h-4 text-[9px] font-bold bg-rose-500 hover:bg-rose-600 border-none text-white px-1.5 rounded truncate max-w-full">
+                                {selectedWongBaker}
+                              </Badge>
+                            ) : (
+                              <span className="text-[9px] font-bold text-muted-foreground/60">Não Avaliado</span>
+                            )}
+                          </button>
+
+                          {/* Card Glasgow Pediátrica */}
+                          <button
+                            type="button"
+                            onClick={() => setOpenGlasgowPedCalc(true)}
+                            className={cn(
+                              "flex flex-col items-start p-2.5 rounded-xl border text-left transition-all relative overflow-hidden group",
+                              selectedGlasgowPed
+                                ? "bg-indigo-500/5 border-indigo-500/30 dark:bg-indigo-500/10"
+                                : "bg-white/45 dark:bg-slate-900/45 border-white/60 dark:border-white/10 hover:border-indigo-500/40 hover:bg-indigo-500/5 backdrop-blur-sm shadow-sm",
+                            )}
+                          >
+                            <div className="flex items-center justify-between w-full mb-1.5">
+                              <span
+                                className={cn(
+                                  "text-[9px] font-black uppercase tracking-wider transition-colors",
+                                  selectedGlasgowPed
+                                    ? "text-indigo-600 dark:text-indigo-400"
+                                    : "text-foreground/80 group-hover:text-indigo-600 dark:group-hover:text-indigo-400",
+                                )}
+                              >
+                                Glasgow Ped.
+                              </span>
+                              <div
+                                className={cn(
+                                  "w-5 h-5 rounded flex items-center justify-center flex-shrink-0 transition-colors",
+                                  selectedGlasgowPed ? "bg-indigo-500" : "bg-indigo-500/15",
+                                )}
+                              >
+                                <Brain
+                                  className={cn("h-3 w-3", selectedGlasgowPed ? "text-white" : "text-indigo-600")}
+                                />
+                              </div>
+                            </div>
+                            {selectedGlasgowPed ? (
+                              <Badge className="h-4 text-[9px] font-bold bg-indigo-500 hover:bg-indigo-600 border-none text-white px-1.5 rounded truncate max-w-full">
+                                {selectedGlasgowPed}
+                              </Badge>
+                            ) : (
+                              <span className="text-[9px] font-bold text-muted-foreground/60">Não Avaliado</span>
+                            )}
+                          </button>
+
+                          {/* Card EVA (Dor) */}
                           <button
                             type="button"
                             onClick={() => setOpenEvaCalc(true)}
                             className={cn(
-                              "flex flex-col items-start p-3 rounded-xl border text-left transition-all relative overflow-hidden group",
+                              "flex flex-col items-start p-2.5 rounded-xl border text-left transition-all relative overflow-hidden group",
                               selectedEva
                                 ? "bg-red-500/5 border-red-500/30 dark:bg-red-500/10"
                                 : "bg-white/45 dark:bg-slate-900/45 border-white/60 dark:border-white/10 hover:border-red-500/40 hover:bg-red-500/5 backdrop-blur-sm shadow-sm",
@@ -5909,36 +6130,31 @@ export default function EvolucaoEnfermagem() {
                             <div className="flex items-center justify-between w-full mb-1.5">
                               <span
                                 className={cn(
-                                  "text-[11px] font-black uppercase tracking-wider transition-colors",
+                                  "text-[9px] font-black uppercase tracking-wider transition-colors",
                                   selectedEva
                                     ? "text-red-600 dark:text-red-400"
                                     : "text-foreground/80 group-hover:text-red-600 dark:group-hover:text-red-400",
                                 )}
                               >
-                                Escala de Dor (EVA)
+                                Dor (EVA)
                               </span>
                               <div
                                 className={cn(
-                                  "w-6 h-6 rounded flex items-center justify-center flex-shrink-0 transition-colors",
+                                  "w-5 h-5 rounded flex items-center justify-center flex-shrink-0 transition-colors",
                                   selectedEva ? "bg-red-500" : "bg-red-500/15",
                                 )}
                               >
                                 <Heart
-                                  className={cn(
-                                    "h-4 w-4",
-                                    selectedEva ? "text-white" : "text-red-600",
-                                  )}
+                                  className={cn("h-3 w-3", selectedEva ? "text-white" : "text-red-600")}
                                 />
                               </div>
                             </div>
                             {selectedEva ? (
-                              <Badge className="h-5 text-[10px] font-bold bg-red-500 hover:bg-red-600 border-none text-white px-2 rounded">
+                              <Badge className="h-4 text-[9px] font-bold bg-red-500 hover:bg-red-600 border-none text-white px-1.5 rounded truncate max-w-full">
                                 {selectedEva}
                               </Badge>
                             ) : (
-                              <span className="text-[10px] font-bold text-muted-foreground/60">
-                                Não Avaliado
-                              </span>
+                              <span className="text-[9px] font-bold text-muted-foreground/60">Não Avaliado</span>
                             )}
                           </button>
                         </div>
@@ -6463,6 +6679,46 @@ export default function EvolucaoEnfermagem() {
         onApply={(desc, sum) => {
           setDescription((p) => (p ? `${p}\n${desc}` : desc));
           setSelectedPews(sum);
+        }}
+      />
+      <HumptyDumptyModal
+        isOpen={openHumptyDumptyCalc}
+        onClose={setOpenHumptyDumptyCalc}
+        onApply={(desc, sum) => {
+          setDescription((p) => (p ? `${p}\n${desc}` : desc));
+          setSelectedHumptyDumpty(sum);
+        }}
+      />
+      <BradenQModal
+        isOpen={openBradenQCalc}
+        onClose={setOpenBradenQCalc}
+        onApply={(desc, sum) => {
+          setDescription((p) => (p ? `${p}\n${desc}` : desc));
+          setSelectedBradenQ(sum);
+        }}
+      />
+      <FlaccModal
+        isOpen={openFlaccCalc}
+        onClose={setOpenFlaccCalc}
+        onApply={(desc, sum) => {
+          setDescription((p) => (p ? `${p}\n${desc}` : desc));
+          setSelectedFlacc(sum);
+        }}
+      />
+      <WongBakerModal
+        isOpen={openWongBakerCalc}
+        onClose={setOpenWongBakerCalc}
+        onApply={(desc, sum) => {
+          setDescription((p) => (p ? `${p}\n${desc}` : desc));
+          setSelectedWongBaker(sum);
+        }}
+      />
+      <GlasgowPediatricModal
+        isOpen={openGlasgowPedCalc}
+        onClose={setOpenGlasgowPedCalc}
+        onApply={(desc, sum) => {
+          setDescription((p) => (p ? `${p}\n${desc}` : desc));
+          setSelectedGlasgowPed(sum);
         }}
       />
       <GlasgowModal
