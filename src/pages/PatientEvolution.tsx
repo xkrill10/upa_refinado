@@ -302,6 +302,8 @@ export default function EvolucaoEnfermagem() {
   const { role } = useRole();
   const [isMedicalModalOpen, setIsMedicalModalOpen] = useState(false);
   const [isNursingModalOpen, setIsNursingModalOpen] = useState(false);
+  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+  const [finalReviewText, setFinalReviewText] = useState("");
 
   const { id } = useParams();
   const navigate = useNavigate();
@@ -954,8 +956,7 @@ export default function EvolucaoEnfermagem() {
     }
   };
 
-  const handleSaveEvolution = () => {
-    // Para sinais vitais, a descrição é gerada automaticamente se não preenchida
+  const handleReviewClick = () => {
     if (
       !evolutionType ||
       !professional ||
@@ -965,7 +966,6 @@ export default function EvolucaoEnfermagem() {
       return;
     }
 
-    // Se for Sinais Vitais, validar que pelo menos PA e FC estão preenchidos para gerar o MEWS
     if (evolutionType === "Sinais Vitais" && (!vsSystolic || !vsHeartRate)) {
       toast.error(
         "Preencha pelo menos a Pressão Arterial Sistólica e a Frequência Cardíaca.",
@@ -973,22 +973,18 @@ export default function EvolucaoEnfermagem() {
       return;
     }
 
-    let finalDescription = description;
-    let finalBloodPressure = vsBloodPressure;
+    let tempFinalDesc = description;
 
     if (evolutionType === "Sinais Vitais") {
-      // Pad to 3 digits on both sides
       const parts = vsBloodPressure.split("/");
       const sysPart = parts[0] ? parts[0].replace(/\D/g, "") : "";
       const diaPart = parts[1] ? parts[1].replace(/\D/g, "") : "";
-
       const finalSystolic = sysPart ? sysPart.padStart(3, "0") : "120";
       const finalDiastolic = diaPart ? diaPart.padStart(3, "0") : "080";
-      finalBloodPressure = `${finalSystolic}/${finalDiastolic}`;
 
       const mews = calculateMEWS();
       const mewsClass = getMEWSClassification(mews);
-      finalDescription =
+      tempFinalDesc =
         `REGISTRO DE SINAIS VITAIS:\n` +
         `- Pressão Arterial (PA): ${finalSystolic}/${finalDiastolic} mmHg\n` +
         `- Frequência Cardíaca (FC): ${vsHeartRate || "--"} bpm\n` +
@@ -1001,25 +997,24 @@ export default function EvolucaoEnfermagem() {
         `Escore MEWS calculado: ${mews} pontos (${mewsClass.label})`;
 
       if (description.trim()) {
-        finalDescription += `\n\nObservações clínicas adicionais:\n${description}`;
+        tempFinalDesc += `\n\nObservações clínicas adicionais:\n${description}`;
       }
     } else if (
       evolutionType === "Prescrição" &&
       prescribedMedications.length > 0
     ) {
-      finalDescription = "PRESCRIÇÃO MÉDICA ESTRUTURADA:\n\n";
+      tempFinalDesc = "PRESCRIÇÃO MÉDICA ESTRUTURADA:\n\n";
       prescribedMedications.forEach((med, idx) => {
-        finalDescription += `${idx + 1}. ${med.medication} - ${med.dosage} (${med.route}) - ${med.frequency}\n`;
+        tempFinalDesc += `${idx + 1}. ${med.medication} - ${med.dosage} (${med.route}) - ${med.frequency}\n`;
         if (med.observation) {
-          finalDescription += `   Observação: ${med.observation}\n`;
+          tempFinalDesc += `   Observação: ${med.observation}\n`;
         }
       });
       if (description.trim()) {
-        finalDescription += `\nObservações Adicionais:\n${description}`;
+        tempFinalDesc += `\nObservações Adicionais:\n${description}`;
       }
     }
 
-    // Anexar carimbo digital se configurado
     if (stampNumber) {
       const categoryLabel =
         stampCouncil === "CRM"
@@ -1027,8 +1022,26 @@ export default function EvolucaoEnfermagem() {
           : stampCouncil === "COREN"
             ? "Enf."
             : "Téc.";
-      finalDescription += `\n\n-----------------------------------------\nAssinado Eletronicamente por: ${categoryLabel} ${professional} - ${stampCouncil}/${stampState}: ${stampNumber}`;
+      tempFinalDesc += `\n\n-----------------------------------------\nAssinado Eletronicamente por: ${categoryLabel} ${professional} - ${stampCouncil}/${stampState}: ${stampNumber}`;
     }
+
+    setFinalReviewText(tempFinalDesc);
+    setIsReviewModalOpen(true);
+  };
+
+  const handleSaveEvolution = () => {
+    let finalBloodPressure = vsBloodPressure;
+
+    if (evolutionType === "Sinais Vitais") {
+      const parts = vsBloodPressure.split("/");
+      const sysPart = parts[0] ? parts[0].replace(/\D/g, "") : "";
+      const diaPart = parts[1] ? parts[1].replace(/\D/g, "") : "";
+      const finalSystolic = sysPart ? sysPart.padStart(3, "0") : "120";
+      const finalDiastolic = diaPart ? diaPart.padStart(3, "0") : "080";
+      finalBloodPressure = `${finalSystolic}/${finalDiastolic}`;
+    }
+
+    const finalDescription = finalReviewText;
 
     addEvolution(id!, {
       type: evolutionType,
@@ -5365,7 +5378,7 @@ export default function EvolucaoEnfermagem() {
                     </AlertDialogContent>
                   </AlertDialog>
                   <Button
-                    onClick={handleSaveEvolution}
+                    onClick={handleReviewClick}
                     className="bg-[#006699] hover:bg-[#005580] text-white font-bold uppercase text-[9px] tracking-widest h-8 px-5 rounded-md shadow-sm active:scale-95"
                   >
                     Salvar Registro
@@ -5890,7 +5903,43 @@ export default function EvolucaoEnfermagem() {
         patientName={patient?.name || ""}
       />
       
-      
+      <Dialog open={isReviewModalOpen} onOpenChange={setIsReviewModalOpen}>
+        <DialogContent className="sm:max-w-[700px] max-h-[85vh] overflow-hidden flex flex-col bg-slate-50/95 dark:bg-slate-950/95 backdrop-blur-xl border-slate-200/60 dark:border-slate-800/60 shadow-2xl p-0">
+          <DialogHeader className="px-6 py-4 border-b border-slate-200/50 dark:border-slate-800/50 shrink-0 bg-white/50 dark:bg-slate-900/50">
+            <DialogTitle className="text-xl font-black text-[#006699] dark:text-sky-400 uppercase tracking-tight flex items-center gap-2">
+              <CheckCircle2 className="h-5 w-5" /> Revisão do Documento
+            </DialogTitle>
+            <DialogDescription className="text-sm font-semibold text-slate-500 dark:text-slate-400">
+              Revise atentamente as informações antes de assinar eletronicamente e salvar no prontuário do paciente.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="flex-1 overflow-y-auto px-6 py-4 bg-white/80 dark:bg-slate-900/80">
+            <div className="bg-white dark:bg-slate-950 rounded-lg p-5 border border-slate-200 dark:border-slate-800 shadow-sm font-mono text-sm whitespace-pre-wrap leading-relaxed text-slate-700 dark:text-slate-300">
+              {finalReviewText}
+            </div>
+          </div>
+          
+          <div className="px-6 py-4 border-t border-slate-200/50 dark:border-slate-800/50 shrink-0 flex items-center justify-end gap-3 bg-white/50 dark:bg-slate-900/50">
+            <Button
+              variant="outline"
+              onClick={() => setIsReviewModalOpen(false)}
+              className="font-bold uppercase tracking-widest text-[10px] h-10 px-6 rounded-xl border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800"
+            >
+              Voltar e Corrigir
+            </Button>
+            <Button
+              onClick={() => {
+                setIsReviewModalOpen(false);
+                handleSaveEvolution();
+              }}
+              className="font-black uppercase tracking-widest text-[10px] h-10 px-6 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg shadow-emerald-600/20 gap-2 transition-all active:scale-95"
+            >
+              <CheckCircle2 className="h-4 w-4" /> Confirmar e Assinar
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
 </motion.div>
   );
