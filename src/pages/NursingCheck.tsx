@@ -25,6 +25,7 @@ import {
   Droplet,
   PackagePlus,
   ArrowRight,
+  Calendar,
 } from "lucide-react";
 import {
   Card,
@@ -1159,84 +1160,124 @@ export default function NursingCheck() {
                         </div>
 
                         {/* APRAZAMENTO HOUR TIMELINE GRID */}
-                        <div className="flex flex-wrap items-center gap-2.5">
-                          {p.hours?.map((h, hourIdx) => {
-                            // Check if current hour bubble is delayed
-                            const isDelayed = h.status === "delayed";
-                            const isChecked = h.status === "checked";
-                            const isRefused = h.status === "refused";
-                            const isPending = h.status === "pending";
+                        <div className="flex flex-col gap-3">
+                          {(() => {
+                            let isTomorrow = false;
+                            let lastHour = -1;
+                            const today: {h: AprazamentoHour, idx: number}[] = [];
+                            const tomorrow: {h: AprazamentoHour, idx: number}[] = [];
+                            
+                            p.hours?.forEach((h, idx) => {
+                              const hrNum = parseInt(h.hour.split(':')[0], 10);
+                              if (hrNum < lastHour && !isTomorrow) {
+                                isTomorrow = true;
+                              }
+                              lastHour = hrNum;
+                              if (isTomorrow) tomorrow.push({h, idx});
+                              else today.push({h, idx});
+                            });
 
-                            return (
-                              <div
-                                key={hourIdx}
-                                onClick={() => handleHourClick(p, hourIdx, h)}
-                                className={cn(
-                                  "h-12 w-12 rounded-xl flex flex-col items-center justify-center cursor-pointer transition-all border group relative shadow-inner select-none",
-                                  isChecked &&
-                                    "bg-emerald-500/20 border-emerald-500/40 text-emerald-600 dark:text-emerald-400 scale-[0.98] hover:bg-emerald-500/30",
-                                  isRefused &&
-                                    "bg-red-500/20 border-red-500/40 text-red-500 scale-[0.98] hover:bg-red-500/30",
-                                  isDelayed &&
-                                    "bg-amber-500/25 border-amber-500/50 text-amber-600 dark:text-amber-400 animate-pulse hover:scale-105",
-                                  isPending &&
-                                    "bg-white/5 border-white/10 text-muted-foreground hover:bg-white/10 hover:border-rose-500/30 hover:text-rose-500 hover:scale-105",
-                                )}
-                              >
-                                <span className="text-[9px] font-black tracking-tight">
-                                  {h.hour}
-                                </span>
+                            const renderBubble = ({h, idx}: {h: AprazamentoHour, idx: number}) => {
+                              const isDelayed = h.status === "delayed";
+                              const isChecked = h.status === "checked";
+                              const isRefused = h.status === "refused";
+                              const isPending = h.status === "pending";
 
-                                <div className="mt-0.5">
-                                  {isChecked && (
-                                    <Check className="h-3 w-3 text-emerald-600 dark:text-emerald-400" />
+                              return (
+                                <div
+                                  key={idx}
+                                  onClick={() => handleHourClick(p, idx, h)}
+                                  className={cn(
+                                    "h-12 w-12 rounded-xl flex flex-col items-center justify-center cursor-pointer transition-all border group relative shadow-inner select-none",
+                                    isChecked &&
+                                      "bg-emerald-500/20 border-emerald-500/40 text-emerald-600 dark:text-emerald-400 scale-[0.98] hover:bg-emerald-500/30",
+                                    isRefused &&
+                                      "bg-red-500/20 border-red-500/40 text-red-500 scale-[0.98] hover:bg-red-500/30",
+                                    isDelayed &&
+                                      "bg-amber-500/25 border-amber-500/50 text-amber-600 dark:text-amber-400 animate-pulse hover:scale-105",
+                                    isPending &&
+                                      "bg-white/5 border-white/10 text-muted-foreground hover:bg-white/10 hover:border-rose-500/30 hover:text-rose-500 hover:scale-105",
                                   )}
-                                  {isRefused && (
-                                    <X className="h-3 w-3 text-red-500" />
-                                  )}
-                                  {isDelayed && (
-                                    <AlertTriangle className="h-3 w-3 text-amber-500" />
-                                  )}
-                                  {isPending && (
-                                    <Clock className="h-3 w-3 text-muted-foreground/40 group-hover:text-rose-500/60" />
+                                >
+                                  <span className="text-[9px] font-black tracking-tight">
+                                    {h.hour}
+                                  </span>
+
+                                  <div className="mt-0.5">
+                                    {isChecked && (
+                                      <Check className="h-3 w-3 text-emerald-600 dark:text-emerald-400" />
+                                    )}
+                                    {isRefused && (
+                                      <X className="h-3 w-3 text-red-500" />
+                                    )}
+                                    {isDelayed && (
+                                      <AlertTriangle className="h-3 w-3 text-amber-500" />
+                                    )}
+                                    {isPending && (
+                                      <Clock className="h-3 w-3 text-muted-foreground/40 group-hover:text-rose-500/60" />
+                                    )}
+                                  </div>
+
+                                  {(isChecked || isRefused) && (
+                                    <div className="absolute z-30 bottom-[calc(100%+8px)] left-1/2 -translate-x-1/2 bg-slate-900 text-white rounded-xl p-3 text-[10px] w-48 shadow-2xl opacity-0 scale-95 pointer-events-none group-hover:opacity-100 group-hover:scale-100 transition-all border border-white/10 flex flex-col gap-1">
+                                      <p className="font-black uppercase tracking-wider text-rose-400">
+                                        {isChecked ? "ADMINISTRADO" : "RECUSADO/NÃO ADM"}
+                                      </p>
+                                      <p className="opacity-80">Por: {h.nurseName}</p>
+                                      <p className="opacity-80">Em: {h.checkedAt}</p>
+                                      {h.vitalSigns?.glycemia && (
+                                        <p className="text-emerald-400 font-bold">
+                                          Glicemia: {h.vitalSigns.glycemia} mg/dL
+                                        </p>
+                                      )}
+                                      {h.vitalSigns?.bp && (
+                                        <p className="text-blue-400 font-bold">
+                                          PA: {h.vitalSigns.bp} mmHg
+                                        </p>
+                                      )}
+                                      {h.justification && (
+                                        <p className="text-red-400 font-medium leading-relaxed italic">
+                                          " {h.justification} "
+                                        </p>
+                                      )}
+                                      <div className="absolute top-full left-1/2 -translate-x-1/2 w-2 h-2 bg-slate-900 rotate-45 border-r border-b border-white/10" />
+                                    </div>
                                   )}
                                 </div>
+                              );
+                            };
 
-                                {/* Custom HTML hover tooltip for details */}
-                                {(isChecked || isRefused) && (
-                                  <div className="absolute z-30 bottom-[calc(100%+8px)] left-1/2 -translate-x-1/2 bg-slate-900 text-white rounded-xl p-3 text-[10px] w-48 shadow-2xl opacity-0 scale-95 pointer-events-none group-hover:opacity-100 group-hover:scale-100 transition-all border border-white/10 flex flex-col gap-1">
-                                    <p className="font-black uppercase tracking-wider text-rose-400">
-                                      {isChecked
-                                        ? "ADMINISTRADO"
-                                        : "RECUSADO/NÃO ADM"}
-                                    </p>
-                                    <p className="opacity-80">
-                                      Por: {h.nurseName}
-                                    </p>
-                                    <p className="opacity-80">
-                                      Em: {h.checkedAt}
-                                    </p>
-                                    {h.vitalSigns?.glycemia && (
-                                      <p className="text-emerald-400 font-bold">
-                                        Glicemia: {h.vitalSigns.glycemia} mg/dL
-                                      </p>
-                                    )}
-                                    {h.vitalSigns?.bp && (
-                                      <p className="text-blue-400 font-bold">
-                                        PA: {h.vitalSigns.bp} mmHg
-                                      </p>
-                                    )}
-                                    {h.justification && (
-                                      <p className="text-red-400 font-medium leading-relaxed italic">
-                                        " {h.justification} "
-                                      </p>
-                                    )}
-                                    <div className="absolute top-full left-1/2 -translate-x-1/2 w-2 h-2 bg-slate-900 rotate-45 border-r border-b border-white/10" />
+                            return (
+                              <>
+                                {today.length > 0 && (
+                                  <div className="space-y-1">
+                                    <div className="flex items-center gap-1.5 text-muted-foreground mb-1 ml-1 opacity-70">
+                                      <Calendar className="h-3 w-3" />
+                                      <span className="text-[9px] font-black uppercase tracking-widest">
+                                        Hoje
+                                      </span>
+                                    </div>
+                                    <div className="flex flex-wrap items-center gap-2.5">
+                                      {today.map(renderBubble)}
+                                    </div>
                                   </div>
                                 )}
-                              </div>
+                                {tomorrow.length > 0 && (
+                                  <div className="space-y-1 mt-3 border-t border-white/5 pt-3">
+                                    <div className="flex items-center gap-1.5 text-muted-foreground mb-1 ml-1 opacity-70">
+                                      <Calendar className="h-3 w-3" />
+                                      <span className="text-[9px] font-black uppercase tracking-widest">
+                                        Amanhã
+                                      </span>
+                                    </div>
+                                    <div className="flex flex-wrap items-center gap-2.5">
+                                      {tomorrow.map(renderBubble)}
+                                    </div>
+                                  </div>
+                                )}
+                              </>
                             );
-                          })}
+                          })()}
                         </div>
                       </div>
                     );
