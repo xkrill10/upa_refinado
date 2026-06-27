@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import {
   Dialog,
+  DialogDragHandle,
   DialogContent,
   DialogHeader,
   DialogTitle,
@@ -96,129 +97,141 @@ export function BradenModal({ isOpen, onClose, onApply }: BradenModalProps) {
     toast.success("Resultado da Escala de Braden inserido no prontuário!");
   };
 
+  const selectTriggerClass = "h-9 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium";
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[550px] rounded-xl glass-card-premium shadow-2xl">
-        <DialogHeader>
-          <DialogTitle className="text-xl mission-control-title flex items-center gap-2">
-            <Activity className="h-6 w-6 text-orange-500" />
-            Escala de Braden (Risco de LPP)
-          </DialogTitle>
-          <DialogDescription className="font-bold uppercase text-[10px] tracking-widest text-muted-foreground">
-            Avaliação do Risco de Lesão por Pressão em Adulto
-          </DialogDescription>
-        </DialogHeader>
+      <DialogContent className="sm:max-w-[550px] rounded-xl glass-card-premium shadow-2xl max-h-[90vh] flex flex-col !p-0 overflow-hidden gap-0">
+        <DialogDragHandle className="p-6 shrink-0 border-b border-border/50 bg-slate-50/30 dark:bg-slate-900/30">
+          <DialogHeader>
+            <DialogTitle className="text-xl mission-control-title flex items-center gap-2">
+              <Activity className="h-6 w-6 text-orange-500" />
+              Escala de Braden (Risco de LPP)
+            </DialogTitle>
+            <DialogDescription className="font-bold uppercase text-[10px] tracking-widest text-muted-foreground">
+              Avaliação do Risco de Lesão por Pressão em Adulto
+            </DialogDescription>
+          </DialogHeader>
+        </DialogDragHandle>
 
-        <div className="space-y-2.5 py-1">
-          {/* 1. Percepção Sensorial */}
-          <div className="space-y-1">
-            <Label className="text-xs font-black uppercase text-foreground/80">
-              1. Percepção Sensorial
-            </Label>
-            <Select value={bradenSensory} onValueChange={setBradenSensory}>
-              <SelectTrigger className="h-9 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
-                <SelectValue placeholder="Selecione o nível de percepção..." />
-              </SelectTrigger>
-              <SelectContent className="rounded-xl">
-                <SelectItem value="1">1 - Totalmente Limitado</SelectItem>
-                <SelectItem value="2">2 - Muito Limitado</SelectItem>
-                <SelectItem value="3">3 - Levemente Limitado</SelectItem>
-                <SelectItem value="4">4 - Nenhuma Limitação</SelectItem>
-              </SelectContent>
-            </Select>
+        <div
+          className="flex-1 flex flex-col overflow-y-auto custom-scrollbar overscroll-contain"
+          onPointerDown={(e) => e.stopPropagation()}
+          style={{ touchAction: "pan-y" }}
+        >
+          <div className="space-y-2.5 p-6">
+            {/* 1. Percepção Sensorial */}
+            <div className="space-y-1">
+              <Label className="text-xs font-black uppercase text-foreground/80">
+                1. Percepção Sensorial
+              </Label>
+              <Select value={bradenSensory} onValueChange={setBradenSensory}>
+                <SelectTrigger className={selectTriggerClass}>
+                  <SelectValue placeholder="Selecione o nível de percepção..." />
+                </SelectTrigger>
+                <SelectContent className="rounded-xl">
+                  <SelectItem value="1">1 - Totalmente Limitado</SelectItem>
+                  <SelectItem value="2">2 - Muito Limitado</SelectItem>
+                  <SelectItem value="3">3 - Levemente Limitado</SelectItem>
+                  <SelectItem value="4">4 - Nenhuma Limitação</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* 2. Umidade */}
+            <div className="space-y-1">
+              <Label className="text-xs font-black uppercase text-foreground/80">
+                2. Umidade da Pele
+              </Label>
+              <Select value={bradenMoisture} onValueChange={setBradenMoisture}>
+                <SelectTrigger className={selectTriggerClass}>
+                  <SelectValue placeholder="Selecione o nível de umidade..." />
+                </SelectTrigger>
+                <SelectContent className="rounded-xl">
+                  <SelectItem value="1">1 - Constantemente Úmida</SelectItem>
+                  <SelectItem value="2">2 - Muito Úmida</SelectItem>
+                  <SelectItem value="3">3 - Ocasionalmente Úmida</SelectItem>
+                  <SelectItem value="4">4 - Raramente Úmida</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* 3. Atividade */}
+            <div className="space-y-1">
+              <Label className="text-xs font-black uppercase text-foreground/80">
+                3. Atividade Física
+              </Label>
+              <Select value={bradenActivity} onValueChange={setBradenActivity}>
+                <SelectTrigger className={selectTriggerClass}>
+                  <SelectValue placeholder="Selecione a atividade física..." />
+                </SelectTrigger>
+                <SelectContent className="rounded-xl">
+                  <SelectItem value="1">1 - Acamado</SelectItem>
+                  <SelectItem value="2">2 - Em Cadeira de Rodas</SelectItem>
+                  <SelectItem value="3">3 - Deambula Ocasionalmente</SelectItem>
+                  <SelectItem value="4">4 - Deambula Frequentemente</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* 4. Mobilidade */}
+            <div className="space-y-1">
+              <Label className="text-xs font-black uppercase text-foreground/80">
+                4. Mobilidade (Capacidade de mudar posição)
+              </Label>
+              <Select value={bradenMobility} onValueChange={setBradenMobility}>
+                <SelectTrigger className={selectTriggerClass}>
+                  <SelectValue placeholder="Selecione o nível de mobilidade..." />
+                </SelectTrigger>
+                <SelectContent className="rounded-xl">
+                  <SelectItem value="1">1 - Totalmente Imóvel</SelectItem>
+                  <SelectItem value="2">2 - Muito Limitada</SelectItem>
+                  <SelectItem value="3">3 - Levemente Limitada</SelectItem>
+                  <SelectItem value="4">4 - Nenhuma Limitação</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* 5. Nutrição */}
+            <div className="space-y-1">
+              <Label className="text-xs font-black uppercase text-foreground/80">
+                5. Padrão de Nutrição
+              </Label>
+              <Select value={bradenNutrition} onValueChange={setBradenNutrition}>
+                <SelectTrigger className={selectTriggerClass}>
+                  <SelectValue placeholder="Selecione o padrão nutricional..." />
+                </SelectTrigger>
+                <SelectContent className="rounded-xl">
+                  <SelectItem value="1">1 - Muito Pobre</SelectItem>
+                  <SelectItem value="2">2 - Provavelmente Inadequada</SelectItem>
+                  <SelectItem value="3">3 - Adequada</SelectItem>
+                  <SelectItem value="4">4 - Excelente</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* 6. Fricção e Cisalhamento */}
+            <div className="space-y-1">
+              <Label className="text-xs font-black uppercase text-foreground/80">
+                6. Fricção e Cisalhamento
+              </Label>
+              <Select value={bradenFriction} onValueChange={setBradenFriction}>
+                <SelectTrigger className={selectTriggerClass}>
+                  <SelectValue placeholder="Selecione fricção/cisalhamento..." />
+                </SelectTrigger>
+                <SelectContent className="rounded-xl">
+                  <SelectItem value="1">1 - Problema Constante</SelectItem>
+                  <SelectItem value="2">2 - Problema Potencial</SelectItem>
+                  <SelectItem value="3">3 - Sem Problema Aparente</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
+        </div>
 
-          {/* 2. Umidade */}
-          <div className="space-y-1">
-            <Label className="text-xs font-black uppercase text-foreground/80">
-              2. Umidade da Pele
-            </Label>
-            <Select value={bradenMoisture} onValueChange={setBradenMoisture}>
-              <SelectTrigger className="h-9 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
-                <SelectValue placeholder="Selecione o nível de umidade..." />
-              </SelectTrigger>
-              <SelectContent className="rounded-xl">
-                <SelectItem value="1">1 - Constantemente Úmida</SelectItem>
-                <SelectItem value="2">2 - Muito Úmida</SelectItem>
-                <SelectItem value="3">3 - Ocasionalmente Úmida</SelectItem>
-                <SelectItem value="4">4 - Raramente Úmida</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* 3. Atividade */}
-          <div className="space-y-1">
-            <Label className="text-xs font-black uppercase text-foreground/80">
-              3. Atividade Física
-            </Label>
-            <Select value={bradenActivity} onValueChange={setBradenActivity}>
-              <SelectTrigger className="h-9 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
-                <SelectValue placeholder="Selecione a atividade física..." />
-              </SelectTrigger>
-              <SelectContent className="rounded-xl">
-                <SelectItem value="1">1 - Acamado</SelectItem>
-                <SelectItem value="2">2 - Em Cadeira de Rodas</SelectItem>
-                <SelectItem value="3">3 - Deambula Ocasionalmente</SelectItem>
-                <SelectItem value="4">4 - Deambula Frequentemente</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* 4. Mobilidade */}
-          <div className="space-y-1">
-            <Label className="text-xs font-black uppercase text-foreground/80">
-              4. Mobilidade (Capacidade de mudar posição)
-            </Label>
-            <Select value={bradenMobility} onValueChange={setBradenMobility}>
-              <SelectTrigger className="h-9 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
-                <SelectValue placeholder="Selecione o nível de mobilidade..." />
-              </SelectTrigger>
-              <SelectContent className="rounded-xl">
-                <SelectItem value="1">1 - Totalmente Imóvel</SelectItem>
-                <SelectItem value="2">2 - Muito Limitada</SelectItem>
-                <SelectItem value="3">3 - Levemente Limitada</SelectItem>
-                <SelectItem value="4">4 - Nenhuma Limitação</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* 5. Nutrição */}
-          <div className="space-y-1">
-            <Label className="text-xs font-black uppercase text-foreground/80">
-              5. Padrão de Nutrição
-            </Label>
-            <Select value={bradenNutrition} onValueChange={setBradenNutrition}>
-              <SelectTrigger className="h-9 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
-                <SelectValue placeholder="Selecione o padrão nutricional..." />
-              </SelectTrigger>
-              <SelectContent className="rounded-xl">
-                <SelectItem value="1">1 - Muito Pobre</SelectItem>
-                <SelectItem value="2">2 - Provavelmente Inadequada</SelectItem>
-                <SelectItem value="3">3 - Adequada</SelectItem>
-                <SelectItem value="4">4 - Excelente</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* 6. Fricção e Cisalhamento */}
-          <div className="space-y-1">
-            <Label className="text-xs font-black uppercase text-foreground/80">
-              6. Fricção e Cisalhamento
-            </Label>
-            <Select value={bradenFriction} onValueChange={setBradenFriction}>
-              <SelectTrigger className="h-9 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
-                <SelectValue placeholder="Selecione fricção/cisalhamento..." />
-              </SelectTrigger>
-              <SelectContent className="rounded-xl">
-                <SelectItem value="1">1 - Problema Constante</SelectItem>
-                <SelectItem value="2">2 - Problema Potencial</SelectItem>
-                <SelectItem value="3">3 - Sem Problema Aparente</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Resultado e Ação */}
-          <div className="mt-3 p-3 rounded-xl bg-slate-50/70 dark:bg-slate-900/40 backdrop-blur-md border border-slate-200/60 dark:border-slate-800/50 space-y-3">
+        {/* Footer - Fixo na base */}
+        <div className="p-4 border-t border-border/50 bg-slate-50/30 dark:bg-slate-900/30 shrink-0">
+          <div className="p-3 rounded-xl bg-slate-50/70 dark:bg-slate-900/40 backdrop-blur-md border border-slate-200/60 dark:border-slate-800/50 space-y-3">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-[10px] font-black uppercase text-muted-foreground tracking-wider">

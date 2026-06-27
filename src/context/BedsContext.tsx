@@ -105,6 +105,7 @@ const generateBeds = (): Bed[] => {
     "2",                // e-4
     "3",                // o-of2
     "4",                // o-om2
+    "jose-doente",      // o-om3
     "baby-1",           // o-ped1
     "baby-2",           // o-ped2
     "12",               // o-iso2
@@ -190,7 +191,7 @@ const generateBeds = (): Bed[] => {
     // UPA - Observação Masculina
     createBed("o-om1", "Leito 1", "Observação", "Observação Masculina", "available"),
     createBed("o-om2", "Leito 2", "Observação", "Observação Masculina", "occupied"),
-    createBed("o-om3", "Leito 3", "Observação", "Observação Masculina", "available"),
+    createBed("o-om3", "Leito 3", "Observação", "Observação Masculina", "occupied"),
     createBed("o-om4", "Leito 4", "Observação", "Observação Masculina", "available"),
     createBed("o-om5", "Maca Extra", "Observação", "Observação Masculina", "available"),
 

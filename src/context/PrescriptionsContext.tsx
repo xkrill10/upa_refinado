@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, ReactNode } from "react";
+import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
 
 export type PrescriptionStatus =
   | "awaiting_pharmacy"
@@ -196,11 +196,109 @@ const initialOrders: PrescriptionOrder[] = [
         ],
       }
     ],
+  },
+  {
+    id: "mock-order-jose",
+    patientId: "jose-doente",
+    patientName: "José Doente",
+    doctorId: "doc-1",
+    doctorName: "Dr. Carlos",
+    createdAt: new Date().toISOString(),
+    medications: [
+      {
+        id: "med-j1",
+        medication: "AAS (Ácido Acetilsalicílico)",
+        dosage: "100mg",
+        route: "VO",
+        frequency: "1x ao dia",
+        status: "active",
+        isHighVigilance: false,
+        category: "medication",
+        hours: [
+          { hour: "12:00", status: "checked", nurseName: "Enf. João" },
+          { hour: "08:00", status: "pending" },
+        ],
+      },
+      {
+        id: "med-j2",
+        medication: "Insulina Regular",
+        dosage: "Conforme Glicemia",
+        route: "SC",
+        frequency: "S/N",
+        status: "active",
+        isHighVigilance: true,
+        category: "medication",
+        hours: [
+          { hour: "10:00", status: "pending" },
+          { hour: "16:00", status: "pending" },
+        ],
+      },
+      {
+        id: "med-j3",
+        medication: "Dieta Leve Hipossódica",
+        dosage: "Porção Padrão",
+        route: "VO",
+        frequency: "Desjejum / Almoço / Jantar",
+        status: "active",
+        category: "diet",
+        hours: [
+          { hour: "08:00", status: "checked", nurseName: "Copa" },
+          { hour: "12:00", status: "checked", nurseName: "Copa" },
+          { hour: "18:00", status: "pending" },
+        ],
+      },
+      {
+        id: "med-j4",
+        medication: "Fisioterapia Respiratória",
+        dosage: "1 Sessão",
+        route: "Leito",
+        frequency: "2x ao dia",
+        status: "active",
+        category: "therapy",
+        hours: [
+          { hour: "10:00", status: "pending" },
+          { hour: "16:00", status: "pending" },
+        ],
+      },
+      {
+        id: "med-j5",
+        medication: "Monitoramento de Sinais Vitais",
+        dosage: "Contínuo",
+        route: "Monitor",
+        frequency: "2/2h",
+        status: "active",
+        category: "nursing",
+        hours: [
+          { hour: "08:00", status: "checked", nurseName: "Enf. João" },
+          { hour: "10:00", status: "checked", nurseName: "Enf. João" },
+          { hour: "12:00", status: "checked", nurseName: "Enf. João" },
+          { hour: "14:00", status: "pending" },
+          { hour: "16:00", status: "pending" },
+          { hour: "18:00", status: "pending" },
+        ],
+      }
+    ],
   }
 ];
 
 export function PrescriptionsProvider({ children }: { children: ReactNode }) {
-  const [orders, setOrders] = useState<PrescriptionOrder[]>(initialOrders);
+  const [orders, setOrders] = useState<PrescriptionOrder[]>(() => {
+    const saved = localStorage.getItem("upa_prescriptions_v2");
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      } catch (e) {
+        console.error("Failed to parse prescriptions context", e);
+      }
+    }
+    return initialOrders;
+  });
+
+  // Sync to localStorage whenever orders change
+  useEffect(() => {
+    localStorage.setItem("upa_prescriptions_v2", JSON.stringify(orders));
+  }, [orders]);
 
   const addPrescriptionOrder = (
     orderData: Omit<PrescriptionOrder, "id" | "createdAt">,

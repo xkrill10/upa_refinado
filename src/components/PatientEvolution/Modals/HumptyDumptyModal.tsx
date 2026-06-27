@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import {
   Dialog,
-  DialogContent,
+  DialogDragHandle, DialogContent,
   DialogHeader,
   DialogTitle,
   DialogDescription,
@@ -111,7 +111,7 @@ export function HumptyDumptyModal({ isOpen, onClose, onApply }: HumptyDumptyModa
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[600px] rounded-xl glass-card-premium shadow-2xl max-h-[90vh] flex flex-col !p-0 overflow-hidden gap-0">
         {/* Header – drag handle */}
-        <div className="p-6 shrink-0 border-b border-border/50 bg-slate-50/30 dark:bg-slate-900/30 cursor-grab active:cursor-grabbing">
+        <DialogDragHandle className="p-6 shrink-0 border-b border-border/50 bg-slate-50/30 dark:bg-slate-900/30">
           <DialogHeader>
             <DialogTitle className="text-xl mission-control-title flex items-center gap-2">
               <ShieldAlert className="h-6 w-6 text-violet-500" />
@@ -121,10 +121,9 @@ export function HumptyDumptyModal({ isOpen, onClose, onApply }: HumptyDumptyModa
               Avaliação de risco de queda para pacientes pediátricos
             </DialogDescription>
           </DialogHeader>
-        </div>
-        {/* Content area – independent scroll */}
+        </DialogDragHandle>{/* Content area – independent scroll */}
         <div
-          className="flex-1 flex flex-col overflow-y-auto custom-scrollbar"
+          className="flex-1 flex flex-col overflow-y-auto custom-scrollbar overscroll-contain"
           onPointerDown={(e) => e.stopPropagation()}
           style={{ touchAction: "pan-y" }}
         >
@@ -229,36 +228,38 @@ export function HumptyDumptyModal({ isOpen, onClose, onApply }: HumptyDumptyModa
                 </SelectContent>
               </Select>
             </div>
+          </div>
+        </div>
 
-            {/* Resultado */}
-            <div className="mt-3 p-3 rounded-xl bg-slate-50/70 dark:bg-slate-900/40 backdrop-blur-md border border-slate-200/60 dark:border-slate-800/50 space-y-3">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-[10px] font-black uppercase text-muted-foreground tracking-wider">Pontuação Calculada</p>
-                  <p className="text-3xl font-black text-foreground">
-                    {score} <span className="text-sm font-bold text-muted-foreground">pts</span>
-                  </p>
-                </div>
-                {isComplete ? (
-                  <Badge className={cn("h-7 rounded-lg text-xs font-black uppercase tracking-wider", riskColor)}>
-                    {riskClass}
-                  </Badge>
-                ) : (
-                  <Badge variant="secondary" className="h-7 rounded-lg text-xs font-black uppercase tracking-wider">
-                    Incompleto
-                  </Badge>
-                )}
+        {/* Footer - Fixo na base */}
+        <div className="p-4 border-t border-border/50 bg-slate-50/30 dark:bg-slate-900/30 shrink-0">
+          <div className="p-3 rounded-xl bg-slate-50/70 dark:bg-slate-900/40 backdrop-blur-md border border-slate-200/60 dark:border-slate-800/50 space-y-3">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-[10px] font-black uppercase text-muted-foreground tracking-wider">Pontuação Calculada</p>
+                <p className="text-3xl font-black text-foreground">
+                  {score} <span className="text-sm font-bold text-muted-foreground">pts</span>
+                </p>
               </div>
-              <div className="flex items-center gap-2 mt-4">
-                <Button type="button" variant="outline" onClick={handleClear}
-                  className="h-11 px-6 rounded-xl font-bold uppercase tracking-wider text-[10px] border-muted-foreground/20 text-muted-foreground hover:border-violet-500/40 hover:bg-violet-500/5 hover:text-violet-600 dark:hover:text-violet-400 transition-all">
-                  Limpar
-                </Button>
-                <Button type="button" disabled={!isComplete} onClick={handleConfirm}
-                  className="flex-1 h-11 rounded-xl font-bold uppercase tracking-wider text-[10px] bg-primary text-primary-foreground">
-                  Confirmar e Aplicar ao Prontuário
-                </Button>
-              </div>
+              {isComplete ? (
+                <Badge className={cn("h-7 rounded-lg text-xs font-black uppercase tracking-wider", riskColor)}>
+                  {riskClass}
+                </Badge>
+              ) : (
+                <Badge variant="secondary" className="h-7 rounded-lg text-xs font-black uppercase tracking-wider">
+                  Incompleto
+                </Badge>
+              )}
+            </div>
+            <div className="flex items-center gap-2 mt-4">
+              <Button type="button" variant="outline" onClick={handleClear}
+                className="h-11 px-6 rounded-xl font-bold uppercase tracking-wider text-[10px] border-muted-foreground/20 text-muted-foreground hover:border-violet-500/40 hover:bg-violet-500/5 hover:text-violet-600 dark:hover:text-violet-400 transition-all">
+                Limpar
+              </Button>
+              <Button type="button" disabled={!isComplete} onClick={handleConfirm}
+                className="flex-1 h-11 rounded-xl font-bold uppercase tracking-wider text-[10px] bg-primary text-primary-foreground">
+                Confirmar e Aplicar ao Prontuário
+              </Button>
             </div>
           </div>
         </div>

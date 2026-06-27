@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import {
   Dialog,
+  DialogDragHandle,
   DialogContent,
   DialogHeader,
   DialogTitle,
@@ -98,119 +99,131 @@ export function MewsModal({ isOpen, onClose, onApply }: MewsModalProps) {
     toast.success("Escore MEWS integrado ao prontuário com sucesso!");
   };
 
+  const selectTriggerClass = "h-9 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium";
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[550px] rounded-xl glass-card-premium shadow-2xl">
-        <DialogHeader>
-          <DialogTitle className="text-xl mission-control-title flex items-center gap-2">
-            <Activity className="h-6 w-6 text-blue-500" />
-            Escore MEWS (Alerta Fisiológico)
-          </DialogTitle>
-          <DialogDescription className="font-bold uppercase text-[10px] tracking-widest text-muted-foreground">
-            Modified Early Warning Score - Triagem Adulta
-          </DialogDescription>
-        </DialogHeader>
+      <DialogContent className="sm:max-w-[550px] rounded-xl glass-card-premium shadow-2xl max-h-[90vh] flex flex-col !p-0 overflow-hidden gap-0">
+        <DialogDragHandle className="p-6 shrink-0 border-b border-border/50 bg-slate-50/30 dark:bg-slate-900/30">
+          <DialogHeader>
+            <DialogTitle className="text-xl mission-control-title flex items-center gap-2">
+              <Activity className="h-6 w-6 text-blue-500" />
+              Escore MEWS (Alerta Fisiológico)
+            </DialogTitle>
+            <DialogDescription className="font-bold uppercase text-[10px] tracking-widest text-muted-foreground">
+              Modified Early Warning Score - Triagem Adulta
+            </DialogDescription>
+          </DialogHeader>
+        </DialogDragHandle>
 
-        <div className="space-y-2.5 py-1">
-          {/* 1. PAS (Pressão Arterial Sistólica) */}
-          <div className="space-y-1">
-            <Label className="text-xs font-black uppercase text-foreground/80">
-              1. Pressão Arterial Sistólica (mmHg)
-            </Label>
-            <Select value={mewsPas} onValueChange={setMewsPas}>
-              <SelectTrigger className="h-9 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
-                <SelectValue placeholder="Selecione a faixa de PAS..." />
-              </SelectTrigger>
-              <SelectContent className="rounded-xl">
-                <SelectItem value="3">&lt;= 70 mmHg (3 pts)</SelectItem>
-                <SelectItem value="2">71 - 80 mmHg (2 pts)</SelectItem>
-                <SelectItem value="1">81 - 100 mmHg (1 pt)</SelectItem>
-                <SelectItem value="0">101 - 199 mmHg (0 pts)</SelectItem>
-                <SelectItem value="2_high">&gt;= 200 mmHg (2 pts)</SelectItem>
-              </SelectContent>
-            </Select>
+        <div
+          className="flex-1 flex flex-col overflow-y-auto custom-scrollbar overscroll-contain"
+          onPointerDown={(e) => e.stopPropagation()}
+          style={{ touchAction: "pan-y" }}
+        >
+          <div className="space-y-2.5 p-6">
+            {/* 1. PAS (Pressão Arterial Sistólica) */}
+            <div className="space-y-1">
+              <Label className="text-xs font-black uppercase text-foreground/80">
+                1. Pressão Arterial Sistólica (mmHg)
+              </Label>
+              <Select value={mewsPas} onValueChange={setMewsPas}>
+                <SelectTrigger className={selectTriggerClass}>
+                  <SelectValue placeholder="Selecione a faixa de PAS..." />
+                </SelectTrigger>
+                <SelectContent className="rounded-xl">
+                  <SelectItem value="3">&lt;= 70 mmHg (3 pts)</SelectItem>
+                  <SelectItem value="2">71 - 80 mmHg (2 pts)</SelectItem>
+                  <SelectItem value="1">81 - 100 mmHg (1 pt)</SelectItem>
+                  <SelectItem value="0">101 - 199 mmHg (0 pts)</SelectItem>
+                  <SelectItem value="2_high">&gt;= 200 mmHg (2 pts)</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* 2. FC (Frequência Cardíaca) */}
+            <div className="space-y-1">
+              <Label className="text-xs font-black uppercase text-foreground/80">
+                2. Frequência Cardíaca (bpm)
+              </Label>
+              <Select value={mewsFc} onValueChange={setMewsFc}>
+                <SelectTrigger className={selectTriggerClass}>
+                  <SelectValue placeholder="Selecione a faixa de FC..." />
+                </SelectTrigger>
+                <SelectContent className="rounded-xl">
+                  <SelectItem value="2_low">&lt;= 40 bpm (2 pts)</SelectItem>
+                  <SelectItem value="1_low">41 - 50 bpm (1 pt)</SelectItem>
+                  <SelectItem value="0">51 - 100 bpm (0 pts)</SelectItem>
+                  <SelectItem value="1_high">101 - 110 bpm (1 pt)</SelectItem>
+                  <SelectItem value="2_high">111 - 129 bpm (2 pts)</SelectItem>
+                  <SelectItem value="3_high">&gt;= 130 bpm (3 pts)</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* 3. FR (Frequência Respiratória) */}
+            <div className="space-y-1">
+              <Label className="text-xs font-black uppercase text-foreground/80">
+                3. Frequência Respiratória (irpm)
+              </Label>
+              <Select value={mewsFr} onValueChange={setMewsFr}>
+                <SelectTrigger className={selectTriggerClass}>
+                  <SelectValue placeholder="Selecione a faixa de FR..." />
+                </SelectTrigger>
+                <SelectContent className="rounded-xl">
+                  <SelectItem value="2_low">&lt;= 8 irpm (2 pts)</SelectItem>
+                  <SelectItem value="0">9 - 14 irpm (0 pts)</SelectItem>
+                  <SelectItem value="1_high">15 - 20 irpm (1 pt)</SelectItem>
+                  <SelectItem value="2_high">21 - 29 irpm (2 pts)</SelectItem>
+                  <SelectItem value="3_high">&gt;= 30 irpm (3 pts)</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* 4. Temperatura */}
+            <div className="space-y-1">
+              <Label className="text-xs font-black uppercase text-foreground/80">
+                4. Temperatura Corporal (°C)
+              </Label>
+              <Select value={mewsTemp} onValueChange={setMewsTemp}>
+                <SelectTrigger className={selectTriggerClass}>
+                  <SelectValue placeholder="Selecione a faixa de temperatura..." />
+                </SelectTrigger>
+                <SelectContent className="rounded-xl">
+                  <SelectItem value="2_low">&lt; 35.0 °C (2 pts)</SelectItem>
+                  <SelectItem value="0">35.0 - 38.4 °C (0 pts)</SelectItem>
+                  <SelectItem value="2_high">&gt;= 38.5 °C (2 pts)</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* 5. Nível de Consciência (AVDI) */}
+            <div className="space-y-1">
+              <Label className="text-xs font-black uppercase text-foreground/80">
+                5. Nível de Consciência (Escala AVDI)
+              </Label>
+              <Select value={mewsAvdi} onValueChange={setMewsAvdi}>
+                <SelectTrigger className={selectTriggerClass}>
+                  <SelectValue placeholder="Selecione o estado neurológico..." />
+                </SelectTrigger>
+                <SelectContent className="rounded-xl">
+                  <SelectItem value="0">
+                    A - Alerta / Responsivo (0 pts)
+                  </SelectItem>
+                  <SelectItem value="1">V - Responsivo à Voz (1 pt)</SelectItem>
+                  <SelectItem value="2">D - Responsivo à Dor (2 pts)</SelectItem>
+                  <SelectItem value="3">
+                    I - Inconsciente / Sem resposta (3 pts)
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
+        </div>
 
-          {/* 2. FC (Frequência Cardíaca) */}
-          <div className="space-y-1">
-            <Label className="text-xs font-black uppercase text-foreground/80">
-              2. Frequência Cardíaca (bpm)
-            </Label>
-            <Select value={mewsFc} onValueChange={setMewsFc}>
-              <SelectTrigger className="h-9 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
-                <SelectValue placeholder="Selecione a faixa de FC..." />
-              </SelectTrigger>
-              <SelectContent className="rounded-xl">
-                <SelectItem value="2_low">&lt;= 40 bpm (2 pts)</SelectItem>
-                <SelectItem value="1_low">41 - 50 bpm (1 pt)</SelectItem>
-                <SelectItem value="0">51 - 100 bpm (0 pts)</SelectItem>
-                <SelectItem value="1_high">101 - 110 bpm (1 pt)</SelectItem>
-                <SelectItem value="2_high">111 - 129 bpm (2 pts)</SelectItem>
-                <SelectItem value="3_high">&gt;= 130 bpm (3 pts)</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* 3. FR (Frequência Respiratória) */}
-          <div className="space-y-1">
-            <Label className="text-xs font-black uppercase text-foreground/80">
-              3. Frequência Respiratória (irpm)
-            </Label>
-            <Select value={mewsFr} onValueChange={setMewsFr}>
-              <SelectTrigger className="h-9 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
-                <SelectValue placeholder="Selecione a faixa de FR..." />
-              </SelectTrigger>
-              <SelectContent className="rounded-xl">
-                <SelectItem value="2_low">&lt;= 8 irpm (2 pts)</SelectItem>
-                <SelectItem value="0">9 - 14 irpm (0 pts)</SelectItem>
-                <SelectItem value="1_high">15 - 20 irpm (1 pt)</SelectItem>
-                <SelectItem value="2_high">21 - 29 irpm (2 pts)</SelectItem>
-                <SelectItem value="3_high">&gt;= 30 irpm (3 pts)</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* 4. Temperatura */}
-          <div className="space-y-1">
-            <Label className="text-xs font-black uppercase text-foreground/80">
-              4. Temperatura Corporal (°C)
-            </Label>
-            <Select value={mewsTemp} onValueChange={setMewsTemp}>
-              <SelectTrigger className="h-9 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
-                <SelectValue placeholder="Selecione a faixa de temperatura..." />
-              </SelectTrigger>
-              <SelectContent className="rounded-xl">
-                <SelectItem value="2_low">&lt; 35.0 °C (2 pts)</SelectItem>
-                <SelectItem value="0">35.0 - 38.4 °C (0 pts)</SelectItem>
-                <SelectItem value="2_high">&gt;= 38.5 °C (2 pts)</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* 5. Nível de Consciência (AVDI) */}
-          <div className="space-y-1">
-            <Label className="text-xs font-black uppercase text-foreground/80">
-              5. Nível de Consciência (Escala AVDI)
-            </Label>
-            <Select value={mewsAvdi} onValueChange={setMewsAvdi}>
-              <SelectTrigger className="h-9 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
-                <SelectValue placeholder="Selecione o estado neurológico..." />
-              </SelectTrigger>
-              <SelectContent className="rounded-xl">
-                <SelectItem value="0">
-                  A - Alerta / Responsivo (0 pts)
-                </SelectItem>
-                <SelectItem value="1">V - Responsivo à Voz (1 pt)</SelectItem>
-                <SelectItem value="2">D - Responsivo à Dor (2 pts)</SelectItem>
-                <SelectItem value="3">
-                  I - Inconsciente / Sem resposta (3 pts)
-                </SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Resultado e Ação */}
-          <div className="mt-3 p-3 rounded-xl bg-slate-50/70 dark:bg-slate-900/40 backdrop-blur-md border border-slate-200/60 dark:border-slate-800/50 space-y-3">
+        {/* Footer - Fixo na base */}
+        <div className="p-4 border-t border-border/50 bg-slate-50/30 dark:bg-slate-900/30 shrink-0">
+          <div className="p-3 rounded-xl bg-slate-50/70 dark:bg-slate-900/40 backdrop-blur-md border border-slate-200/60 dark:border-slate-800/50 space-y-3">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-[10px] font-black uppercase text-muted-foreground tracking-wider">

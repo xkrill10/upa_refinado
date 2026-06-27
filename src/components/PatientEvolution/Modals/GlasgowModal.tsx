@@ -75,91 +75,101 @@ export function GlasgowModal({ isOpen, onClose, onApply }: GlasgowModalProps) {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[500px] rounded-xl glass-card-premium shadow-2xl max-h-[85vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="text-2xl mission-control-title flex items-center gap-2">
-            <Brain className="h-6 w-6 text-indigo-500 animate-pulse" />
-            Escala de Coma de Glasgow (GCS)
-          </DialogTitle>
-          <DialogDescription className="font-bold uppercase text-[10px] tracking-widest text-muted-foreground">
-            Avaliação do Nível de Consciência e Reatividade Neurológica
-          </DialogDescription>
-        </DialogHeader>
+      <DialogContent className="sm:max-w-[500px] rounded-xl glass-card-premium shadow-2xl max-h-[85vh] flex flex-col !p-0 overflow-hidden gap-0">
+        <div className="p-6 shrink-0 border-b border-border/50 bg-slate-50/30 dark:bg-slate-900/30">
+          <DialogHeader>
+            <DialogTitle className="text-2xl mission-control-title flex items-center gap-2">
+              <Brain className="h-6 w-6 text-indigo-500 animate-pulse" />
+              Escala de Coma de Glasgow (GCS)
+            </DialogTitle>
+            <DialogDescription className="font-bold uppercase text-[10px] tracking-widest text-muted-foreground">
+              Avaliação do Nível de Consciência e Reatividade Neurológica
+            </DialogDescription>
+          </DialogHeader>
+        </div>
 
-        <div className="space-y-4 py-3">
-          {/* 1. Abertura Ocular */}
-          <div className="space-y-1">
-            <Label className="text-xs font-black uppercase text-foreground/80">
-              1. Abertura Ocular (AO)
-            </Label>
-            <Select value={gcsEye} onValueChange={setGcsEye}>
-              <SelectTrigger className="h-10 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
-                <SelectValue placeholder="Selecione a abertura ocular..." />
-              </SelectTrigger>
-              <SelectContent className="rounded-xl">
-                <SelectItem value="4">4 - Espontânea</SelectItem>
-                <SelectItem value="3">
-                  3 - Ao estímulo verbal / À ordem
-                </SelectItem>
-                <SelectItem value="2">
-                  2 - Ao estímulo doloroso / À pressão
-                </SelectItem>
-                <SelectItem value="1">1 - Sem resposta (Ausente)</SelectItem>
-              </SelectContent>
-            </Select>
+        <div
+          className="flex-1 flex flex-col overflow-y-auto custom-scrollbar overscroll-contain"
+          onPointerDown={(e) => e.stopPropagation()}
+          style={{ touchAction: "pan-y" }}
+        >
+          <div className="space-y-4 p-6">
+            {/* 1. Abertura Ocular */}
+            <div className="space-y-1">
+              <Label className="text-xs font-black uppercase text-foreground/80">
+                1. Abertura Ocular (AO)
+              </Label>
+              <Select value={gcsEye} onValueChange={setGcsEye}>
+                <SelectTrigger className="h-10 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
+                  <SelectValue placeholder="Selecione a abertura ocular..." />
+                </SelectTrigger>
+                <SelectContent className="rounded-xl">
+                  <SelectItem value="4">4 - Espontânea</SelectItem>
+                  <SelectItem value="3">
+                    3 - Ao estímulo verbal / À ordem
+                  </SelectItem>
+                  <SelectItem value="2">
+                    2 - Ao estímulo doloroso / À pressão
+                  </SelectItem>
+                  <SelectItem value="1">1 - Sem resposta (Ausente)</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* 2. Resposta Verbal */}
+            <div className="space-y-1">
+              <Label className="text-xs font-black uppercase text-foreground/80">
+                2. Resposta Verbal (RV)
+              </Label>
+              <Select value={gcsVerbal} onValueChange={setGcsVerbal}>
+                <SelectTrigger className="h-10 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
+                  <SelectValue placeholder="Selecione a resposta verbal..." />
+                </SelectTrigger>
+                <SelectContent className="rounded-xl">
+                  <SelectItem value="5">5 - Orientado</SelectItem>
+                  <SelectItem value="4">4 - Confuso / Desorientado</SelectItem>
+                  <SelectItem value="3">3 - Palavras inapropriadas</SelectItem>
+                  <SelectItem value="2">
+                    2 - Sons incompreensíveis / Inespecíficos
+                  </SelectItem>
+                  <SelectItem value="1">1 - Sem resposta (Ausente)</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* 3. Resposta Motora */}
+            <div className="space-y-1">
+              <Label className="text-xs font-black uppercase text-foreground/80">
+                3. Resposta Motora (RM)
+              </Label>
+              <Select value={gcsMotor} onValueChange={setGcsMotor}>
+                <SelectTrigger className="h-10 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
+                  <SelectValue placeholder="Selecione a resposta motora..." />
+                </SelectTrigger>
+                <SelectContent className="rounded-xl">
+                  <SelectItem value="6">6 - Obedece a comandos verbal</SelectItem>
+                  <SelectItem value="5">
+                    5 - Localiza estímulo doloroso
+                  </SelectItem>
+                  <SelectItem value="4">
+                    4 - Flexão normal / Retirada à dor
+                  </SelectItem>
+                  <SelectItem value="3">
+                    3 - Flexão anormal (Decorticação)
+                  </SelectItem>
+                  <SelectItem value="2">
+                    2 - Extensão anormal (Descerebração)
+                  </SelectItem>
+                  <SelectItem value="1">1 - Sem resposta (Ausente)</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
+        </div>
 
-          {/* 2. Resposta Verbal */}
-          <div className="space-y-1">
-            <Label className="text-xs font-black uppercase text-foreground/80">
-              2. Resposta Verbal (RV)
-            </Label>
-            <Select value={gcsVerbal} onValueChange={setGcsVerbal}>
-              <SelectTrigger className="h-10 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
-                <SelectValue placeholder="Selecione a resposta verbal..." />
-              </SelectTrigger>
-              <SelectContent className="rounded-xl">
-                <SelectItem value="5">5 - Orientado</SelectItem>
-                <SelectItem value="4">4 - Confuso / Desorientado</SelectItem>
-                <SelectItem value="3">3 - Palavras inapropriadas</SelectItem>
-                <SelectItem value="2">
-                  2 - Sons incompreensíveis / Inespecíficos
-                </SelectItem>
-                <SelectItem value="1">1 - Sem resposta (Ausente)</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* 3. Resposta Motora */}
-          <div className="space-y-1">
-            <Label className="text-xs font-black uppercase text-foreground/80">
-              3. Resposta Motora (RM)
-            </Label>
-            <Select value={gcsMotor} onValueChange={setGcsMotor}>
-              <SelectTrigger className="h-10 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
-                <SelectValue placeholder="Selecione a resposta motora..." />
-              </SelectTrigger>
-              <SelectContent className="rounded-xl">
-                <SelectItem value="6">6 - Obedece a comandos verbal</SelectItem>
-                <SelectItem value="5">
-                  5 - Localiza estímulo doloroso
-                </SelectItem>
-                <SelectItem value="4">
-                  4 - Flexão normal / Retirada à dor
-                </SelectItem>
-                <SelectItem value="3">
-                  3 - Flexão anormal (Decorticação)
-                </SelectItem>
-                <SelectItem value="2">
-                  2 - Extensão anormal (Descerebração)
-                </SelectItem>
-                <SelectItem value="1">1 - Sem resposta (Ausente)</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Resultado e Ação */}
-          <div className="mt-6 p-4 rounded-xl bg-slate-50/70 dark:bg-slate-900/40 backdrop-blur-md border border-slate-200/60 dark:border-slate-800/50 space-y-3">
+        {/* Footer - Fixo na base */}
+        <div className="p-4 border-t border-border/50 bg-slate-50/30 dark:bg-slate-900/30 shrink-0">
+          <div className="p-4 rounded-xl bg-slate-50/70 dark:bg-slate-900/40 backdrop-blur-md border border-slate-200/60 dark:border-slate-800/50 space-y-3">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-[10px] font-black uppercase text-muted-foreground tracking-wider">

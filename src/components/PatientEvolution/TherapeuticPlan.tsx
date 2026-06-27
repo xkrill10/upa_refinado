@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useLayoutEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ShieldAlert, Clock, CheckCircle2, XCircle, ChevronLeft, ChevronRight, Calendar as CalendarIcon, Pill, Utensils, Activity, Stethoscope, Ban, Trash2 } from "lucide-react";
+import { ShieldAlert, Clock, CheckCircle2, XCircle, ChevronLeft, ChevronRight, Calendar as CalendarIcon, Pill, Utensils, Activity, Stethoscope, Ban, Trash2, Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { usePrescriptions, PrescriptionMedication, AprazamentoHour, PrescriptionStatus } from "@/context/PrescriptionsContext";
 import { DoubleCheckModal } from "./Modals/DoubleCheckModal";
@@ -57,13 +57,15 @@ interface TherapeuticPlanProps {
 }
 
 export function TherapeuticPlan({ patientId }: TherapeuticPlanProps) {
-  const { orders, updateMedicationHours, updateMedicationExecution, addCareItem, removeCareItem } = usePrescriptions();
-  const { addEvolution, updatePatient } = usePatients();
+  const { orders, updateMedicationHours, updateMedicationExecution, addCareItem, removeCareItem, addPrescriptionOrder } = usePrescriptions();
+  const { addEvolution, updatePatient, patients } = usePatients();
   const scrollRef = useRef<HTMLDivElement>(null);
   const headerRef = useRef<HTMLTableSectionElement>(null);
   const isUserScrolling = useRef(false);
   const previousDateRef = useRef(new Date());
-  const activeOrder = orders.find((o) => o.patientId === patientId) || orders[0];
+  // Find order for current patient, or undefined if none exists yet
+  const activeOrder = orders.find((o) => o.patientId === patientId);
+  const patient = patients.find(p => p.id === patientId);
 
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedMed, setSelectedMed] = useState<{med: PrescriptionMedication, hour: any} | null>(null);
@@ -179,7 +181,7 @@ export function TherapeuticPlan({ patientId }: TherapeuticPlanProps) {
         });
       }
     }
-  }, [currentDate, currentHourStr]);
+  }, [currentDate, currentHourStr, activeOrder]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -199,15 +201,45 @@ export function TherapeuticPlan({ patientId }: TherapeuticPlanProps) {
 
   if (!activeOrder) {
     return (
-      <Card className="glass-card">
-        <CardContent className="flex flex-col items-center justify-center py-10 text-center">
-          <Clock className="h-10 w-10 text-muted-foreground mb-4 opacity-50" />
-          <h3 className="text-lg font-bold text-foreground">Nenhuma Prescrição Ativa</h3>
-          <p className="text-sm text-muted-foreground max-w-sm mt-2">
-            O paciente não possui um plano terapêutico definido.
-          </p>
-        </CardContent>
-      </Card>
+      <>
+        <div className="flex items-center gap-3 mb-6">
+          <h2 className="text-2xl font-black tracking-tighter uppercase text-foreground">Painel de Cuidados</h2>
+          <Button 
+            className="bg-[#006699] hover:bg-[#005580] text-white rounded-full font-bold uppercase text-[10px] tracking-widest px-4 h-8"
+            onClick={() => setIsAddModalOpen(true)}
+          >
+            <Plus className="mr-1.5 h-3.5 w-3.5" /> Novo Item
+          </Button>
+        </div>
+        <Card className="glass-card">
+          <CardContent className="flex flex-col items-center justify-center py-10 text-center">
+            <Clock className="h-10 w-10 text-muted-foreground mb-4 opacity-50" />
+            <h3 className="text-lg font-bold text-foreground">Nenhuma Prescrição Ativa</h3>
+            <p className="text-sm text-muted-foreground max-w-sm mt-2">
+              O paciente não possui um plano terapêutico definido.
+            </p>
+          </CardContent>
+        </Card>
+        
+        <AddCareItemModal 
+          patientId={patientId}
+          isOpen={isAddModalOpen} 
+          onClose={() => setIsAddModalOpen(false)} 
+          onAdd={(item) => {
+            if (patient) {
+              const newOrder = {
+                patientId: patient.id,
+                patientName: patient.name,
+                doctorId: "enf-principal",
+                doctorName: "Enfermeiro",
+                medications: [item]
+              };
+              addPrescriptionOrder(newOrder);
+              toast.success("Plano Terapêutico iniciado e item adicionado!");
+            }
+          }} 
+        />
+      </>
     );
   }
 
@@ -380,13 +412,13 @@ export function TherapeuticPlan({ patientId }: TherapeuticPlanProps) {
   };
 
   const groupedMeds = {
-    medication: activeOrder.medications.filter(m => !m.category || m.category === 'medication'),
-    diet: activeOrder.medications.filter(m => m.category === 'diet'),
-    therapy: activeOrder.medications.filter(m => m.category === 'therapy'),
-    nursing: activeOrder.medications.filter(m => m.category === 'nursing'),
+    medication: activeOrder?.medications.filter(m => !m.category || m.category === 'medication') || [],
+    diet: activeOrder?.medications.filter(m => m.category === 'diet') || [],
+    therapy: activeOrder?.medications.filter(m => m.category === 'therapy') || [],
+    nursing: activeOrder?.medications.filter(m => m.category === 'nursing') || [],
   };
 
-  const renderGroup = (meds: PrescriptionMedication[], title: string, icon: React.ReactNode, bgColor: string, textColor: string) => {
+  const renderGroup = (meds: PrescriptionMedication[], title: string, icon: React.ReactNode, bgColor: string, textColor: string, borderColor: string, rowBgColor: string) => {
     if (meds.length === 0) return null;
     return (
       <>
@@ -397,10 +429,14 @@ export function TherapeuticPlan({ patientId }: TherapeuticPlanProps) {
         </tr>
         {meds.map((med) => (
           <tr key={med.id} className={cn(
-            "border-b border-white/20 dark:border-white/5 hover:bg-white/20 dark:hover:bg-slate-800/40 transition-colors",
-            med.isHighVigilance && "bg-red-500/5 hover:bg-red-500/10"
+            "border-b border-white/20 dark:border-white/5 hover:bg-white/40 dark:hover:bg-slate-800/60 transition-colors",
+            rowBgColor,
+            med.isHighVigilance && "bg-red-500/10 hover:bg-red-500/20"
           )}>
-            <td className="px-4 py-3 sticky left-0 z-10 bg-white/40 dark:bg-slate-900/40 backdrop-blur-xl border-r border-b border-white/30 dark:border-white/10 w-[250px] shadow-[2px_0_10px_rgba(0,0,0,0.02)] group">
+            <td className={cn(
+              "px-4 py-3 sticky left-0 z-10 backdrop-blur-xl border-r border-b border-l-[3px] border-white/30 dark:border-white/10 w-[250px] shadow-[2px_0_10px_rgba(0,0,0,0.02)] group",
+              bgColor, borderColor
+            )}>
               <div className="flex flex-col gap-1 w-[230px]">
                 <div className="flex items-center gap-2">
                   <span className={cn(
@@ -728,17 +764,39 @@ export function TherapeuticPlan({ patientId }: TherapeuticPlanProps) {
             </thead>
             <tbody>
               <TooltipProvider delayDuration={100}>
-                {renderGroup(groupedMeds.medication, "Medicamentos e Infusões", <Pill className="h-3.5 w-3.5" />, "bg-purple-500/10", "text-purple-600 dark:text-purple-400")}
-                {renderGroup(groupedMeds.diet, "Dietas e Refeições", <Utensils className="h-3.5 w-3.5" />, "bg-orange-500/10", "text-orange-600 dark:text-orange-400")}
-                {renderGroup(groupedMeds.therapy, "Terapias e Reabilitação", <Activity className="h-3.5 w-3.5" />, "bg-emerald-500/10", "text-emerald-600 dark:text-emerald-400")}
-                {renderGroup(groupedMeds.nursing, "Cuidados de Enfermagem", <Stethoscope className="h-3.5 w-3.5" />, "bg-[#006699]/10 dark:bg-sky-500/10", "text-[#006699] dark:text-sky-400")}
+                {renderGroup(groupedMeds.medication, "Medicamentos e Infusões", <Pill className="h-3.5 w-3.5" />, "bg-purple-500/10", "text-purple-600 dark:text-purple-400", "border-l-purple-500", "bg-purple-500/5")}
+                {renderGroup(groupedMeds.diet, "Dietas e Refeições", <Utensils className="h-3.5 w-3.5" />, "bg-orange-500/10", "text-orange-600 dark:text-orange-400", "border-l-orange-500", "bg-orange-500/5")}
+                {renderGroup(groupedMeds.therapy, "Terapias e Reabilitação", <Activity className="h-3.5 w-3.5" />, "bg-emerald-500/10", "text-emerald-600 dark:text-emerald-400", "border-l-emerald-500", "bg-emerald-500/5")}
+                {renderGroup(groupedMeds.nursing, "Cuidados de Enfermagem", <Stethoscope className="h-3.5 w-3.5" />, "bg-[#006699]/10 dark:bg-sky-500/10", "text-[#006699] dark:text-sky-400", "border-l-[#006699] dark:border-l-sky-500", "bg-[#006699]/5 dark:bg-sky-500/5")}
               </TooltipProvider>
             </tbody>
           </table>
         </div>
-        <div className="bg-muted/10 border-t border-border/50 p-2 flex items-center justify-between">
-          <div className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground px-2">
-            Deslize para ver todos os horários
+        <div className="bg-muted/10 border-t border-border/50 p-2 flex flex-col md:flex-row items-center justify-between gap-4">
+          <div className="flex flex-wrap items-center gap-4 px-2">
+            <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+              <div className="w-3 h-3 rounded-full bg-amber-500/20 border border-amber-500 flex items-center justify-center">
+                <div className="w-1.5 h-1.5 rounded-full bg-amber-500" />
+              </div> Pendente
+            </div>
+            <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+              <div className="w-3 h-3 rounded-full bg-emerald-500/20 border border-emerald-500 flex items-center justify-center">
+                <CheckCircle2 className="h-2 w-2 text-emerald-500" />
+              </div> Realizado
+            </div>
+            <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+              <div className="w-3 h-3 rounded-full bg-orange-500/20 border border-orange-500 flex items-center justify-center">
+                <Clock className="h-2 w-2 text-orange-500" />
+              </div> Adiado
+            </div>
+            <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+              <div className="w-3 h-3 rounded-full bg-red-500/20 border border-red-500 flex items-center justify-center">
+                <XCircle className="h-2 w-2 text-red-500" />
+              </div> Recusado
+            </div>
+            <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+              <ShieldAlert className="h-3 w-3 text-red-500" /> Alta Vigilância
+            </div>
           </div>
           <div className="flex items-center gap-2">
             <Button 
@@ -747,7 +805,7 @@ export function TherapeuticPlan({ patientId }: TherapeuticPlanProps) {
               className="h-8 rounded-full px-4 text-[10px] font-bold uppercase flex items-center gap-2" 
               onClick={() => scrollTimeline('left')}
             >
-              <ChevronLeft className="h-3 w-3" /> Horários Anteriores
+              <ChevronLeft className="h-3 w-3" /> Anteriores
             </Button>
             <Button 
               variant="outline" 
@@ -755,38 +813,11 @@ export function TherapeuticPlan({ patientId }: TherapeuticPlanProps) {
               className="h-8 rounded-full px-4 text-[10px] font-bold uppercase flex items-center gap-2" 
               onClick={() => scrollTimeline('right')}
             >
-              Próximos Horários <ChevronRight className="h-3 w-3" />
+              Próximos <ChevronRight className="h-3 w-3" />
             </Button>
           </div>
         </div>
       </Card>
-
-      {/* Legends */}
-      <div className="flex flex-wrap items-center gap-4 pt-2">
-        <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
-          <div className="w-3 h-3 rounded-full bg-amber-500/20 border border-amber-500 flex items-center justify-center">
-            <div className="w-1.5 h-1.5 rounded-full bg-amber-500" />
-          </div> Pendente
-        </div>
-        <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
-          <div className="w-3 h-3 rounded-full bg-emerald-500/20 border border-emerald-500 flex items-center justify-center">
-            <CheckCircle2 className="h-2 w-2 text-emerald-500" />
-          </div> Realizado
-        </div>
-        <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
-          <div className="w-3 h-3 rounded-full bg-orange-500/20 border border-orange-500 flex items-center justify-center">
-            <Clock className="h-2 w-2 text-orange-500" />
-          </div> Adiado
-        </div>
-        <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
-          <div className="w-3 h-3 rounded-full bg-red-500/20 border border-red-500 flex items-center justify-center">
-            <XCircle className="h-2 w-2 text-red-500" />
-          </div> Recusado
-        </div>
-        <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
-          <ShieldAlert className="h-3 w-3 text-red-500" /> Alta Vigilância
-        </div>
-      </div>
 
       {selectedMed && (
         <DoubleCheckModal
@@ -917,6 +948,19 @@ export function TherapeuticPlan({ patientId }: TherapeuticPlanProps) {
           if (activeOrder) {
             addCareItem(activeOrder.id, item);
             toast.success("Novo item de cuidado adicionado com sucesso!");
+          } else {
+            // Se o paciente ainda não tem um 'order' (prontuário), cria um primeiro
+            if (patient) {
+              const newOrder = {
+                patientId: patient.id,
+                patientName: patient.name,
+                doctorId: "enf-principal",
+                doctorName: "Enfermeiro",
+                medications: [item]
+              };
+              addPrescriptionOrder(newOrder);
+              toast.success("Plano Terapêutico iniciado e item adicionado!");
+            }
           }
         }} 
       />

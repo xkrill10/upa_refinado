@@ -97,6 +97,23 @@ export const ClinicalLayout = ({ children }: ClinicalLayoutProps) => {
         { id: "nir", icon: Ambulance, label: "Regulação (NIR)", path: "/nir" },
       ];
     }
+    if (role === "tecnico_enfermagem" || role === "auxiliar_enfermagem") {
+      return [
+        {
+          id: "fila_atividades",
+          icon: ClipboardList,
+          label: "Fila de Atividades",
+          path: "/checagem-enfermagem",
+        },
+        {
+          id: "checagem_sala",
+          icon: Syringe,
+          label: "Visão por Sala",
+          path: "/sala/checagem",
+        },
+      ];
+    }
+    
     return [
       {
         id: "painel",
@@ -147,7 +164,9 @@ export const ClinicalLayout = ({ children }: ClinicalLayoutProps) => {
     user?.user_metadata?.name ||
     user?.email?.split("@")[0] ||
     localDoctor ||
-    "ENFERMAGEM";
+    (role === "tecnico_enfermagem" ? "TÉCNICO DE ENFERMAGEM" : 
+     role === "auxiliar_enfermagem" ? "AUXILIAR DE ENFERMAGEM" : 
+     "ENFERMAGEM");
 
   return (
     <div className="h-screen w-full flex overflow-hidden">

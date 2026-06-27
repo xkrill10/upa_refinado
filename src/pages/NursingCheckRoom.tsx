@@ -53,6 +53,7 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { NurseWorkspaceHeader } from "@/components/NurseWorkspaceHeader";
 import { useNavigate } from "react-router-dom";
+import { useRole } from "@/context/RoleContext";
 
 /* ─── Types and Interfaces ─── */
 interface AprazamentoHour {
@@ -139,6 +140,7 @@ const formatArrivalTime = (timeStr?: string): string => {
 };
 
 export default function NursingCheckRoom() {
+  const { role } = useRole();
   const { patients, addEvolution, updatePatient } = usePatients();
   const { orders, updateMedicationHours } = usePrescriptions();
 
@@ -481,6 +483,18 @@ export default function NursingCheckRoom() {
       });
       return;
     }
+    
+    // Restrição para Auxiliar de Enfermagem
+    if (role === "auxiliar_enfermagem") {
+      const isMedication = prescriptionItem.route && prescriptionItem.route !== "-" && prescriptionItem.route !== "Leito" && prescriptionItem.route !== "VO";
+      if (isMedication) {
+        toast.error("Procedimento Restrito", {
+          description: "Auxiliares de enfermagem não podem checar medicações complexas (apenas VO ou cuidados básicos). Solicite um Técnico ou Enfermeiro.",
+        });
+        return;
+      }
+    }
+
     setActiveCheckItem({
       prescriptionId: prescriptionItem.id,
       orderId: prescriptionItem.orderId,

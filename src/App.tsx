@@ -146,8 +146,10 @@ const AppContent = () => {
                     className="bg-transparent text-xs font-black border-none outline-none cursor-pointer focus:ring-0 text-foreground"
                   >
                     <option value="diretoria">👔 DIRETORIA</option>
-                    <option value="enfermeiro">👩‍⚕️ ENFERMAGEM</option>
                     <option value="medico">👨‍⚕️ MÉDICO</option>
+                    <option value="enfermeiro">👩‍⚕️ ENFERMEIRO(A)</option>
+                    <option value="tecnico_enfermagem">🩺 TÉCNICO ENFERMAGEM</option>
+                    <option value="auxiliar_enfermagem">🩹 AUXILIAR ENFERMAGEM</option>
                     <option value="recepcao">🙋‍♀️ RECEPÇÃO</option>
                   </select>
                 </div>

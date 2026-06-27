@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import {
   Dialog,
+  DialogDragHandle,
   DialogContent,
   DialogHeader,
   DialogTitle,
@@ -89,136 +90,148 @@ export function MorseModal({ isOpen, onClose, onApply }: MorseModalProps) {
     toast.success("Resultado da Escala de Morse inserido no prontuário!");
   };
 
+  const selectTriggerClass = "h-9 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium";
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[550px] rounded-xl glass-card-premium shadow-2xl">
-        <DialogHeader>
-          <DialogTitle className="text-xl mission-control-title flex items-center gap-2">
-            <ShieldAlert className="h-6 w-6 text-amber-500" />
-            Escala de Morse (Risco de Quedas)
-          </DialogTitle>
-          <DialogDescription className="font-bold uppercase text-[10px] tracking-widest text-muted-foreground">
-            Avaliação do Risco de Quedas em Paciente Adulto
-          </DialogDescription>
-        </DialogHeader>
+      <DialogContent className="sm:max-w-[550px] rounded-xl glass-card-premium shadow-2xl max-h-[90vh] flex flex-col !p-0 overflow-hidden gap-0">
+        <DialogDragHandle className="p-6 shrink-0 border-b border-border/50 bg-slate-50/30 dark:bg-slate-900/30">
+          <DialogHeader>
+            <DialogTitle className="text-xl mission-control-title flex items-center gap-2">
+              <ShieldAlert className="h-6 w-6 text-amber-500" />
+              Escala de Morse (Risco de Quedas)
+            </DialogTitle>
+            <DialogDescription className="font-bold uppercase text-[10px] tracking-widest text-muted-foreground">
+              Avaliação do Risco de Quedas em Paciente Adulto
+            </DialogDescription>
+          </DialogHeader>
+        </DialogDragHandle>
 
-        <div className="space-y-2.5 py-1">
-          {/* 1. Histórico de Quedas */}
-          <div className="space-y-1">
-            <Label className="text-xs font-black uppercase text-foreground/80">
-              1. Histórico de Quedas nos últimos 3 meses
-            </Label>
-            <Select value={morseHistory} onValueChange={setMorseHistory}>
-              <SelectTrigger className="h-9 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
-                <SelectValue placeholder="Selecione..." />
-              </SelectTrigger>
-              <SelectContent className="rounded-xl">
-                <SelectItem value="no">Não (0 pts)</SelectItem>
-                <SelectItem value="yes">Sim (25 pts)</SelectItem>
-              </SelectContent>
-            </Select>
+        <div
+          className="flex-1 flex flex-col overflow-y-auto custom-scrollbar overscroll-contain"
+          onPointerDown={(e) => e.stopPropagation()}
+          style={{ touchAction: "pan-y" }}
+        >
+          <div className="space-y-2.5 p-6">
+            {/* 1. Histórico de Quedas */}
+            <div className="space-y-1">
+              <Label className="text-xs font-black uppercase text-foreground/80">
+                1. Histórico de Quedas nos últimos 3 meses
+              </Label>
+              <Select value={morseHistory} onValueChange={setMorseHistory}>
+                <SelectTrigger className={selectTriggerClass}>
+                  <SelectValue placeholder="Selecione..." />
+                </SelectTrigger>
+                <SelectContent className="rounded-xl">
+                  <SelectItem value="no">Não (0 pts)</SelectItem>
+                  <SelectItem value="yes">Sim (25 pts)</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* 2. Diagnóstico Secundário */}
+            <div className="space-y-1">
+              <Label className="text-xs font-black uppercase text-foreground/80">
+                2. Diagnóstico Secundário no prontuário
+              </Label>
+              <Select value={morseDiagnosis} onValueChange={setMorseDiagnosis}>
+                <SelectTrigger className={selectTriggerClass}>
+                  <SelectValue placeholder="Selecione..." />
+                </SelectTrigger>
+                <SelectContent className="rounded-xl">
+                  <SelectItem value="no">Não (0 pts)</SelectItem>
+                  <SelectItem value="yes">Sim (15 pts)</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* 3. Auxílio na Deambulação */}
+            <div className="space-y-1">
+              <Label className="text-xs font-black uppercase text-foreground/80">
+                3. Auxílio na Deambulação
+              </Label>
+              <Select value={morseAmbulation} onValueChange={setMorseAmbulation}>
+                <SelectTrigger className={selectTriggerClass}>
+                  <SelectValue placeholder="Selecione o auxílio..." />
+                </SelectTrigger>
+                <SelectContent className="rounded-xl">
+                  <SelectItem value="none">
+                    Nenhum / Acamado / Cadeira de Rodas (0 pts)
+                  </SelectItem>
+                  <SelectItem value="crutches">
+                    Muletas / Bengala / Andador (15 pts)
+                  </SelectItem>
+                  <SelectItem value="furniture">
+                    Apoia-se em móveis ou paredes (30 pts)
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* 4. Terapia Intravenosa */}
+            <div className="space-y-1">
+              <Label className="text-xs font-black uppercase text-foreground/80">
+                4. Terapia Intravenosa / Dispositivo Endovenoso (Soro, Acesso)
+              </Label>
+              <Select value={morseIv} onValueChange={setMorseIv}>
+                <SelectTrigger className={selectTriggerClass}>
+                  <SelectValue placeholder="Selecione..." />
+                </SelectTrigger>
+                <SelectContent className="rounded-xl">
+                  <SelectItem value="no">Não (0 pts)</SelectItem>
+                  <SelectItem value="yes">Sim (20 pts)</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* 5. Marcha */}
+            <div className="space-y-1">
+              <Label className="text-xs font-black uppercase text-foreground/80">
+                5. Marcha / Transferência
+              </Label>
+              <Select value={morseGait} onValueChange={setMorseGait}>
+                <SelectTrigger className={selectTriggerClass}>
+                  <SelectValue placeholder="Selecione o padrão de marcha..." />
+                </SelectTrigger>
+                <SelectContent className="rounded-xl">
+                  <SelectItem value="normal">
+                    Normal / Acamado / Cadeira de Rodas (0 pts)
+                  </SelectItem>
+                  <SelectItem value="weak">
+                    Fraca / Ligeiramente alterada (10 pts)
+                  </SelectItem>
+                  <SelectItem value="impaired">
+                    Limitada / Com esforço ou passos curtos (20 pts)
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* 6. Estado Mental */}
+            <div className="space-y-1">
+              <Label className="text-xs font-black uppercase text-foreground/80">
+                6. Estado Mental
+              </Label>
+              <Select value={morseMental} onValueChange={setMorseMental}>
+                <SelectTrigger className={selectTriggerClass}>
+                  <SelectValue placeholder="Selecione o estado mental..." />
+                </SelectTrigger>
+                <SelectContent className="rounded-xl">
+                  <SelectItem value="oriented">
+                    Orientado / Limites próprios (0 pts)
+                  </SelectItem>
+                  <SelectItem value="forgetful">
+                    Superestima limites / Esquecido (15 pts)
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
+        </div>
 
-          {/* 2. Diagnóstico Secundário */}
-          <div className="space-y-1">
-            <Label className="text-xs font-black uppercase text-foreground/80">
-              2. Diagnóstico Secundário no prontuário
-            </Label>
-            <Select value={morseDiagnosis} onValueChange={setMorseDiagnosis}>
-              <SelectTrigger className="h-9 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
-                <SelectValue placeholder="Selecione..." />
-              </SelectTrigger>
-              <SelectContent className="rounded-xl">
-                <SelectItem value="no">Não (0 pts)</SelectItem>
-                <SelectItem value="yes">Sim (15 pts)</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* 3. Auxílio na Deambulação */}
-          <div className="space-y-1">
-            <Label className="text-xs font-black uppercase text-foreground/80">
-              3. Auxílio na Deambulação
-            </Label>
-            <Select value={morseAmbulation} onValueChange={setMorseAmbulation}>
-              <SelectTrigger className="h-9 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
-                <SelectValue placeholder="Selecione o auxílio..." />
-              </SelectTrigger>
-              <SelectContent className="rounded-xl">
-                <SelectItem value="none">
-                  Nenhum / Acamado / Cadeira de Rodas (0 pts)
-                </SelectItem>
-                <SelectItem value="crutches">
-                  Muletas / Bengala / Andador (15 pts)
-                </SelectItem>
-                <SelectItem value="furniture">
-                  Apoia-se em móveis ou paredes (30 pts)
-                </SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* 4. Terapia Intravenosa */}
-          <div className="space-y-1">
-            <Label className="text-xs font-black uppercase text-foreground/80">
-              4. Terapia Intravenosa / Dispositivo Endovenoso (Soro, Acesso)
-            </Label>
-            <Select value={morseIv} onValueChange={setMorseIv}>
-              <SelectTrigger className="h-9 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
-                <SelectValue placeholder="Selecione..." />
-              </SelectTrigger>
-              <SelectContent className="rounded-xl">
-                <SelectItem value="no">Não (0 pts)</SelectItem>
-                <SelectItem value="yes">Sim (20 pts)</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* 5. Marcha */}
-          <div className="space-y-1">
-            <Label className="text-xs font-black uppercase text-foreground/80">
-              5. Marcha / Transferência
-            </Label>
-            <Select value={morseGait} onValueChange={setMorseGait}>
-              <SelectTrigger className="h-9 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
-                <SelectValue placeholder="Selecione o padrão de marcha..." />
-              </SelectTrigger>
-              <SelectContent className="rounded-xl">
-                <SelectItem value="normal">
-                  Normal / Acamado / Cadeira de Rodas (0 pts)
-                </SelectItem>
-                <SelectItem value="weak">
-                  Fraca / Ligeiramente alterada (10 pts)
-                </SelectItem>
-                <SelectItem value="impaired">
-                  Limitada / Com esforço ou passos curtos (20 pts)
-                </SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* 6. Estado Mental */}
-          <div className="space-y-1">
-            <Label className="text-xs font-black uppercase text-foreground/80">
-              6. Estado Mental
-            </Label>
-            <Select value={morseMental} onValueChange={setMorseMental}>
-              <SelectTrigger className="h-9 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 transition-all font-medium">
-                <SelectValue placeholder="Selecione o estado mental..." />
-              </SelectTrigger>
-              <SelectContent className="rounded-xl">
-                <SelectItem value="oriented">
-                  Orientado / Limites próprios (0 pts)
-                </SelectItem>
-                <SelectItem value="forgetful">
-                  Superestima limites / Esquecido (15 pts)
-                </SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Resultado e Ação */}
-          <div className="mt-3 p-3 rounded-xl bg-slate-50/70 dark:bg-slate-900/40 backdrop-blur-md border border-slate-200/60 dark:border-slate-800/50 space-y-3">
+        {/* Footer - Fixo na base */}
+        <div className="p-4 border-t border-border/50 bg-slate-50/30 dark:bg-slate-900/30 shrink-0">
+          <div className="p-3 rounded-xl bg-slate-50/70 dark:bg-slate-900/40 backdrop-blur-md border border-slate-200/60 dark:border-slate-800/50 space-y-3">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-[10px] font-black uppercase text-muted-foreground tracking-wider">

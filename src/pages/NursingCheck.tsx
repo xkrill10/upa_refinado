@@ -52,6 +52,7 @@ import {
 } from "@/context/PrescriptionsContext";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { useRole } from "@/context/RoleContext";
 
 /* ─── Types and Interfaces ─── */
 interface AprazamentoHour {
@@ -145,6 +146,7 @@ const formatArrivalTime = (timeStr?: string): string => {
 };
 
 export default function NursingCheck() {
+  const { role } = useRole();
   const { patients } = usePatients();
   const { beds } = useBeds();
   const { orders, updateMedicationHours } = usePrescriptions();
@@ -457,6 +459,18 @@ export default function NursingCheck() {
       });
       return;
     }
+    
+    // Restrição para Auxiliar de Enfermagem
+    if (role === "auxiliar_enfermagem") {
+      const isMedication = prescriptionItem.route && prescriptionItem.route !== "-" && prescriptionItem.route !== "Leito" && prescriptionItem.route !== "VO";
+      if (isMedication) {
+        toast.error("Procedimento Restrito", {
+          description: "Auxiliares de enfermagem não podem checar medicações complexas (apenas VO ou cuidados básicos). Solicite um Técnico ou Enfermeiro.",
+        });
+        return;
+      }
+    }
+
     setActiveCheckItem({
       prescriptionId: prescriptionItem.id,
       orderId: prescriptionItem.orderId,
@@ -958,14 +972,36 @@ export default function NursingCheck() {
                       </div>
                     </div>
 
-                    {p.allergies && (
-                      <Badge
-                        variant="outline"
-                        className="bg-red-500/10 text-red-500 border-red-500/20 text-[8px] font-black uppercase tracking-wider py-0.5 px-2 animate-pulse shrink-0 ml-2"
-                      >
-                        Alergia
-                      </Badge>
-                    )}
+                    <div className="flex items-center gap-1 shrink-0 ml-2">
+                      {(() => {
+                        const patientSheet = getPatientCheckSheet(p.id);
+                        const pendingCount = patientSheet.prescriptions?.reduce(
+                          (acc, curr) => acc + (curr?.hours?.filter((h) => h.status === "pending")?.length || 0),
+                          0
+                        ) || 0;
+                        
+                        if (pendingCount > 0) {
+                          return (
+                            <Badge
+                              className="bg-amber-500/20 text-amber-600 dark:text-amber-400 border-amber-500/30 text-[8px] font-black uppercase tracking-wider py-0.5 px-2 animate-pulse flex items-center gap-1 shadow-sm"
+                            >
+                              <Syringe className="h-2.5 w-2.5" />
+                              {pendingCount} Pendentes
+                            </Badge>
+                          );
+                        }
+                        return null;
+                      })()}
+                      
+                      {p.allergies && (
+                        <Badge
+                          variant="outline"
+                          className="bg-red-500/10 text-red-500 border-red-500/20 text-[8px] font-black uppercase tracking-wider py-0.5 px-2 animate-pulse"
+                        >
+                          Alergia
+                        </Badge>
+                      )}
+                    </div>
                   </div>
                 );
               })}
@@ -1580,9 +1616,9 @@ export default function NursingCheck() {
               initial={{ opacity: 0, scale: 0.95, y: "-40%", x: "-50%" }}
               animate={{ opacity: 1, scale: 1, y: "-50%", x: "-50%" }}
               exit={{ opacity: 0, scale: 0.95, y: "-40%", x: "-50%" }}
-              className="fixed left-[50%] top-[50%] z-50 w-full max-w-md overflow-hidden rounded-[2.5rem] bg-white/95 dark:bg-slate-950/95 border border-slate-200/50 dark:border-white/10 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.15)] dark:shadow-[0_30px_60px_-15px_rgba(0,0,0,0.5)] backdrop-blur-xl"
+              className="fixed left-[50%] top-[50%] z-50 w-full max-w-md max-h-[90vh] flex flex-col overflow-hidden rounded-[2.5rem] bg-white/95 dark:bg-slate-950/95 border border-slate-200/50 dark:border-white/10 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.15)] dark:shadow-[0_30px_60px_-15px_rgba(0,0,0,0.5)] backdrop-blur-xl"
             >
-              <div className="p-8 bg-gradient-to-br from-rose-500 to-rose-600 dark:from-rose-600/90 dark:to-rose-700/90 text-white relative border-b border-rose-450 dark:border-rose-950/20">
+              <div className="p-8 bg-gradient-to-br from-rose-500 to-rose-600 dark:from-rose-600/90 dark:to-rose-700/90 text-white relative border-b border-rose-450 dark:border-rose-950/20 shrink-0">
                 <button
                   type="button"
                   onClick={() => setActiveCheckItem(null)}
@@ -1607,7 +1643,7 @@ export default function NursingCheck() {
                 </p>
               </div>
 
-              <div className="p-8 space-y-6">
+              <div className="p-8 space-y-6 overflow-y-auto custom-scrollbar flex-1 min-h-0">
                 {/* SELECT ACTION TYPE */}
                 <div className="grid grid-cols-2 gap-2 bg-muted/40 p-1.5 rounded-2xl border">
                   <button

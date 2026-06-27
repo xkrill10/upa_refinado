@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import {
   Dialog,
-  DialogContent,
+  DialogDragHandle, DialogContent,
   DialogHeader,
   DialogTitle,
   DialogDescription,
@@ -64,7 +64,7 @@ export function WongBakerModal({ isOpen, onClose, onApply }: WongBakerModalProps
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[550px] rounded-xl glass-card-premium shadow-2xl max-h-[90vh] flex flex-col !p-0 overflow-hidden gap-0">
-        <div className="p-6 shrink-0 border-b border-border/50 bg-slate-50/30 dark:bg-slate-900/30 cursor-grab active:cursor-grabbing">
+        <DialogDragHandle className="p-6 shrink-0 border-b border-border/50 bg-slate-50/30 dark:bg-slate-900/30">
           <DialogHeader>
             <DialogTitle className="text-xl mission-control-title flex items-center gap-2">
               <Heart className="h-6 w-6 text-rose-500" />
@@ -74,9 +74,9 @@ export function WongBakerModal({ isOpen, onClose, onApply }: WongBakerModalProps
               Avaliação de dor para crianças a partir de 3 anos — Selecione a face correspondente
             </DialogDescription>
           </DialogHeader>
-        </div>
+        </DialogDragHandle>
         <div
-          className="flex-1 flex flex-col overflow-y-auto custom-scrollbar"
+          className="flex-1 flex flex-col overflow-y-auto custom-scrollbar overscroll-contain"
           onPointerDown={(e) => e.stopPropagation()}
           style={{ touchAction: "pan-y" }}
         >

@@ -6,13 +6,15 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { PrescriptionMedication, AprazamentoHour } from "@/context/PrescriptionsContext";
-import { Activity, Pill, Stethoscope, Utensils, ShieldAlert, CalendarIcon, Trash2, CheckCircle2 } from "lucide-react";
+import { Activity, Pill, Stethoscope, Utensils, ShieldAlert, CalendarIcon, Trash2, CheckCircle2, X } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { CARE_LIBRARY } from "@/data/careLibrary";
 import { usePatients } from "@/hooks/use-patients";
 import { AlertTriangle } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
 
 interface AddCareItemModalProps {
   patientId?: string;
@@ -110,6 +112,8 @@ export function AddCareItemModal({ patientId, isOpen, onClose, onAdd }: AddCareI
     else if (freq === "12/12h" || freq === "12em12h") hours = ["10:00", "22:00"];
     else if (freq === "6/6h" || freq === "6em6h") hours = ["06:00", "12:00", "18:00", "00:00"];
     else if (freq === "4/4h" || freq === "4em4h") hours = ["02:00", "06:00", "10:00", "14:00", "18:00", "22:00"];
+    else if (freq === "2/2h" || freq === "2em2h") hours = ["08:00", "10:00", "12:00", "14:00", "16:00", "18:00", "20:00", "22:00", "00:00", "02:00", "04:00", "06:00"];
+    else if (freq === "1/1h" || freq === "1em1h" || freq === "1h") hours = ["08:00", "09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00", "20:00", "21:00", "22:00", "23:00", "00:00", "01:00", "02:00", "03:00", "04:00", "05:00", "06:00", "07:00"];
     else if (freq === "24/24h" || freq === "24h" || freq === "1xaodia" || freq === "1xdia") hours = ["10:00"];
     
     if (hours.length > 0) {
@@ -218,17 +222,35 @@ export function AddCareItemModal({ patientId, isOpen, onClose, onAdd }: AddCareI
             {/* Nome do Item com Biblioteca */}
             <div className="space-y-1.5 relative">
               <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Nome do Item</Label>
-              <Input 
-                className="bg-background/50 border-border/50 rounded-xl h-9 font-bold text-xs" 
-                placeholder="Ex: Dipirona..."
-                value={medication}
-                onChange={e => {
-                  setMedication(e.target.value);
-                  setShowSuggestions(true);
-                }}
-                onFocus={() => setShowSuggestions(true)}
-                onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
-              />
+              <div className="relative">
+                <Input 
+                  className="bg-background/50 border-border/50 rounded-xl h-9 font-bold text-xs pr-8" 
+                  placeholder="Ex: Dipirona..."
+                  value={medication}
+                  onChange={e => {
+                    setMedication(e.target.value);
+                    setShowSuggestions(true);
+                  }}
+                  onFocus={() => setShowSuggestions(true)}
+                  onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
+                />
+                {medication && (
+                  <button 
+                    type="button"
+                    onClick={() => {
+                      setMedication("");
+                      setDosage("");
+                      setRoute("");
+                      setFrequency("");
+                      setShowSuggestions(false);
+                    }}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-red-500 transition-colors"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                )}
+              </div>
+
               {showSuggestions && filteredLibrary.length > 0 && (
                 <div className="absolute top-full left-0 w-full mt-1 z-[100] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden shadow-2xl max-h-48 overflow-y-auto">
                   {filteredLibrary.map(item => (

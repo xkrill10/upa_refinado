@@ -3,7 +3,7 @@
 import * as React from "react";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { X } from "lucide-react";
-import { motion } from "motion/react";
+import { motion, useDragControls } from "motion/react";
 
 import { cn } from "@/lib/utils";
 
@@ -30,11 +30,14 @@ const DialogOverlay = React.forwardRef<
 ));
 DialogOverlay.displayName = DialogPrimitive.Overlay.displayName;
 
+// Context to pass drag controls down to DialogDragHandle
+const DragControlsContext = React.createContext<ReturnType<typeof useDragControls> | null>(null);
+
 const DialogContent = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content>
 >(({ className, children, ...props }, ref) => {
-
+  const dragControls = useDragControls();
 
   const hasCustomBg =
     className &&
@@ -46,10 +49,11 @@ const DialogContent = React.forwardRef<
       <DialogPrimitive.Content ref={ref} asChild {...props}>
         <motion.div
           drag
+          dragControls={dragControls}
+          dragListener={false}
           dragMomentum={false}
           dragElastic={0}
           dragTransition={{ bounceStiffness: 1000, bounceDamping: 50 }}
-          whileDrag={{ cursor: "grabbing" }}
           style={{
             x: "-50%",
             y: "-50%",
@@ -61,7 +65,9 @@ const DialogContent = React.forwardRef<
             className,
           )}
         >
-          {children}
+          <DragControlsContext.Provider value={dragControls}>
+            {children}
+          </DragControlsContext.Provider>
           <DialogPrimitive.Close className="absolute right-4 top-4 z-50 flex h-8 w-8 items-center justify-center rounded-full bg-slate-100/50 dark:bg-slate-900/50 border border-slate-200/50 dark:border-white/10 opacity-70 backdrop-blur-md ring-offset-background transition-all hover:opacity-100 hover:scale-110 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none text-foreground shadow-sm">
             <X className="h-4 w-4" />
             <span className="sr-only">Close</span>
@@ -72,6 +78,24 @@ const DialogContent = React.forwardRef<
   );
 });
 DialogContent.displayName = DialogPrimitive.Content.displayName;
+
+// Wrap your header/title area with this to make ONLY that area draggable
+const DialogDragHandle = ({ className, children, ...props }: React.HTMLAttributes<HTMLDivElement>) => {
+  const dragControls = React.useContext(DragControlsContext);
+  return (
+    <div
+      className={cn("cursor-grab active:cursor-grabbing select-none", className)}
+      onPointerDown={(e) => {
+        e.preventDefault();
+        dragControls?.start(e);
+      }}
+      {...props}
+    >
+      {children}
+    </div>
+  );
+};
+DialogDragHandle.displayName = "DialogDragHandle";
 
 const DialogHeader = ({
   className,
@@ -135,6 +159,7 @@ export {
   DialogClose,
   DialogTrigger,
   DialogContent,
+  DialogDragHandle,
   DialogHeader,
   DialogFooter,
   DialogTitle,
