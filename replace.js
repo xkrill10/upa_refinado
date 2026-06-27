@@ -1,18 +1,18 @@
-const fs = require("fs");
-let content = fs.readFileSync("src/pages/PatientEvolution.tsx", "utf-8");
+﻿const fs = require('fs');
+let content = fs.readFileSync('src/pages/PatientEvolution.tsx', 'utf-8');
 
-const importTarget = `    FlaskConical,
+const importTarget =     FlaskConical,
     Syringe,
-} from "lucide-react";`;
-const importReplacement = `    FlaskConical,
+} from "lucide-react";;
+const importReplacement =     FlaskConical,
     Syringe,
     AlertTriangle,
     Smile,
     FileHeart,
-} from "lucide-react";`;
+} from "lucide-react";;
 content = content.replace(importTarget, importReplacement);
 
-const badgeCode = `
+const badgeCode = 
 interface SmartBadgeProps {
   onClick: () => void;
   title: string;
@@ -93,7 +93,7 @@ function SmartBadge({ onClick, title, icon, selectedValue, color }: SmartBadgePr
 
   let displayValue = "Não Avaliado";
   if (isEvaluated) {
-    displayValue = selectedValue.split("\\n")[0].replace("Risco ", "Risco: ");
+    displayValue = selectedValue.split('\\n')[0].replace("Risco ", "Risco: ");
   }
 
   return (
@@ -103,7 +103,7 @@ function SmartBadge({ onClick, title, icon, selectedValue, color }: SmartBadgePr
       className={cn(
         "flex flex-col items-start gap-1 p-2.5 rounded-xl border transition-all text-left w-[145px] shadow-sm hover:-translate-y-0.5 duration-200",
         isEvaluated
-          ? \`\${t.bg} \${t.border}\`
+          ? \\ \\
           : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700"
       )}
     >
@@ -123,10 +123,10 @@ function SmartBadge({ onClick, title, icon, selectedValue, color }: SmartBadgePr
 }
 
 export default function EvolucaoEnfermagem() {
-`;
+;
 content = content.replace("export default function EvolucaoEnfermagem() {", badgeCode);
 
-const newButtons = `                    <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2 block">
+const newButtons =                     <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2 block">
                       Ferramentas Opcionais {isChild ? "(Pediátricas)" : "(Adulto)"}
                     </span>
                     <div className="flex flex-wrap gap-2">
@@ -150,10 +150,10 @@ const newButtons = `                    <span className="text-[10px] font-bold t
                           <SmartBadge onClick={() => setOpenNandaCalc(true)} title="NANDA/NIC" icon={<FileHeart className="w-3.5 h-3.5" />} selectedValue={activeNandaPlan} color="indigo" />
                         </>
                       )}
-                    </div>`;
+                    </div>;
                     
 const regex = /<span className="text-\[10px\] font-bold text-slate-500 uppercase tracking-wider mb-2 block">[\s\S]*?<\/div>\s*<\/div>/;
 content = content.replace(regex, newButtons + "\n                  </div>");
 
-fs.writeFileSync("src/pages/PatientEvolution.tsx", content, "utf-8");
-console.log("Done");
+fs.writeFileSync('src/pages/PatientEvolution.tsx', content, 'utf-8');
+console.log('Done');
