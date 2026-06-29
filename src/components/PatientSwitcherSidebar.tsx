@@ -121,7 +121,7 @@ export const PatientSwitcherSidebar = () => {
                       }
                     }}
                     className={cn(
-                      "w-full flex items-stretch gap-3 text-left p-2 rounded-xl transition-all border group",
+                      "w-full flex items-center gap-3 text-left p-2 rounded-xl transition-all border group",
                       isActive
                         ? "bg-sky-50/50 dark:bg-sky-900/10 border-sky-200 dark:border-sky-800/50 shadow-sm"
                         : "bg-transparent border-transparent hover:bg-slate-50 dark:hover:bg-slate-800/20 hover:border-slate-200 dark:hover:border-slate-700/30"
