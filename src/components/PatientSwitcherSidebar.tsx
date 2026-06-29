@@ -132,7 +132,7 @@ export const PatientSwitcherSidebar = () => {
                       className={cn(
                         "w-[64px] shrink-0 rounded-lg flex flex-col items-center justify-center py-2 text-center transition-all font-black text-[10px] uppercase tracking-wider shadow-sm",
                         getRiskColorClass(patient.risk),
-                        isActive && "ring-2 ring-blue-600 dark:ring-sky-400 ring-offset-2 scale-[1.02] shadow-md"
+                        isActive && "ring-2 ring-inset ring-white/60 dark:ring-white/40 shadow-md"
                       )}
                     >
                       <span className="text-[7px] opacity-75 font-black uppercase tracking-widest block mb-0.5 leading-none">Leito</span>
