@@ -90,6 +90,14 @@ const ROOMS = [
     icon: BedDouble,
     color: "orange",
   },
+  {
+    id: "SALA DE EMERGÊNCIA",
+    name: "Sala de Emergência",
+    type: "medication",
+    destination: "/sala/checagem",
+    icon: Activity,
+    color: "red",
+  },
 ];
 
 export default function NurseDashboard() {
@@ -157,6 +165,15 @@ export default function NurseDashboard() {
 
     localStorage.setItem("upa_active_room", selectedRoom.id);
     localStorage.setItem("upa_active_nurse", nurseName.trim());
+
+    // Identificar o setor (Emergência ou Observação)
+    let sector = "Todas";
+    if (selectedRoom.id.toUpperCase().includes("EMERGÊNCIA")) {
+      sector = "Emergência";
+    } else if (selectedRoom.id.toUpperCase().includes("OBSERVAÇÃO")) {
+      sector = "Observação";
+    }
+    localStorage.setItem("upa_active_sector", sector);
 
     // Salvar carimbo digital integrado
     localStorage.setItem("upa_stamp_name", nurseName.trim());
