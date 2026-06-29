@@ -130,10 +130,9 @@ export const PatientSwitcherSidebar = () => {
                       {/* Leito Badge */}
                       <div
                         className={cn(
-                          "w-[64px] shrink-0 rounded-lg flex flex-col items-center justify-center py-2 text-center transition-all font-black text-[10px] uppercase tracking-wider",
-                          isActive 
-                            ? "bg-[#006699] text-white dark:bg-sky-500/25 dark:text-sky-300 shadow-inner" 
-                            : "bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400 group-hover:bg-slate-200 dark:group-hover:bg-slate-700"
+                          "w-[64px] shrink-0 rounded-lg flex flex-col items-center justify-center py-2 text-center transition-all font-black text-[10px] uppercase tracking-wider shadow-sm",
+                          getRiskColorClass(patient.risk),
+                          isActive && "ring-2 ring-inset ring-white/60 dark:ring-white/40 shadow-md"
                         )}
                       >
                         <span className="text-[7px] opacity-75 font-black uppercase tracking-widest block mb-0.5 leading-none">Leito</span>
