@@ -22,7 +22,7 @@ const AppContent = () => {
   const { role, setRole } = useRole();
 
   const isClinicalPanel =
-    (role === "enfermeiro" || role === "medico" || role === "recepcao") &&
+    (role === "enfermeiro" || role === "medico" || role === "recepcao" || role === "tecnico_enfermagem" || role === "auxiliar_enfermagem") &&
     (location.pathname.startsWith("/painel-enfermagem") ||
       location.pathname.startsWith("/painel-medico") ||
       location.pathname.startsWith("/fila") ||
@@ -30,7 +30,8 @@ const AppContent = () => {
       location.pathname.startsWith("/paciente") ||
       location.pathname.startsWith("/lista-internacao") ||
       location.pathname.startsWith("/leitos") ||
-      location.pathname.startsWith("/novo-paciente"));
+      location.pathname.startsWith("/novo-paciente") ||
+      location.pathname.startsWith("/checagem-enfermagem"));
   const isClinicalRoom = location.pathname.startsWith("/sala/");
 
   const localDoctor =

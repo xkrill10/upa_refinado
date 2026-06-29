@@ -45,7 +45,11 @@ export const ClinicalLayout = ({ children }: ClinicalLayoutProps) => {
   const { role } = useRole();
 
   const isPatientRoute = location.pathname.startsWith("/paciente/");
-  const isNursingProfile = location.pathname.endsWith("/perfil-enfermagem");
+  const isCollapsedLayout = 
+    location.pathname.endsWith("/perfil-enfermagem") || 
+    location.pathname.endsWith("/evolucao/medica") ||
+    role === "tecnico_enfermagem" ||
+    role === "auxiliar_enfermagem";
   const [isMenuOpen, setIsMenuOpen] = React.useState(!isPatientRoute);
   const [isNavMenuOpen, setIsNavMenuOpen] = React.useState(false);
 
@@ -113,7 +117,7 @@ export const ClinicalLayout = ({ children }: ClinicalLayoutProps) => {
         { id: "nir", icon: Ambulance, label: "Regulação (NIR)", path: "/nir" },
       ];
     }
-    if (role === "tecnico_enfermagem" || role === "auxiliar_enfermagem") {
+    if (role === "tecnico_enfermagem") {
       return [
         {
           id: "fila_atividades",
@@ -121,11 +125,15 @@ export const ClinicalLayout = ({ children }: ClinicalLayoutProps) => {
           label: "Fila de Atividades",
           path: "/checagem-enfermagem",
         },
+      ];
+    }
+    if (role === "auxiliar_enfermagem") {
+      return [
         {
-          id: "checagem_sala",
-          icon: Syringe,
-          label: "Visão por Sala",
-          path: "/sala/checagem",
+          id: "fila_atividades",
+          icon: ClipboardList,
+          label: "Fila de Atividades",
+          path: "/checagem-enfermagem",
         },
       ];
     }
@@ -190,7 +198,7 @@ export const ClinicalLayout = ({ children }: ClinicalLayoutProps) => {
       <div 
         className={cn(
           "h-full flex-shrink-0 flex flex-col items-center py-6 z-40 relative transition-all duration-300 backdrop-blur-2xl border-r shadow-[4px_0_24px_-10px_rgba(0,0,0,0.08)] dark:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.5)]",
-          isNursingProfile
+          isCollapsedLayout
             ? (isNavMenuOpen 
                 ? "w-[72px] bg-sky-500/15 dark:bg-gradient-to-b dark:from-[#004466]/95 dark:to-[#001a33]/95 border-sky-500/20 dark:border-blue-700/30"
                 : "w-0 overflow-hidden border-none opacity-0 pointer-events-none")
@@ -199,7 +207,7 @@ export const ClinicalLayout = ({ children }: ClinicalLayoutProps) => {
                 : "w-14 bg-white/40 dark:bg-slate-900/40 border-slate-200/50 dark:border-slate-800/50")
         )}
       >
-        {isNursingProfile ? (
+        {isCollapsedLayout ? (
           <div 
             className={cn(
               "h-full w-full flex flex-col items-center justify-between transition-all duration-500 ease-in-out",
@@ -430,7 +438,7 @@ export const ClinicalLayout = ({ children }: ClinicalLayoutProps) => {
         {/* Simplified Header matching the dark blue theme */}
         <header className="h-20 flex items-center justify-between px-2 sticky top-0 z-20 header-premium-glass">
           <div className="flex items-center gap-4">
-            {isNursingProfile && (
+            {isCollapsedLayout && (
               <button
                 onClick={() => setIsNavMenuOpen(!isNavMenuOpen)}
                 className="w-10 h-10 rounded-xl flex items-center justify-center text-slate-500 hover:text-[#006699] hover:bg-white/50 dark:text-slate-400 dark:hover:text-white dark:hover:bg-slate-800 transition-all border border-slate-200/50 dark:border-slate-800/50 shadow-sm mr-1 shrink-0"

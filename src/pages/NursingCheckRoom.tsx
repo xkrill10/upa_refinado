@@ -855,23 +855,25 @@ export default function NursingCheckRoom() {
           </p>
         </div>
 
-        <div className="flex gap-2">
-          <Button
-            onClick={() => setShowWizard(true)}
-            className="gap-2 h-12 px-6 rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-lg shadow-rose-500/15 bg-rose-600 hover:bg-rose-700 text-white"
-          >
-            <Plus className="h-4 w-4" />
-            Simular Aprazamento
-          </Button>
-          <Button
-            onClick={resetPatientChecks}
-            variant="outline"
-            className="gap-2 h-12 px-4 rounded-2xl border-white/20 dark:border-white/10 text-muted-foreground hover:text-foreground"
-            title="Reiniciar checagens do paciente atual"
-          >
-            <RotateCcw className="h-4 w-4" />
-          </Button>
-        </div>
+        {role !== "tecnico_enfermagem" && role !== "auxiliar_enfermagem" && (
+          <div className="flex gap-2">
+            <Button
+              onClick={() => setShowWizard(true)}
+              className="gap-2 h-12 px-6 rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-lg shadow-rose-500/15 bg-rose-600 hover:bg-rose-700 text-white"
+            >
+              <Plus className="h-4 w-4" />
+              Simular Aprazamento
+            </Button>
+            <Button
+              onClick={resetPatientChecks}
+              variant="outline"
+              className="gap-2 h-12 px-4 rounded-2xl border-white/20 dark:border-white/10 text-muted-foreground hover:text-foreground"
+              title="Reiniciar checagens do paciente atual"
+            >
+              <RotateCcw className="h-4 w-4" />
+            </Button>
+          </div>
+        )}
       </div>
 
       {/* STATS BAR */}
@@ -1019,11 +1021,10 @@ export default function NursingCheckRoom() {
         <div className="lg:col-span-8 space-y-6">
           {selectedPatient ? (
             <Card className="glass-card-premium border-white/40 dark:border-white/10 shadow-xl overflow-hidden rounded-[2rem]">
-              {/* SELECTED PATIENT SUMMARY */}
-              <div className="p-6 bg-rose-600 text-white relative">
-                <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full blur-2xl pointer-events-none -translate-y-1/2 translate-x-1/3" />
+              <div className="p-6 bg-gradient-to-r from-sky-100/90 via-blue-50/80 to-sky-100/90 backdrop-blur-xl border-b border-sky-200/50 text-[#004466] relative">
+                <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/5 rounded-full blur-2xl pointer-events-none -translate-y-1/2 translate-x-1/3" />
                 <div className="relative z-10 flex flex-col md:flex-row md:items-center gap-4">
-                  <div className="h-16 w-16 rounded-2xl overflow-hidden shrink-0 border-2 border-white/30 shadow-lg">
+                  <div className="h-16 w-16 rounded-2xl overflow-hidden shrink-0 border-2 border-[#004466]/20 shadow-md">
                     <img
                       src={getPatientAvatar(selectedPatient.name)}
                       alt={selectedPatient.name}
@@ -1037,20 +1038,20 @@ export default function NursingCheckRoom() {
                     <div className="flex items-center gap-2 mb-1">
                       <Badge
                         variant="outline"
-                        className="bg-white/20 border-none text-white text-[9px] font-black uppercase tracking-widest"
+                        className="bg-[#004466]/10 border-none text-[#004466] text-[9px] font-black uppercase tracking-widest"
                       >
                         {selectedPatient.sector || "Leito Clinico"}
                       </Badge>
                       {selectedPatient.risk === "emergency" && (
-                        <Badge className="bg-red-900 border-none text-white text-[9px] font-black uppercase tracking-widest animate-bounce">
+                        <Badge className="bg-red-500 border-none text-white text-[9px] font-black uppercase tracking-widest animate-bounce">
                           Emergência
                         </Badge>
                       )}
                     </div>
-                    <h2 className="text-2xl font-black uppercase tracking-tight">
+                    <h2 className="text-2xl font-black uppercase tracking-tight text-[#004466]">
                       {selectedPatient.name}
                     </h2>
-                    <p className="text-xs text-rose-100 font-bold mt-1 uppercase tracking-wider">
+                    <p className="text-xs text-[#006699]/80 font-bold mt-1 uppercase tracking-wider">
                       Idade: {selectedPatient.age} anos • CPF:{" "}
                       {selectedPatient.cpf}
                     </p>
@@ -1058,13 +1059,13 @@ export default function NursingCheckRoom() {
 
                   {/* Allergy Warning Plate */}
                   {selectedPatient.allergies && (
-                    <div className="bg-red-950/40 border border-red-500/30 p-3 rounded-2xl flex items-center gap-3 backdrop-blur-sm shadow-lg max-w-xs animate-pulse">
-                      <AlertOctagon className="h-6 w-6 text-red-400 shrink-0" />
+                    <div className="bg-red-500/10 border border-red-500/30 p-3 rounded-2xl flex items-center gap-3 backdrop-blur-sm shadow-md max-w-xs animate-pulse">
+                      <AlertOctagon className="h-6 w-6 text-red-650 shrink-0" />
                       <div>
-                        <p className="text-[9px] font-black uppercase tracking-widest text-red-300">
+                        <p className="text-[9px] font-black uppercase tracking-widest text-red-600">
                           ALERGIA DETECTADA!
                         </p>
-                        <p className="text-xs font-bold text-white uppercase mt-0.5">
+                        <p className="text-xs font-bold text-red-950 uppercase mt-0.5">
                           {selectedPatient.allergies}
                         </p>
                       </div>
@@ -1076,7 +1077,7 @@ export default function NursingCheckRoom() {
                     <Button
                       type="button"
                       onClick={() => setShowPharmacyModal(true)}
-                      className="bg-sky-500/20 hover:bg-sky-500/30 text-sky-100 rounded-2xl h-10 px-4 font-black uppercase tracking-wider text-[10px] border border-sky-400/30 backdrop-blur-sm transition-all flex items-center gap-1.5 shadow-[0_0_15px_rgba(14,165,233,0.3)] hover:shadow-[0_0_25px_rgba(14,165,233,0.5)]"
+                      className="bg-sky-500/10 hover:bg-sky-500/20 text-[#006699] rounded-2xl h-10 px-4 font-black uppercase tracking-wider text-[10px] border border-sky-400/30 backdrop-blur-sm transition-all flex items-center gap-1.5 shadow-[0_0_15px_rgba(14,165,233,0.1)] hover:shadow-[0_0_25px_rgba(14,165,233,0.2)]"
                     >
                       <PackagePlus className="h-4 w-4" />
                       Solicitar Insumo (Farm. Satélite)
@@ -1084,7 +1085,7 @@ export default function NursingCheckRoom() {
                     <Button
                       type="button"
                       onClick={() => setShowOccurrenceLogger(true)}
-                      className="bg-white/10 hover:bg-white/20 text-white rounded-2xl h-10 px-4 font-black uppercase tracking-wider text-[10px] border border-white/20 backdrop-blur-sm transition-all flex items-center gap-1.5"
+                      className="bg-slate-500/10 hover:bg-slate-500/20 text-slate-700 rounded-2xl h-10 px-4 font-black uppercase tracking-wider text-[10px] border border-slate-500/20 backdrop-blur-sm transition-all flex items-center gap-1.5"
                     >
                       <AlertOctagon className="h-4 w-4" />
                       Reportar Ocorrência
@@ -1097,7 +1098,7 @@ export default function NursingCheckRoom() {
               <div className="p-6 space-y-6">
                 <div className="flex items-center justify-between pb-3 border-b border-border/50">
                   <div className="flex items-center gap-2">
-                    <FileText className="h-5 w-5 text-rose-600" />
+                    <FileText className="h-5 w-5 text-blue-600" />
                     <span className="text-xs font-black uppercase tracking-wider">
                       Prontuário de Aprazamentos Vigente
                     </span>

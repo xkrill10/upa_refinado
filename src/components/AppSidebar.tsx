@@ -287,22 +287,22 @@ export function AppSidebar() {
           ) as any,
       },
     ];
-  } else if (role === "tecnico_enfermagem" || role === "auxiliar_enfermagem") {
+  } else if (role === "tecnico_enfermagem") {
     menuGroups = [
       {
         label: "Atendimento Clínico",
-        items: menuGroupsRaw[1].items
-          .filter((item) =>
-            [
-              "Checagem Leito",
-            ].includes(item.title),
-          )
-          .map(item => {
-            if (item.title === "Checagem Leito") {
-              return { ...item, title: "Fila de Atividades" };
-            }
-            return item;
-          }) as any,
+        items: [
+          { title: "Fila de Atividades", url: "/checagem-enfermagem", icon: ClipboardList },
+        ] as any,
+      },
+    ];
+  } else if (role === "auxiliar_enfermagem") {
+    menuGroups = [
+      {
+        label: "Atendimento Clínico",
+        items: [
+          { title: "Fila de Atividades", url: "/checagem-enfermagem", icon: ClipboardList },
+        ] as any,
       },
     ];
   }
