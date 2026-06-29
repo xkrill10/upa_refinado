@@ -426,3 +426,23 @@ if (typeof globalThis !== "undefined") {
 }
 
 export default db;
+
+// PATCH: Force update Maria Eduarda's role to LIDERANÇA in LocalStorage if it's currently SUPERVISÃO
+try {
+  let stored = localStorage.getItem("escala_db_Employee");
+  if (stored) {
+    let parsed = JSON.parse(stored);
+    let modified = false;
+    for (let emp of parsed) {
+      if (emp.name && emp.name.toLowerCase().includes("maria eduarda")) {
+        if (emp.role !== "LIDERANÇA") {
+          emp.role = "LIDERANÇA";
+          modified = true;
+        }
+      }
+    }
+    if (modified) {
+      localStorage.setItem("escala_db_Employee", JSON.stringify(parsed));
+    }
+  }
+} catch (e) {}

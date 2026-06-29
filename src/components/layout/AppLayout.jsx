@@ -8,7 +8,7 @@ export default function AppLayout() {
   const isSchedulePage = location.pathname === "/escala";
 
   return (
-    <div className="h-full rounded-xl overflow-hidden bg-background flex shadow-sm border">
+    <div className="h-full overflow-hidden bg-background flex">
       <motion.main
         initial={false}
         className="flex-1 h-full overflow-hidden relative"

@@ -172,7 +172,7 @@ const AppContent = () => {
           <main
             className={cn(
               "flex-1 min-w-0 w-full",
-              !isCallPanel && !isLogin && !isCleaning && "p-2",
+              !isCallPanel && !isLogin && !isCleaning && !isFullscreen && "p-2",
             )}
           >
             <Suspense
