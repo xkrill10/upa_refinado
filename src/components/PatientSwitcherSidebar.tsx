@@ -111,38 +111,39 @@ export const PatientSwitcherSidebar = () => {
                 const isActive = patient.id === currentPatientId;
                 
                 return (
-                  <button
-                    key={bed.id}
-                    onClick={() => {
-                      if (role === "medico") {
-                        navigate(`/paciente/${patient.id}/evolucao/medica`);
-                      } else {
-                        navigate(`/paciente/${patient.id}/perfil-enfermagem`);
-                      }
-                    }}
-                    className={cn(
-                      "w-full flex items-center gap-3 text-left p-2 rounded-xl transition-all border group",
-                      isActive
-                        ? "bg-sky-50/50 dark:bg-sky-900/10 border-sky-200 dark:border-sky-800/50 shadow-sm"
-                        : "bg-transparent border-transparent hover:bg-slate-50 dark:hover:bg-slate-800/20 hover:border-slate-200 dark:hover:border-slate-700/30"
-                    )}
-                  >
-                    {/* Leito Badge */}
-                    <div
+                    <button
+                      key={bed.id}
+                      onClick={() => {
+                        if (role === "medico") {
+                          navigate(`/paciente/${patient.id}/evolucao/medica`);
+                        } else {
+                          navigate(`/paciente/${patient.id}/perfil-enfermagem`);
+                        }
+                      }}
                       className={cn(
-                        "w-[64px] shrink-0 rounded-lg flex flex-col items-center justify-center py-2 text-center transition-all font-black text-[10px] uppercase tracking-wider shadow-sm",
-                        getRiskColorClass(patient.risk),
-                        isActive && "ring-2 ring-inset ring-white/60 dark:ring-white/40 shadow-md"
+                        "w-full flex items-center gap-3 text-left p-2 rounded-xl transition-all border group",
+                        isActive
+                          ? "bg-white dark:bg-slate-900 border-[#006699]/30 dark:border-sky-500/30 shadow-md ring-1 ring-[#006699]/10 dark:ring-sky-500/10"
+                          : "bg-transparent border-transparent hover:bg-white dark:hover:bg-slate-800/50 hover:border-slate-200 dark:hover:border-slate-700/50 hover:shadow-sm"
                       )}
                     >
-                      <span className="text-[7px] opacity-75 font-black uppercase tracking-widest block mb-0.5 leading-none">Leito</span>
-                      <span className="text-xs leading-none font-black truncate max-w-full px-1">
-                        {(() => {
-                          const shortName = bed.name.replace("Leito ", "");
-                          return shortName === "Maca Extra" ? "M. Extra" : shortName;
-                        })()}
-                      </span>
-                    </div>
+                      {/* Leito Badge */}
+                      <div
+                        className={cn(
+                          "w-[64px] shrink-0 rounded-lg flex flex-col items-center justify-center py-2 text-center transition-all font-black text-[10px] uppercase tracking-wider",
+                          isActive 
+                            ? "bg-[#006699] text-white dark:bg-sky-500/25 dark:text-sky-300 shadow-inner" 
+                            : "bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400 group-hover:bg-slate-200 dark:group-hover:bg-slate-700"
+                        )}
+                      >
+                        <span className="text-[7px] opacity-75 font-black uppercase tracking-widest block mb-0.5 leading-none">Leito</span>
+                        <span className="text-xs leading-none font-black truncate max-w-full px-1">
+                          {(() => {
+                            const shortName = bed.name.replace("Leito ", "");
+                            return shortName === "Maca Extra" ? "M. Extra" : shortName;
+                          })()}
+                        </span>
+                      </div>
 
                     {/* Informações do Paciente */}
                     <div className="flex-1 min-w-0 flex flex-col justify-center gap-1.5">
@@ -151,7 +152,7 @@ export const PatientSwitcherSidebar = () => {
                           "text-xs font-black leading-tight line-clamp-2",
                           isActive
                             ? "text-[#006699] dark:text-sky-300"
-                            : "text-slate-700 dark:text-slate-200"
+                            : "text-slate-700 dark:text-slate-200 group-hover:text-[#006699] dark:group-hover:text-sky-300"
                         )}
                       >
                         {patient.name}
@@ -162,7 +163,8 @@ export const PatientSwitcherSidebar = () => {
                           <div className="flex items-center gap-1">
                             <span className={cn(
                               "w-1.5 h-1.5 rounded-full shrink-0",
-                              patient.risk === "emergency" ? "bg-red-500 animate-pulse" : "bg-emerald-500"
+                              getRiskColorClass(patient.risk).split(' ')[0], // pega apenas o bg-*
+                              patient.risk === "emergency" && "animate-pulse ring-2 ring-red-500/30"
                             )} />
                             <span className="text-[8px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">
                               {patient.risk === "emergency" ? "Crítico" : "Estável"}

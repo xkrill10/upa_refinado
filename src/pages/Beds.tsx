@@ -813,6 +813,9 @@ export default function Beds() {
                         onClick={(e) => {
                           e.stopPropagation();
                           if (patient) {
+                            if (bed.ward) {
+                                localStorage.setItem("upa_active_sector", bed.ward);
+                            }
                             if (role === 'medico') {
                                 navigate(`/paciente/${patient.id}/evolucao/medica`);
                             } else {
@@ -1968,6 +1971,9 @@ export default function Beds() {
                                 className="h-8 px-2.5 text-[9px] font-black uppercase tracking-widest rounded-lg bg-white/50 dark:bg-slate-800/50 hover:bg-emerald-600 hover:text-white border-emerald-600/30 text-emerald-700 dark:text-emerald-400"
                                 onClick={(e) => {
                                   e.stopPropagation();
+                                  if (bed.ward) {
+                                      localStorage.setItem("upa_active_sector", bed.ward);
+                                  }
                                   navigate(`/paciente/${patient.id}/evolucao`);
                                 }}
                               >
