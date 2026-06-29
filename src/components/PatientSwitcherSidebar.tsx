@@ -39,6 +39,23 @@ export const PatientSwitcherSidebar = () => {
     localStorage.setItem("upa_active_sector", sector);
   };
 
+  const getRiskColorClass = (risk: string) => {
+    switch (risk) {
+      case "emergency":
+        return "bg-red-500 text-white dark:bg-red-600";
+      case "very-urgent":
+        return "bg-orange-500 text-white dark:bg-orange-600";
+      case "urgent":
+        return "bg-yellow-400 text-amber-950 dark:bg-yellow-500 dark:text-amber-950";
+      case "less-urgent":
+        return "bg-green-500 text-white dark:bg-green-600";
+      case "not-urgent":
+        return "bg-blue-500 text-white dark:bg-blue-600";
+      default:
+        return "bg-slate-400 text-white dark:bg-slate-600";
+    }
+  };
+
   const occupiedBeds = beds.filter((b) => b.status === "occupied" && b.patientId);
 
   const filteredBeds = occupiedBeds.filter((bed) => {
@@ -114,9 +131,8 @@ export const PatientSwitcherSidebar = () => {
                     <div
                       className={cn(
                         "w-[64px] shrink-0 rounded-lg flex flex-col items-center justify-center py-2 text-center transition-all font-black text-[10px] uppercase tracking-wider shadow-sm",
-                        isActive
-                          ? "bg-[#006699] text-white dark:bg-sky-500 dark:text-slate-950"
-                          : "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 group-hover:bg-slate-200 dark:group-hover:bg-slate-700"
+                        getRiskColorClass(patient.risk),
+                        isActive && "ring-2 ring-blue-600 dark:ring-sky-400 ring-offset-2 scale-[1.02] shadow-md"
                       )}
                     >
                       <span className="text-[7px] opacity-75 font-black uppercase tracking-widest block mb-0.5 leading-none">Leito</span>
