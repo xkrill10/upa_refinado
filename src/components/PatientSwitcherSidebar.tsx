@@ -4,7 +4,107 @@ import { usePatients } from "@/hooks/use-patients";
 import { useBeds } from "@/context/BedsContext";
 import { cn } from "@/lib/utils";
 import { useRole } from "@/context/RoleContext";
-import { Users, AlertCircle } from "lucide-react";
+import { Users, Zap, ShieldAlert, Baby } from "lucide-react";
+
+// Ícone SVG inline para Feminino (♀)
+const FemaleIcon = ({ className }: { className?: string }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="12" cy="9" r="5" />
+    <line x1="12" y1="14" x2="12" y2="22" />
+    <line x1="9" y1="19" x2="15" y2="19" />
+  </svg>
+);
+
+// Ícone SVG inline para Masculino (♂)
+const MaleIcon = ({ className }: { className?: string }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="10" cy="14" r="5" />
+    <line x1="19" y1="5" x2="13.6" y2="10.4" />
+    <line x1="15" y1="5" x2="19" y2="5" />
+    <line x1="19" y1="5" x2="19" y2="9" />
+  </svg>
+);
+
+/**
+ * Retorna ícone e estilo de cor NEUTRO baseado no SETOR (room),
+ * sem usar cores da Classificação de Risco de Manchester
+ * (vermelho, laranja, amarelo, verde, azul).
+ */
+const getSectorBadgeConfig = (room: string) => {
+  const r = room.toLowerCase();
+
+  if (r.includes("emergência") || r.includes("box")) {
+    return {
+      bg: "bg-orange-500 dark:bg-orange-600",
+      text: "text-white",
+      icon: Zap,
+      customIcon: null,
+      label: "EMG",
+    };
+  }
+  if (r.includes("feminina")) {
+    return {
+      bg: "bg-pink-400 dark:bg-pink-500",
+      text: "text-white",
+      icon: null,
+      customIcon: FemaleIcon,
+      label: "OBS-F",
+    };
+  }
+  if (r.includes("masculina")) {
+    return {
+      bg: "bg-blue-400 dark:bg-blue-500",
+      text: "text-white",
+      icon: null,
+      customIcon: MaleIcon,
+      label: "OBS-M",
+    };
+  }
+  if (r.includes("pediatria") || r.includes("pediátrica") || r.includes("infantil")) {
+    return {
+      bg: "bg-violet-500 dark:bg-violet-400",
+      text: "text-white",
+      icon: Baby,
+      customIcon: null,
+      label: "PED",
+    };
+  }
+  if (r.includes("isolamento")) {
+    return {
+      bg: "bg-cyan-500 dark:bg-cyan-600",
+      text: "text-white",
+      icon: ShieldAlert,
+      customIcon: null,
+      label: "ISO",
+    };
+  }
+  // Fallback neutro
+  return {
+    bg: "bg-slate-500 dark:bg-slate-600",
+    text: "text-white",
+    icon: null,
+    customIcon: null,
+    label: "LEITO",
+  };
+};
+
+/** Cor do indicador de risco (bolinha pequena ao lado do nome) */
+const getRiskDotColor = (risk: string) => {
+  switch (risk) {
+    case "emergency":
+      return "bg-red-500";
+    case "very-urgent":
+      return "bg-orange-500";
+    case "urgent":
+      return "bg-yellow-400";
+    case "less-urgent":
+      return "bg-green-500";
+    case "not-urgent":
+      return "bg-blue-500";
+    default:
+      return "bg-slate-400";
+  }
+};
 
 export const PatientSwitcherSidebar = () => {
   const { beds } = useBeds();
@@ -37,23 +137,6 @@ export const PatientSwitcherSidebar = () => {
   const handleSectorChange = (sector: string) => {
     setActiveSector(sector);
     localStorage.setItem("upa_active_sector", sector);
-  };
-
-  const getRiskColorClass = (risk: string) => {
-    switch (risk) {
-      case "emergency":
-        return "bg-red-500 text-white dark:bg-red-600";
-      case "very-urgent":
-        return "bg-orange-500 text-white dark:bg-orange-600";
-      case "urgent":
-        return "bg-yellow-400 text-amber-950 dark:bg-yellow-500 dark:text-amber-950";
-      case "less-urgent":
-        return "bg-green-500 text-white dark:bg-green-600";
-      case "not-urgent":
-        return "bg-blue-500 text-white dark:bg-blue-600";
-      default:
-        return "bg-slate-400 text-white dark:bg-slate-600";
-    }
   };
 
   const occupiedBeds = beds.filter((b) => b.status === "occupied" && b.patientId);
@@ -109,7 +192,10 @@ export const PatientSwitcherSidebar = () => {
                 const patient = patients.find((p) => p.id === bed.patientId);
                 if (!patient) return null;
                 const isActive = patient.id === currentPatientId;
-                
+                const sectorConfig = getSectorBadgeConfig(bed.room);
+                const SectorIcon = sectorConfig.icon;
+                const CustomSectorIcon = sectorConfig.customIcon;
+
                 return (
                     <button
                       key={bed.id}
@@ -127,20 +213,28 @@ export const PatientSwitcherSidebar = () => {
                           : "bg-transparent border-transparent hover:bg-white dark:hover:bg-slate-800/50 hover:border-slate-200 dark:hover:border-slate-700/50 hover:shadow-sm"
                       )}
                     >
-                      {/* Leito Badge */}
+                      {/* Leito Badge - cor NEUTRA por setor, com ícone + número */}
                       <div
                         className={cn(
-                          "w-[64px] shrink-0 rounded-lg flex flex-col items-center justify-center py-2 text-center transition-all font-black text-[10px] uppercase tracking-wider shadow-sm",
-                          getRiskColorClass(patient.risk),
+                          "w-[64px] shrink-0 rounded-lg flex flex-col items-center justify-center py-1.5 text-center transition-all font-black shadow-sm gap-0.5",
+                          sectorConfig.bg,
+                          sectorConfig.text,
                           isActive && "ring-2 ring-inset ring-white/60 dark:ring-white/40 shadow-md"
                         )}
                       >
-                        <span className="text-[7px] opacity-75 font-black uppercase tracking-widest block mb-0.5 leading-none">Leito</span>
-                        <span className="text-xs leading-none font-black truncate max-w-full px-1">
+                        {/* Ícone do setor */}
+                        {SectorIcon && <SectorIcon className="w-5 h-5 drop-shadow-sm mb-0.5" />}
+                        {CustomSectorIcon && <CustomSectorIcon className="w-5 h-5 drop-shadow-sm mb-0.5" />}
+                        {/* Número do leito */}
+                        <span className="text-sm leading-none font-black truncate max-w-full px-1">
                           {(() => {
                             const shortName = bed.name.replace("Leito ", "");
-                            return shortName === "Maca Extra" ? "M. Extra" : shortName;
+                            return shortName === "Maca Extra" ? "M.E" : shortName;
                           })()}
+                        </span>
+                        {/* Abreviação do setor */}
+                        <span className="text-[7px] opacity-80 font-black uppercase tracking-widest leading-none">
+                          {sectorConfig.label}
                         </span>
                       </div>
 
@@ -162,7 +256,7 @@ export const PatientSwitcherSidebar = () => {
                           <div className="flex items-center gap-1">
                             <span className={cn(
                               "w-1.5 h-1.5 rounded-full shrink-0",
-                              getRiskColorClass(patient.risk).split(' ')[0], // pega apenas o bg-*
+                              getRiskDotColor(patient.risk),
                               patient.risk === "emergency" && "animate-pulse ring-2 ring-red-500/30"
                             )} />
                             <span className="text-[8px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">

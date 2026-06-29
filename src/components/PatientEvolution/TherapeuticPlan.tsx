@@ -160,7 +160,7 @@ export function TherapeuticPlan({ patientId }: TherapeuticPlanProps) {
     // passive: false is needed to call preventDefault
     headerEl.addEventListener('wheel', handleWheel, { passive: false });
     return () => headerEl.removeEventListener('wheel', handleWheel);
-  }, []);
+  }, [activeOrder]);
 
   useEffect(() => {
     if (isUserScrolling.current) {
