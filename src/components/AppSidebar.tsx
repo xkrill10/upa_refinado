@@ -170,6 +170,7 @@ export function AppSidebar() {
     {
       label: "Gestão e Administração",
       items: [
+        { title: "Flow Control (Jornada)", url: "/gestao-fluxo", icon: Activity },
         { title: "Pacientes", url: "/pacientes", icon: Users },
         {
           title: "Central de Integrações",

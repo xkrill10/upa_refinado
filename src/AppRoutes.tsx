@@ -64,6 +64,7 @@ const Login = React.lazy(() => import("./pages/Login"));
 const NirDashboard = React.lazy(() => import("./pages/NirDashboard"));
 const CleaningDashboard = React.lazy(() => import("./pages/CleaningDashboard"));
 const InpatientList = React.lazy(() => import("./pages/InpatientList"));
+const FlowDashboard = React.lazy(() => import("./pages/FlowDashboard"));
 
 export const AppRoutes = () => {
   return (
@@ -78,6 +79,7 @@ export const AppRoutes = () => {
       <Route path="/painel-chamadas" element={<CallPanel />} />
       <Route path="/pacientes" element={<Patients />} />
       <Route path="/leitos" element={<Beds />} />
+      <Route path="/gestao-fluxo" element={<FlowDashboard />} />
       <Route path="/setores" element={<Sectors />} />
       <Route path="/farmacia" element={<Pharmacy />} />
       <Route path="/farmacia-satelite" element={<SatellitePharmacy />} />

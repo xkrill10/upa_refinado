@@ -16,7 +16,21 @@ import {
   HeartPulse,
   Sparkles,
   TerminalSquare,
+  Calendar as CalendarIcon,
+  FileText,
+  CheckCircle2,
+  ChevronRight,
+  ActivitySquare,
+  BrainCircuit,
+  ArrowRight,
+  ShieldAlert,
+  Syringe,
+  Crosshair,
+  Zap,
+  ShieldCheck,
 } from "lucide-react";
+import { format } from "date-fns";
+import { ptBR } from "date-fns/locale";
 import {
   BarChart,
   Bar,
@@ -29,15 +43,24 @@ import {
   Tooltip,
   ResponsiveContainer,
   Legend,
+  AreaChart,
+  Area,
+  Tooltip as RechartsTooltip,
+  RadarChart,
+  PolarGrid,
+  PolarAngleAxis,
+  PolarRadiusAxis,
+  Radar,
 } from "recharts";
 import { useNavigate } from "react-router-dom";
 import { PatientQueueTable } from "@/components/PatientQueueTable";
-import { usePatients } from "@/hooks/use-patients";
+import { usePatients, Patient } from "@/hooks/use-patients";
 import { useBeds } from "@/context/BedsContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ActionTooltip } from "@/components/ui/action-tooltip";
 import { Button } from "@/components/ui/button";
+import { PatientJourneyTimeline } from "@/components/PatientEvolution/PatientJourneyTimeline";
 import {
   Dialog,
   DialogContent,
@@ -79,6 +102,7 @@ export default function Dashboard() {
   const [dashboardFilter, setDashboardFilter] = useState<
     "all" | "waiting" | "attending" | "critical" | "central"
   >("all");
+  const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
   const [selectedKpi, setSelectedKpi] = useState<string | null>(null);
   const [showKpiDialog, setShowKpiDialog] = useState(false);
   const [liveFeed, setLiveFeed] = useState<
@@ -153,6 +177,12 @@ export default function Dashboard() {
 
     return () => clearInterval(interval);
   }, [cleaningHistory]);
+
+  // Calculate critical patients for the ticker
+  const activePatients = patients.filter(p => p.status !== 'completed' && p.status !== 'evasion');
+  const criticalPatients = [...activePatients]
+    .sort((a, b) => new Date(a.arrivalTime).getTime() - new Date(b.arrivalTime).getTime())
+    .slice(0, 8); // Top 8 oldest patients
 
   const waiting = patients.filter((p) => p.status === "waiting").length;
   const attending = patients.filter((p) => p.status === "attending").length;
@@ -293,22 +323,28 @@ export default function Dashboard() {
 
       <Tabs defaultValue="operacional" className="w-full space-y-6">
         <div className="flex justify-center w-full mb-2">
-          <TabsList className="grid w-full max-w-xl grid-cols-3 bg-black/10 dark:bg-black/40 border border-white/10 p-1 rounded-xl h-10 shadow-sm">
+          <TabsList className="grid w-full max-w-3xl grid-cols-4 bg-black/10 dark:bg-black/40 border border-white/10 p-1 rounded-xl h-10 shadow-sm">
             <TabsTrigger
               value="operacional"
-              className="rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground font-black uppercase tracking-widest text-[10px] h-8"
+              className="rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground font-black uppercase tracking-widest text-[10px] h-8 transition-all"
             >
               Visão Operacional
             </TabsTrigger>
             <TabsTrigger
+              value="mineracao"
+              className="rounded-lg data-[state=active]:bg-teal-500 data-[state=active]:text-slate-950 font-black uppercase tracking-widest text-[10px] h-8 transition-all"
+            >
+              Jornada do Paciente
+            </TabsTrigger>
+            <TabsTrigger
               value="gestao"
-              className="rounded-lg data-[state=active]:bg-purple-600 data-[state=active]:text-white font-black uppercase tracking-widest text-[10px] h-8"
+              className="rounded-lg data-[state=active]:bg-purple-600 data-[state=active]:text-white font-black uppercase tracking-widest text-[10px] h-8 transition-all"
             >
               Visão Estratégica
             </TabsTrigger>
             <TabsTrigger
               value="preditiva"
-              className="rounded-lg data-[state=active]:bg-indigo-600 data-[state=active]:text-white font-black uppercase tracking-widest text-[10px] h-8"
+              className="rounded-lg data-[state=active]:bg-indigo-600 data-[state=active]:text-white font-black uppercase tracking-widest text-[10px] h-8 transition-all"
             >
               Visão Preditiva (IA)
             </TabsTrigger>
@@ -802,6 +838,196 @@ export default function Dashboard() {
             </motion.div>
           </div>
         </TabsContent>
+
+        <TabsContent
+          value="mineracao"
+          className="space-y-6 mt-0 focus-visible:outline-none focus-visible:ring-0"
+        >
+          <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+            
+            {/* Heatmap Section */}
+            <div className="xl:col-span-2 space-y-6">
+              <Card className="border-none bg-slate-950/80 backdrop-blur-xl shadow-2xl rounded-3xl overflow-hidden relative">
+                <div className="absolute inset-0 bg-gradient-to-br from-teal-500/10 via-transparent to-purple-500/10 pointer-events-none" />
+                <CardHeader className="border-b border-white/5 pb-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <CardTitle className="text-white text-lg font-black uppercase tracking-widest flex items-center gap-2">
+                        <Activity className="h-5 w-5 text-teal-400" />
+                        Heatmap de Lotação
+                      </CardTitle>
+                      <p className="text-slate-400 text-xs mt-1 font-semibold uppercase tracking-widest">
+                        Volume de entradas por hora (Tempo Real)
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-2 bg-slate-900/50 px-3 py-1.5 rounded-lg border border-white/10">
+                      <div className="h-2 w-2 rounded-full bg-teal-500 animate-pulse" />
+                      <span className="text-[10px] font-black text-teal-400 uppercase tracking-widest">Live Feed</span>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent className="pt-6 relative">
+                  <div className="h-[250px] w-full">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart data={[
+                        { hora: '08:00', pacientes: 12 }, { hora: '09:00', pacientes: 25 }, 
+                        { hora: '10:00', pacientes: 45 }, { hora: '11:00', pacientes: 62 }, 
+                        { hora: '12:00', pacientes: 58 }, { hora: '13:00', pacientes: 40 }, 
+                        { hora: '14:00', pacientes: 35 }, { hora: '15:00', pacientes: 50 },
+                        { hora: '16:00', pacientes: 70 }, { hora: '17:00', pacientes: 85 },
+                        { hora: '18:00', pacientes: 60 }, { hora: '19:00', pacientes: 30 }
+                      ]}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
+                        <XAxis dataKey="hora" stroke="rgba(255,255,255,0.3)" fontSize={10} tickLine={false} axisLine={false} />
+                        <YAxis stroke="rgba(255,255,255,0.3)" fontSize={10} tickLine={false} axisLine={false} />
+                        <RechartsTooltip 
+                          cursor={{fill: 'rgba(255,255,255,0.05)'}}
+                          contentStyle={{ backgroundColor: 'rgba(15, 23, 42, 0.9)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: '#fff' }}
+                        />
+                        <Bar dataKey="pacientes" radius={[4, 4, 0, 0]}>
+                          {
+                            [12, 25, 45, 62, 58, 40, 35, 50, 70, 85, 60, 30].map((entry, index) => (
+                              <Cell key={`cell-${index}`} fill={entry > 60 ? '#ef4444' : entry > 40 ? '#f59e0b' : '#14b8a6'} />
+                            ))
+                          }
+                        </Bar>
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Status LEDs Animados */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {[
+                  { name: 'Recepção', status: 'normal', time: '12 min' },
+                  { name: 'Triagem', status: 'warning', time: '45 min' },
+                  { name: 'Médico', status: 'critical', time: '2h 10m' },
+                  { name: 'Exames', status: 'normal', time: '30 min' }
+                ].map(sector => (
+                  <div key={sector.name} className="glass-card bg-slate-950/60 border border-white/5 rounded-2xl p-4 flex flex-col justify-between relative overflow-hidden group">
+                    <div className="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                    <div className="flex justify-between items-start mb-4">
+                      <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">{sector.name}</span>
+                      <div className={cn(
+                        "h-3 w-3 rounded-full shadow-[0_0_10px_rgba(0,0,0,0.5)]",
+                        sector.status === 'normal' ? "bg-teal-500 shadow-teal-500/50" : 
+                        sector.status === 'warning' ? "bg-amber-500 shadow-amber-500/50 animate-pulse" : 
+                        "bg-red-500 shadow-red-500/80 animate-ping"
+                      )} />
+                    </div>
+                    <div>
+                      <p className="text-2xl font-black text-white tracking-tighter">{sector.time}</p>
+                      <p className="text-[9px] text-slate-500 uppercase tracking-widest mt-1">Tempo Médio</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Radar Section */}
+            <div className="space-y-6">
+              <Card className="border-none bg-slate-950/80 backdrop-blur-xl shadow-2xl rounded-3xl overflow-hidden h-full">
+                <CardHeader className="border-b border-white/5 pb-4">
+                  <CardTitle className="text-white text-lg font-black uppercase tracking-widest flex items-center gap-2">
+                    <Crosshair className="h-5 w-5 text-indigo-400" />
+                    Radar de Gargalos
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="pt-6 flex flex-col items-center justify-center h-[calc(100%-80px)]">
+                  <div className="h-[250px] w-full">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <RadarChart cx="50%" cy="50%" outerRadius="70%" data={[
+                        { subject: 'Recep.', A: 120, fullMark: 150 },
+                        { subject: 'Triagem', A: 98, fullMark: 150 },
+                        { subject: 'Médico', A: 140, fullMark: 150 },
+                        { subject: 'Exame', A: 85, fullMark: 150 },
+                        { subject: 'Leito', A: 65, fullMark: 150 },
+                      ]}>
+                        <PolarGrid stroke="rgba(255,255,255,0.1)" />
+                        <PolarAngleAxis dataKey="subject" tick={{ fill: 'rgba(255,255,255,0.5)', fontSize: 10, fontWeight: 'bold' }} />
+                        <PolarRadiusAxis angle={30} domain={[0, 150]} tick={false} axisLine={false} />
+                        <Radar name="Atraso" dataKey="A" stroke="#818cf8" fill="#818cf8" fillOpacity={0.4} />
+                        <RechartsTooltip 
+                          contentStyle={{ backgroundColor: 'rgba(15, 23, 42, 0.9)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: '#fff' }}
+                        />
+                      </RadarChart>
+                    </ResponsiveContainer>
+                  </div>
+                  <div className="w-full mt-4 bg-indigo-500/10 border border-indigo-500/20 rounded-xl p-3 flex items-center gap-3">
+                    <AlertTriangle className="h-5 w-5 text-indigo-400 shrink-0" />
+                    <p className="text-[10px] text-indigo-200 uppercase tracking-wider font-semibold">
+                      O gargalo atual se concentra no <strong>Atendimento Médico</strong> (Alta distorção no radar).
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+            
+            {/* Ticker Section - Span full width */}
+            <div className="xl:col-span-3">
+              <div className="bg-slate-950 border border-red-500/30 rounded-2xl overflow-hidden flex items-stretch h-12 shadow-lg shadow-red-900/20">
+                <div className="bg-red-600 px-4 flex items-center justify-center shrink-0 z-10 shadow-[4px_0_15px_rgba(220,38,38,0.5)]">
+                  <span className="text-[10px] font-black uppercase tracking-widest text-white flex items-center gap-2">
+                    <div className="h-2 w-2 bg-white rounded-full animate-pulse" />
+                    Críticos
+                  </span>
+                </div>
+                <div className="flex-1 flex items-center overflow-hidden relative">
+                  {/* CSS Marquee effect with Real Patients */}
+                  <div className="animate-marquee whitespace-nowrap flex items-center gap-8 px-4 text-xs font-bold uppercase tracking-widest text-slate-300">
+                    {criticalPatients.map((patient, index) => {
+                      const timeInUpaMs = new Date().getTime() - new Date(patient.arrivalTime).getTime();
+                      const hours = Math.floor(timeInUpaMs / (1000 * 60 * 60));
+                      const minutes = Math.floor((timeInUpaMs % (1000 * 60 * 60)) / (1000 * 60));
+                      
+                      const isEmergency = patient.risk === 'emergency' || patient.risk === 'very-urgent';
+                      
+                      return (
+                        <div key={`${patient.id}-${index}`} className="flex items-center gap-2">
+                          <span 
+                            onClick={() => setSelectedPatient(patient)}
+                            className={cn(
+                              "cursor-pointer hover:underline transition-all hover:scale-105 active:scale-95 px-2 py-1 rounded-md",
+                              isEmergency ? "text-red-400 hover:bg-red-900/30" : "text-amber-400 hover:bg-amber-900/30"
+                            )}
+                          >
+                            {isEmergency ? '⚠️' : '⚡'} {patient.name} (Tempo: {hours}h {minutes}m)
+                          </span>
+                          <span className="text-slate-600 ml-4">•</span>
+                        </div>
+                      )
+                    })}
+                    {/* Repeat for seamless loop if needed, though marquee animation usually loops the block */}
+                    {criticalPatients.map((patient, index) => {
+                      const timeInUpaMs = new Date().getTime() - new Date(patient.arrivalTime).getTime();
+                      const hours = Math.floor(timeInUpaMs / (1000 * 60 * 60));
+                      const minutes = Math.floor((timeInUpaMs % (1000 * 60 * 60)) / (1000 * 60));
+                      
+                      const isEmergency = patient.risk === 'emergency' || patient.risk === 'very-urgent';
+                      
+                      return (
+                        <div key={`repeat-${patient.id}-${index}`} className="flex items-center gap-2">
+                          <span 
+                            onClick={() => setSelectedPatient(patient)}
+                            className={cn(
+                              "cursor-pointer hover:underline transition-all hover:scale-105 active:scale-95 px-2 py-1 rounded-md",
+                              isEmergency ? "text-red-400 hover:bg-red-900/30" : "text-amber-400 hover:bg-amber-900/30"
+                            )}
+                          >
+                            {isEmergency ? '⚠️' : '⚡'} {patient.name} (Tempo: {hours}h {minutes}m)
+                          </span>
+                          <span className="text-slate-600 ml-4">•</span>
+                        </div>
+                      )
+                    })}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </TabsContent>
       </Tabs>
 
       {/* MODALS */}
@@ -1128,6 +1354,15 @@ export default function Dashboard() {
           </DialogHeader>
           <div className="p-6 h-[500px]">
             <AreaChartFluxo expanded />
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Modal Jornada do Paciente */}
+      <Dialog open={!!selectedPatient} onOpenChange={(open) => !open && setSelectedPatient(null)}>
+        <DialogContent className="max-w-4xl p-0 overflow-hidden bg-transparent border-none shadow-2xl">
+          <div className="h-[85vh] overflow-y-auto rounded-3xl">
+            <PatientJourneyTimeline patient={selectedPatient} />
           </div>
         </DialogContent>
       </Dialog>

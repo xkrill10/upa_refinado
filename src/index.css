@@ -442,6 +442,17 @@
   .animate-blink-amber {
     animation: blink-amber 2s infinite;
   }
+
+  @keyframes marquee-scroll {
+    0% { transform: translateX(0%); }
+    100% { transform: translateX(-100%); }
+  }
+  .animate-marquee {
+    animation: marquee-scroll 60s linear infinite;
+  }
+  .animate-marquee:hover {
+    animation-play-state: paused;
+  }
 }
 
 /* Regras de PDF da Escala */
