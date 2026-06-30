@@ -27,6 +27,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogDescription,
+  DialogDragHandle,
 } from "@/components/ui/dialog";
 import {
   Search,
@@ -1756,9 +1757,10 @@ export default function TriageRoom() {
               >
                 <Card className="glass-card-premium shadow-2xl border-primary/20 overflow-hidden h-[90vh] md:h-auto md:max-h-[85vh] flex flex-col">
                   <CardHeader className="bg-[#006699]/5 p-8 md:p-10 pb-6 md:pb-8 shrink-0">
-                    <div className="flex items-center justify-between">
-                      <div className="space-y-1">
-                        <CardTitle className="text-lg font-black mission-control-title uppercase tracking-tight flex items-center gap-2">
+                    <div className="flex items-start justify-between">
+                      <DialogDragHandle className="flex-1 pb-2">
+                        <div className="space-y-1">
+                          <CardTitle className="text-lg font-black mission-control-title uppercase tracking-tight flex items-center gap-2">
                           {activeFlowchart ? (
                             <div className="flex items-center gap-2">
                               {(() => {
@@ -1798,7 +1800,8 @@ export default function TriageRoom() {
                                 : `Escolha o fluxograma baseado na queixa principal do paciente`}
                         </CardDescription>
                       </div>
-                      <div className="flex items-center gap-3">
+                      </DialogDragHandle>
+                      <div className="flex items-center gap-3 mt-1">
                         {activeFlowchart && (
                           <Badge
                             variant="outline"

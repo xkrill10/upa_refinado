@@ -17,6 +17,7 @@ const Patients = React.lazy(() => import("./pages/Patients"));
 const CallPanel = React.lazy(() => import("./pages/CallPanel"));
 const PatientEvolution = React.lazy(() => import("./pages/PatientEvolution"));
 const EvolucaoMedica = React.lazy(() => import("./pages/EvolucaoMedica"));
+const EvolucaoMedicaMenu = React.lazy(() => import("./pages/EvolucaoMedicaMenu"));
 const EvolucaoEnfermagem = React.lazy(() => import("./pages/EvolucaoEnfermagem"));
 const AnotacaoEnfermagem = React.lazy(() => import("./pages/AnotacaoEnfermagem"));
 const EvolucaoFisioterapia = React.lazy(() => import("./pages/EvolucaoFisioterapia"));
@@ -135,6 +136,50 @@ export const AppRoutes = () => {
         path="/paciente/:id/evolucao/farmacia-clinica"
         element={<EvolucaoFarmaciaClinica />}
       />
+
+      {/* Rotas Independentes do Menu Lateral Antigo */}
+      <Route path="/menu/paciente/:id/evolucao" element={<PatientEvolution />} />
+      <Route
+        path="/menu/paciente/:id/evolucao/medica"
+        element={<EvolucaoMedicaMenu />}
+      />
+      <Route
+        path="/menu/paciente/:id/evolucao/enfermagem"
+        element={<EvolucaoEnfermagem />}
+      />
+      <Route
+        path="/menu/paciente/:id/evolucao/anotacao-enfermagem"
+        element={<AnotacaoEnfermagem />}
+      />
+      <Route
+        path="/menu/paciente/:id/evolucao/fisioterapia"
+        element={<EvolucaoFisioterapia />}
+      />
+      <Route
+        path="/menu/paciente/:id/evolucao/nutricao"
+        element={<EvolucaoNutricao />}
+      />
+      <Route
+        path="/menu/paciente/:id/evolucao/psicologia"
+        element={<EvolucaoPsicologia />}
+      />
+      <Route
+        path="/menu/paciente/:id/evolucao/servico-social"
+        element={<EvolucaoServicoSocial />}
+      />
+      <Route
+        path="/menu/paciente/:id/evolucao/terapia-ocupacional"
+        element={<EvolucaoTerapiaOcupacional />}
+      />
+      <Route
+        path="/menu/paciente/:id/evolucao/fonoaudiologia"
+        element={<EvolucaoFonoaudiologia />}
+      />
+      <Route
+        path="/menu/paciente/:id/evolucao/farmacia-clinica"
+        element={<EvolucaoFarmaciaClinica />}
+      />
+
       <Route path="/admin/usuarios" element={<UserManagement />} />
       <Route path="/admin/auditoria" element={<AuditLogs />} />
       <Route path="/admin/backups" element={<BackupAdmin />} />

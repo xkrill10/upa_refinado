@@ -112,47 +112,47 @@ export function AppSidebar() {
           subItems: [
             {
               title: "Geral (Pesquisa)",
-              url: `/paciente/${currentPatientId}/evolucao`,
+              url: `/menu/paciente/${currentPatientId}/evolucao`,
             },
             {
               title: "Médica",
-              url: `/paciente/${currentPatientId}/evolucao/medica`,
+              url: `/menu/paciente/${currentPatientId}/evolucao/medica`,
             },
             {
               title: "Enfermagem",
-              url: `/paciente/${currentPatientId}/evolucao/enfermagem`,
+              url: `/menu/paciente/${currentPatientId}/evolucao/enfermagem`,
             },
             {
               title: "Anotação Técnica",
-              url: `/paciente/${currentPatientId}/evolucao/anotacao-enfermagem`,
+              url: `/menu/paciente/${currentPatientId}/evolucao/anotacao-enfermagem`,
             },
             {
               title: "Fisioterapia",
-              url: `/paciente/${currentPatientId}/evolucao/fisioterapia`,
+              url: `/menu/paciente/${currentPatientId}/evolucao/fisioterapia`,
             },
             {
               title: "Nutrição",
-              url: `/paciente/${currentPatientId}/evolucao/nutricao`,
+              url: `/menu/paciente/${currentPatientId}/evolucao/nutricao`,
             },
             {
               title: "Psicologia",
-              url: `/paciente/${currentPatientId}/evolucao/psicologia`,
+              url: `/menu/paciente/${currentPatientId}/evolucao/psicologia`,
             },
             {
               title: "Serviço Social",
-              url: `/paciente/${currentPatientId}/evolucao/servico-social`,
+              url: `/menu/paciente/${currentPatientId}/evolucao/servico-social`,
             },
             {
               title: "Terapia Ocupacional",
-              url: `/paciente/${currentPatientId}/evolucao/terapia-ocupacional`,
+              url: `/menu/paciente/${currentPatientId}/evolucao/terapia-ocupacional`,
             },
             {
               title: "Fonoaudiologia",
-              url: `/paciente/${currentPatientId}/evolucao/fonoaudiologia`,
+              url: `/menu/paciente/${currentPatientId}/evolucao/fonoaudiologia`,
             },
             {
               title: "Farmácia Clínica",
-              url: `/paciente/${currentPatientId}/evolucao/farmacia-clinica`,
+              url: `/menu/paciente/${currentPatientId}/evolucao/farmacia-clinica`,
             },
           ],
         },

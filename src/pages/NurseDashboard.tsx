@@ -21,6 +21,7 @@ import {
   DialogContent,
   DialogDescription,
   DialogTitle,
+  DialogDragHandle,
 } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
@@ -505,7 +506,7 @@ export default function NurseDashboard() {
 
             return (
               <DialogContent className="sm:max-w-[450px] p-0 overflow-hidden border border-white/20 dark:border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.3)] rounded-3xl bg-white/70 dark:bg-slate-950/60 backdrop-blur-xl [&>button]:hidden">
-                <div
+                <DialogDragHandle
                   className={cn(
                     "p-8 text-center text-white relative shadow-lg backdrop-blur-md transition-colors duration-300",
                     isSelectedRoomOccupied && !willResume
@@ -562,7 +563,7 @@ export default function NurseDashboard() {
                       </>
                     )}
                   </DialogDescription>
-                </div>
+                </DialogDragHandle>
 
                 <div className="p-8 space-y-5">
                   <div className="space-y-2">
