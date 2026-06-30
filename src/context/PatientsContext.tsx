@@ -36,6 +36,8 @@ export interface Patient {
     | "evasion"
     | "evasao"
     | "observation"
+    | "in-observation"
+    | "waiting-medication"
     | "interned";
   subStatus?: "reaval" | "exam_pending" | "medication_pending";
   risk:
