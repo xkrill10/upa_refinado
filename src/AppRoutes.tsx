@@ -67,6 +67,15 @@ const CleaningDashboard = React.lazy(() => import("./pages/CleaningDashboard"));
 const InpatientList = React.lazy(() => import("./pages/InpatientList"));
 const FlowDashboard = React.lazy(() => import("./pages/FlowDashboard"));
 
+// Integração Upa_escala
+const EscalaDashboard = React.lazy(() => import("./pages/EscalaDashboard"));
+const EscalaReports = React.lazy(() => import("./pages/EscalaReports"));
+const Certificates = React.lazy(() => import("./pages/Certificates"));
+const EscalaControl = React.lazy(() => import("./pages/EscalaControl"));
+const Management = React.lazy(() => import("./pages/Management"));
+const NewEmployee = React.lazy(() => import("./pages/NewEmployee"));
+const SearchPage = React.lazy(() => import("./pages/Search"));
+
 export const AppRoutes = () => {
   return (
     <Routes>

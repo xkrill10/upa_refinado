@@ -13,14 +13,7 @@ export function Toaster() {
 
   return (
     <ToastProvider>
-      {toasts.map(function ({
-        id,
-        title,
-        description,
-        action,
-        open,
-        ...props
-      }) {
+      {toasts.map(function ({ id, title, description, action, open, ...props }) {
         if (open === false) return null;
         return (
           <Toast key={id} {...props}>
