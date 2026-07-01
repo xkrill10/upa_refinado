@@ -22,7 +22,18 @@ const AppContent = () => {
   const { role, setRole } = useRole();
 
   const isClinicalPanel =
-    (role === "enfermeiro" || role === "medico" || role === "recepcao" || role === "tecnico_enfermagem" || role === "auxiliar_enfermagem") &&
+    (role === "enfermeiro" ||
+      role === "medico" ||
+      role === "recepcao" ||
+      role === "tecnico_enfermagem" ||
+      role === "auxiliar_enfermagem" ||
+      role === "fisioterapeuta" ||
+      role === "nutricionista" ||
+      role === "psicologo" ||
+      role === "assistente_social" ||
+      role === "terapeuta_ocupacional" ||
+      role === "fonoaudiologo" ||
+      role === "farmaceutico_clinico") &&
     (location.pathname.startsWith("/painel-enfermagem") ||
       location.pathname.startsWith("/painel-medico") ||
       location.pathname.startsWith("/fila") ||
@@ -152,6 +163,13 @@ const AppContent = () => {
                     <option value="tecnico_enfermagem">🩺 TÉCNICO ENFERMAGEM</option>
                     <option value="auxiliar_enfermagem">🩹 AUXILIAR ENFERMAGEM</option>
                     <option value="recepcao">🙋‍♀️ RECEPÇÃO</option>
+                    <option value="fisioterapeuta">🦿 FISIOTERAPEUTA</option>
+                    <option value="nutricionista">🥗 NUTRICIONISTA</option>
+                    <option value="psicologo">🧠 PSICÓLOGO(A)</option>
+                    <option value="assistente_social">🤝 ASSISTENTE SOCIAL</option>
+                    <option value="terapeuta_ocupacional">🧩 TERAPEUTA OCUPACIONAL</option>
+                    <option value="fonoaudiologo">🗣️ FONOAUDIÓLOGO(A)</option>
+                    <option value="farmaceutico_clinico">💊 FARMACÊUTICO(A) CLÍNICO(A)</option>
                   </select>
                 </div>
                 <GlobalClock />

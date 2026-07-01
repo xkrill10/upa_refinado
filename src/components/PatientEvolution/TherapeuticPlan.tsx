@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useLayoutEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ShieldAlert, Clock, CheckCircle2, XCircle, ChevronLeft, ChevronRight, Calendar as CalendarIcon, Pill, Utensils, Activity, Stethoscope, Ban, Trash2, Plus } from "lucide-react";
+import { ShieldAlert, Clock, CheckCircle2, XCircle, ChevronLeft, ChevronRight, Calendar as CalendarIcon, Pill, Utensils, Activity, Stethoscope, Ban, Trash2, Plus, Ear, Brain, HeartHandshake, Puzzle, FlaskConical } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { usePrescriptions, PrescriptionMedication, AprazamentoHour, PrescriptionStatus } from "@/context/PrescriptionsContext";
 import { DoubleCheckModal } from "./Modals/DoubleCheckModal";
@@ -416,6 +416,11 @@ export function TherapeuticPlan({ patientId }: TherapeuticPlanProps) {
     diet: activeOrder?.medications.filter(m => m.category === 'diet') || [],
     therapy: activeOrder?.medications.filter(m => m.category === 'therapy') || [],
     nursing: activeOrder?.medications.filter(m => m.category === 'nursing') || [],
+    speech_therapy: activeOrder?.medications.filter(m => m.category === 'speech_therapy') || [],
+    psychology: activeOrder?.medications.filter(m => m.category === 'psychology') || [],
+    social_work: activeOrder?.medications.filter(m => m.category === 'social_work') || [],
+    occupational_therapy: activeOrder?.medications.filter(m => m.category === 'occupational_therapy') || [],
+    clinical_pharmacy: activeOrder?.medications.filter(m => m.category === 'clinical_pharmacy') || [],
   };
 
   const renderGroup = (meds: PrescriptionMedication[], title: string, icon: React.ReactNode, bgColor: string, textColor: string, borderColor: string, rowBgColor: string) => {
@@ -768,6 +773,11 @@ export function TherapeuticPlan({ patientId }: TherapeuticPlanProps) {
                 {renderGroup(groupedMeds.diet, "Dietas e Refeições", <Utensils className="h-3.5 w-3.5" />, "bg-orange-500/10", "text-orange-600 dark:text-orange-400", "border-l-orange-500", "bg-orange-500/5")}
                 {renderGroup(groupedMeds.therapy, "Terapias e Reabilitação", <Activity className="h-3.5 w-3.5" />, "bg-emerald-500/10", "text-emerald-600 dark:text-emerald-400", "border-l-emerald-500", "bg-emerald-500/5")}
                 {renderGroup(groupedMeds.nursing, "Cuidados de Enfermagem", <Stethoscope className="h-3.5 w-3.5" />, "bg-[#006699]/10 dark:bg-sky-500/10", "text-[#006699] dark:text-sky-400", "border-l-[#006699] dark:border-l-sky-500", "bg-[#006699]/5 dark:bg-sky-500/5")}
+                {renderGroup(groupedMeds.speech_therapy, "Fonoaudiologia", <Ear className="h-3.5 w-3.5" />, "bg-indigo-500/10", "text-indigo-600 dark:text-indigo-400", "border-l-indigo-500", "bg-indigo-500/5")}
+                {renderGroup(groupedMeds.psychology, "Psicologia", <Brain className="h-3.5 w-3.5" />, "bg-pink-500/10", "text-pink-600 dark:text-pink-400", "border-l-pink-500", "bg-pink-500/5")}
+                {renderGroup(groupedMeds.social_work, "Serviço Social", <HeartHandshake className="h-3.5 w-3.5" />, "bg-rose-500/10", "text-rose-600 dark:text-rose-400", "border-l-rose-500", "bg-rose-500/5")}
+                {renderGroup(groupedMeds.occupational_therapy, "Terapia Ocupacional", <Puzzle className="h-3.5 w-3.5" />, "bg-teal-500/10", "text-teal-600 dark:text-teal-400", "border-l-teal-500", "bg-teal-500/5")}
+                {renderGroup(groupedMeds.clinical_pharmacy, "Farmácia Clínica", <FlaskConical className="h-3.5 w-3.5" />, "bg-cyan-500/10", "text-cyan-600 dark:text-cyan-400", "border-l-cyan-500", "bg-cyan-500/5")}
               </TooltipProvider>
             </tbody>
           </table>

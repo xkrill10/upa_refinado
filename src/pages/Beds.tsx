@@ -39,6 +39,7 @@ import {
   formatWords,
   getEvolutionStatus,
   formatPatientAge,
+  getPatientProfileUrl,
 } from "@/lib/utils";
 import { ExamsModal } from "@/components/PatientEvolution/Modals/ExamsModal";
 import PatientRecord from "@/pages/PatientRecord";
@@ -816,11 +817,7 @@ export default function Beds() {
                             if (bed.ward) {
                                 localStorage.setItem("upa_active_sector", bed.ward);
                             }
-                            if (role === 'medico') {
-                                navigate(`/paciente/${patient.id}/evolucao/medica`);
-                            } else {
-                                navigate(`/paciente/${patient.id}/perfil-enfermagem`);
-                            }
+                            navigate(getPatientProfileUrl(patient.id, role || ""));
                           }
                         }}
                       >
@@ -1974,7 +1971,7 @@ export default function Beds() {
                                   if (bed.ward) {
                                       localStorage.setItem("upa_active_sector", bed.ward);
                                   }
-                                  navigate(`/paciente/${patient.id}/evolucao`);
+                                  navigate(getPatientProfileUrl(patient.id, role || ""));
                                 }}
                               >
                                 <Syringe className="h-3 w-3 mr-1.5" />

@@ -1,10 +1,8 @@
 import { useState, useRef, useEffect } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { usePatients } from "@/hooks/use-patients";
-import { PatientSwitcherSidebar } from "@/components/PatientSwitcherSidebar";
 import { EvolutionRecord } from "@/context/PatientsContext";
 import { useBeds } from "@/context/BedsContext";
-import { PatientVitalsCard } from "@/components/PatientVitalsCard";
 import {
   usePrescriptions,
   PrescriptionMedication,
@@ -803,7 +801,7 @@ export default function EvolucaoMedicaMenu() {
         `- Pressão Arterial (PA): ${finalSystolic}/${finalDiastolic} mmHg\n` +
         `- Frequência Cardíaca (FC): ${vsHeartRate || "--"} bpm\n` +
         `- Saturação de O2 (SpO2): ${vsSpO2 || "--"}%\n` +
-        `- Temperatura Corporal: ${vsTemperature || "--"} °C\n` +
+        `- Temperatura Corporal: ${vsTemperature || "--"} ┬░C\n` +
         `- Frequência Respiratória (FR): ${vsRespiratoryRate || "--"} irpm\n` +
         `- Escala de Dor: ${vsPain}/10\n` +
         `- Consciência (AVDI): ${vsConsciousness === "A" ? "Alerta" : vsConsciousness === "V" ? "Reage a Voz" : vsConsciousness === "D" ? "Reage a Dor" : "Inconsciente"}\n` +
@@ -1088,7 +1086,7 @@ export default function EvolucaoMedicaMenu() {
                             textDark,
                           )}
                         >
-                          Adicionado ✓
+                          Adicionado Ô£ô
                         </span>
                       ) : (
                         <span className="text-[10px] text-slate-400 dark:text-slate-500 group-hover:text-[#006699] dark:group-hover:text-sky-400 font-bold transition-all">
@@ -1107,14 +1105,11 @@ export default function EvolucaoMedicaMenu() {
   };
 
   return (
-    <div className="flex h-full w-full -m-2">
-      <PatientSwitcherSidebar />
-      <div className="flex-1 overflow-y-auto p-4 md:p-6 bg-slate-50/50 dark:bg-slate-900/50">
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="space-y-8 max-w-7xl mx-auto"
-        >
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="space-y-8"
+    >
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex items-center gap-6">
           <Button
@@ -1180,7 +1175,7 @@ export default function EvolucaoMedicaMenu() {
               disabled
               className="rounded-xl gap-2 font-black bg-amber-500/20 text-amber-600 dark:text-amber-400 border border-amber-500/50 uppercase tracking-widest text-[10px] h-10 px-4"
             >
-              ⏳ Vaga Solicitada
+              ÔÅ│ Vaga Solicitada
             </Button>
           ) : patientBed ? (
             <Button
@@ -1204,7 +1199,7 @@ export default function EvolucaoMedicaMenu() {
             className="rounded-xl gap-2 font-black bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-500/20 uppercase tracking-widest text-[10px] h-10 px-4"
           >
             <Clock className="h-4 w-4" />
-            ⏱️ Jornada
+            ÔÅ▒´©Å Jornada
           </Button>
         </div>
       </div>
@@ -1234,11 +1229,11 @@ export default function EvolucaoMedicaMenu() {
                   {patient.allergies &&
                   patient.allergies !== "Sem alergias conhecidas" ? (
                     <span className="text-red-500 bg-red-500/10 px-1.5 py-0.5 rounded border border-red-500/15 transition-all duration-300 group-hover:bg-red-500 group-hover:text-white group-hover:border-red-500/30">
-                      ⚠️ {patient.allergies}
+                      ÔÜá´©Å {patient.allergies}
                     </span>
                   ) : (
                     <span className="text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/15 transition-all duration-300 group-hover:bg-emerald-500 group-hover:text-white group-hover:border-emerald-500/30">
-                      ✅ Sem Alergias
+                      Ô£à Sem Alergias
                     </span>
                   )}
                 </div>
@@ -1300,10 +1295,35 @@ export default function EvolucaoMedicaMenu() {
           </Card>
 
           {/* Card 3: Status Sinais Vitais */}
-          <PatientVitalsCard
-            patient={patient}
+          <Card
+            className="group glass-card-premium border border-rose-500/15 dark:border-rose-500/20 bg-rose-500/[0.02] dark:bg-rose-500/[0.04] shadow-[0_8px_30px_rgba(0,0,0,0.02)] rounded-xl overflow-hidden transition-all duration-500 cursor-pointer hover:scale-[1.02] active:scale-[0.98] hover:bg-rose-500/[0.07] dark:hover:bg-rose-500/[0.10] hover:border-rose-500/40 hover:shadow-[0_12px_40px_rgba(244,63,94,0.12)] lg:col-span-1"
             onClick={() => setIsVitalsHistoryOpen(true)}
-          />
+          >
+            <CardContent className="p-4 flex flex-col justify-between h-full gap-2 font-black">
+              <div className="flex items-center justify-between">
+                <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest group-hover:text-rose-500/80 transition-colors duration-300">
+                  Status Sinais Vitais
+                </p>
+                <span className="text-[9px] font-black text-rose-500 dark:text-rose-450 uppercase tracking-wider flex items-center gap-0.5 transition-all duration-300 group-hover:scale-105">
+                  ­ƒôê Histórico
+                </span>
+              </div>
+              <div className="flex flex-wrap items-center gap-1.5">
+                <span className="text-[11px] font-black text-[#006699] dark:text-sky-300 bg-[#006699]/10 px-2 py-0.5 rounded-md border border-[#006699]/15 transition-all duration-300 group-hover:bg-[#006699] group-hover:text-white group-hover:border-[#006699]/30">
+                  PA: {patient.pa || "--"}
+                </span>
+                <span className="text-[11px] font-black text-red-500 bg-red-500/10 px-2 py-0.5 rounded-md border border-red-500/15 transition-all duration-300 group-hover:bg-red-500 group-hover:text-white group-hover:border-red-500/30">
+                  FC: {patient.fc || "--"}
+                </span>
+                <span className="text-[11px] font-black text-emerald-500 bg-emerald-500/10 px-2 py-0.5 rounded-md border border-emerald-500/15 transition-all duration-300 group-hover:bg-emerald-500 group-hover:text-white group-hover:border-emerald-500/30">
+                  SpO2: {patient.spo2 || "--"}%
+                </span>
+                <span className="text-[11px] font-black text-orange-500 bg-orange-500/10 px-2 py-0.5 rounded-md border border-orange-500/15 transition-all duration-300 group-hover:bg-orange-500 group-hover:text-white group-hover:border-orange-500/30">
+                  T: {patient.temperature || "--"}┬░C
+                </span>
+              </div>
+            </CardContent>
+          </Card>
 
           {/* Card 4: Histórico de Evoluções */}
           <Card
@@ -1582,8 +1602,8 @@ export default function EvolucaoMedicaMenu() {
                     <div className="flex items-center justify-between">
                       <span className="font-extrabold text-[#006699] uppercase tracking-wider text-[10px]">
                         {evolutionType === "Evolução Enfermagem"
-                          ? "📋 Diretriz: Evolução de Enfermagem (COFEN Res. 564/2017)"
-                          : "📝 Diretriz: Anotação de Enfermagem"}
+                          ? "­ƒôï Diretriz: Evolução de Enfermagem (COFEN Res. 564/2017)"
+                          : "­ƒôØ Diretriz: Anotação de Enfermagem"}
                       </span>
                       <span className="text-[9px] font-bold text-muted-foreground/60 uppercase tracking-widest">
                         Segurança Jurídica & Cuidado
@@ -1659,7 +1679,7 @@ export default function EvolucaoMedicaMenu() {
                           }}
                           className="text-[9px] font-extrabold text-[#006699] hover:underline uppercase tracking-wider bg-[#006699]/10 px-2 py-0.5 rounded border border-[#006699]/15 transition-all flex items-center gap-1 shrink-0"
                         >
-                          ⚡ Parâmetros Normais
+                          ÔÜí Parâmetros Normais
                         </button>
                         <button
                           type="button"
@@ -1737,11 +1757,11 @@ export default function EvolucaoMedicaMenu() {
                       </div>
                       <div className="space-y-1">
                         <Label className="text-[9px] font-black uppercase text-muted-foreground">
-                          Temperatura (°C)
+                          Temperatura (┬░C)
                         </Label>
                         <Input
                           type="text"
-                          placeholder="Temp °C"
+                          placeholder="Temp ┬░C"
                           className={cn(
                             "h-8 text-xs bg-white/45 dark:bg-slate-900/45 border-white/60 dark:border-white/10 focus:bg-white/60 dark:focus:bg-slate-900/60 rounded-xl backdrop-blur-sm shadow-sm transition-all focus:ring-1 focus:ring-[#006699]/20",
                             isDefaultTemperature
@@ -1878,7 +1898,7 @@ export default function EvolucaoMedicaMenu() {
                   >
                     <div className="flex items-center justify-between border-b border-slate-500/20 pb-2">
                       <span className="font-extrabold text-[#006699] uppercase tracking-wider text-[11px] flex items-center gap-1.5">
-                        ⚡ Super Painel de Prescrição Médica (UPA 24h)
+                        ÔÜí Super Painel de Prescrição Médica (UPA 24h)
                       </span>
                       <span className="text-[9px] font-black text-muted-foreground/60 uppercase tracking-widest">
                         Prescrição Expressa & Adaptativa
@@ -2035,7 +2055,7 @@ export default function EvolucaoMedicaMenu() {
                                   </span>
                                 </span>
                                 <span className="text-[10px] text-muted-foreground">
-                                  Via: {med.route} • Freq: {med.frequency}
+                                  Via: {med.route} ÔÇó Freq: {med.frequency}
                                 </span>
                               </div>
                             ))
@@ -2272,7 +2292,7 @@ export default function EvolucaoMedicaMenu() {
                   >
                     <div className="flex items-center justify-between border-b border-slate-500/20 pb-2">
                       <span className="font-extrabold text-[#006699] uppercase tracking-wider text-[11px] flex items-center gap-1.5">
-                        ⚡ Super Painel de Desfecho Clínico & Alta (UPA 24h)
+                        ÔÜí Super Painel de Desfecho Clínico & Alta (UPA 24h)
                       </span>
                       <span className="text-[9px] font-black text-muted-foreground/60 uppercase tracking-widest">
                         Fluxo de Alta Expresso & Adaptativo
@@ -2349,7 +2369,7 @@ export default function EvolucaoMedicaMenu() {
                                 ).length;
                                 return count > 0 ? (
                                   <Badge className="bg-emerald-600 text-white font-black text-[9px] px-1.5 py-0.5 rounded-full border-none shadow-sm animate-in zoom-in-50 duration-200">
-                                    Selecionado ✓
+                                    Selecionado Ô£ô
                                   </Badge>
                                 ) : null;
                               })()}
@@ -2410,7 +2430,7 @@ export default function EvolucaoMedicaMenu() {
                                       </span>
                                       {isActive ? (
                                         <span className="text-[10px] font-black text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
-                                          Ativo ✓
+                                          Ativo Ô£ô
                                         </span>
                                       ) : (
                                         <span className="text-[10px] text-slate-400 dark:text-slate-500 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 font-bold transition-all">
@@ -2540,7 +2560,7 @@ export default function EvolucaoMedicaMenu() {
                                       </span>
                                       {isActive ? (
                                         <span className="text-[10px] font-black text-blue-600 dark:text-blue-400 flex items-center gap-1">
-                                          Adicionado ✓
+                                          Adicionado Ô£ô
                                         </span>
                                       ) : (
                                         <span className="text-[10px] text-slate-400 dark:text-slate-500 group-hover:text-blue-600 dark:group-hover:text-blue-400 font-bold transition-all">
@@ -2632,7 +2652,7 @@ export default function EvolucaoMedicaMenu() {
                             {normalizeText(description).includes(
                               "termo de responsabilidade",
                             )
-                              ? "Anexado ✓"
+                              ? "Anexado Ô£ô"
                               : "Não Inserido"}
                           </span>
                         </button>
@@ -2696,7 +2716,7 @@ export default function EvolucaoMedicaMenu() {
                             {normalizeText(description).includes(
                               "regulação cross",
                             )
-                              ? "Regulação Ativa ✓"
+                              ? "Regulação Ativa Ô£ô"
                               : "Não Solicitada"}
                           </span>
                         </button>
@@ -2760,7 +2780,7 @@ export default function EvolucaoMedicaMenu() {
                             {normalizeText(description).includes(
                               "receituário e atestado",
                             )
-                              ? "Emitido ✓"
+                              ? "Emitido Ô£ô"
                               : "Não Emitido"}
                           </span>
                         </button>
@@ -2824,7 +2844,7 @@ export default function EvolucaoMedicaMenu() {
                             {normalizeText(description).includes(
                               "declaração de óbito",
                             )
-                              ? "Preenchida ✓"
+                              ? "Preenchida Ô£ô"
                               : "Não Preenchida"}
                           </span>
                         </button>
@@ -2842,7 +2862,7 @@ export default function EvolucaoMedicaMenu() {
                   >
                     <div className="flex items-center justify-between border-b border-slate-500/20 pb-2">
                       <span className="font-extrabold text-[#006699] uppercase tracking-wider text-[11px]">
-                        🩺 Super Painel Médico (Adulto UPA 24h)
+                        ­ƒ®║ Super Painel Médico (Adulto UPA 24h)
                       </span>
                     </div>
 
@@ -2969,7 +2989,7 @@ export default function EvolucaoMedicaMenu() {
                                         </span>
                                         {isActive ? (
                                           <span className="text-[10px] font-black text-green-600 dark:text-green-400 flex items-center gap-1">
-                                            Adicionado ✓
+                                            Adicionado Ô£ô
                                           </span>
                                         ) : (
                                           <span className="text-[10px] text-slate-400 dark:text-slate-500 group-hover:text-[#006699] dark:group-hover:text-sky-400 font-bold transition-all">
@@ -3108,7 +3128,7 @@ export default function EvolucaoMedicaMenu() {
                                         </span>
                                         {isActive ? (
                                           <span className="text-[10px] font-black text-red-600 dark:text-red-400 flex items-center gap-1">
-                                            Adicionado ✓
+                                            Adicionado Ô£ô
                                           </span>
                                         ) : (
                                           <span className="text-[10px] text-slate-400 dark:text-slate-500 group-hover:text-[#006699] dark:group-hover:text-sky-400 font-bold transition-all">
@@ -3250,7 +3270,7 @@ export default function EvolucaoMedicaMenu() {
                                         </span>
                                         {isActive ? (
                                           <span className="text-[10px] font-black text-blue-600 dark:text-blue-400 flex items-center gap-1">
-                                            Adicionado ✓
+                                            Adicionado Ô£ô
                                           </span>
                                         ) : (
                                           <span className="text-[10px] text-slate-400 dark:text-slate-500 group-hover:text-[#006699] dark:group-hover:text-sky-400 font-bold transition-all">
@@ -3393,7 +3413,7 @@ export default function EvolucaoMedicaMenu() {
                   >
                     <div className="flex items-center justify-between border-b border-slate-500/20 pb-2">
                       <span className="font-extrabold text-[#006699] uppercase tracking-wider text-[11px]">
-                        🧸 Super Painel Médico (Pediatria UPA 24h)
+                        ­ƒº© Super Painel Médico (Pediatria UPA 24h)
                       </span>
                     </div>
 
@@ -3524,7 +3544,7 @@ export default function EvolucaoMedicaMenu() {
                                           </span>
                                           {isActive ? (
                                             <span className="text-[10px] font-black text-green-600 dark:text-green-400 flex items-center gap-1">
-                                              Adicionado ✓
+                                              Adicionado Ô£ô
                                             </span>
                                           ) : (
                                             <span className="text-[10px] text-slate-400 dark:text-slate-500 group-hover:text-[#006699] dark:group-hover:text-sky-400 font-bold transition-all">
@@ -3664,7 +3684,7 @@ export default function EvolucaoMedicaMenu() {
                                         </span>
                                         {isActive ? (
                                           <span className="text-[10px] font-black text-red-600 dark:text-red-400 flex items-center gap-1">
-                                            Adicionado ✓
+                                            Adicionado Ô£ô
                                           </span>
                                         ) : (
                                           <span className="text-[10px] text-slate-400 dark:text-slate-500 group-hover:text-[#006699] dark:group-hover:text-sky-400 font-bold transition-all">
@@ -3806,7 +3826,7 @@ export default function EvolucaoMedicaMenu() {
                                         </span>
                                         {isActive ? (
                                           <span className="text-[10px] font-black text-blue-600 dark:text-blue-400 flex items-center gap-1">
-                                            Adicionado ✓
+                                            Adicionado Ô£ô
                                           </span>
                                         ) : (
                                           <span className="text-[10px] text-slate-400 dark:text-slate-500 group-hover:text-[#006699] dark:group-hover:text-sky-400 font-bold transition-all">
@@ -3942,7 +3962,7 @@ export default function EvolucaoMedicaMenu() {
                   >
                     <div className="flex items-center justify-between border-b border-slate-500/20 pb-2">
                       <span className="font-extrabold text-[#006699] uppercase tracking-wider text-[11px]">
-                        💉 Super Painel da Equipe Técnica (Anotações UPA 24h)
+                        ­ƒÆë Super Painel da Equipe Técnica (Anotações UPA 24h)
                       </span>
                     </div>
 
@@ -4073,7 +4093,7 @@ export default function EvolucaoMedicaMenu() {
                                         </span>
                                         {isActive ? (
                                           <span className="text-[10px] font-black text-red-600 dark:text-red-400 flex items-center gap-1">
-                                            Adicionado ✓
+                                            Adicionado Ô£ô
                                           </span>
                                         ) : (
                                           <span className="text-[10px] text-slate-400 dark:text-slate-500 group-hover:text-[#006699] dark:group-hover:text-sky-400 font-bold transition-all">
@@ -4217,7 +4237,7 @@ export default function EvolucaoMedicaMenu() {
                                         </span>
                                         {isActive ? (
                                           <span className="text-[10px] font-black text-blue-600 dark:text-blue-400 flex items-center gap-1">
-                                            Adicionado ✓
+                                            Adicionado Ô£ô
                                           </span>
                                         ) : (
                                           <span className="text-[10px] text-slate-400 dark:text-slate-500 group-hover:text-[#006699] dark:group-hover:text-sky-400 font-bold transition-all">
@@ -4356,7 +4376,7 @@ export default function EvolucaoMedicaMenu() {
                                         </span>
                                         {isActive ? (
                                           <span className="text-[10px] font-black text-orange-600 dark:text-orange-400 flex items-center gap-1">
-                                            Adicionado ✓
+                                            Adicionado Ô£ô
                                           </span>
                                         ) : (
                                           <span className="text-[10px] text-slate-400 dark:text-slate-500 group-hover:text-[#006699] dark:group-hover:text-sky-400 font-bold transition-all">
@@ -4494,7 +4514,7 @@ export default function EvolucaoMedicaMenu() {
                                         </span>
                                         {isActive ? (
                                           <span className="text-[10px] font-black text-indigo-600 dark:text-indigo-400 flex items-center gap-1">
-                                            Adicionado ✓
+                                            Adicionado Ô£ô
                                           </span>
                                         ) : (
                                           <span className="text-[10px] text-slate-400 dark:text-slate-500 group-hover:text-[#006699] dark:group-hover:text-sky-400 font-bold transition-all">
@@ -4523,7 +4543,7 @@ export default function EvolucaoMedicaMenu() {
                   >
                     <div className="flex items-center justify-between border-b border-slate-500/20 pb-2">
                       <span className="font-extrabold text-[#006699] uppercase tracking-wider text-[11px]">
-                        🫁 Super Painel da Fisioterapia{" "}
+                        ­ƒ½ü Super Painel da Fisioterapia{" "}
                         {isChild && "(Pediatria)"}
                       </span>
                     </div>
@@ -4597,7 +4617,7 @@ export default function EvolucaoMedicaMenu() {
                   >
                     <div className="flex items-center justify-between border-b border-slate-500/20 pb-2">
                       <span className="font-extrabold text-[#006699] uppercase tracking-wider text-[11px]">
-                        🥗 Super Painel da Nutrição {isChild && "(Pediatria)"}
+                        ­ƒÑù Super Painel da Nutrição {isChild && "(Pediatria)"}
                       </span>
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -4674,7 +4694,7 @@ export default function EvolucaoMedicaMenu() {
                   >
                     <div className="flex items-center justify-between border-b border-slate-500/20 pb-2">
                       <span className="font-extrabold text-[#006699] uppercase tracking-wider text-[11px]">
-                        🧠 Super Painel da Psicologia {isChild && "(Pediatria)"}
+                        ­ƒºá Super Painel da Psicologia {isChild && "(Pediatria)"}
                       </span>
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -4744,7 +4764,7 @@ export default function EvolucaoMedicaMenu() {
                   >
                     <div className="flex items-center justify-between border-b border-slate-500/20 pb-2">
                       <span className="font-extrabold text-[#006699] uppercase tracking-wider text-[11px]">
-                        🤝 Super Painel do Serviço Social{" "}
+                        ­ƒñØ Super Painel do Serviço Social{" "}
                         {isChild && "(Pediatria)"}
                       </span>
                     </div>
@@ -4826,7 +4846,7 @@ export default function EvolucaoMedicaMenu() {
                   >
                     <div className="flex items-center justify-between border-b border-slate-500/20 pb-2">
                       <span className="font-extrabold text-[#006699] uppercase tracking-wider text-[11px]">
-                        🧩 Super Painel da Terapia Ocupacional{" "}
+                        ­ƒº® Super Painel da Terapia Ocupacional{" "}
                         {isChild && "(Pediatria)"}
                       </span>
                     </div>
@@ -4900,7 +4920,7 @@ export default function EvolucaoMedicaMenu() {
                   >
                     <div className="flex items-center justify-between border-b border-slate-500/20 pb-2">
                       <span className="font-extrabold text-[#006699] uppercase tracking-wider text-[11px]">
-                        🗣️ Super Painel da Fonoaudiologia{" "}
+                        ­ƒùú´©Å Super Painel da Fonoaudiologia{" "}
                         {isChild && "(Pediatria)"}
                       </span>
                     </div>
@@ -4968,7 +4988,7 @@ export default function EvolucaoMedicaMenu() {
                   >
                     <div className="flex items-center justify-between border-b border-slate-500/20 pb-2">
                       <span className="font-extrabold text-[#006699] uppercase tracking-wider text-[11px]">
-                        💊 Super Painel da Farmácia Clínica{" "}
+                        ­ƒÆè Super Painel da Farmácia Clínica{" "}
                         {isChild && "(Pediatria)"}
                       </span>
                     </div>
@@ -5164,7 +5184,7 @@ export default function EvolucaoMedicaMenu() {
                   >
                     <div className="flex items-center justify-between border-b border-slate-500/20 pb-2">
                       <span className="font-extrabold text-[#006699] uppercase tracking-wider text-[11px]">
-                        📋 Super Painel SAE - Processo de Enfermagem (UPA 24h)
+                        ­ƒôï Super Painel SAE - Processo de Enfermagem (UPA 24h)
                       </span>
                     </div>
 
@@ -5291,7 +5311,7 @@ export default function EvolucaoMedicaMenu() {
                                         </span>
                                         {isActive ? (
                                           <span className="text-[10px] font-black text-red-600 dark:text-red-400 flex items-center gap-1">
-                                            Adicionado ✓
+                                            Adicionado Ô£ô
                                           </span>
                                         ) : (
                                           <span className="text-[10px] text-slate-400 dark:text-slate-500 group-hover:text-[#006699] dark:group-hover:text-sky-400 font-bold transition-all">
@@ -5427,7 +5447,7 @@ export default function EvolucaoMedicaMenu() {
                                         </span>
                                         {isActive ? (
                                           <span className="text-[10px] font-black text-blue-600 dark:text-blue-400 flex items-center gap-1">
-                                            Adicionado ✓
+                                            Adicionado Ô£ô
                                           </span>
                                         ) : (
                                           <span className="text-[10px] text-slate-400 dark:text-slate-500 group-hover:text-[#006699] dark:group-hover:text-sky-400 font-bold transition-all">
@@ -6170,9 +6190,9 @@ export default function EvolucaoMedicaMenu() {
                     onClick={() => setIsStampConfigOpen(!isStampConfigOpen)}
                     className="w-full px-4 py-2.5 bg-white/20 dark:bg-slate-800/20 hover:bg-white/35 dark:hover:bg-slate-800/35 transition-all flex items-center justify-between text-[10px] font-black uppercase tracking-wider text-muted-foreground"
                   >
-                    <span>🖋️ Carimbo Digital & Assinatura (COREN / CRM)</span>
+                    <span>­ƒûï´©Å Carimbo Digital & Assinatura (COREN / CRM)</span>
                     <span className="font-mono text-xs">
-                      {isStampConfigOpen ? "Recolher ▲" : "Configurar ▼"}
+                      {isStampConfigOpen ? "Recolher Ôû▓" : "Configurar Ôû╝"}
                     </span>
                   </button>
                   {isStampConfigOpen && (
@@ -6742,8 +6762,6 @@ export default function EvolucaoMedicaMenu() {
           />
         </>
       )}
-        </motion.div>
-      </div>
-    </div>
+    </motion.div>
   );
 }

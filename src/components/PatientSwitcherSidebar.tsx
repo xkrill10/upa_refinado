@@ -2,7 +2,7 @@ import React from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { usePatients } from "@/hooks/use-patients";
 import { useBeds } from "@/context/BedsContext";
-import { cn } from "@/lib/utils";
+import { cn, getPatientProfileUrl } from "@/lib/utils";
 import { useRole } from "@/context/RoleContext";
 import { Users, Zap, ShieldAlert, Baby } from "lucide-react";
 
@@ -200,11 +200,7 @@ export const PatientSwitcherSidebar = () => {
                     <button
                       key={bed.id}
                       onClick={() => {
-                        if (role === "medico") {
-                          navigate(`/paciente/${patient.id}/evolucao/medica`);
-                        } else {
-                          navigate(`/paciente/${patient.id}/perfil-enfermagem`);
-                        }
+                        navigate(getPatientProfileUrl(patient.id, role || ""));
                       }}
                       className={cn(
                         "w-full flex items-center gap-3 text-left p-2 rounded-xl transition-all border group",

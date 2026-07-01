@@ -49,7 +49,14 @@ export const ClinicalLayout = ({ children }: ClinicalLayoutProps) => {
     location.pathname.endsWith("/perfil-enfermagem") || 
     location.pathname.endsWith("/evolucao/medica") ||
     role === "tecnico_enfermagem" ||
-    role === "auxiliar_enfermagem";
+    role === "auxiliar_enfermagem" ||
+    role === "fisioterapeuta" ||
+    role === "nutricionista" ||
+    role === "psicologo" ||
+    role === "assistente_social" ||
+    role === "terapeuta_ocupacional" ||
+    role === "fonoaudiologo" ||
+    role === "farmaceutico_clinico";
   const [isMenuOpen, setIsMenuOpen] = React.useState(!isPatientRoute);
   const [isNavMenuOpen, setIsNavMenuOpen] = React.useState(false);
 
@@ -138,6 +145,57 @@ export const ClinicalLayout = ({ children }: ClinicalLayoutProps) => {
       ];
     }
     
+    if (
+      role === "fisioterapeuta" ||
+      role === "nutricionista" ||
+      role === "psicologo" ||
+      role === "assistente_social" ||
+      role === "terapeuta_ocupacional" ||
+      role === "fonoaudiologo" ||
+      role === "farmaceutico_clinico"
+    ) {
+      const getEvolutionPath = () => {
+        switch (role) {
+          case "fisioterapeuta": return "fisioterapia";
+          case "nutricionista": return "nutricao";
+          case "psicologo": return "psicologia";
+          case "assistente_social": return "servico-social";
+          case "terapeuta_ocupacional": return "terapia-ocupacional";
+          case "fonoaudiologo": return "fonoaudiologia";
+          case "farmaceutico_clinico": return "farmacia-clinica";
+          default: return "fisioterapia";
+        }
+      };
+
+      const getRoleLabel = () => {
+        switch (role) {
+          case "fisioterapeuta": return "Fisioterapia";
+          case "nutricionista": return "Nutrição";
+          case "psicologo": return "Psicologia";
+          case "assistente_social": return "Serviço Social";
+          case "terapeuta_ocupacional": return "Terapia Ocupacional";
+          case "fonoaudiologo": return "Fonoaudiologia";
+          case "farmaceutico_clinico": return "Farmácia Clínica";
+          default: return "Evolução";
+        }
+      };
+
+      return [
+        {
+          id: "leitos",
+          icon: BedDouble,
+          label: "Gestão de Leitos",
+          path: "/leitos",
+        },
+        {
+          id: "evolucao-especialidade",
+          icon: FileText,
+          label: `Evolução - ${getRoleLabel()}`,
+          path: `/paciente/${currentPatientId}/evolucao/${getEvolutionPath()}`,
+        },
+      ];
+    }
+    
     return [
       {
         id: "painel",
@@ -190,6 +248,14 @@ export const ClinicalLayout = ({ children }: ClinicalLayoutProps) => {
     localDoctor ||
     (role === "tecnico_enfermagem" ? "TÉCNICO DE ENFERMAGEM" : 
      role === "auxiliar_enfermagem" ? "AUXILIAR DE ENFERMAGEM" : 
+     role === "fisioterapeuta" ? "FISIOTERAPEUTA" :
+     role === "nutricionista" ? "NUTRICIONISTA" :
+     role === "psicologo" ? "PSICÓLOGO(A)" :
+     role === "assistente_social" ? "ASSISTENTE SOCIAL" :
+     role === "terapeuta_ocupacional" ? "TERAPEUTA OCUPACIONAL" :
+     role === "fonoaudiologo" ? "FONOAUDIÓLOGO(A)" :
+     role === "farmaceutico_clinico" ? "FARMACÊUTICO(A) CLÍNICO(A)" :
+     role === "medico" ? "MÉDICO(A)" :
      "ENFERMAGEM");
 
   return (

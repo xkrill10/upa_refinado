@@ -27,6 +27,15 @@ const EvolucaoServicoSocial = React.lazy(() => import("./pages/EvolucaoServicoSo
 const EvolucaoTerapiaOcupacional = React.lazy(() => import("./pages/EvolucaoTerapiaOcupacional"));
 const EvolucaoFonoaudiologia = React.lazy(() => import("./pages/EvolucaoFonoaudiologia"));
 const EvolucaoFarmaciaClinica = React.lazy(() => import("./pages/EvolucaoFarmaciaClinica"));
+const PerfilFisioterapia = React.lazy(() => import("./pages/PerfilFisioterapia"));
+const PerfilNutricao = React.lazy(() => import("./pages/PerfilNutricao"));
+const PerfilPsicologia = React.lazy(() => import("./pages/PerfilPsicologia"));
+const PerfilServicoSocial = React.lazy(() => import("./pages/PerfilServicoSocial"));
+const PerfilTerapiaOcupacional = React.lazy(() => import("./pages/PerfilTerapiaOcupacional"));
+const PerfilFonoaudiologia = React.lazy(() => import("./pages/PerfilFonoaudiologia"));
+const PerfilFarmaciaClinica = React.lazy(() => import("./pages/PerfilFarmaciaClinica"));
+const PerfilEnfermagem = React.lazy(() => import("./pages/PerfilEnfermagem"));
+const PerfilMedico = React.lazy(() => import("./pages/PerfilMedico"));
 const UserManagement = React.lazy(() => import("./pages/Admin/UserManagement"));
 const AuditLogs = React.lazy(() => import("./pages/Admin/AuditLogs"));
 const BackupAdmin = React.lazy(() => import("./pages/Admin/BackupAdmin"));
@@ -103,7 +112,7 @@ export const AppRoutes = () => {
       <Route path="/paciente/:id/evolucao" element={<PatientEvolution />} />
       <Route
         path="/paciente/:id/evolucao/medica"
-        element={<EvolucaoMedica />}
+        element={<PerfilMedico />}
       />
       <Route
         path="/paciente/:id/perfil-enfermagem"
@@ -111,7 +120,7 @@ export const AppRoutes = () => {
       />
       <Route
         path="/paciente/:id/evolucao/enfermagem"
-        element={<EvolucaoEnfermagem />}
+        element={<PerfilEnfermagem />}
       />
       <Route
         path="/paciente/:id/evolucao/anotacao-enfermagem"
@@ -119,31 +128,31 @@ export const AppRoutes = () => {
       />
       <Route
         path="/paciente/:id/evolucao/fisioterapia"
-        element={<EvolucaoFisioterapia />}
+        element={<PerfilFisioterapia />}
       />
       <Route
         path="/paciente/:id/evolucao/nutricao"
-        element={<EvolucaoNutricao />}
+        element={<PerfilNutricao />}
       />
       <Route
         path="/paciente/:id/evolucao/psicologia"
-        element={<EvolucaoPsicologia />}
+        element={<PerfilPsicologia />}
       />
       <Route
         path="/paciente/:id/evolucao/servico-social"
-        element={<EvolucaoServicoSocial />}
+        element={<PerfilServicoSocial />}
       />
       <Route
         path="/paciente/:id/evolucao/terapia-ocupacional"
-        element={<EvolucaoTerapiaOcupacional />}
+        element={<PerfilTerapiaOcupacional />}
       />
       <Route
         path="/paciente/:id/evolucao/fonoaudiologia"
-        element={<EvolucaoFonoaudiologia />}
+        element={<PerfilFonoaudiologia />}
       />
       <Route
         path="/paciente/:id/evolucao/farmacia-clinica"
-        element={<EvolucaoFarmaciaClinica />}
+        element={<PerfilFarmaciaClinica />}
       />
 
       {/* Rotas Independentes do Menu Lateral Antigo */}

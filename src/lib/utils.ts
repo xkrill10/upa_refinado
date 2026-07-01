@@ -306,3 +306,29 @@ export function formatCPF(value: string) {
   if (v.length <= 9) return `${v.slice(0, 3)}.${v.slice(3, 6)}.${v.slice(6)}`;
   return `${v.slice(0, 3)}.${v.slice(3, 6)}.${v.slice(6, 9)}-${v.slice(9)}`;
 }
+
+export function getPatientProfileUrl(patientId: string, role: string) {
+  switch (role) {
+    case 'medico':
+      return `/paciente/${patientId}/evolucao/medica`;
+    case 'fisioterapeuta':
+      return `/paciente/${patientId}/evolucao/fisioterapia`;
+    case 'nutricionista':
+      return `/paciente/${patientId}/evolucao/nutricao`;
+    case 'psicologo':
+      return `/paciente/${patientId}/evolucao/psicologia`;
+    case 'assistente_social':
+      return `/paciente/${patientId}/evolucao/servico-social`;
+    case 'terapeuta_ocupacional':
+      return `/paciente/${patientId}/evolucao/terapia-ocupacional`;
+    case 'fonoaudiologo':
+      return `/paciente/${patientId}/evolucao/fonoaudiologia`;
+    case 'farmaceutico_clinico':
+      return `/paciente/${patientId}/evolucao/farmacia-clinica`;
+    case 'enfermeiro':
+    case 'tecnico_enfermagem':
+    case 'auxiliar_enfermagem':
+    default:
+      return `/paciente/${patientId}/perfil-enfermagem`;
+  }
+}

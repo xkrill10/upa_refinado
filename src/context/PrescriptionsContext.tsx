@@ -59,7 +59,7 @@ export interface PrescriptionMedication {
   executions?: Record<string, ExecutionRecord>;
   isHighVigilance?: boolean;
   isDoubleCheckRequired?: boolean;
-  category?: "medication" | "diet" | "therapy" | "nursing";
+  category?: "medication" | "diet" | "therapy" | "nursing" | "speech_therapy" | "psychology" | "social_work" | "occupational_therapy" | "clinical_pharmacy";
 }
 
 export interface PrescriptionOrder {

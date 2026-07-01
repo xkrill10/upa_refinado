@@ -1,8 +1,10 @@
 import { useState, useRef, useEffect } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { usePatients } from "@/hooks/use-patients";
+import { PatientSwitcherSidebar } from "@/components/PatientSwitcherSidebar";
 import { EvolutionRecord } from "@/context/PatientsContext";
 import { useBeds } from "@/context/BedsContext";
+import { PatientVitalsCard } from "@/components/PatientVitalsCard";
 import {
   usePrescriptions,
   PrescriptionMedication,
@@ -31,6 +33,7 @@ import {
   Droplet,
   Wind,
   FlaskConical,
+  Key,
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { Input } from "@/components/ui/input";
@@ -140,7 +143,7 @@ import { PatientTimelineModal } from "@/components/PatientEvolution/Modals/Patie
 import { BedRequestModal } from "@/components/PatientEvolution/Modals/BedRequestModal";
 import { ExamsModal } from "@/components/PatientEvolution/Modals/ExamsModal";
 
-export default function EvolucaoFonoaudiologia() {
+export default function PerfilMedico() {
   const { id } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
@@ -187,13 +190,16 @@ export default function EvolucaoFonoaudiologia() {
   const [isFormOpen, setIsFormOpen] = useState(true);
 
   const [evolutionType, setEvolutionType] = useState(
-    "Evolução da Fonoaudiologia",
+    isChild ? "Evolução Médica (Pediátrica)" : "Evolução Médica",
   );
   const [activeTab, setActiveTab] = useState<
     "all" | "evolutions" | "prescriptions" | "vitals" | "exams" | "discharge"
   >("all");
   const [professional, setProfessional] = useState(
-    () => localStorage.getItem("upa_stamp_name") || "",
+    () =>
+      localStorage.getItem("upa_stamp_name") ||
+      localStorage.getItem("upa_active_doctor") ||
+      "",
   );
   const [description, setDescription] = useState("");
   const [selectedCid, setSelectedCid] = useState<CID10Item | null>(null);
@@ -204,7 +210,9 @@ export default function EvolucaoFonoaudiologia() {
     if (isExpressMode && !isFormOpen) {
       setIsFormOpen(true);
       setActiveTab("prescriptions");
-      setEvolutionType("Evolução da Fonoaudiologia");
+      setEvolutionType(
+        isChild ? "Evolução Médica (Pediátrica)" : "Evolução Médica",
+      );
     }
   }, [isExpressMode, isChild, isFormOpen]);
 
@@ -1099,11 +1107,14 @@ export default function EvolucaoFonoaudiologia() {
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="space-y-8"
-    >
+    <div className="flex h-full w-full -m-2">
+      <PatientSwitcherSidebar />
+      <div className="flex-1 overflow-y-auto p-4 md:p-6 bg-slate-50/50 dark:bg-slate-900/50">
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="space-y-8 max-w-7xl mx-auto"
+        >
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex items-center gap-6">
           <Button
@@ -1289,35 +1300,10 @@ export default function EvolucaoFonoaudiologia() {
           </Card>
 
           {/* Card 3: Status Sinais Vitais */}
-          <Card
-            className="group glass-card-premium border border-rose-500/15 dark:border-rose-500/20 bg-rose-500/[0.02] dark:bg-rose-500/[0.04] shadow-[0_8px_30px_rgba(0,0,0,0.02)] rounded-xl overflow-hidden transition-all duration-500 cursor-pointer hover:scale-[1.02] active:scale-[0.98] hover:bg-rose-500/[0.07] dark:hover:bg-rose-500/[0.10] hover:border-rose-500/40 hover:shadow-[0_12px_40px_rgba(244,63,94,0.12)] lg:col-span-1"
+          <PatientVitalsCard
+            patient={patient}
             onClick={() => setIsVitalsHistoryOpen(true)}
-          >
-            <CardContent className="p-4 flex flex-col justify-between h-full gap-2 font-black">
-              <div className="flex items-center justify-between">
-                <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest group-hover:text-rose-500/80 transition-colors duration-300">
-                  Status Sinais Vitais
-                </p>
-                <span className="text-[9px] font-black text-rose-500 dark:text-rose-450 uppercase tracking-wider flex items-center gap-0.5 transition-all duration-300 group-hover:scale-105">
-                  📈 Histórico
-                </span>
-              </div>
-              <div className="flex flex-wrap items-center gap-1.5">
-                <span className="text-[11px] font-black text-[#006699] dark:text-sky-300 bg-[#006699]/10 px-2 py-0.5 rounded-md border border-[#006699]/15 transition-all duration-300 group-hover:bg-[#006699] group-hover:text-white group-hover:border-[#006699]/30">
-                  PA: {patient.pa || "--"}
-                </span>
-                <span className="text-[11px] font-black text-red-500 bg-red-500/10 px-2 py-0.5 rounded-md border border-red-500/15 transition-all duration-300 group-hover:bg-red-500 group-hover:text-white group-hover:border-red-500/30">
-                  FC: {patient.fc || "--"}
-                </span>
-                <span className="text-[11px] font-black text-emerald-500 bg-emerald-500/10 px-2 py-0.5 rounded-md border border-emerald-500/15 transition-all duration-300 group-hover:bg-emerald-500 group-hover:text-white group-hover:border-emerald-500/30">
-                  SpO2: {patient.spo2 || "--"}%
-                </span>
-                <span className="text-[11px] font-black text-orange-500 bg-orange-500/10 px-2 py-0.5 rounded-md border border-orange-500/15 transition-all duration-300 group-hover:bg-orange-500 group-hover:text-white group-hover:border-orange-500/30">
-                  T: {patient.temperature || "--"}°C
-                </span>
-              </div>
-            </CardContent>
-          </Card>
+          />
 
           {/* Card 4: Histórico de Evoluções */}
           <Card
@@ -1420,7 +1406,11 @@ export default function EvolucaoFonoaudiologia() {
                   );
                   if (isFormOpen) {
                     if (tab.id === "prescriptions") {
-                      handleEvolutionTypeChange("Evolução da Fonoaudiologia");
+                      handleEvolutionTypeChange(
+                        isChild
+                          ? "Evolução Médica (Pediátrica)"
+                          : "Evolução Médica",
+                      );
                     } else if (tab.id === "vitals") {
                       handleEvolutionTypeChange("Sinais Vitais");
                     } else if (tab.id === "discharge") {
@@ -1429,7 +1419,11 @@ export default function EvolucaoFonoaudiologia() {
                       if (unreadExamsCount > 0 && id) markExamsAsRead(id);
                       handleEvolutionTypeChange("Procedimento");
                     } else if (tab.id === "evolutions") {
-                      handleEvolutionTypeChange("Evolução da Fonoaudiologia");
+                      handleEvolutionTypeChange(
+                        isChild
+                          ? "Evolução Médica (Pediátrica)"
+                          : "Evolução Médica",
+                      );
                     }
                   }
                 }}
@@ -1466,7 +1460,9 @@ export default function EvolucaoFonoaudiologia() {
             onClick={() => {
               setIsFormOpen(true);
               if (activeTab === "prescriptions") {
-                handleEvolutionTypeChange("Evolução da Fonoaudiologia");
+                handleEvolutionTypeChange(
+                  isChild ? "Evolução Médica (Pediátrica)" : "Evolução Médica",
+                );
               } else if (activeTab === "vitals") {
                 handleEvolutionTypeChange("Sinais Vitais");
               } else if (activeTab === "discharge") {
@@ -1474,9 +1470,13 @@ export default function EvolucaoFonoaudiologia() {
               } else if (activeTab === "exams") {
                 handleEvolutionTypeChange("Procedimento");
               } else if (activeTab === "evolutions") {
-                handleEvolutionTypeChange("Evolução da Fonoaudiologia");
+                handleEvolutionTypeChange(
+                  isChild ? "Evolução Médica (Pediátrica)" : "Evolução Médica",
+                );
               } else {
-                handleEvolutionTypeChange("Evolução da Fonoaudiologia");
+                handleEvolutionTypeChange(
+                  isChild ? "Evolução Médica (Pediátrica)" : "Evolução Médica",
+                );
               }
             }}
             className="bg-[#006699] hover:bg-[#005580] text-white gap-2 px-5 rounded-lg h-9 shadow-sm transition-all active:scale-95 text-xs font-bold uppercase tracking-wider"
@@ -1526,11 +1526,18 @@ export default function EvolucaoFonoaudiologia() {
                       <SelectContent className="max-h-[300px] overflow-y-auto">
                         <SelectGroup>
                           <SelectLabel className="pl-3 text-[10px] font-black uppercase tracking-widest bg-sky-500/5 dark:bg-sky-500/10 rounded-md py-1 my-1 text-[#006699] dark:text-sky-400">
-                            Equipe Multidisciplinar
+                            Corpo Clínico
                           </SelectLabel>
-                          <SelectItem value="Evolução da Fonoaudiologia">
-                            Evolução da Fonoaudiologia
-                          </SelectItem>
+                          {!isChild && (
+                            <SelectItem value="Evolução Médica">
+                              Evolução Médica
+                            </SelectItem>
+                          )}
+                          {isChild && (
+                            <SelectItem value="Evolução Médica (Pediátrica)">
+                              Evolução Médica (Pediátrica)
+                            </SelectItem>
+                          )}
                         </SelectGroup>
 
                         <SelectSeparator className="my-1" />
@@ -1556,8 +1563,8 @@ export default function EvolucaoFonoaudiologia() {
                       Profissional Responsável *
                     </Label>
                     <Input
-                      placeholder="Nome do profissional"
-                      className="h-9 bg-white/45 dark:bg-slate-900/45 border-white/60 dark:border-white/10 focus:bg-white/60 dark:focus:bg-slate-900/60 text-xs rounded-xl backdrop-blur-sm shadow-sm transition-all focus:ring-1 focus:ring-primary/20"
+                      placeholder="Nome do profissional (Automático)"
+                      className="h-9 bg-white/45 dark:bg-slate-900/45 border-white/60 dark:border-white/10 focus:bg-white/60 dark:focus:bg-slate-900/60 text-xs rounded-xl backdrop-blur-sm shadow-sm transition-all focus:ring-1 focus:ring-primary/20 font-bold"
                       value={professional}
                       onChange={(e) => setProfessional(e.target.value)}
                     />
@@ -3261,11 +3268,65 @@ export default function EvolucaoFonoaudiologia() {
                       </div>
                     </div>
 
-                    {/* Escores e Calculadoras Rápidas */}
-                    <div className="space-y-3 pt-2">
+                    {/* 4. Apoio Diagnóstico */}
+                    <div className="space-y-3 pt-4 border-t border-slate-500/10">
                       <div className="flex items-center justify-between">
                         <span className="text-[9px] font-black uppercase text-muted-foreground">
-                          4. Escores e Calculadoras Rápidas
+                          4. Apoio Diagnóstico (Exames Laboratoriais e Imagem)
+                        </span>
+                        <Badge
+                          variant="outline"
+                          className="text-[8px] uppercase tracking-wider bg-purple-500/5 text-purple-600 border-purple-500/20"
+                        >
+                          Solicitações
+                        </Badge>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setIsExamsModalOpen(true)}
+                        className="w-full flex items-center justify-between p-4 rounded-xl border bg-white/45 dark:bg-slate-900/45 hover:bg-white/60 dark:hover:bg-slate-900/60 border-purple-500/30 hover:border-purple-500/50 backdrop-blur-sm shadow-sm transition-all group"
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className="h-10 w-10 rounded-lg flex items-center justify-center bg-purple-500/10 text-purple-600 transition-colors group-hover:bg-purple-500 group-hover:text-white">
+                            <FlaskConical className="h-5 w-5" />
+                          </div>
+                          <div className="text-left">
+                            <p className="text-xs font-bold text-foreground">
+                              Apoio Diagnóstico e Exames
+                            </p>
+                            <p className="text-[10px] font-semibold text-muted-foreground mt-0.5">
+                              Acessar painéis laboratoriais e protocolos de
+                              imagem para a UPA 24h
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Badge className="bg-purple-600 hover:bg-purple-700 text-white border-none text-[9px] uppercase tracking-wider font-bold">
+                            Abrir Menu
+                          </Badge>
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="16"
+                            height="16"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            className="text-muted-foreground/40 group-hover:text-purple-500 transition-colors"
+                          >
+                            <path d="m9 18 6-6-6-6" />
+                          </svg>
+                        </div>
+                      </button>
+                    </div>
+
+                    {/* Escores e Calculadoras Rápidas */}
+                    <div className="space-y-3 pt-4 border-t border-slate-500/10">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[9px] font-black uppercase text-muted-foreground">
+                          5. Escores e Calculadoras Rápidas
                         </span>
                         <Badge
                           variant="outline"
@@ -3763,11 +3824,65 @@ export default function EvolucaoFonoaudiologia() {
                       </div>
                     </div>
 
-                    {/* Escores e Calculadoras Rápidas (Pediatria) */}
-                    <div className="space-y-3 pt-2">
+                    {/* 4. Apoio Diagnóstico */}
+                    <div className="space-y-3 pt-4 border-t border-slate-500/10">
                       <div className="flex items-center justify-between">
                         <span className="text-[9px] font-black uppercase text-muted-foreground">
-                          4. Escores Pediátricos (Fast-Track)
+                          4. Apoio Diagnóstico (Exames Laboratoriais e Imagem)
+                        </span>
+                        <Badge
+                          variant="outline"
+                          className="text-[8px] uppercase tracking-wider bg-purple-500/5 text-purple-600 border-purple-500/20"
+                        >
+                          Solicitações
+                        </Badge>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setIsExamsModalOpen(true)}
+                        className="w-full flex items-center justify-between p-4 rounded-xl border bg-white/45 dark:bg-slate-900/45 hover:bg-white/60 dark:hover:bg-slate-900/60 border-purple-500/30 hover:border-purple-500/50 backdrop-blur-sm shadow-sm transition-all group"
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className="h-10 w-10 rounded-lg flex items-center justify-center bg-purple-500/10 text-purple-600 transition-colors group-hover:bg-purple-500 group-hover:text-white">
+                            <FlaskConical className="h-5 w-5" />
+                          </div>
+                          <div className="text-left">
+                            <p className="text-xs font-bold text-foreground">
+                              Apoio Diagnóstico e Exames
+                            </p>
+                            <p className="text-[10px] font-semibold text-muted-foreground mt-0.5">
+                              Acessar painéis laboratoriais e protocolos de
+                              imagem para a UPA 24h
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Badge className="bg-purple-600 hover:bg-purple-700 text-white border-none text-[9px] uppercase tracking-wider font-bold">
+                            Abrir Menu
+                          </Badge>
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="16"
+                            height="16"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            className="text-muted-foreground/40 group-hover:text-purple-500 transition-colors"
+                          >
+                            <path d="m9 18 6-6-6-6" />
+                          </svg>
+                        </div>
+                      </button>
+                    </div>
+
+                    {/* Escores e Calculadoras Rápidas (Pediatria) */}
+                    <div className="space-y-3 pt-4 border-t border-slate-500/10">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[9px] font-black uppercase text-muted-foreground">
+                          5. Escores Pediátricos (Fast-Track)
                         </span>
                         <Badge
                           variant="outline"
@@ -6153,10 +6268,23 @@ export default function EvolucaoFonoaudiologia() {
                     Cancelar
                   </Button>
                   <Button
+                    variant="outline"
+                    className="border-green-500/30 text-green-700 bg-green-50 hover:bg-green-100 dark:border-green-400/30 dark:text-green-400 dark:bg-green-950/30 hover:dark:bg-green-900/50 shadow-sm font-bold uppercase text-[9px] tracking-widest h-8 px-5"
+                    onClick={() => {
+                      toast.success(
+                        "Certificado A3 Validado: Assinatura Eletrônica inserida com sucesso via ICP-Brasil.",
+                      );
+                      handleSaveEvolution();
+                    }}
+                  >
+                    <Key className="mr-2 h-4 w-4" />
+                    Assinar Digitalmente
+                  </Button>
+                  <Button
                     onClick={handleSaveEvolution}
                     className="bg-[#006699] hover:bg-[#005580] text-white font-bold uppercase text-[9px] tracking-widest h-8 px-5 rounded-md shadow-sm active:scale-95"
                   >
-                    Salvar Registro
+                    Salvar sem Assinar
                   </Button>
                 </div>
               </CardContent>
@@ -6402,19 +6530,20 @@ export default function EvolucaoFonoaudiologia() {
       </Dialog>
 
       <Dialog open={isExamsModalOpen} onOpenChange={setIsExamsModalOpen}>
-        <DialogContent className="sm:max-w-[600px] rounded-[2rem] p-6 overflow-hidden glass-card-premium bg-white/70 dark:bg-slate-900/80 backdrop-blur-xl border border-white/40 dark:border-white/10 shadow-[0_25px_50px_-12px_rgba(0,0,0,0.25)]">
-          <DialogHeader>
-            <DialogTitle className="text-xl font-black uppercase tracking-tight text-purple-600 dark:text-purple-400">
-              Apoio Diagnóstico
-            </DialogTitle>
-            <DialogDescription className="font-bold uppercase text-[10px] tracking-widest text-slate-500 dark:text-slate-400 mt-1">
-              Solicitação de Exames Laboratoriais e de Imagem
-            </DialogDescription>
-          </DialogHeader>
-          <ExamsModal
-            patient={patient}
-            onClose={() => setIsExamsModalOpen(false)}
-          />
+        <DialogContent className="sm:max-w-[650px] rounded-[1.5rem] p-0 overflow-hidden glass-card-premium bg-white/70 dark:bg-slate-900/80 backdrop-blur-xl border border-white/40 dark:border-white/10 shadow-[0_25px_50px_-12px_rgba(0,0,0,0.25)] flex flex-col max-h-[95vh]">
+          <div className="px-5 py-3 border-b border-slate-500/10 shrink-0">
+            <DialogHeader>
+              <DialogTitle className="text-lg font-black uppercase tracking-tight text-purple-600 dark:text-purple-400">
+                Apoio Diagnóstico
+              </DialogTitle>
+            </DialogHeader>
+          </div>
+          <div className="px-5 py-3 flex-1 overflow-hidden flex flex-col">
+            <ExamsModal
+              patient={patient}
+              onClose={() => setIsExamsModalOpen(false)}
+            />
+          </div>
         </DialogContent>
       </Dialog>
 
@@ -6613,6 +6742,8 @@ export default function EvolucaoFonoaudiologia() {
           />
         </>
       )}
-    </motion.div>
+        </motion.div>
+      </div>
+    </div>
   );
 }

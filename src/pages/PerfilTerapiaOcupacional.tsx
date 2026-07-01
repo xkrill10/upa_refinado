@@ -1,3 +1,4 @@
+import { TherapeuticPlan } from "@/components/PatientEvolution/TherapeuticPlan";
 import { useState, useRef, useEffect } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { usePatients } from "@/hooks/use-patients";
@@ -31,6 +32,7 @@ import {
   Droplet,
   Wind,
   FlaskConical,
+  Puzzle,
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { Input } from "@/components/ui/input";
@@ -140,7 +142,7 @@ import { PatientTimelineModal } from "@/components/PatientEvolution/Modals/Patie
 import { BedRequestModal } from "@/components/PatientEvolution/Modals/BedRequestModal";
 import { ExamsModal } from "@/components/PatientEvolution/Modals/ExamsModal";
 
-export default function EvolucaoFonoaudiologia() {
+export default function EvolucaoTerapiaOcupacional() {
   const { id } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
@@ -187,7 +189,7 @@ export default function EvolucaoFonoaudiologia() {
   const [isFormOpen, setIsFormOpen] = useState(true);
 
   const [evolutionType, setEvolutionType] = useState(
-    "Evolução da Fonoaudiologia",
+    "Evolução da Terapia Ocupacional",
   );
   const [activeTab, setActiveTab] = useState<
     "all" | "evolutions" | "prescriptions" | "vitals" | "exams" | "discharge"
@@ -204,7 +206,7 @@ export default function EvolucaoFonoaudiologia() {
     if (isExpressMode && !isFormOpen) {
       setIsFormOpen(true);
       setActiveTab("prescriptions");
-      setEvolutionType("Evolução da Fonoaudiologia");
+      setEvolutionType("Evolução da Terapia Ocupacional");
     }
   }, [isExpressMode, isChild, isFormOpen]);
 
@@ -1362,11 +1364,7 @@ export default function EvolucaoFonoaudiologia() {
               label: "Histórico Geral",
               icon: <History className="h-3.5 w-3.5" />,
             },
-            {
-              id: "vitals",
-              label: "Sinais Vitais",
-              icon: <Activity className="h-3.5 w-3.5" />,
-            },
+            
             {
               id: "evolutions",
               label: "Evoluções",
@@ -1374,23 +1372,8 @@ export default function EvolucaoFonoaudiologia() {
             },
             {
               id: "prescriptions",
-              label: "Prescrições",
-              icon: (
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="14"
-                  height="14"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z" />
-                  <path d="m8.5 8.5 7 7" />
-                </svg>
-              ),
+              label: "Plano Terapêutico",
+              icon: <Puzzle className="h-3.5 w-3.5" />,
             },
             {
               id: "exams",
@@ -1398,11 +1381,7 @@ export default function EvolucaoFonoaudiologia() {
               icon: <Search className="h-3.5 w-3.5" />,
               badge: unreadExamsCount,
             },
-            {
-              id: "discharge",
-              label: "Alta & Desfecho",
-              icon: <CheckCircle2 className="h-3.5 w-3.5" />,
-            },
+            
           ].map((tab) => {
             const isActive = activeTab === tab.id;
             return (
@@ -1418,10 +1397,10 @@ export default function EvolucaoFonoaudiologia() {
                       | "exams"
                       | "discharge",
                   );
-                  if (isFormOpen) {
-                    if (tab.id === "prescriptions") {
-                      handleEvolutionTypeChange("Evolução da Fonoaudiologia");
-                    } else if (tab.id === "vitals") {
+                  if (tab.id === "prescriptions") {
+                    setIsFormOpen(false);
+                  } else if (isFormOpen) {
+                    if (tab.id === "vitals") {
                       handleEvolutionTypeChange("Sinais Vitais");
                     } else if (tab.id === "discharge") {
                       handleEvolutionTypeChange("Alta");
@@ -1429,7 +1408,7 @@ export default function EvolucaoFonoaudiologia() {
                       if (unreadExamsCount > 0 && id) markExamsAsRead(id);
                       handleEvolutionTypeChange("Procedimento");
                     } else if (tab.id === "evolutions") {
-                      handleEvolutionTypeChange("Evolução da Fonoaudiologia");
+                      // fallback for others
                     }
                   }
                 }}
@@ -1466,7 +1445,7 @@ export default function EvolucaoFonoaudiologia() {
             onClick={() => {
               setIsFormOpen(true);
               if (activeTab === "prescriptions") {
-                handleEvolutionTypeChange("Evolução da Fonoaudiologia");
+                handleEvolutionTypeChange("Evolução da Terapia Ocupacional");
               } else if (activeTab === "vitals") {
                 handleEvolutionTypeChange("Sinais Vitais");
               } else if (activeTab === "discharge") {
@@ -1474,9 +1453,9 @@ export default function EvolucaoFonoaudiologia() {
               } else if (activeTab === "exams") {
                 handleEvolutionTypeChange("Procedimento");
               } else if (activeTab === "evolutions") {
-                handleEvolutionTypeChange("Evolução da Fonoaudiologia");
+                handleEvolutionTypeChange("Evolução da Terapia Ocupacional");
               } else {
-                handleEvolutionTypeChange("Evolução da Fonoaudiologia");
+                handleEvolutionTypeChange("Evolução da Terapia Ocupacional");
               }
             }}
             className="bg-[#006699] hover:bg-[#005580] text-white gap-2 px-5 rounded-lg h-9 shadow-sm transition-all active:scale-95 text-xs font-bold uppercase tracking-wider"
@@ -1528,8 +1507,8 @@ export default function EvolucaoFonoaudiologia() {
                           <SelectLabel className="pl-3 text-[10px] font-black uppercase tracking-widest bg-sky-500/5 dark:bg-sky-500/10 rounded-md py-1 my-1 text-[#006699] dark:text-sky-400">
                             Equipe Multidisciplinar
                           </SelectLabel>
-                          <SelectItem value="Evolução da Fonoaudiologia">
-                            Evolução da Fonoaudiologia
+                          <SelectItem value="Evolução da Terapia Ocupacional">
+                            Evolução da Terapia Ocupacional
                           </SelectItem>
                         </SelectGroup>
 
@@ -1539,13 +1518,11 @@ export default function EvolucaoFonoaudiologia() {
                           <SelectLabel className="pl-3 text-[10px] font-black uppercase tracking-widest bg-sky-500/5 dark:bg-sky-500/10 rounded-md py-1 my-1 text-[#006699] dark:text-sky-400">
                             Condutas e Registros
                           </SelectLabel>
-                          <SelectItem value="Sinais Vitais">
-                            Sinais Vitais
-                          </SelectItem>
+                          
                           <SelectItem value="Procedimento">
                             Procedimento
                           </SelectItem>
-                          <SelectItem value="Alta">Alta</SelectItem>
+                          
                         </SelectGroup>
                       </SelectContent>
                     </Select>
@@ -6170,7 +6147,11 @@ export default function EvolucaoFonoaudiologia() {
           Linha do Tempo de Atendimento
         </h2>
 
-        {filteredEvolutions.length === 0 &&
+        {activeTab === "prescriptions" ? (
+          <div className="space-y-6">
+            <TherapeuticPlan patientId={id || ""} />
+          </div>
+        ) : filteredEvolutions.length === 0 &&
         !(patient?.exams && patient.exams.length > 0) ? (
           <Card className="glass-card-premium border border-white/40 dark:border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.06)] rounded-xl overflow-hidden transition-all duration-500">
             <CardContent className="h-36 flex items-center justify-center bg-muted/5">

@@ -66,5 +66,24 @@ export const CARE_LIBRARY: LibraryItem[] = [
   { name: "👶 Pesar fraldas (Balanço Hídrico)", category: "nursing", dosage: "-", route: "-", frequency: "A cada troca" },
   { name: "👶 Controle Rigoroso de Temperatura", category: "nursing", dosage: "-", route: "-", frequency: "2/2h" },
   { name: "👶 Permitir acompanhante", category: "nursing", dosage: "-", route: "-", frequency: "Tempo integral" },
-  { name: "👶 Inalação / O2 Terapia", category: "therapy", dosage: "Conforme protocolo", route: "Inalatória", frequency: "S/N" }
+  { name: "👶 Inalação / O2 Terapia", category: "therapy", dosage: "Conforme protocolo", route: "Inalatória", frequency: "S/N" },
+
+  // SPEECH THERAPY
+  { name: "Restrição de Consistência (Dieta Pastosa)", category: "speech_therapy", dosage: "-", route: "Via Oral", frequency: "Durante refeições" },
+  { name: "Exercícios Vocais/Fonoarticulares", category: "speech_therapy", dosage: "1 Sessão", route: "Leito", frequency: "1x ao dia" },
+
+  // PSYCHOLOGY
+  { name: "Avaliação Psicológica", category: "psychology", dosage: "1 Sessão", route: "Leito", frequency: "Diário" },
+  { name: "Acolhimento Familiar", category: "psychology", dosage: "-", route: "-", frequency: "S/N" },
+
+  // SOCIAL WORK
+  { name: "Entrevista Social", category: "social_work", dosage: "-", route: "-", frequency: "1x ao dia" },
+  { name: "Organização de Transferência", category: "social_work", dosage: "-", route: "-", frequency: "Agora" },
+
+  // OCCUPATIONAL THERAPY
+  { name: "Terapia de Reabilitação Ocupacional", category: "occupational_therapy", dosage: "1 Sessão", route: "Leito", frequency: "1x ao dia" },
+
+  // CLINICAL PHARMACY
+  { name: "Reconciliação Medicamentosa", category: "clinical_pharmacy", dosage: "-", route: "-", frequency: "Na admissão/alta" },
+  { name: "Checagem de Interações", category: "clinical_pharmacy", dosage: "-", route: "-", frequency: "Diário" }
 ];

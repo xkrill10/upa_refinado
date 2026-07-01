@@ -6,11 +6,12 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { PrescriptionMedication, AprazamentoHour } from "@/context/PrescriptionsContext";
-import { Activity, Pill, Stethoscope, Utensils, ShieldAlert, CalendarIcon, Trash2, CheckCircle2, X } from "lucide-react";
+import { Activity, Pill, Stethoscope, Utensils, ShieldAlert, CalendarIcon, Trash2, CheckCircle2, X, Brain, Users, Puzzle, MessageCircle } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { CARE_LIBRARY } from "@/data/careLibrary";
 import { usePatients } from "@/hooks/use-patients";
+import { useRole } from "@/context/RoleContext";
 import { AlertTriangle } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
@@ -25,10 +26,30 @@ interface AddCareItemModalProps {
 
 export function AddCareItemModal({ patientId, isOpen, onClose, onAdd }: AddCareItemModalProps) {
   const { patients } = usePatients();
+  const { role } = useRole();
   const patient = patientId ? patients.find((p) => p.id === patientId) : null;
+  const isDoctor = role === "medico";
+
+  const getLockedCategory = (): "medication" | "diet" | "therapy" | "nursing" | "speech_therapy" | "psychology" | "social_work" | "occupational_therapy" | "clinical_pharmacy" => {
+    switch (role) {
+      case "fisioterapeuta": return "therapy";
+      case "nutricionista": return "diet";
+      case "fonoaudiologo": return "speech_therapy";
+      case "psicologo": return "psychology";
+      case "assistente_social": return "social_work";
+      case "terapeuta_ocupacional": return "occupational_therapy";
+      case "farmaceutico_clinico": return "clinical_pharmacy";
+      case "enfermeiro":
+      case "tecnico_enfermagem":
+      case "auxiliar_enfermagem":
+        return "nursing";
+      default: return "medication";
+    }
+  };
+
   const allergiesText = patient?.allergies?.toLowerCase() || "";
   const [medication, setMedication] = useState("");
-  const [category, setCategory] = useState<"medication" | "diet" | "therapy" | "nursing">("medication");
+  const [category, setCategory] = useState<"medication" | "diet" | "therapy" | "nursing" | "speech_therapy" | "psychology" | "social_work" | "occupational_therapy" | "clinical_pharmacy">("medication");
   const [dosage, setDosage] = useState("");
   const [route, setRoute] = useState("");
   const [frequency, setFrequency] = useState("");
@@ -46,7 +67,7 @@ export function AddCareItemModal({ patientId, isOpen, onClose, onAdd }: AddCareI
   useEffect(() => {
     if (isOpen) {
       setMedication("");
-      setCategory("medication");
+      setCategory(isDoctor ? "medication" : getLockedCategory());
       setDosage("");
       setRoute("");
       setFrequency("");
@@ -198,25 +219,54 @@ export function AddCareItemModal({ patientId, isOpen, onClose, onAdd }: AddCareI
             {/* Tipo / Categoria */}
             <div className="space-y-1.5">
               <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Tipo / Categoria</Label>
-              <Select value={category} onValueChange={(val: any) => setCategory(val)}>
-                <SelectTrigger className="bg-background/50 border-border/50 rounded-xl h-10 font-bold">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent className="glass-card rounded-xl">
-                  <SelectItem value="medication">
-                    <div className="flex items-center gap-2"><Pill className="h-4 w-4 text-purple-500" /> Medicamento / Infusão</div>
-                  </SelectItem>
-                  <SelectItem value="diet">
-                    <div className="flex items-center gap-2"><Utensils className="h-4 w-4 text-orange-500" /> Dieta / Refeição</div>
-                  </SelectItem>
-                  <SelectItem value="therapy">
-                    <div className="flex items-center gap-2"><Activity className="h-4 w-4 text-emerald-500" /> Terapia / Fisioterapia</div>
-                  </SelectItem>
-                  <SelectItem value="nursing">
-                    <div className="flex items-center gap-2"><Stethoscope className="h-4 w-4 text-[#006699]" /> Cuidado de Enfermagem</div>
-                  </SelectItem>
-                </SelectContent>
-              </Select>
+              {isDoctor ? (
+                <Select value={category} onValueChange={(val: any) => setCategory(val)}>
+                  <SelectTrigger className="bg-background/50 border-border/50 rounded-xl h-10 font-bold">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="glass-card rounded-xl">
+                    <SelectItem value="medication">
+                      <div className="flex items-center gap-2"><Pill className="h-4 w-4 text-purple-500" /> Medicamento / Infusão</div>
+                    </SelectItem>
+                    <SelectItem value="diet">
+                      <div className="flex items-center gap-2"><Utensils className="h-4 w-4 text-orange-500" /> Dieta / Refeição</div>
+                    </SelectItem>
+                    <SelectItem value="therapy">
+                      <div className="flex items-center gap-2"><Activity className="h-4 w-4 text-emerald-500" /> Terapia / Fisioterapia</div>
+                    </SelectItem>
+                    <SelectItem value="nursing">
+                      <div className="flex items-center gap-2"><Stethoscope className="h-4 w-4 text-[#006699]" /> Cuidado de Enfermagem</div>
+                    </SelectItem>
+                    <SelectItem value="speech_therapy">
+                      <div className="flex items-center gap-2"><MessageCircle className="h-4 w-4 text-pink-500" /> Cuidado Fonoaudiológico</div>
+                    </SelectItem>
+                    <SelectItem value="psychology">
+                      <div className="flex items-center gap-2"><Brain className="h-4 w-4 text-violet-500" /> Acompanhamento Psicológico</div>
+                    </SelectItem>
+                    <SelectItem value="social_work">
+                      <div className="flex items-center gap-2"><Users className="h-4 w-4 text-amber-500" /> Ação Serviço Social</div>
+                    </SelectItem>
+                    <SelectItem value="occupational_therapy">
+                      <div className="flex items-center gap-2"><Puzzle className="h-4 w-4 text-teal-500" /> Terapia Ocupacional</div>
+                    </SelectItem>
+                    <SelectItem value="clinical_pharmacy">
+                      <div className="flex items-center gap-2"><Pill className="h-4 w-4 text-red-500" /> Intervenção Farmacêutica</div>
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              ) : (
+                <div className="bg-background/50 border border-border/50 rounded-xl h-10 px-3 flex items-center font-bold text-sm opacity-90 cursor-not-allowed">
+                  {category === "diet" && <div className="flex items-center gap-2"><Utensils className="h-4 w-4 text-orange-500" /> Dieta / Refeição</div>}
+                  {category === "therapy" && <div className="flex items-center gap-2"><Activity className="h-4 w-4 text-emerald-500" /> Terapia / Fisioterapia</div>}
+                  {category === "nursing" && <div className="flex items-center gap-2"><Stethoscope className="h-4 w-4 text-[#006699]" /> Cuidado de Enfermagem</div>}
+                  {category === "speech_therapy" && <div className="flex items-center gap-2"><MessageCircle className="h-4 w-4 text-pink-500" /> Cuidado Fonoaudiológico</div>}
+                  {category === "psychology" && <div className="flex items-center gap-2"><Brain className="h-4 w-4 text-violet-500" /> Acompanhamento Psicológico</div>}
+                  {category === "social_work" && <div className="flex items-center gap-2"><Users className="h-4 w-4 text-amber-500" /> Ação Serviço Social</div>}
+                  {category === "occupational_therapy" && <div className="flex items-center gap-2"><Puzzle className="h-4 w-4 text-teal-500" /> Terapia Ocupacional</div>}
+                  {category === "clinical_pharmacy" && <div className="flex items-center gap-2"><Pill className="h-4 w-4 text-red-500" /> Intervenção Farmacêutica</div>}
+                  {category === "medication" && <div className="flex items-center gap-2"><Pill className="h-4 w-4 text-purple-500" /> Medicamento / Infusão</div>}
+                </div>
+              )}
             </div>
 
             {/* Nome do Item com Biblioteca */}
