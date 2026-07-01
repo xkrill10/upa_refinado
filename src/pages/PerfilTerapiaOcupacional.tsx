@@ -1370,11 +1370,7 @@ export default function EvolucaoTerapiaOcupacional() {
               label: "Evoluções",
               icon: <MessageSquare className="h-3.5 w-3.5" />,
             },
-            {
-              id: "prescriptions",
-              label: "Plano Terapêutico",
-              icon: <Puzzle className="h-3.5 w-3.5" />,
-            },
+
             {
               id: "exams",
               label: "Exames & Procedimentos",

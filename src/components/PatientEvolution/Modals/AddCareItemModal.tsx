@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { PrescriptionMedication, AprazamentoHour } from "@/context/PrescriptionsContext";
-import { Activity, Pill, Stethoscope, Utensils, ShieldAlert, CalendarIcon, Trash2, CheckCircle2, X, Brain, Users, Puzzle, MessageCircle } from "lucide-react";
+import { Activity, Pill, Stethoscope, Utensils, ShieldAlert, CalendarIcon, Trash2, CheckCircle2, X, Brain, Users, Puzzle, MessageCircle, HeartPulse, Ear, Accessibility } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { CARE_LIBRARY } from "@/data/careLibrary";
@@ -47,6 +47,21 @@ export function AddCareItemModal({ patientId, isOpen, onClose, onAdd }: AddCareI
     }
   };
 
+  const getCategoryTheme = (cat: string) => {
+    switch (cat) {
+      case "diet": return { bg: "bg-orange-500/15 dark:bg-orange-500/20", border: "border-orange-500/40", text: "text-orange-700 dark:text-orange-300", icon: <Utensils className="h-4 w-4 text-orange-600 dark:text-orange-400" />, label: "Dieta / Refeição", placeholder: "Ex: Dieta Branda, Jejum..." };
+      case "therapy": return { bg: "bg-emerald-500/15 dark:bg-emerald-500/20", border: "border-emerald-500/40", text: "text-emerald-700 dark:text-emerald-300", icon: <Accessibility className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />, label: "Terapia / Fisioterapia", placeholder: "Ex: Exercício Respiratório, Deambulação..." };
+      case "nursing": return { bg: "bg-blue-500/15 dark:bg-blue-500/20", border: "border-blue-500/40", text: "text-blue-700 dark:text-blue-300", icon: <HeartPulse className="h-4 w-4 text-blue-600 dark:text-blue-400" />, label: "Cuidado de Enfermagem", placeholder: "Ex: Aferir Sinais Vitais, Curativo..." };
+      case "speech_therapy": return { bg: "bg-pink-500/15 dark:bg-pink-500/20", border: "border-pink-500/40", text: "text-pink-700 dark:text-pink-300", icon: <Ear className="h-4 w-4 text-pink-600 dark:text-pink-400" />, label: "Cuidado Fonoaudiológico", placeholder: "Ex: Avaliação de Deglutição..." };
+      case "psychology": return { bg: "bg-violet-500/15 dark:bg-violet-500/20", border: "border-violet-500/40", text: "text-violet-700 dark:text-violet-300", icon: <Brain className="h-4 w-4 text-violet-600 dark:text-violet-400" />, label: "Acompanhamento Psicológico", placeholder: "Ex: Acompanhamento Psicológico..." };
+      case "social_work": return { bg: "bg-amber-500/15 dark:bg-amber-500/20", border: "border-amber-500/40", text: "text-amber-700 dark:text-amber-300", icon: <Users className="h-4 w-4 text-amber-600 dark:text-amber-400" />, label: "Ação Serviço Social", placeholder: "Ex: Avaliação Socioeconômica..." };
+      case "occupational_therapy": return { bg: "bg-teal-500/15 dark:bg-teal-500/20", border: "border-teal-500/40", text: "text-teal-700 dark:text-teal-300", icon: <Puzzle className="h-4 w-4 text-teal-600 dark:text-teal-400" />, label: "Terapia Ocupacional", placeholder: "Ex: Estímulo Sensorial..." };
+      case "clinical_pharmacy": return { bg: "bg-red-500/15 dark:bg-red-500/20", border: "border-red-500/40", text: "text-red-700 dark:text-red-300", icon: <Pill className="h-4 w-4 text-red-600 dark:text-red-400" />, label: "Intervenção Farmacêutica", placeholder: "Ex: Ajuste de Dose..." };
+      case "medication": return { bg: "bg-purple-500/15 dark:bg-purple-500/20", border: "border-purple-500/40", text: "text-purple-700 dark:text-purple-300", icon: <Pill className="h-4 w-4 text-purple-600 dark:text-purple-400" />, label: "Medicamento / Infusão", placeholder: "Ex: Dipirona, Paracetamol..." };
+      default: return { bg: "bg-slate-500/15", border: "border-slate-500/40", text: "text-slate-700", icon: <Activity className="h-4 w-4" />, label: "Geral", placeholder: "Ex: Novo item..." };
+    }
+  };
+
   const allergiesText = patient?.allergies?.toLowerCase() || "";
   const [medication, setMedication] = useState("");
   const [category, setCategory] = useState<"medication" | "diet" | "therapy" | "nursing" | "speech_therapy" | "psychology" | "social_work" | "occupational_therapy" | "clinical_pharmacy">("medication");
@@ -80,7 +95,7 @@ export function AddCareItemModal({ patientId, isOpen, onClose, onAdd }: AddCareI
       setShowSuggestions(false);
       setShowClearConfirm(false);
     }
-  }, [isOpen]);
+  }, [isOpen, isDoctor]);
 
   const isAllergic = medication.length > 2 && allergiesText.includes(medication.toLowerCase());
 
@@ -94,7 +109,7 @@ export function AddCareItemModal({ patientId, isOpen, onClose, onAdd }: AddCareI
     setHoursStr("");
     setShowSuggestions(false);
     setRequiresDoubleCheck(false);
-  }, [category]);
+  }, [category, isDoctor]);
 
   const isChild = !!(patient && patient.age < 12);
 
@@ -225,47 +240,30 @@ export function AddCareItemModal({ patientId, isOpen, onClose, onAdd }: AddCareI
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent className="glass-card rounded-xl">
-                    <SelectItem value="medication">
-                      <div className="flex items-center gap-2"><Pill className="h-4 w-4 text-purple-500" /> Medicamento / Infusão</div>
-                    </SelectItem>
-                    <SelectItem value="diet">
-                      <div className="flex items-center gap-2"><Utensils className="h-4 w-4 text-orange-500" /> Dieta / Refeição</div>
-                    </SelectItem>
-                    <SelectItem value="therapy">
-                      <div className="flex items-center gap-2"><Activity className="h-4 w-4 text-emerald-500" /> Terapia / Fisioterapia</div>
-                    </SelectItem>
-                    <SelectItem value="nursing">
-                      <div className="flex items-center gap-2"><Stethoscope className="h-4 w-4 text-[#006699]" /> Cuidado de Enfermagem</div>
-                    </SelectItem>
-                    <SelectItem value="speech_therapy">
-                      <div className="flex items-center gap-2"><MessageCircle className="h-4 w-4 text-pink-500" /> Cuidado Fonoaudiológico</div>
-                    </SelectItem>
-                    <SelectItem value="psychology">
-                      <div className="flex items-center gap-2"><Brain className="h-4 w-4 text-violet-500" /> Acompanhamento Psicológico</div>
-                    </SelectItem>
-                    <SelectItem value="social_work">
-                      <div className="flex items-center gap-2"><Users className="h-4 w-4 text-amber-500" /> Ação Serviço Social</div>
-                    </SelectItem>
-                    <SelectItem value="occupational_therapy">
-                      <div className="flex items-center gap-2"><Puzzle className="h-4 w-4 text-teal-500" /> Terapia Ocupacional</div>
-                    </SelectItem>
-                    <SelectItem value="clinical_pharmacy">
-                      <div className="flex items-center gap-2"><Pill className="h-4 w-4 text-red-500" /> Intervenção Farmacêutica</div>
-                    </SelectItem>
+                    {["medication", "diet", "therapy", "nursing", "speech_therapy", "psychology", "social_work", "occupational_therapy", "clinical_pharmacy"].map((cat) => {
+                      const theme = getCategoryTheme(cat);
+                      return (
+                        <SelectItem key={cat} value={cat}>
+                          <div className="flex items-center gap-2 font-bold text-sm text-foreground">
+                            {theme.icon} {theme.label}
+                          </div>
+                        </SelectItem>
+                      );
+                    })}
                   </SelectContent>
                 </Select>
               ) : (
-                <div className="bg-background/50 border border-border/50 rounded-xl h-10 px-3 flex items-center font-bold text-sm opacity-90 cursor-not-allowed">
-                  {category === "diet" && <div className="flex items-center gap-2"><Utensils className="h-4 w-4 text-orange-500" /> Dieta / Refeição</div>}
-                  {category === "therapy" && <div className="flex items-center gap-2"><Activity className="h-4 w-4 text-emerald-500" /> Terapia / Fisioterapia</div>}
-                  {category === "nursing" && <div className="flex items-center gap-2"><Stethoscope className="h-4 w-4 text-[#006699]" /> Cuidado de Enfermagem</div>}
-                  {category === "speech_therapy" && <div className="flex items-center gap-2"><MessageCircle className="h-4 w-4 text-pink-500" /> Cuidado Fonoaudiológico</div>}
-                  {category === "psychology" && <div className="flex items-center gap-2"><Brain className="h-4 w-4 text-violet-500" /> Acompanhamento Psicológico</div>}
-                  {category === "social_work" && <div className="flex items-center gap-2"><Users className="h-4 w-4 text-amber-500" /> Ação Serviço Social</div>}
-                  {category === "occupational_therapy" && <div className="flex items-center gap-2"><Puzzle className="h-4 w-4 text-teal-500" /> Terapia Ocupacional</div>}
-                  {category === "clinical_pharmacy" && <div className="flex items-center gap-2"><Pill className="h-4 w-4 text-red-500" /> Intervenção Farmacêutica</div>}
-                  {category === "medication" && <div className="flex items-center gap-2"><Pill className="h-4 w-4 text-purple-500" /> Medicamento / Infusão</div>}
-                </div>
+                (() => {
+                  const theme = getCategoryTheme(category);
+                  return (
+                    <div className={`border rounded-xl h-10 px-3 flex items-center font-black text-[11px] uppercase tracking-widest shadow-sm relative overflow-hidden group ${theme.bg} ${theme.border} ${theme.text}`}>
+                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 dark:via-white/5 to-transparent -translate-x-full animate-[shimmer_2s_infinite]" />
+                      <div className="flex items-center gap-2 relative z-10">
+                        {theme.icon} {theme.label}
+                      </div>
+                    </div>
+                  );
+                })()
               )}
             </div>
 
@@ -275,13 +273,14 @@ export function AddCareItemModal({ patientId, isOpen, onClose, onAdd }: AddCareI
               <div className="relative">
                 <Input 
                   className="bg-background/50 border-border/50 rounded-xl h-9 font-bold text-xs pr-8" 
-                  placeholder="Ex: Dipirona..."
+                  placeholder={getCategoryTheme(category).placeholder}
                   value={medication}
                   onChange={e => {
                     setMedication(e.target.value);
                     setShowSuggestions(true);
                   }}
                   onFocus={() => setShowSuggestions(true)}
+                  onClick={() => setShowSuggestions(true)}
                   onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
                 />
                 {medication && (

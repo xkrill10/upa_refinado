@@ -1367,11 +1367,7 @@ export default function EvolucaoPsicologia() {
               label: "Evoluções",
               icon: <MessageSquare className="h-3.5 w-3.5" />,
             },
-            {
-              id: "prescriptions",
-              label: "Plano Terapêutico",
-              icon: <Brain className="h-3.5 w-3.5" />,
-            },
+
             {
               id: "exams",
               label: "Exames & Procedimentos",

@@ -1370,11 +1370,7 @@ export default function EvolucaoServicoSocial() {
               label: "Evoluções",
               icon: <MessageSquare className="h-3.5 w-3.5" />,
             },
-            {
-              id: "prescriptions",
-              label: "Plano Terapêutico",
-              icon: <HeartHandshake className="h-3.5 w-3.5" />,
-            },
+
             {
               id: "exams",
               label: "Exames & Procedimentos",
